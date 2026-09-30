@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import argparse
 import re
+import shlex
 import sys
 from pathlib import Path
 
@@ -23,6 +24,7 @@ SYSTEM_GB = 16
 DATA_GB_DEFAULT = 60  # WORM da 50 GB + margine; si ridimensiona dopo la misura dei volumi
 STORAGE_NAME = re.compile(r"^[A-Za-z][A-Za-z0-9_.-]*$")
 BRIDGE_NAME = re.compile(r"^vmbr[0-9]+$")
+ISO_VOLUME = re.compile(r"^[A-Za-z][A-Za-z0-9_.-]*:iso/[A-Za-z0-9_.+-]+\.iso$")
 
 
 def _flag(value: str, name: str) -> bool:
@@ -34,7 +36,9 @@ def _flag(value: str, name: str) -> bool:
     raise adsparams.ParamsError(f"{name}: atteso true o false, trovato {value!r}")
 
 
-def build_command(params: adsparams.Params, data_gb: int) -> tuple[list[str], list[str]]:
+def build_command(
+    params: adsparams.Params, data_gb: int, iso: str | None = None
+) -> tuple[list[str], list[str]]:
     """Restituisce le parti del comando e gli avvisi da mostrare prima di eseguirlo."""
     warnings: list[str] = []
     pve = str(adsparams.require(params, "proxmox.pve_version"))
@@ -54,6 +58,10 @@ def build_command(params: adsparams.Params, data_gb: int) -> tuple[list[str], li
         raise adsparams.ParamsError(f"proxmox.vlan_server: atteso 1-4094, trovato {vlan!r}")
     if not 1 <= data_gb <= 4096:
         raise adsparams.ParamsError(f"--dati-gb: valore fuori intervallo {data_gb}")
+    if iso is not None and not ISO_VOLUME.match(iso):
+        raise adsparams.ParamsError(f"--iso: atteso <storage>:iso/<file>.iso, trovato {iso!r}")
+    if iso is None:
+        warnings.append("nessuna --iso: la VM nasce senza supporto di installazione")
 
     major = pve.split(".", 1)[0].strip()
     if major == "8":
@@ -113,6 +121,9 @@ def build_command(params: adsparams.Params, data_gb: int) -> tuple[list[str], li
         "--tablet",
         "0",
     ]
+    if iso is not None:
+        # Primo avvio: scsi0 è vuoto e OVMF passa al CD; a installazione finita parte dal disco.
+        parts += ["--ide2", f"{iso},media=cdrom", "--boot", "order=scsi0;ide2"]
     return parts, warnings
 
 
@@ -125,16 +136,18 @@ def main(argv: list[str] | None = None) -> int:
         default=DATA_GB_DEFAULT,
         help=f"dimensione di scsi1 in GB (default {DATA_GB_DEFAULT})",
     )
+    parser.add_argument("--iso", help="ISO di installazione, per esempio local:iso/<file>.iso")
     args = parser.parse_args(argv)
     try:
         params = adsparams.load(args.parametri)
-        parts, warnings = build_command(params, args.dati_gb)
+        parts, warnings = build_command(params, args.dati_gb, args.iso)
     except adsparams.ParamsError as exc:
         print(f"errore: {exc}", file=sys.stderr)
         return 1
     for line in warnings:
         print(f"avviso: {line}", file=sys.stderr)
-    print(" ".join(parts))
+    # shlex.join mette tra apici ciò che la shell dell'host interpreterebbe, come il ; di --boot.
+    print(shlex.join(parts))
     return 0
 
 

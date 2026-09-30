@@ -34,8 +34,10 @@ ruff.toml, .gitattributes         lint Python, LF su script e configurazioni
 Definition of done:
 
 - [x] codice e configurazioni scritti, lint e test verdi (38 pytest, 14 bats su Windows e Linux, verifica in container `debian:trixie`)
-- [ ] `config/parametri.yaml` compilato: dal 2026-09-30 contiene i valori Proxmox ricavati dallo snapshot di network-design, VMID 210 e FQDN `ads-collector.int.intrawelt.com` confermati, i due amministratori non MSP (ADR-007); manca l'indirizzo del collettore, proposto nella serie dei server, fuori dal pool DHCP e non visto negli snapshot, da confermare e da verificare libero prima dell'assegnazione
-- [ ] VM creata sull'host con il comando stampato da `ads-vm-command.py`, dopo conferma esplicita
+- [x] `config/parametri.yaml` compilato il 2026-09-30: valori Proxmox dallo snapshot di network-design, VMID 210, FQDN, indirizzo del collettore nella serie dei server confermato dall'utente, due amministratori (ADR-007, ADR-008); indirizzo verificato libero il 2026-09-30 dalla postazione di Alessio Sopranzi (ping senza risposta, vicino `Unreachable` con indirizzo fisico nullo)
+- [x] PKI emessa il 2026-09-30 in `%USERPROFILE%ds-pki\` sulla postazione di Alessio Sopranzi; pacchetto per il collettore in `build/pacchetto/`, provato con `--prova`
+- [ ] netinst `debian-13.7.0-amd64-netinst.iso` scaricata in `local` e verificata con SHA-512
+- [ ] VM creata sull'host con il comando stampato da `ads-vm-command.py --iso`, dopo conferma esplicita
 - [ ] Debian installata, `scsi1` montato su `/srv/ads` con `nodev,nosuid,noexec`, chiavi pubbliche dei due amministratori raccolte, `ads-bootstrap.sh` eseguito dalla console di Proxmox, password locali impostate
 - [ ] collaudo punti 1, 2 e 7 della sezione 6 dell'handoff sul collettore vero
 
@@ -54,7 +56,7 @@ Domande aperte:
 
 La rete attuale smentisce due presupposti dell'handoff: nessun bridge di Proxmox è VLAN-aware e la LAN è un'unica rete, non una LAN più una VLAN server (scheda `design-and-security.md` di `D:/network-design`). Il codice ne tiene conto rendendo facoltativi `proxmox.vlan_server` e `rete.subnet_server`, ma resta da decidere con chi amministra la rete se il collettore debba nascere su `vmbr0` senza tag, come oggi è possibile, o aspettare la segmentazione del piano firewall di network-design; la regola nftables ammette 514 e 6514 dall'intera LAN finché non ci sono reti più strette. Una volta decisa, la scelta va riportata anche in network-design come nuova VM e nuova sorgente di traffico, secondo ADR-004.
 
-Le due domande di ADR-007 sono chiuse: le postazioni hanno indirizzo fisso, e gli account sono personali (ADR-008). Prima del bootstrap ciascun amministratore genera sulla propria postazione una chiave SSH e consegna il solo file `.pub`, nominato `asopranzi.pub` e `tvezeni.pub`; dopo il bootstrap, dalla console, si imposta a ciascuno una password temporanea con scadenza immediata. Il nome `ads-collector.int.intrawelt.com` va registrato nel DNS del firewall, come prevede M25 di network-design, prima di configurare le sorgenti TLS.
+Le due domande di ADR-007 sono chiuse: le postazioni hanno indirizzo fisso, e gli account sono personali (ADR-008). Prima del bootstrap ciascun amministratore genera sulla propria postazione una chiave SSH e consegna il solo file `.pub`, nominato `asopranzi.pub` e `tvezeni.pub` e raccolto nella cartella privata `_notes/chiavi/` della postazione di Alessio Sopranzi, ignorata da git, da cui arriva al collettore insieme al materiale TLS; la chiave è generata come `ads-collector_ed25519` in `.ssh` del profilo utente, senza passphrase per scelta dell'utente; al 2026-09-30 ci sono entrambe; dopo il bootstrap, dalla console, si imposta a ciascuno una password temporanea con scadenza immediata. Il nome `ads-collector.int.intrawelt.com` va registrato nel DNS del firewall, come prevede M25 di network-design, prima di configurare le sorgenti TLS.
 
 ## Riconciliazione
 

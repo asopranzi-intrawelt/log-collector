@@ -29,7 +29,7 @@ def test_comando_con_i_parametri_dell_handoff(params_text):
     assert opt(parts, "--efidisk0") == "local-lvm:1,efitype=4m,pre-enrolled-keys=1"
     assert opt(parts, "--memory") == "2048" and opt(parts, "--balloon") == "0"
     assert opt(parts, "--protection") == "1"
-    assert warnings == []
+    assert warnings == ["nessuna --iso: la VM nasce senza supporto di installazione"]
 
 
 def test_senza_vlan_nessun_tag(params_text):
@@ -83,3 +83,27 @@ def test_main_stampa_una_riga_sola(tmp_path, params_text, capsys):
     assert vm.main(["--parametri", str(f)]) == 0
     out = capsys.readouterr().out
     assert out.count("\n") == 1 and out.startswith("qm create 140 ")
+
+
+ISO = "local:iso/debian-13.1.0-amd64-netinst.iso"
+
+
+def test_con_iso_lettore_cd_e_ordine_di_avvio(params_text):
+    parts, warnings = vm.build_command(adsparams.parse(params_text), 60, ISO)
+    assert opt(parts, "--ide2") == f"{ISO},media=cdrom"
+    assert opt(parts, "--boot") == "order=scsi0;ide2"
+    assert not any("--iso" in w for w in warnings)
+
+
+def test_iso_malformata_rifiutata(params_text):
+    with pytest.raises(adsparams.ParamsError, match="--iso: atteso"):
+        vm.build_command(adsparams.parse(params_text), 60, "debian.iso")
+
+
+def test_il_punto_e_virgola_arriva_tra_apici(tmp_path, params_text, capsys):
+    # Senza apici, sulla shell dell'host "order=scsi0;ide2" diventerebbe due comandi.
+    f = tmp_path / "p.yaml"
+    f.write_text(params_text, encoding="utf-8")
+    assert vm.main(["--parametri", str(f), "--iso", ISO]) == 0
+    out = capsys.readouterr().out
+    assert "--boot 'order=scsi0;ide2'" in out
