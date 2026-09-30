@@ -1,4 +1,4 @@
-# Handoff di sviluppo – Collettore log AdS su Proxmox
+# Handoff di sviluppo - Collettore log AdS su Proxmox
 
 Riferimento funzionale: `studio-collettore-ads.md`. Questo file dice **come e in che ordine** costruire. Legenda: **[V]** verificato su fonte · **[Non verificato]** da confermare durante lo sviluppo · **[Inferenza]** dedotto.
 
@@ -167,9 +167,9 @@ if $programname == ["pvedaemon","pveproxy","sshd","sudo","su","login","pveproxy-
 
 ## 7. Ordine di sviluppo
 
-1. VM + Debian + nftables + chrony + TLS (0,5–1 gg-p)
+1. VM + Debian + nftables + chrony + TLS (0,5-1 gg-p)
 2. rsyslog ricevente + accessi al collettore stesso
-3. Firewall, NAS, Proxmox host → collaudo punti 2–3
+3. Firewall, NAS, Proxmox host → collaudo punti 2-3
 4. `ads-ilo.py` → collaudo punto 3 su iLO
 5. `ads-nightly.sh` senza marca e senza WORM, poi aggiunta WORM, poi TSA quando scelta
 6. `ads-silence.sh`
@@ -177,4 +177,4 @@ if $programname == ["pvedaemon","pveproxy","sshd","sudo","su","login","pveproxy-
 8. `ads-m365.py`, `ads-ninja.py`
 9. Collaudo completo sezione 6 → estensione Windows dopo il parere privacy
 
-Scadenze dello studio: punti 1–4 entro il 23/10/2026, il resto entro il 13/11/2026.
+Scadenze dello studio: punti 1-4 entro il 23/10/2026, il resto entro il 13/11/2026.

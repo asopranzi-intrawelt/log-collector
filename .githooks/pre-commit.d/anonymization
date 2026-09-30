@@ -1,0 +1,39 @@
+#!/bin/sh
+# Passo del pre-commit dei commit manuali, pacchetto anonymization. Esegue Test-Anonymization.py
+# sul perimetro pubblicabile, cioe' file tracciati piu' non tracciati e non ignorati, e ferma il
+# commit se trova un dato identificante reale: un valore finito nella storia git non si toglie
+# piu' senza riscriverla. La regola e' .claude/rules/anonymization.md.
+#
+# Se il file dei pattern manca, lo strumento esce con 2 perche' non ha niente da cercare: e' il
+# caso di un clone nuovo, dove _notes/ non viaggia con il repository. Qui quel caso avvisa e non
+# blocca, per non fermare i commit di chi non ha ancora istanziato il proprio layer privato, ma
+# lo dice a ogni commit finche' il file non esiste.
+
+root=$(git rev-parse --show-toplevel)
+py="${PYTHON_CMD:-}"
+if [ -z "$py" ]; then
+    for candidate in python3 python; do
+        if command -v "$candidate" >/dev/null 2>&1 && "$candidate" -c 'import sys' >/dev/null 2>&1; then
+            py="$candidate"
+            break
+        fi
+    done
+fi
+[ -n "$py" ] || exit 0
+
+strumento="$root/tools/Test-Anonymization.py"
+[ -f "$strumento" ] || exit 0
+
+"$py" "$strumento" --radice "$root"
+esito=$?
+case "$esito" in
+    0) exit 0 ;;
+    2)
+        echo "anonymization: _notes/.anonymization-patterns.json assente, controllo NON eseguito (avviso)" >&2
+        exit 0
+        ;;
+    *)
+        echo "anonymization: dati identificanti nel perimetro pubblicabile, commit fermato" >&2
+        exit 1
+        ;;
+esac

@@ -1,11 +1,11 @@
 ---
-generated-from-commit: PENDING-FIRST-COMMIT
+generated-from-commit: 9ee87b4
 generated-from-branch: main
 generated-date: 2026-09-30
 covers-paths:
   - config/**
   - docs/handoff-sviluppo-collettore.md
-last-verified-commit: PENDING-FIRST-COMMIT
+last-verified-commit: 9ee87b4
 ---
 
 # Deployment

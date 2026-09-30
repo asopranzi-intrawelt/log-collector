@@ -6,10 +6,10 @@
 
 ```
 Branch attivo:        main
-Commit di riferimento: PENDING-FIRST-COMMIT
+Commit di riferimento: 9ee87b4
 Data snapshot:        2026-09-30
 Albero autorevole:    unico
-Remoto:               git@github-corp:asopranzi-intrawelt/log-collector.git (vuoto al 2026-09-30)
+Remoto:               git@github-corp:asopranzi-intrawelt/log-collector.git (primo push di 9ee87b4 il 2026-09-30)
 Template:             E:\template-claude-developing @ d732a25
 ```
 
@@ -17,13 +17,13 @@ Template:             E:\template-claude-developing @ d732a25
 
 | Scheda | last-verified | Stato |
 |---|---|---|
-| STACK.md | PENDING-FIRST-COMMIT | stack dichiarato, nessun codice ancora |
-| design-and-security.md | PENDING-FIRST-COMMIT | solo struttura |
-| deployment.md | PENDING-FIRST-COMMIT | solo struttura; gate separazione-ambienti da fare |
-| dev-testing.md | PENDING-FIRST-COMMIT | solo struttura |
-| current-work.md | PENDING-FIRST-COMMIT | nessuna feature attiva |
-| roadmap.md | PENDING-FIRST-COMMIT | solo struttura |
+| STACK.md | 9ee87b4 | stack dichiarato, nessun codice ancora |
+| design-and-security.md | 9ee87b4 | solo struttura |
+| deployment.md | 9ee87b4 | solo struttura; gate separazione-ambienti da fare |
+| dev-testing.md | 9ee87b4 | solo struttura |
+| current-work.md | 9ee87b4 | nessuna feature attiva |
+| roadmap.md | 9ee87b4 | solo struttura |
 
 ## Punto di ripresa
 
-Dopo il primo commit: eseguire `sync-context` per ancorare le schede a HEAD; poi completare i gate rimasti aperti dell'inizializzazione (pacchetti, separazione fra test e produzione, MCP, README pubblico) e iniziare lo sviluppo dalla sezione 7 dell'handoff, verificando prima i valori bloccanti della sezione 0 in `config/parametri.yaml`.
+Schede ancorate a `9ee87b4` e gate dei pacchetti chiuso il 2026-09-30 (fix-typography, anti-slop, anonymization; esiti in `progress.md`). Prossimo: completare i gate rimasti aperti dell'inizializzazione (separazione fra test e produzione, README pubblico, procedura concreta del legame con network-design secondo ADR-004; MCP rifiutato per ora) e iniziare lo sviluppo dalla sezione 7 dell'handoff, verificando prima i valori bloccanti della sezione 0 in `config/parametri.yaml`.

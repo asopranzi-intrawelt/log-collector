@@ -1,4 +1,4 @@
-# Studio collettore log AdS – completamento
+# Studio collettore log AdS - completamento
 
 Integra il foglio "Collettore" (verifica documentale del 29/09/2026). Verifica aggiuntiva del 30/09/2026. Legenda: **[V]** verificato su fonte (elenco in fondo) · **[Non verificato]** da confermare nel pilota · **[Inferenza]** dedotto, non documentato.
 
@@ -25,7 +25,7 @@ Integra il foglio "Collettore" (verifica documentale del 29/09/2026). Verifica a
 |---|---|---|---|---|---|---|
 | Windows (Fluent Bit) | `TargetUserName` | `EventID` + `LogonType` | `Computer` | `IpAddress` | `TimeCreated` | Campi Windows noti; nomi nel record Fluent Bit **[Non verificato]** fino alla prova con output `stdout`. `IpAddress` vale `-` o `127.0.0.1` negli accessi locali alla console: accettabile, va scritto nel documento. |
 | Firewall USG FLEX 500 | nel testo del log admin | login/logout/fallito | IP firewall (`fromhost-ip`) | nel testo del log | ora di ricezione collettore | **[Non verificato]** presenza del login admin nel syslog (già segnalato nel foglio). |
-| Switch/AP Nebula | – | – | – | – | – | Vedi D8. |
+| Switch/AP Nebula | - | - | - | - | - | Vedi D8. |
 | QNAP (QuLog) | campo utente access log | tipo accesso | IP NAS | campo IP access log | ora evento + ora ricezione | Funzione [V] nel foglio; contenuto del messaggio **[Non verificato]**. |
 | Proxmox | `user@realm` (pvedaemon), utente sshd | successful auth / authentication failure / sshd accepted | hostname | `rhost` (fallimenti), IP sshd; per i login web riusciti l'IP è in `/var/log/pveproxy/access.log` | ora journal | **[Non verificato]** formato esatto dei messaggi; il login web riuscito potrebbe richiedere l'unione di due righe. |
 | iLO 5 (Redfish IEL) | nel campo `Message` (es. login REST di un utente) | `Message` + `Oem.Hpe.Code` | IP iLO | nel `Message` per i login da browser/SSH **[Non verificato]** | `Created` (UTC) | [V] struttura della voce. Attenzione: l'IEL **accorpa gli eventi ripetuti** in una voce con `Count` (sezione 4.1). |
@@ -200,7 +200,7 @@ Il collettore deve poter raggiungere la TSA in uscita (HTTP/HTTPS): regola da ap
 | Criteri di controllo, dimensione log, filtro da Custom Field | 0,25 | 0,5 |
 | Heartbeat e controllo di silenzio | 0,25 | 0,5 |
 | Marca temporale al posto dell'HMAC (differenza) | 0 | 0,25 |
-| **Totale aggiornato (foglio 7,5–9,5)** | **8,75** | **11,75** |
+| **Totale aggiornato (foglio 7,5-9,5)** | **8,75** | **11,75** |
 
 [Inferenza] Compatibile con il 13/11/2026 se sono dedicati almeno 2 gg-p a settimana da ottobre. Entro il 23/10 aggiungere NTP e iLO; entro il 13/11 marca temporale e heartbeat.
 
@@ -219,8 +219,8 @@ Il collettore deve poter raggiungere la TSA in uscita (HTTP/HTTPS): regola da ap
 
 ## Fonti consultate in questa verifica
 - Garante privacy, provvedimento 27/11/2008 (mod. 25/06/2009): access log con completezza, inalterabilità, verificabilità dell'integrità; conservazione non inferiore a sei mesi; verifica almeno annuale dell'operato degli AdS.
-- docs.fluentbit.io – input Windows Event logs (winevtlog), pagina corrente: `event_data_as_map`, `event_query` XPath/XML Query, `db`, privilegi per il canale Security.
-- docs.fluentbit.io – output Syslog: modalità udp/tcp/tls/dtls, `syslog_message_key`, formato rfc5424.
+- docs.fluentbit.io - input Windows Event logs (winevtlog), pagina corrente: `event_data_as_map`, `event_query` XPath/XML Query, `db`, privilegi per il canale Security.
+- docs.fluentbit.io - output Syslog: modalità udp/tcp/tls/dtls, `syslog_message_key`, formato rfc5424.
 - HPE, iLO standard and licensed features: Remote Syslog incluso in iLO Advanced, non in iLO Standard.
 - HPE iLO 5 Redfish API docs (logging): IEL su `/redfish/v1/Managers/1/LogServices/IEL/Entries`, campi `Created`, `Message`, `Oem.Hpe.Categories`, `Code`, `Count`.
 - Reg. UE 910/2014 (eIDAS), art. 41: effetti giuridici della validazione temporale elettronica qualificata.
