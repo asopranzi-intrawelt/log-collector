@@ -42,14 +42,16 @@ ok() { echo "ok  $*"; }
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -qq
 apt-get install -y -qq --no-install-recommends nftables openssh-server chrony \
-    unattended-upgrades qemu-guest-agent rsyslog rsyslog-gnutls >/dev/null
+    unattended-upgrades qemu-guest-agent rsyslog rsyslog-gnutls sudo >/dev/null
 ok "pacchetti installabili su $(. /etc/os-release && echo "$PRETTY_NAME")"
 
 nft -c -f /tree/etc/nftables.conf || fail "nft -c rifiuta il ruleset"
 ok "nftables: ruleset valido per nft $(nft --version | cut -d" " -f2)"
 
 install -m 0644 /tree/etc/ssh/sshd_config.d/10-ads.conf /etc/ssh/sshd_config.d/
-useradd -m adsadmin
+groupadd ads-admin
+admins=$(grep -v "^#" /tree/etc/ads/amministratori | tr "," " ")
+for u in $admins; do useradd -m -G ads-admin "$u"; done
 mkdir -p /run/sshd
 ssh-keygen -A >/dev/null
 sshd -t || fail "sshd -t rifiuta la configurazione"
@@ -57,9 +59,22 @@ eff=$(sshd -T)
 grep -qx "permitrootlogin no" <<<"$eff" || fail "PermitRootLogin effettivo non e no"
 grep -qx "passwordauthentication no" <<<"$eff" || fail "PasswordAuthentication effettivo non e no"
 grep -qx "kbdinteractiveauthentication no" <<<"$eff" || fail "KbdInteractiveAuthentication non e no"
-grep -qx "allowusers adsadmin" <<<"$eff" || fail "AllowUsers effettivo non e adsadmin"
+grep -qx "allowgroups ads-admin" <<<"$eff" || fail "AllowGroups effettivo non e ads-admin"
+grep -q "^allowusers" <<<"$eff" && fail "AllowUsers presente: restringerebbe oltre il gruppo"
+for u in $admins; do
+    sshd -T -C "user=$u,host=h,addr=192.0.2.9" | grep -qx "allowgroups ads-admin" || fail "sshd -T per $u"
+done
 grep -q "^Include /etc/ssh/sshd_config.d/\*.conf" /etc/ssh/sshd_config || fail "sshd_config non include il drop-in"
 ok "sshd: il drop-in prevale, valori effettivi verificati con sshd -T"
+
+install -m 0440 /tree/etc/sudoers.d/ads-admin /etc/sudoers.d/ads-admin
+visudo -c -f /etc/sudoers.d/ads-admin >/dev/null || fail "visudo rifiuta sudoers.d/ads-admin"
+for u in $admins; do
+    sudo -l -U "$u" | grep -q "(ALL : ALL) ALL" || fail "$u non ha i privilegi sudo attesi"
+done
+useradd --system --shell /usr/sbin/nologin ads
+sudo -l -U ads | grep -q "(ALL" && fail "l utente di servizio ha sudo"
+ok "sudo: file valido, privilegi a ogni amministratore dell elenco ($admins)"
 
 install -m 0644 /tree/etc/qemu/qemu-ga.conf /etc/qemu/qemu-ga.conf
 dump=$(qemu-ga --dump-conf 2>&1) || fail "qemu-ga --dump-conf: $dump"

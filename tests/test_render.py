@@ -21,7 +21,7 @@ def test_nftables_ammette_le_sole_reti_dichiarate(tmp_path):
     assert code == 0
     nft = (dest / "etc" / "nftables.conf").read_text(encoding="utf-8")
     assert "{{" not in nft
-    # subnet_server e' vuoto: l'insieme contiene la sola LAN, senza virgole pendenti.
+    # subnet_server è vuoto: l'insieme contiene la sola LAN, senza virgole pendenti.
     assert "ip saddr { 192.0.2.0/24 } udp dport 514 accept" in nft
     assert "ip saddr { 192.0.2.0/24 } tcp dport 6514 accept" in nft
     assert "ip saddr { 203.0.113.10, 203.0.113.11 } tcp dport 22 accept" in nft
@@ -48,6 +48,7 @@ def test_file_statici_copiati_identici(tmp_path):
         "etc/chrony/sources.d/inrim.sources",
         "etc/ssh/sshd_config.d/10-ads.conf",
         "etc/apt/apt.conf.d/52ads-unattended-upgrades",
+        "etc/sudoers.d/ads-admin",
     ]:
         assert (dest / rel).read_bytes() == (SOURCE / rel).read_bytes()
     assert not list(dest.rglob("*.template"))
@@ -83,7 +84,7 @@ def test_entrambe_le_reti_vuote_e_un_errore(tmp_path, params_text, capsys):
 
 
 def test_il_file_di_esempio_non_basta_a_generare(tmp_path, capsys):
-    # Con i soli valori di esempio, tutti vuoti, il rendering deve rifiutarsi: e' la prova che
+    # Con i soli valori di esempio, tutti vuoti, il rendering deve rifiutarsi: è la prova che
     # nessun valore dell'ambiente viene inventato.
     code, dest = run(tmp_path, ROOT / "config" / "parametri.example.yaml")
     assert code == 1
@@ -111,3 +112,10 @@ def test_lista_resa_con_virgole(tmp_path):
     errors: list[str] = []
     assert render.render_text("{{ sorgenti.qnap }}", p, "t", errors) == "192.0.2.4, 192.0.2.5"
     assert errors == []
+
+
+def test_elenco_amministratori_generato(tmp_path):
+    code, dest = run(tmp_path, FIXTURES / "parametri-completi.yaml")
+    assert code == 0
+    text = (dest / "etc" / "ads" / "amministratori").read_text(encoding="utf-8")
+    assert text.splitlines()[-1] == "admuno, admdue"

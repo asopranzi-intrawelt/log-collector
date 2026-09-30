@@ -12,6 +12,7 @@ rete:
   ip_admin_non_msp: []     # una o più postazioni ammesse in SSH; nome in commento
 collettore:
   fqdn: ""
+  amministratori: []       # account personali degli amministratori non MSP (ADR-008)
   ip: ""
 sorgenti:                  # elenco atteso per il controllo di silenzio
   firewall_usg_flex: ""

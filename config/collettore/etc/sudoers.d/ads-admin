@@ -1,0 +1,4 @@
+# Privilegi degli amministratori non MSP (ADR-008). Ciascuno usa il proprio account e la propria
+# password locale: sudo registra chi ha eseguito che cosa, e quelle righe sono accessi AdS che
+# il collettore conserva come quelli delle altre sorgenti (handoff, sezione 2 punto 7).
+%ads-admin ALL=(ALL:ALL) ALL

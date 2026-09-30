@@ -15,6 +15,7 @@ rete:
 collettore:
   fqdn: "ads-collector.example.com"
   ip: "192.0.2.50"
+  amministratori: ["admuno", "admdue"]
 sorgenti:
   firewall_usg_flex: "192.0.2.1"
   nebula_switch_ap: ["192.0.2.2", "192.0.2.3"]

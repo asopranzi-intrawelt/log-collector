@@ -22,7 +22,7 @@ def test_il_cancelletto_dentro_gli_apici_non_e_un_commento(params_text):
 
 
 def test_legge_il_file_di_esempio_versionato():
-    # Il file di esempio e' il contratto: se diventa illeggibile, lo e' anche la copia locale.
+    # Il file di esempio è il contratto: se diventa illeggibile, lo è anche la copia locale.
     p = adsparams.load(ROOT / "config" / "parametri.example.yaml")
     assert p["proxmox"]["bridge"] == "vmbr0"
     assert p["ads"]["elenco_approvato"] == []

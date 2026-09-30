@@ -1,0 +1,4 @@
+# Account personali degli amministratori non MSP (ADR-008), da collettore.amministratori in
+# parametri.yaml. Letto da ads-bootstrap.sh, che per ciascuno pretende <utente>.pub nella
+# cartella delle chiavi. Generato da ads-render.py: si cambia parametri.yaml, non questo file.
+{{ collettore.amministratori }}

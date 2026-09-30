@@ -6,7 +6,7 @@
 
 ```
 Branch attivo:        main
-Commit di riferimento: e3e6e69
+Commit di riferimento: c913760
 Data snapshot:        2026-09-30
 Albero autorevole:    unico
 Remoto:               git@github-corp:asopranzi-intrawelt/log-collector.git (primo push di 9ee87b4 il 2026-09-30)
