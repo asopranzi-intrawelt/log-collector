@@ -1,0 +1,36 @@
+# Fixture: parametri compilati con valori di documentazione (RFC 5737, RFC 2606), mai reali.
+proxmox:
+  pve_version: "9.2.1"     # commento in coda
+  vmid: "140"
+  storage: "local-lvm"
+  storage_is_ssd: "true"
+  bridge: "vmbr0"
+  vlan_server: ""
+rete:
+  subnet_lan: "192.0.2.0/24"
+  subnet_server: ""
+  ip_admin_non_msp: "203.0.113.10"
+collettore:
+  fqdn: "ads-collector.example.com"
+  ip: "192.0.2.50"
+sorgenti:
+  firewall_usg_flex: "192.0.2.1"
+  nebula_switch_ap: ["192.0.2.2", "192.0.2.3"]
+  qnap:
+    - "192.0.2.4"
+    - "192.0.2.5"
+  ilo: []
+  proxmox_host: []
+  windows_pilota: []
+ads:
+  elenco_approvato: []
+  upn_m365: []
+integrita:
+  tsa_url: ""
+  tsa_ca_file: ""
+  nas_hero_worm_share: ""
+  mail_direzione: ""
+  smtp_relay: ""
+api:
+  ninjaone_base_url: "https://api.example.com/#frammento"
+  m365_tenant_id: ""

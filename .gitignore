@@ -69,3 +69,6 @@ config/parametri.yaml
 secrets/
 # Le chiavi di prova dei test restano versionate: la negazione sta dopo *.pem apposta.
 !tests/fixtures/*.pem
+
+# Albero di configurazione generato da ads-render.py: contiene valori reali dell'ambiente.
+build/

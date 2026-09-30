@@ -1,0 +1,7 @@
+# Script e configurazioni del collettore girano su Linux (collettore, sorgenti): sempre LF, anche
+# da un clone Windows. Un CR in uno script Bash lo rompe in modi che non nominano la causa.
+# Le regole valgono per le sole cartelle del progetto: .claude/templates/ resta come il template.
+bin/**        text eol=lf
+tests/**      text eol=lf
+config/**     text eol=lf
+.githooks/**  text eol=lf

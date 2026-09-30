@@ -1,0 +1,4 @@
+# Sorgenti di tempo del collettore: INRIM, riferimento nazionale (handoff, sezione 2 punto 4).
+# Il pool Debian in /etc/chrony/chrony.conf va commentato: lo fa ads-bootstrap.sh.
+server ntp1.inrim.it iburst
+server ntp2.inrim.it iburst

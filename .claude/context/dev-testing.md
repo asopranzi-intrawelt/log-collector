@@ -4,7 +4,7 @@ generated-from-branch: main
 generated-date: 2026-09-30
 covers-paths:
   - tests/**
-last-verified-commit: 9ee87b4
+last-verified-commit: 039e562
 ---
 
 # Test di sviluppo
@@ -13,12 +13,14 @@ last-verified-commit: 9ee87b4
 
 ## Test runner e comandi
 
-<framework di test, comando di esecuzione, copertura, dove girano i test>
+Tre livelli, dal più rapido al più vicino al collettore. Il primo è `python -m pytest -q tests`, che copre lettura dei parametri, rendering e comando della VM: 38 prove al 2026-09-30, senza rete. Il secondo è `bats tests/*.bats`, 14 prove su PKI e bootstrap in modalità di prova, verdi sia in Git Bash su Windows sia su Ubuntu 24.04 in WSL, dove il controllo dei permessi 0600 della chiave vale davvero; su NTFS da Git Bash il permesso non si conserva e quel controllo si salta. Il terzo è `bash tests/debian13/verifica-config.sh`, che con Docker attivo genera l'albero dalla fixture e lo controlla dentro `debian:trixie` con `nft -c`, `sshd -T`, `qemu-ga --dump-conf`, `apt-config`, `unattended-upgrade --dry-run` e `chronyd -p`; richiede rete per immagine e pacchetti e circa un minuto.
+
+Due prove di non vacuità fatte il 2026-09-30. Togliendo da `ads-render.py` il filtro dei valori vuoti cadono 4 prove di rendering, togliendo la condizione sul tag VLAN ne cade 1; togliendo la riga `#clear` dalla configurazione di unattended-upgrades la verifica in container fallisce sull'origine non di sicurezza che Debian 13 abilita di default.
 
 ## Rotte e dati mockati
 
-<endpoint o servizi mockati in sviluppo, fixture, ambienti finti>
+`tests/fixtures/parametri-completi.yaml` è un `parametri.yaml` compilato solo con indirizzi di documentazione (RFC 5737) e domini `example.com`, mai valori reali: lo richiede il controllo di anonimizzazione, che blocca il commit se un prefisso reale compare in un file pubblicabile. Il bootstrap non si prova contro un sistema vero ma nella sua modalità `--prova`, che stampa i comandi; il terzo livello verifica i file contro Debian 13 in container, e la prova sul collettore vero resta il collaudo della sezione 6 dell'handoff.
 
 ## Hook e controlli di qualità
 
-<lint, type-check, build e altri controlli eseguiti prima del commit>
+Lint: `ruff check bin tests` e `ruff format --check bin tests`, `shellcheck bin/*.sh tests/*.bats tests/debian13/*.sh .githooks/pre-commit.d/*`. Sulla macchina di sviluppo Windows ruff, shellcheck e bats non sono installati: il 2026-09-30 sono stati usati da un ambiente virtuale e da un clone di `bats-core` nello scratchpad di sessione, quindi vanno reinstallati alla sessione successiva finché non si decide dove tenerli. Il pre-commit esegue misura degli instruction file, anti-slop (avviso) e anonymization (blocca). `.gitattributes` impone LF su `bin/`, `tests/`, `config/` e `.githooks/`, perché un CR in uno script Bash lo rompe su Linux.

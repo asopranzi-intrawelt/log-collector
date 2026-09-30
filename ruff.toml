@@ -1,0 +1,9 @@
+# Lint del codice Python del collettore: Python 3 di Debian 13 (3.13).
+target-version = "py313"
+line-length = 100
+
+[lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+
+[lint.isort]
+known-first-party = ["adsparams", "conftest"]
