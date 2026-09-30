@@ -75,7 +75,7 @@ Norme caricate su richiesta, una riga per situazione con le parole con cui si pr
 Voci brevi e datate per le decisioni e le scoperte operative che non hanno ancora una casa definitiva. La voce nasce qui e migra appena possibile nella sede propria, `memory/decisions.md` se è una decisione architetturale, la scheda di contesto pertinente se è conoscenza strutturale, e si cancella da qui una volta migrata: questa sezione è un buffer, non un archivio.
 
 ```
-- [<YYYY-MM-DD>] <decisione o scoperta, una riga>
+- [2026-09-30] Le schede di network-design sono anonimizzate (IP sostituiti da un prefisso segnaposto): i valori dell'ambiente si prendono dagli snapshot in D:/network-design/output/, non dalle schede. Da migrare nella procedura di ADR-004.
 ```
 
 ## Vincoli di team

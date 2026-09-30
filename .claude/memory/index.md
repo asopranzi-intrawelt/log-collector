@@ -6,7 +6,7 @@
 
 ```
 Branch attivo:        main
-Commit di riferimento: 039e562
+Commit di riferimento: e3e6e69
 Data snapshot:        2026-09-30
 Albero autorevole:    unico
 Remoto:               git@github-corp:asopranzi-intrawelt/log-collector.git (primo push di 9ee87b4 il 2026-09-30)
@@ -26,4 +26,4 @@ Template:             E:\template-claude-developing @ d732a25
 
 ## Punto di ripresa
 
-Componente 1 dell'ordine di sviluppo (VM, Debian, nftables, chrony, TLS) scritto e provato in locale il 2026-09-30, da committare; dettaglio e voci [Non verificato] in `context/current-work.md`, scelta su VLAN e subnet in ADR-006. Per eseguirlo servono `config/parametri.yaml` compilato con i valori di `proxmox`, `rete` e `collettore`, e la decisione con chi amministra la rete su dove far nascere la VM. Senza quei valori si prosegue con il componente 2, rsyslog ricevente e accessi al collettore stesso, che si scrive e si prova allo stesso modo. Restano aperti i gate separazione-ambienti, README pubblico e procedura concreta del legame con network-design (ADR-004).
+Componente 1 dell'ordine di sviluppo (VM, Debian, nftables, chrony, TLS) scritto, provato in locale e committato in `e3e6e69` il 2026-09-30; dettaglio e voci [Non verificato] in `context/current-work.md`, scelta su VLAN e subnet in ADR-006. Per eseguirlo manca in `config/parametri.yaml` solo l'indirizzo del collettore; restano aperte le domande di ADR-006 e ADR-007. Senza quei valori si prosegue con il componente 2, rsyslog ricevente e accessi al collettore stesso, che si scrive e si prova allo stesso modo. Restano aperti i gate separazione-ambienti, README pubblico e procedura concreta del legame con network-design (ADR-004).

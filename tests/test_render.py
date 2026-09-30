@@ -5,6 +5,7 @@ from conftest import FIXTURES, ROOT, load_script
 
 render = load_script("ads-render.py")
 SOURCE = ROOT / "config" / "collettore"
+ADMINS = 'ip_admin_non_msp:\n    - "203.0.113.10"\n    - "203.0.113.11"'
 
 
 def run(tmp_path, params_file, source=SOURCE):
@@ -23,7 +24,7 @@ def test_nftables_ammette_le_sole_reti_dichiarate(tmp_path):
     # subnet_server e' vuoto: l'insieme contiene la sola LAN, senza virgole pendenti.
     assert "ip saddr { 192.0.2.0/24 } udp dport 514 accept" in nft
     assert "ip saddr { 192.0.2.0/24 } tcp dport 6514 accept" in nft
-    assert "ip saddr 203.0.113.10 tcp dport 22 accept" in nft
+    assert "ip saddr { 203.0.113.10, 203.0.113.11 } tcp dport 22 accept" in nft
     assert "policy drop;" in nft
 
 
@@ -52,12 +53,18 @@ def test_file_statici_copiati_identici(tmp_path):
     assert not list(dest.rglob("*.template"))
 
 
+def test_un_solo_amministratore_scritto_come_scalare(tmp_path, params_text):
+    f = tmp_path / "p.yaml"
+    f.write_text(params_text.replace(ADMINS, 'ip_admin_non_msp: "203.0.113.10"'), encoding="utf-8")
+    code, dest = run(tmp_path, f)
+    assert code == 0
+    nft = (dest / "etc" / "nftables.conf").read_text(encoding="utf-8")
+    assert "ip saddr { 203.0.113.10 } tcp dport 22 accept" in nft
+
+
 def test_valore_mancante_non_scrive_niente(tmp_path, params_text, capsys):
     f = tmp_path / "p.yaml"
-    f.write_text(
-        params_text.replace('ip_admin_non_msp: "203.0.113.10"', 'ip_admin_non_msp: ""'),
-        encoding="utf-8",
-    )
+    f.write_text(params_text.replace(ADMINS, "ip_admin_non_msp: []"), encoding="utf-8")
     code, dest = run(tmp_path, f)
     assert code == 1
     assert not dest.exists()

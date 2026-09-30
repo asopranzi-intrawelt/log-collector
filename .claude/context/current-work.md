@@ -34,7 +34,7 @@ ruff.toml, .gitattributes         lint Python, LF su script e configurazioni
 Definition of done:
 
 - [x] codice e configurazioni scritti, lint e test verdi (38 pytest, 14 bats su Windows e Linux, verifica in container `debian:trixie`)
-- [ ] `config/parametri.yaml` compilato: servono `proxmox.*` (con `pveversion` letto sull'host), `rete.subnet_lan`, `rete.ip_admin_non_msp`, `collettore.fqdn`, `collettore.ip`
+- [ ] `config/parametri.yaml` compilato: dal 2026-09-30 contiene i valori Proxmox ricavati dallo snapshot di network-design, VMID 210 e FQDN `ads-collector.int.intrawelt.com` confermati, i due amministratori non MSP (ADR-007); manca l'indirizzo del collettore, proposto nella serie dei server, fuori dal pool DHCP e non visto negli snapshot, da confermare e da verificare libero prima dell'assegnazione
 - [ ] VM creata sull'host con il comando stampato da `ads-vm-command.py`, dopo conferma esplicita
 - [ ] Debian installata, `scsi1` montato su `/srv/ads` con `nodev,nosuid,noexec`, `ads-bootstrap.sh` eseguito
 - [ ] collaudo punti 1, 2 e 7 della sezione 6 dell'handoff sul collettore vero
@@ -45,7 +45,7 @@ Stato delle voci [Non verificato] del componente, dall'handoff sezioni 1-3:
 |---|---|---|
 | Sintassi di `allow-rpcs` in `/etc/qemu/qemu-ga.conf` | Verificata in container il 2026-09-30: `qemu-ga --dump-conf` di Debian 13 legge il file di default e riporta l'elenco | Resta la prova dall'host: `qm guest exec <VMID> -- id` deve fallire (collaudo punto 1) |
 | rsyslog non installato di default su Debian 13 | Aperta: il container non è un'installazione netinst | Irrilevante per il risultato, perché `ads-bootstrap.sh` lo installa comunque; si annota dopo l'installazione con `dpkg -l rsyslog` |
-| Modello CPU `x86-64-v2-AES` su PVE 8.x | Aperta, e forse inapplicabile: la versione corrente è la 9.2 | `pveversion` sull'host; `ads-vm-command.py` avvisa se la versione è 8 |
+| Modello CPU `x86-64-v2-AES` su PVE 8.x | Verificata il 2026-09-30 sullo snapshot Proxmox di network-design delle 07:30: il nodo è a pve-manager 8.3.4 e sette VM su dieci usano già `x86-64-v2-AES`; la VM100 usa già q35, OVMF ed efidisk con chiavi pre-caricate sullo storage SERVIZI | Chiusa per questo nodo; l'avviso di `ads-vm-command.py` resta perché vale per qualunque host 8.x |
 | Origini di sicurezza di unattended-upgrades su Debian 13 | Verificata in container: Debian 13 abilita di default anche l'origine `label=Debian`, e senza `#clear` resterebbe attiva | Chiusa |
 | Forma delle righe `pool` in `chrony.conf` di Debian 13 | Verificata in container: una riga `pool`, `sourcedir /etc/chrony/sources.d` presente, `chronyd -p` accetta il risultato | Chiusa |
 | Fluent Bit confronta `Host` con il SAN del certificato (Inferenza, sezione 3) | Aperta | Si verifica nel pilota Windows (punto 7): il certificato porta FQDN e IP nel SAN, quindi regge entrambe le scelte |
@@ -54,6 +54,8 @@ Domande aperte:
 
 La rete attuale smentisce due presupposti dell'handoff: nessun bridge di Proxmox è VLAN-aware e la LAN è un'unica rete, non una LAN più una VLAN server (scheda `design-and-security.md` di `D:/network-design`). Il codice ne tiene conto rendendo facoltativi `proxmox.vlan_server` e `rete.subnet_server`, ma resta da decidere con chi amministra la rete se il collettore debba nascere su `vmbr0` senza tag, come oggi è possibile, o aspettare la segmentazione del piano firewall di network-design; la regola nftables ammette 514 e 6514 dall'intera LAN finché non ci sono reti più strette. Una volta decisa, la scelta va riportata anche in network-design come nuova VM e nuova sorgente di traffico, secondo ADR-004.
 
+Aperte da ADR-007: se l'account `adsadmin` resti unico o diventino due account personali, perché gli accessi SSH al collettore sono accessi AdS e un account condiviso non li attribuisce; se le postazioni dei due amministratori abbiano indirizzo fisso o una prenotazione DHCP, senza la quale la regola SSH le chiude fuori al primo cambio di indirizzo. Il nome `ads-collector.int.intrawelt.com` va registrato nel DNS del firewall, come prevede M25 di network-design, prima di configurare le sorgenti TLS.
+
 ## Riconciliazione
 
-Ultima verifica: 2026-09-30 al commit 039e562, con il componente 1 non ancora committato.
+Ultima verifica: 2026-09-30 al commit e3e6e69, con le modifiche di ADR-007 non ancora committate.

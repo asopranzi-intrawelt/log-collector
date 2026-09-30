@@ -3,7 +3,7 @@
 # non modificare sul collettore, si cambia il template nel repository.
 #
 # Ingresso: syslog in chiaro (514/udp) e TLS (6514/tcp) solo dalle reti delle sorgenti, SSH
-# solo dall'amministratore non MSP. Collaudo punto 2: da una sorgente non ammessa nessuna
+# solo dalle postazioni degli amministratori non MSP (una o piu', ADR-007). Collaudo punto 2: da una sorgente non ammessa nessuna
 # scrittura. Uscita libera verso NTP, iLO, TSA, relay SMTP, NAS-HERO e API.
 # La seconda rete e' facoltativa: oggi la LAN e' unica e subnet_server resta vuoto.
 
@@ -17,7 +17,7 @@ table inet filter {
     iif lo accept
     ip saddr { {{ rete.subnet_lan + rete.subnet_server }} } udp dport 514 accept
     ip saddr { {{ rete.subnet_lan + rete.subnet_server }} } tcp dport 6514 accept
-    ip saddr {{ rete.ip_admin_non_msp }} tcp dport 22 accept
+    ip saddr { {{ rete.ip_admin_non_msp }} } tcp dport 22 accept
     icmp type echo-request accept
     # Neighbor discovery IPv6: senza, l'interfaccia perde i vicini se IPv6 e' attivo.
     icmpv6 type { nd-neighbor-solicit, nd-neighbor-advert, nd-router-advert } accept

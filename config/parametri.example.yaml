@@ -9,7 +9,7 @@ proxmox:
 rete:
   subnet_lan: ""
   subnet_server: ""
-  ip_admin_non_msp: ""
+  ip_admin_non_msp: []     # una o più postazioni ammesse in SSH; nome in commento
 collettore:
   fqdn: ""
   ip: ""
