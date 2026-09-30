@@ -1,0 +1,34 @@
+# Copiare in parametri.yaml (escluso da git) e compilare. Vuoto = non ancora noto.
+proxmox:
+  pve_version: ""          # output di pveversion
+  vmid: ""
+  storage: ""
+  storage_is_ssd: ""       # true/false -> ssd=1
+  bridge: "vmbr0"
+  vlan_server: ""
+rete:
+  subnet_lan: ""
+  subnet_server: ""
+  ip_admin_non_msp: ""
+collettore:
+  fqdn: ""
+  ip: ""
+sorgenti:                  # elenco atteso per il controllo di silenzio
+  firewall_usg_flex: ""
+  nebula_switch_ap: []
+  qnap: []
+  ilo: []
+  proxmox_host: []
+  windows_pilota: []
+ads:
+  elenco_approvato: []     # BLOCCANTE: account AdS approvati dalla Direzione
+  upn_m365: []
+integrita:
+  tsa_url: ""              # BLOCCANTE per la marca temporale
+  tsa_ca_file: ""
+  nas_hero_worm_share: ""  # BLOCCANTE per la copia WORM
+  mail_direzione: ""
+  smtp_relay: ""           # BLOCCANTE per l'invio mail
+api:
+  ninjaone_base_url: ""
+  m365_tenant_id: ""

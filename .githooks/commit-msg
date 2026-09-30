@@ -1,0 +1,45 @@
+#!/bin/sh
+# commit-msg dei commit manuali: attua la sezione "Messaggio di commit" della regola
+# .claude/rules/git-commands-format.md, con la divergenza dal template registrata come ADR-002
+# in .claude/memory/decisions.md.
+#
+# Il template rifiuta ogni riga Co-authored-by. Questo progetto invece ha due contributori umani,
+# come intralino: i commit si firmano con l'identità locale Alessio Sopranzi (chiave github-corp)
+# e portano il trailer del co-autore Tommaso Vezeni, che l'hook aggiunge da sé se manca.
+#
+# Rifiuta, e non corregge:
+#   1. qualunque attribuzione a un agente: Co-authored-by verso Claude, Codex, Copilot e simili,
+#      gli indirizzi noreply di Anthropic e OpenAI, le firme "Generated with";
+#   2. un oggetto più lungo di 72 caratteri.
+# Aggiunge, se manca e se l'autore non è già lui, il trailer del co-autore umano.
+set -eu
+
+file="$1"
+coautore="Tommaso Vezeni <tvezeni@intrawelt.com>"
+
+# Le righe di commento che git aggiunge nell'editor non fanno parte del messaggio.
+if grep -v '^#' "$file" | grep -qiE 'generated with .*(claude|codex)|noreply@anthropic\.com|noreply@openai\.com|^[[:space:]]*co-authored-by:.*(claude|anthropic|codex|openai|copilot|chatgpt|gpt-)'; then
+    echo "commit-msg: il messaggio contiene un'attribuzione a un agente (Co-authored-by o firma generata)." >&2
+    echo "commit-msg: la regola git-commands-format.md la vieta: toglierla e rifare il commit." >&2
+    exit 1
+fi
+
+oggetto="$(grep -v '^#' "$file" | grep -m1 -v '^[[:space:]]*$' || true)"
+# wc -m conta i caratteri e non i byte, così le lettere accentate valgono uno.
+lunghezza="$(printf '%s' "$oggetto" | LC_ALL=C.UTF-8 wc -m 2>/dev/null | tr -d ' ')"
+if [ -n "$lunghezza" ] && [ "$lunghezza" -gt 72 ]; then
+    echo "commit-msg: l'oggetto è di $lunghezza caratteri, la regola ne ammette al massimo 72." >&2
+    exit 1
+fi
+
+# Il trailer del co-autore: non si aggiunge se l'autore del commit è già Tommaso Vezeni, né se
+# il messaggio lo porta già (il confronto ignora maiuscole e minuscole, come fa GitHub).
+autore="$(git var GIT_AUTHOR_IDENT 2>/dev/null || true)"
+case "$autore" in
+    *"<tvezeni@intrawelt.com>"*) exit 0 ;;
+esac
+if ! grep -v '^#' "$file" | grep -qiF "co-authored-by: $coautore"; then
+    git interpret-trailers --in-place --trailer "Co-authored-by: $coautore" "$file"
+fi
+
+exit 0

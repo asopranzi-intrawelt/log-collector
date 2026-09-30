@@ -1,0 +1,39 @@
+#!/bin/sh
+# Passo del pre-commit dei commit manuali. Misura il carico degli instruction file che Claude
+# Code legge a ogni avvio, cioe' i CLAUDE.md piu' ogni .md sotto .claude/rules/ senza frontmatter
+# paths:, e ferma il commit se la parte di progetto supera la soglia di guardia. A differenza del
+# passo anti-slop, questo blocca: il budget e' un vincolo della piattaforma, non un indizio da
+# rileggere, e una soglia che avvisa soltanto e' esattamente il presidio che non ha funzionato.
+# La ragione, con il criterio per decidere se una norma sta in rules/ o in una skill, e' nella
+# sezione 24 di .claude/PROJECT-SYSTEM.md.
+#
+# Si installa copiandolo in .githooks/pre-commit.d/ di un progetto che usa l'hook pre-commit di
+# readme-sync, o richiamandolo da un hook proprio.
+
+root=$(git rev-parse --show-toplevel)
+py="${PYTHON_CMD:-}"
+if [ -z "$py" ]; then
+    for candidate in python3 python; do
+        if command -v "$candidate" >/dev/null 2>&1 && "$candidate" -c 'import sys' >/dev/null 2>&1; then
+            py="$candidate"
+            break
+        fi
+    done
+fi
+[ -n "$py" ] || exit 0
+
+strumento=""
+for cartella in tools .claude/templates/tools; do
+    if [ -f "$root/$cartella/misura-istruzioni.py" ]; then
+        strumento="$root/$cartella/misura-istruzioni.py"
+        break
+    fi
+done
+[ -n "$strumento" ] || exit 0
+
+if ! "$py" "$strumento" --root "$root"; then
+    echo "misura-istruzioni: carico degli instruction file oltre la soglia, commit fermato" >&2
+    exit 1
+fi
+
+exit 0
