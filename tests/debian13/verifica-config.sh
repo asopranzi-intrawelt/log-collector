@@ -42,7 +42,7 @@ ok() { echo "ok  $*"; }
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -qq
 apt-get install -y -qq --no-install-recommends nftables openssh-server chrony \
-    unattended-upgrades qemu-guest-agent rsyslog rsyslog-gnutls sudo >/dev/null
+    unattended-upgrades qemu-guest-agent rsyslog rsyslog-gnutls sudo openssl iproute2 >/dev/null
 ok "pacchetti installabili su $(. /etc/os-release && echo "$PRETTY_NAME")"
 
 nft -c -f /tree/etc/nftables.conf || fail "nft -c rifiuta il ruleset"
@@ -102,6 +102,49 @@ grep -qE "^pool[[:space:]]" /etc/chrony/chrony.conf && fail "righe pool rimaste 
 install -m 0644 /tree/etc/chrony/sources.d/inrim.sources /etc/chrony/sources.d/
 chronyd -p -f /etc/chrony/chrony.conf >/dev/null || fail "chronyd -p rifiuta la configurazione"
 ok "chrony: $pools righe pool commentate, sources.d letto, configurazione accettata"
+
+# rsyslog: ricezione UDP e TLS, rifiuto del TCP in chiaro sulla 6514, accessi locali nel ruleset
+# ads e nient altro. Certificato di prova sul solo 127.0.0.1, valido un giorno.
+install -m 0644 /tree/etc/rsyslog.d/10-ads.conf /etc/rsyslog.d/
+mkdir -p /etc/rsyslog.d/tls /srv/ads
+openssl req -x509 -newkey rsa:2048 -nodes -days 1 -subj "/CN=prova" -addext "subjectAltName=IP:127.0.0.1" \
+    -keyout /etc/rsyslog.d/tls/collector.key -out /etc/rsyslog.d/tls/collector.pem 2>/dev/null
+cp /etc/rsyslog.d/tls/collector.pem /etc/rsyslog.d/tls/ca.pem
+chmod 0600 /etc/rsyslog.d/tls/collector.key
+chown root:ads /srv/ads && chmod 0750 /srv/ads
+rsyslogd -N1 >/dev/null 2>&1 || { rsyslogd -N1; fail "rsyslogd -N1 rifiuta la configurazione"; }
+rsyslogd -iNONE
+for i in 1 2 3 4 5 6 7 8 9 10; do [ -S /dev/log ] && break; sleep 0.5; done
+sleep 1
+logger -n 127.0.0.1 -P 514 -d -t prova-udp "messaggio udp"
+logger -n 127.0.0.1 -P 514 -d --rfc3164 -t prova-3164 "messaggio 3164"
+printf "<13>Oct  1 12:00:00 sorgente-tls prova-tls: messaggio tls\n" \
+    | timeout 5 openssl s_client -connect 127.0.0.1:6514 -quiet -CAfile /etc/rsyslog.d/tls/ca.pem >/dev/null 2>&1 || true
+printf "<13>Oct  1 12:00:00 sorgente-tcp prova-tcp: messaggio in chiaro\n" > /dev/tcp/127.0.0.1/6514 || true
+# Nomi dei programmi presi dai log reali del collettore (OpenSSH 10.0 su Debian 13), non ipotizzati:
+# una prova che genera il messaggio con lo stesso nome che il codice si aspetta non misura nulla.
+logger -t sshd-session "Accepted publickey for admuno from 192.0.2.9 port 50000 ssh2: ED25519 SHA256:prova"
+logger -t sshd-auth "Invalid user prova from 192.0.2.9 port 50001"
+logger -t sudo "admuno : TTY=pts/1 ; PWD=/home/admuno ; USER=root ; COMMAND=/usr/bin/id"
+logger -t cron "messaggio estraneo agli accessi"
+sleep 2
+f=/srv/ads/127.0.0.1/$(date +%Y-%m-%d).log
+[ -f "$f" ] || { ls -R /srv/ads; fail "file del giorno assente: $f"; }
+grep -q "prova-udp messaggio udp" "$f" || { cat "$f"; fail "riga UDP RFC 5424 assente o con tag e messaggio fusi"; }
+grep -q "prova-3164: messaggio 3164" "$f" || { cat "$f"; fail "riga UDP RFC 3164 assente"; }
+grep -q "prova-udpmessaggio" "$f" && fail "tag e messaggio fusi"
+grep -q "sorgente-tls prova-tls: messaggio tls" "$f" || fail "riga TLS assente"
+grep -q "messaggio in chiaro" "$f" && fail "TCP in chiaro accettato sulla porta TLS"
+grep -q "sshd-session: Accepted publickey for admuno" "$f" || fail "login sshd-session assente dal ruleset ads"
+grep -q "sshd-auth: Invalid user prova" "$f" || fail "tentativo sshd-auth assente dal ruleset ads"
+grep -q "sudo: admuno : TTY=pts/1" "$f" || fail "sudo assente dal ruleset ads"
+grep -q "messaggio estraneo" "$f" && fail "messaggio locale non di accesso finito nel ruleset ads"
+rfc="[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9:.]+[+-][0-9]{2}:[0-9]{2}"
+bad=$(grep -cvE "^$rfc 127\.0\.0\.1 $rfc [^ ]+ [^ ]+" "$f" || true)
+[ "$bad" -eq 0 ] || { cat "$f"; fail "$bad righe non rispettano i cinque campi di AdsLine"; }
+[ "$(stat -c "%U:%G %a" "$f")" = "root:ads 640" ] || fail "permessi del file: $(stat -c "%U:%G %a" "$f")"
+[ "$(stat -c "%U:%G %a" "$(dirname "$f")")" = "root:ads 750" ] || fail "permessi della cartella: $(stat -c "%U:%G %a" "$(dirname "$f")")"
+ok "rsyslog: UDP (RFC 5424 e 3164) e TLS ricevuti con tag e messaggio separati, TCP in chiaro scartato, accessi sshd-session, sshd-auth e sudo nel ruleset ads, $(wc -l < "$f") righe AdsLine, permessi root:ads"
 
 echo "tutte le verifiche superate"
 '

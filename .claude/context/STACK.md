@@ -27,4 +27,4 @@ Il flusso va dalla postazione dell'amministratore al collettore. Sulla postazion
 
 ## Riferimenti a snippet
 
-`bin/adsparams.py:parse` e `bin/adsparams.py:require` per la lettura dei parametri; `bin/ads-render.py:render_text` per i segnaposto; `bin/ads-vm-command.py:build_command` per il comando della VM; `bin/ads-bootstrap.sh:check_inputs` per i controlli che precedono qualunque scrittura; `config/collettore/etc/nftables.conf.template` per il firewall locale.
+`bin/adsparams.py:parse` e `bin/adsparams.py:require` per la lettura dei parametri; `bin/ads-render.py:render_text` per i segnaposto; `bin/ads-vm-command.py:build_command` per il comando della VM; `bin/ads-bootstrap.sh:check_inputs` per i controlli che precedono qualunque scrittura; `config/collettore/etc/nftables.conf.template` per il firewall locale; `config/collettore/etc/rsyslog.d/10-ads.conf` per la ricezione, il formato `AdsLine` e gli accessi al collettore stesso.

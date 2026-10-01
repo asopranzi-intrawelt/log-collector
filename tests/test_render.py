@@ -49,6 +49,7 @@ def test_file_statici_copiati_identici(tmp_path):
         "etc/ssh/sshd_config.d/10-ads.conf",
         "etc/apt/apt.conf.d/52ads-unattended-upgrades",
         "etc/sudoers.d/ads-admin",
+        "etc/rsyslog.d/10-ads.conf",
     ]:
         assert (dest / rel).read_bytes() == (SOURCE / rel).read_bytes()
     assert not list(dest.rglob("*.template"))

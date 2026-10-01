@@ -60,6 +60,21 @@ La rete attuale smentisce due presupposti dell'handoff: nessun bridge di Proxmox
 
 Le due domande di ADR-007 sono chiuse: le postazioni hanno indirizzo fisso, e gli account sono personali (ADR-008). Prima del bootstrap ciascun amministratore genera sulla propria postazione una chiave SSH e consegna il solo file `.pub`, nominato `asopranzi.pub` e `tvezeni.pub` e raccolto nella cartella privata `_notes/chiavi/` della postazione di Alessio Sopranzi, ignorata da git, da cui arriva al collettore insieme al materiale TLS; la chiave è generata come `ads-collector_ed25519` in `.ssh` del profilo utente, senza passphrase per scelta dell'utente; al 2026-09-30 ci sono entrambe; dopo il bootstrap, dalla console, si imposta a ciascuno una password temporanea con scadenza immediata. Aperta dal 2026-10-01, misurata: con il desktop (ADR-012) la VM ha 546 MiB disponibili su 1.9 GiB; chiudere la sessione grafica quando non serve, o portare la RAM a 4 GB a VM spenta. Aperte dal 2026-10-01 per ADR-010 (`docs/modello-di-custodia.md`): chi custodisce la prova, cioè quale TSA e chi amministra il supporto immutabile, che non può essere Intrawelt né l'MSP; se la finestra del giorno in corso vada stretta; se serva un'analisi continua; la verifica annuale del punto 4.4 è decisa (ADR-011: IT Manager e IT Assistant, MSP in loro assenza, con la cautela della verifica incrociata). Candidati per la prova: TSA qualificata via RFC 3161 (InfoCert verificata sul manuale) e, come terzo custode da interrogare, Intrusa. Il componente 5 dipende dalla prima risposta. Aperta dal 2026-10-01: Wazuh. Lo studio `docs/confronto-wazuh.md` propone di tenere il collettore come sistema di registrazione, di aggiungere GravityZone come sorgente e di valutare Wazuh come livello di analisi dopo il pilota Windows; serve la decisione dell'utente e, se possibile, lo studio completo dell'MSP. Il nome `ads-collector.int.intrawelt.com` va registrato nel DNS del firewall, come prevede M25 di network-design, prima di configurare le sorgenti TLS.
 
+## Feature: componente 2, rsyslog ricevente e accessi al collettore
+
+Cosa fa: riceve i log delle sorgenti su 514/udp e 6514/tcp in TLS e li scrive in `/srv/ads/<ip>/<giorno>.log` nel formato `AdsLine`; instrada nello stesso ruleset gli accessi al collettore stesso (`sshd`, `sudo`, `su`, `login`, `systemd-logind`, `gdm-password`), in `/srv/ads/127.0.0.1/`. Punto 2 della sezione 7 dell'handoff.
+
+Definition of done:
+
+- [x] configurazione `config/collettore/etc/rsyslog.d/10-ads.conf`, installata e controllata dal bootstrap
+- [x] verifica in container `debian:trixie`: ricezione UDP e TLS, TCP in chiaro scartato, accessi locali instradati, cinque campi, permessi
+- [x] bootstrap rieseguito sul collettore con il pacchetto nuovo il 2026-10-01, senza errori e senza pacchetti nuovi (rieseguibile)
+- [x] sul collettore vero: un accesso SSH di un amministratore compare in `/srv/ads/127.0.0.1/` come `sshd-session ... Accepted publickey`, con impronta della chiave (2026-10-01, dopo la correzione del filtro)
+- [x] una riga inviata da una sorgente ammessa (l'host Proxmox) compare nella sua cartella, `root:ads` 0750, nel formato a cinque campi (2026-10-01)
+- [ ] collaudo punto 2 completo: da una sorgente non ammessa nessuna scrittura; con la LAN unica /19 serve un mittente fuori da quella rete
+
+Rinviato: filtro D7 del QNAP, che dipende dall'elenco AdS approvato (sezione 0, bloccante).
+
 ## Riconciliazione
 
 Ultima verifica: 2026-09-30 al commit e3e6e69, con le modifiche di ADR-008 non ancora committate.

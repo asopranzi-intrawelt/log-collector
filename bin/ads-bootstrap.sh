@@ -29,6 +29,7 @@ readonly CONFIG_FILES=(
     etc/qemu/qemu-ga.conf
     etc/sudoers.d/ads-admin
     etc/ads/amministratori
+    etc/rsyslog.d/10-ads.conf
 )
 readonly TLS_FILES=(ca.pem collector.pem collector.key)
 readonly DATA_MOUNT=/srv/ads
@@ -152,7 +153,8 @@ main() {
     run install -d -o root -g ads -m 0750 "${ROOT}/etc/ads"
     run install -d -o ads -g ads -m 0700 "${ROOT}/etc/ads/secrets"
     run install -d -o ads -g ads -m 0750 "${ROOT}/var/lib/ads"
-    run install -d -o root -g root -m 0755 "${ROOT}${DATA_MOUNT}"
+    # I file dei log li scrive rsyslog come root; il gruppo ads li legge per i job notturni.
+    run install -d -o root -g ads -m 0750 "${ROOT}${DATA_MOUNT}"
 
     # Amministratori non MSP: un account personale ciascuno, prima di toccare sshd (ADR-008).
     if ((DRY_RUN)) || ! getent group "$ADMIN_GROUP" >/dev/null; then
@@ -179,8 +181,10 @@ main() {
 
     run nft -c -f "${ROOT}/etc/nftables.conf"
     run sshd -t
+    run rsyslogd -N1 -f "${ROOT}/etc/rsyslog.conf"
     run systemctl enable --now nftables
     run systemctl restart chrony
+    run systemctl restart rsyslog
     run systemctl reload ssh
     run systemctl restart qemu-guest-agent
     run systemctl enable --now unattended-upgrades

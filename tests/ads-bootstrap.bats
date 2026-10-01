@@ -138,3 +138,13 @@ setup() {
     [ "$status" -eq 0 ]
     [[ "$(grep -F "apt-get install" <<<"$output")" == *"openssh-server"* ]]
 }
+
+@test "installa la configurazione di rsyslog e la controlla prima di riavviarlo" {
+    run bash "$BOOT" --prova "$TREE" "$TLS" "$KEYS"
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"10-ads.conf /etc/rsyslog.d/10-ads.conf"* ]]
+    check=$(grep -n -F "+ rsyslogd -N1" <<<"$output" | cut -d: -f1)
+    restart=$(grep -n -F "+ systemctl restart rsyslog" <<<"$output" | cut -d: -f1)
+    [ -n "$check" ] && [ "$check" -lt "$restart" ]
+    [[ "$(grep -E "install -d .*/srv/ads$" <<<"$output")" == *"-g ads -m 0750"* ]]
+}
