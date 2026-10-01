@@ -7,6 +7,8 @@ proxmox:
   bridge: "vmbr0"
   vlan_server: ""
 rete:
+  gateway: ""             # gateway della rete del collettore
+  dns: []                  # server DNS del collettore
   subnet_lan: ""
   subnet_server: ""
   ip_admin_non_msp: []     # una o più postazioni ammesse in SSH; nome in commento
@@ -21,6 +23,7 @@ sorgenti:                  # elenco atteso per il controllo di silenzio
   ilo: []
   proxmox_host: []
   windows_pilota: []
+  gravityzone: ""         # console GravityZone come sorgente attesa (studio, D9)
 ads:
   elenco_approvato: []     # BLOCCANTE: account AdS approvati dalla Direzione
   upn_m365: []
@@ -32,4 +35,5 @@ integrita:
   smtp_relay: ""           # BLOCCANTE per l'invio mail
 api:
   ninjaone_base_url: ""
+  gravityzone_api_url: ""  # URL dell'API pubblica GravityZone (studio, D9)
   m365_tenant_id: ""

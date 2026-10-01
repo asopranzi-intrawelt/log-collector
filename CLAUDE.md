@@ -10,6 +10,9 @@ Collettore centrale open source degli accessi degli amministratori di sistema (p
 
 - Cosa e perché: `docs/studio-collettore-ads.md`
 - Come e in che ordine: `docs/handoff-sviluppo-collettore.md`
+- Che cosa è stato fatto davvero, passo per passo con l'esito: `docs/runbook-componente-1.md`, da aggiornare a ogni passo eseguito su un host
+- Ratio del progetto, da leggere prima di decidere chi amministra che cosa: `docs/modello-di-custodia.md` (chi è amministratore di sistema non custodisce la prova dei propri accessi; tre livelli: raccolta, prova, analisi)
+- Perché non Wazuh, e che cosa si prende dalla proposta dell'MSP: `docs/confronto-wazuh.md`
 - Valori dell'ambiente: `config/parametri.yaml` (copia locale di `config/parametri.example.yaml`, fuori da git)
 
 I due documenti non si importano a ogni avvio, perché da soli valgono oltre 30.000 caratteri e porterebbero il progetto sopra la soglia degli instruction file (sezione 24 di `.claude/PROJECT-SYSTEM.md`). Si leggono a richiesta: prima di lavorare su un componente si leggono la sezione dell'handoff che lo descrive e le sezioni dello studio che quella richiama, e la sezione 0 dell'handoff prima di decidere se un componente è bloccato.

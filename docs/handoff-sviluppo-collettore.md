@@ -114,6 +114,7 @@ Resta vero (studio, sezione 6) che l'amministratore dell'hypervisor può acceder
 | `ads-ilo.py` | Python | ogni ora | IEL via Redfish → `/srv/ads/<ip-ilo>/` (studio 4.1) |
 | `ads-m365.py` | Python | ogni ora | Management Activity API, UPN in elenco AdS → `/srv/ads/m365/` |
 | `ads-ninja.py` | Python | ogni giorno 00:05 | `/v2/activities` → `/srv/ads/ninjaone/` |
+| `ads-gravityzone.py` | Python | ogni ora **[Non verificato]** cadenza | accessi alla console via API pubblica → `/srv/ads/gravityzone/` (studio, D9) |
 | `ads-nightly.sh` | Bash | ogni giorno 00:15 | gzip, manifest a catena, marca TSA, copia WORM, mail (studio sez. 5) |
 | `ads-silence.sh` | Bash | ogni giorno 00:45 | sorgenti attese senza file/heartbeat → mail |
 | `ads-verify.sh` | Bash | manuale, mensile | ricalcolo catena + `openssl ts -verify` → verbale |
@@ -174,7 +175,7 @@ if $programname == ["pvedaemon","pveproxy","sshd","sudo","su","login","pveproxy-
 5. `ads-nightly.sh` senza marca e senza WORM, poi aggiunta WORM, poi TSA quando scelta
 6. `ads-silence.sh`
 7. Pilota Windows (2 postazioni + 1 server) con Fluent Bit → misura volumi → ridimensionamento `scsi1` e WORM
-8. `ads-m365.py`, `ads-ninja.py`
+8. `ads-m365.py`, `ads-ninja.py`, `ads-gravityzone.py` (studio, D9)
 9. Collaudo completo sezione 6 → estensione Windows dopo il parere privacy
 
 Scadenze dello studio: punti 1-4 entro il 23/10/2026, il resto entro il 13/11/2026.

@@ -126,3 +126,15 @@ setup() {
     [ "$status" -eq 1 ]
     [[ "$output" == *"root non puo' essere un amministratore"* ]]
 }
+
+@test "imposta il fuso orario dell'Italia" {
+    run bash "$BOOT" --prova "$TREE" "$TLS" "$KEYS"
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"+ timedatectl set-timezone Europe/Rome"* ]]
+}
+
+@test "installa il server SSH anche se l'installer non l'ha selezionato" {
+    run bash "$BOOT" --prova "$TREE" "$TLS" "$KEYS"
+    [ "$status" -eq 0 ]
+    [[ "$(grep -F "apt-get install" <<<"$output")" == *"openssh-server"* ]]
+}

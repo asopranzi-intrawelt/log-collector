@@ -16,11 +16,11 @@
 # prima di caricarlo, cosi' un errore di sintassi non lascia il collettore senza firewall, e
 # sshd si ricarica solo dopo che ogni amministratore ha account e chiave, cosi' AllowGroups non
 # chiude fuori nessuno. La password locale di ciascuno, che serve a sudo, si imposta a mano alla
-# fine: lo script non la conosce e non la genera.
+# fine e il titolare la cambia con passwd: lo script non la conosce e non la genera.
 set -euo pipefail
 
 readonly PACKAGES=(rsyslog rsyslog-gnutls chrony nftables openssl curl python3-requests
-    msmtp-mta cifs-utils unattended-upgrades qemu-guest-agent sudo)
+    msmtp-mta cifs-utils unattended-upgrades qemu-guest-agent sudo openssh-server)
 readonly CONFIG_FILES=(
     etc/nftables.conf
     etc/chrony/sources.d/inrim.sources
@@ -33,6 +33,8 @@ readonly CONFIG_FILES=(
 readonly TLS_FILES=(ca.pem collector.pem collector.key)
 readonly DATA_MOUNT=/srv/ads
 readonly ADMIN_GROUP=ads-admin
+# Fuso dell'Italia: l'orologio resta in UTC, il fuso decide come l'ora locale viene mostrata.
+readonly TIMEZONE=Europe/Rome
 readonly USER_NAME='^[a-z][a-z0-9-]{0,30}$'
 
 DRY_RUN=0
@@ -138,6 +140,7 @@ main() {
     check_admins "$keys" "${admins[@]}"
     check_data_mount
 
+    run timedatectl set-timezone "$TIMEZONE"
     run apt-get update
     run env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends "${PACKAGES[@]}"
 
@@ -183,8 +186,9 @@ main() {
     run systemctl enable --now unattended-upgrades
 
     echo "bootstrap completato; verifiche: chronyc sources, nft list ruleset, qemu-ga --dump-conf"
-    echo "resta a mano, dalla console: per ogni amministratore 'passwd <utente>' con una password"
-    echo "temporanea e 'chage -d 0 <utente>', cosi' al primo sudo la cambia lui: ${admins[*]}"
+    # Niente 'chage -d 0': con SSH solo a chiave una password scaduta puo' bloccare il login.
+    echo "resta a mano: per ogni amministratore 'sudo passwd <utente>' con una password temporanea,"
+    echo "che lui cambia con 'passwd' al primo accesso: ${admins[*]}"
 }
 
 main "$@"
