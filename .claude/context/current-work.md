@@ -96,7 +96,8 @@ Cosa fa: il firewall (ZLD 5.42) invia in syslog UDP sulla 514 i propri log, fra 
 Definition of done:
 
 - [x] firewall: stato attuale di `Log Settings` letto il 2026-10-02: quattro Remote Server vuoti e inattivi, setup da zero
-- [ ] a setup concluso, aggiornare `D:/network-design` e il suo contesto con le modifiche al firewall (mandato dell'utente, ADR-004)
+- [x] `D:/network-design` aggiornato il 2026-10-02 con le modifiche a firewall, host Proxmox e collettore (ADR-004), da committare in quel repository
+- [ ] decisione aperta: backup del disco di sistema della VM 210, che nessun job seleziona
 - [x] firewall: Remote Server 1 verso il collettore, categorie Authenticate e System; login riuscito, fallito e logout registrati con i cinque campi, nella categoria User (2026-10-02)
 - [x] firewall: sottocategoria System Monitoring spenta il 2026-10-02; nessun messaggio di stato dopo lo spegnimento
 - [ ] domanda aperta: account amministrativi personali sul firewall (oggi `admin` generico) e su Proxmox (oggi `root`), come ADR-008
