@@ -89,6 +89,25 @@ Definition of done:
 - [x] un login SSH e uno web riusciti all'host compaiono in `/srv/ads/<IP host>/` sul collettore, con i cinque campi (2026-10-01 e 2026-10-02); richieste periodiche e task esclusi
 - [x] un login SSH e uno web falliti compaiono (2026-10-02): `pvedaemon ... authentication failure; rhost=... user=...` e `sshd ... Failed password`; nessuna riga 401 perché la forma `extjs` dell'API risponde sempre 200; esito letto da `pvedaemon`. Collaudo punto 3 per l'host superato il 2026-10-02
 
+## Feature: punto 3, firewall USG FLEX e NAS QNAP
+
+Cosa fa: il firewall (ZLD 5.42) invia in syslog UDP sulla 514 i propri log, fra cui i login amministrativi; i NAS QNAP inviano gli accessi amministrativi con il metodo che il loro firmware consente. Amministrati dall'IT Manager.
+
+Definition of done:
+
+- [x] firewall: stato attuale di `Log Settings` letto il 2026-10-02: quattro Remote Server vuoti e inattivi, setup da zero
+- [ ] a setup concluso, aggiornare `D:/network-design` e il suo contesto con le modifiche al firewall (mandato dell'utente, ADR-004)
+- [x] firewall: Remote Server 1 verso il collettore, categorie Authenticate e System; login riuscito, fallito e logout registrati con i cinque campi, nella categoria User (2026-10-02)
+- [x] firewall: sottocategoria System Monitoring spenta il 2026-10-02; nessun messaggio di stato dopo lo spegnimento
+- [ ] domanda aperta: account amministrativi personali sul firewall (oggi `admin` generico) e su Proxmox (oggi `root`), come ADR-008
+- [x] firewall: NTP su `ntp1.inrim.it`, fuso manuale di Roma, ora legale europea a mano (2026-10-02); [Non verificato] semantica dell'ora di fine, da controllare dopo il 25/10/2026
+- [x] collaudo punto 7 per il firewall: ora dichiarata e ora di ricezione coincidono entro il secondo (2026-10-02)
+- [ ] domanda aperta: includere la categoria VPN se gli AdS o l'MSP accedono dall'esterno con la VPN del firewall
+- [ ] NAS: firmware di ciascuno letto sul dispositivo; decisione su INTRA3, dismesso di fatto
+- [ ] NAS: invio configurato, filtro D7 rinviato all'elenco AdS
+- [x] collaudo punto 3 per il firewall: login riuscito, fallito e logout con i cinque campi (2026-10-02)
+- [ ] collaudo punto 3 per i NAS
+
 ## Riconciliazione
 
 Ultima verifica: 2026-09-30 al commit e3e6e69, con le modifiche di ADR-008 non ancora committate.

@@ -127,12 +127,18 @@ logger -t sshd-session "Accepted publickey for admuno from 192.0.2.9 port 50000 
 logger -t sshd-auth "Invalid user prova from 192.0.2.9 port 50001"
 logger -t sudo "admuno : TTY=pts/1 ; PWD=/home/admuno ; USER=root ; COMMAND=/usr/bin/id"
 logger -t cron "messaggio estraneo agli accessi"
+# Riga del firewall Zyxel ZLD 5.42 come arriva sulla 514 (letta sul collettore il 2026-10-02, con
+# indirizzi di documentazione e identificativo del dispositivo azzerato): anno dopo l ora e nessun
+# nome di programma, con i due punti dentro il primo campo.
+printf "<142>Oct  2 05:35:37 2026 usgflex500 src=\"192.0.2.73:0\" dst=\"192.0.2.1:0\" msg=\"Failed login attempt to Device from http/https (incorrect password or inexistent username)\" note=\"Account: admin\" user=\"unknown\" devID=\"000000000000\" cat=\"User\"" > /dev/udp/127.0.0.1/514
 sleep 2
 f=/srv/ads/127.0.0.1/$(date +%Y-%m-%d).log
 [ -f "$f" ] || { ls -R /srv/ads; fail "file del giorno assente: $f"; }
 grep -q "prova-udp messaggio udp" "$f" || { cat "$f"; fail "riga UDP RFC 5424 assente o con tag e messaggio fusi"; }
 grep -q "prova-3164: messaggio 3164" "$f" || { cat "$f"; fail "riga UDP RFC 3164 assente"; }
 grep -q "prova-udpmessaggio" "$f" && fail "tag e messaggio fusi"
+grep -qF " usgflex500 src=\"192.0.2.73:0\" dst=\"192.0.2.1:0\" msg=\"Failed login attempt" "$f" || { cat "$f"; fail "riga Zyxel alterata o con il sistema sbagliato"; }
+grep -q " 2026 usgflex500 " "$f" && fail "anno preso per nome del sistema"
 grep -q "sorgente-tls prova-tls: messaggio tls" "$f" || fail "riga TLS assente"
 grep -q "messaggio in chiaro" "$f" && fail "TCP in chiaro accettato sulla porta TLS"
 grep -q "sshd-session: Accepted publickey for admuno" "$f" || fail "login sshd-session assente dal ruleset ads"
@@ -144,7 +150,7 @@ bad=$(grep -cvE "^$rfc 127\.0\.0\.1 $rfc [^ ]+ [^ ]+" "$f" || true)
 [ "$bad" -eq 0 ] || { cat "$f"; fail "$bad righe non rispettano i cinque campi di AdsLine"; }
 [ "$(stat -c "%U:%G %a" "$f")" = "root:ads 640" ] || fail "permessi del file: $(stat -c "%U:%G %a" "$f")"
 [ "$(stat -c "%U:%G %a" "$(dirname "$f")")" = "root:ads 750" ] || fail "permessi della cartella: $(stat -c "%U:%G %a" "$(dirname "$f")")"
-ok "rsyslog: UDP (RFC 5424 e 3164) e TLS ricevuti con tag e messaggio separati, TCP in chiaro scartato, accessi sshd-session, sshd-auth e sudo nel ruleset ads, $(wc -l < "$f") righe AdsLine, permessi root:ads"
+ok "rsyslog: UDP (RFC 5424 e 3164, riga Zyxel identica con sistema giusto) e TLS ricevuti, TCP in chiaro scartato, accessi sshd-session, sshd-auth e sudo nel ruleset ads, $(wc -l < "$f") righe AdsLine, permessi root:ads"
 
 echo "tutte le verifiche superate"
 '

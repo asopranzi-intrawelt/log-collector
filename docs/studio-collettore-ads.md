@@ -132,7 +132,7 @@ global(DefaultNetstreamDriverCAFile="/etc/rsyslog.d/tls/ca.pem"
 
 template(name="AdsFile" type="string" string="/srv/ads/%fromhost-ip%/%$year%-%$month%-%$day%.log")
 template(name="AdsLine" type="string"
-  string="%timegenerated:::date-rfc3339% %fromhost-ip% %timereported:::date-rfc3339% %hostname% %syslogtag%%msg:::sp-if-no-1st-sp%%msg:::drop-last-lf%\n")
+  string="%timegenerated:::date-rfc3339% %fromhost-ip% %timereported:::date-rfc3339% %hostname% %$!ads_msg:::drop-last-lf%\n")
 
 ruleset(name="ads") {
   action(type="omfile" dynaFile="AdsFile" template="AdsLine"
@@ -146,7 +146,7 @@ input(type="imtcp" port="6514" ruleset="ads")
 - TLS lato server con client anonimi; l'autenticazione del mittente è data dall'IP: **nftables** sul collettore accetta 514/udp e 6514/tcp solo dalle subnet gestite, SSH solo dall'IP di amministrazione della credenziale non MSP.
 - Filtro D7 per QNAP: regola prima dell'`omfile` che scarta le righe dell'IP del NAS non contenenti un account dell'elenco AdS.
 - [V] Sintassi dei parametri TLS verificata il 2026-10-01 in container `debian:trixie` con rsyslog 8.2504, la versione installata sul collettore: `rsyslogd -N1` accetta la configurazione, un messaggio inviato in TLS sulla 6514 arriva, uno inviato in TCP in chiaro sulla stessa porta viene scartato (`tests/debian13/verifica-config.sh`).
-- Correzione del 2026-10-01, provata nello stesso container: con `%syslogtag%%msg%` i messaggi RFC 5424, il cui tag non finisce con `:` e il cui testo non comincia con uno spazio, uscivano con tag e messaggio fusi (`prova-udpmessaggio udp`); la forma `%msg:::sp-if-no-1st-sp%%msg:::drop-last-lf%`, quella del formato tradizionale di rsyslog, separa i due campi in entrambi i formati.
+- Correzione del 2026-10-01, provata nello stesso container: con `%syslogtag%%msg%` i messaggi RFC 5424, il cui tag non finisce con `:` e il cui testo non comincia con uno spazio, uscivano con tag e messaggio fusi (`prova-udpmessaggio udp`); la forma `%msg:::sp-if-no-1st-sp%%msg:::drop-last-lf%`, quella del formato tradizionale di rsyslog, separa i due campi in entrambi i formati. Seconda correzione, del 2026-10-02, che supera la prima: con il firewall Zyxel, che dopo il nome del sistema non scrive un nome di programma, rsyslog prende `src="<ip>:` per tag, e la regola dello spazio aggiunto se manca lo infilava dentro l'indirizzo (`src="192.0.2.73: 0"`), alterando la prova. Il campo messaggio è ora `$!ads_msg`, calcolato nel ruleset: per RFC 3164 tag e testo riattaccati esattamente, per RFC 5424 separati da uno spazio (`$protocol-version`). Inoltre ZLD scrive l'anno dopo l'ora, e senza il parser `pmrfc3164` con `detect.YearAfterTimestamp="on"` il campo sistema valeva `2026`.
 
 ### 4.1 iLO 5 senza licenza Advanced: raccolta via Redfish
 

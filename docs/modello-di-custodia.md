@@ -20,7 +20,7 @@ Il terzo livello è l'analisi: qualcuno deve guardare i log, almeno una volta l'
 
 ## Chi amministra che cosa, al 2026-10-01
 
-Il nodo Proxmox lo amministra l'IT Manager; lo stesso nodo è gestito da NinjaOne RMM, amministrato dall'MSP, che quindi vi accede attraverso l'agent. Il collettore lo amministrano Alessio Sopranzi e Tommaso Vezeni (ADR-007, ADR-008). Tutti e tre i soggetti sono amministratori di sistema dei sistemi registrati: è il dato da cui discende la richiesta di un custode della prova esterno a ciascuno di loro.
+Il nodo Proxmox, il firewall USG FLEX e i NAS QNAP li amministra l'IT Manager; lo stesso nodo è gestito da NinjaOne RMM, amministrato dall'MSP, che quindi vi accede attraverso l'agent. Il collettore lo amministrano Alessio Sopranzi e Tommaso Vezeni (ADR-007, ADR-008). Tutti e tre i soggetti sono amministratori di sistema dei sistemi registrati: è il dato da cui discende la richiesta di un custode della prova esterno a ciascuno di loro.
 
 ## Che cosa cambia nelle decisioni già prese
 
