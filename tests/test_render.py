@@ -120,3 +120,19 @@ def test_elenco_amministratori_generato(tmp_path):
     assert code == 0
     text = (dest / "etc" / "ads" / "amministratori").read_text(encoding="utf-8")
     assert text.splitlines()[-1] == "admuno, admdue"
+
+
+def test_configurazione_host_proxmox(tmp_path):
+    code, dest = run(
+        tmp_path, FIXTURES / "parametri-completi.yaml", ROOT / "config" / "proxmox-host"
+    )
+    assert code == 0
+    conf = (dest / "etc" / "rsyslog.d" / "90-ads.conf").read_text(encoding="utf-8")
+    assert "{{" not in conf
+    assert 'target="192.0.2.50" port="6514"' in conf
+    assert 'StreamDriverPermittedPeers="ads-collector.example.com"' in conf
+    assert 'freshStartTail="on"' in conf
+    # L'access log va su un ruleset proprio e si inoltra solo il login (runbook del punto 3).
+    assert 'ruleset="ads_pveproxy"' in conf
+    assert 'if $msg contains "/access/ticket" then' in conf
+    assert '$programname == "pvedaemon" and $msg contains "auth"' in conf

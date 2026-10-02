@@ -18,6 +18,10 @@ Il secondo livello è la custodia della prova: rendere le registrazioni di ciasc
 
 Il terzo livello è l'analisi: qualcuno deve guardare i log, almeno una volta l'anno per il punto 4.4, e con una frequenza maggiore se lo scopo è anche accorgersi di un abuso quando accade. L'analisi richiede uno strumento, per esempio Wazuh, e soprattutto una persona o un servizio che lo usi, perché un sistema che nessuno guarda produce costo senza effetto. Il verificatore del punto 4.4 è il titolare o un responsabile del trattamento, non l'amministratore di sistema verificato.
 
+## Chi amministra che cosa, al 2026-10-01
+
+Il nodo Proxmox lo amministra l'IT Manager; lo stesso nodo è gestito da NinjaOne RMM, amministrato dall'MSP, che quindi vi accede attraverso l'agent. Il collettore lo amministrano Alessio Sopranzi e Tommaso Vezeni (ADR-007, ADR-008). Tutti e tre i soggetti sono amministratori di sistema dei sistemi registrati: è il dato da cui discende la richiesta di un custode della prova esterno a ciascuno di loro.
+
 ## Che cosa cambia nelle decisioni già prese
 
 ADR-007 e ADR-008 restano validi per il primo livello: Alessio Sopranzi e Tommaso Vezeni amministrano la VM di raccolta, con account personali i cui accessi il collettore registra. Non bastano per il secondo livello, e non devono essere letti come se bastassero: la loro posizione è la stessa che `docs/confronto-wazuh.md` contestava all'MSP. Il residuo che resta scoperto anche con la custodia esterna va dichiarato: chi amministra il collettore può ancora alterare o sopprimere le righe del giorno in corso prima che la catena notturna le chiuda (studio, sezione 6), e la mitigazione possibile è ridurre quella finestra, per esempio con una marca temporale più frequente della giornaliera, o con un inoltro in tempo reale verso il custode.

@@ -1,0 +1,47 @@
+# Host Proxmox come sorgente del collettore AdS (handoff, sezione 5). Generato da ads-render.py
+# su config/proxmox-host; si installa sull'host insieme alla CA del collettore in
+# /etc/rsyslog.d/tls/ca.pem. Richiede i pacchetti rsyslog e rsyslog-gnutls, che PVE 8 non installa.
+#
+# Invio in TLS sulla 6514 con verifica del certificato del collettore per nome (x509/name): il
+# nome permesso e' il FQDN scritto nel certificato, mentre la destinazione e' l'indirizzo, cosi'
+# l'invio non dipende dal DNS interno, che per il collettore non e' ancora registrato.
+# Coda su disco: se il collettore e' fermo i messaggi restano sull'host e partono alla ripresa.
+#
+# Si inoltrano gli accessi, non le attivita': il provvedimento chiede di registrare
+# l'autenticazione, e il resto (ogni richiesta dell'interfaccia web, ogni task di pvedaemon)
+# produrrebbe milioni di righe al mese senza aggiungere un accesso. Righe reali lette il
+# 2026-10-01 da PVE 8.3.4: runbook docs/runbook-componente-3-proxmox.md.
+
+global(DefaultNetstreamDriverCAFile="/etc/rsyslog.d/tls/ca.pem")
+
+# Accessi web. pveproxy scrive nel suo access log l'IP del login, che pvedaemon non scrive:
+# la riga e' "POST /api2/extjs/access/ticket" (o /api2/json/...), con utente "-" perche' a quel
+# punto non e' ancora autenticato, e l'utente lo da' la riga di pvedaemon dello stesso secondo.
+# L'access log si legge su un ruleset proprio: cosi' le sue righe non entrano nel ruleset
+# predefinito e non duplicano /var/log/syslog dell'host. freshStartTail: al primo avvio si parte
+# dalla fine del file, senza rimandare lo storico.
+ruleset(name="ads_pveproxy") {
+    if $msg contains "/access/ticket" then {
+        action(type="omfwd" target="{{ collettore.ip }}" port="6514" protocol="tcp"
+               StreamDriver="gtls" StreamDriverMode="1"
+               StreamDriverAuthMode="x509/name" StreamDriverPermittedPeers="{{ collettore.fqdn }}"
+               queue.type="LinkedList" queue.filename="ads_fwd_pveproxy" queue.maxDiskSpace="100m"
+               queue.saveOnShutdown="on" action.resumeRetryCount="-1")
+    }
+}
+module(load="imfile")
+input(type="imfile" File="/var/log/pveproxy/access.log" Tag="pveproxy-access:"
+      freshStartTail="on" ruleset="ads_pveproxy")
+
+# Accessi SSH e locali, e autenticazioni dell'interfaccia web. Per SSH ogni nome che comincia con
+# "sshd", come sul collettore: da OpenSSH 9.8 i login li scrive sshd-session. Di pvedaemon solo
+# i messaggi di autenticazione ("successful auth", "authentication failure"), non i task.
+if $programname startswith "sshd"
+   or $programname == ["sudo", "su", "login"]
+   or ($programname == "pvedaemon" and $msg contains "auth") then {
+    action(type="omfwd" target="{{ collettore.ip }}" port="6514" protocol="tcp"
+           StreamDriver="gtls" StreamDriverMode="1"
+           StreamDriverAuthMode="x509/name" StreamDriverPermittedPeers="{{ collettore.fqdn }}"
+           queue.type="LinkedList" queue.filename="ads_fwd" queue.maxDiskSpace="500m"
+           queue.saveOnShutdown="on" action.resumeRetryCount="-1")
+}

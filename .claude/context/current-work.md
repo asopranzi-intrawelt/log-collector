@@ -75,6 +75,20 @@ Definition of done:
 
 Rinviato: filtro D7 del QNAP, che dipende dall'elenco AdS approvato (sezione 0, bloccante).
 
+## Feature: punto 3, host Proxmox come sorgente
+
+Cosa fa: l'host invia al collettore, in TLS con verifica del certificato per nome, i login SSH, le autenticazioni di `pvedaemon` e l'access log di `pveproxy`, con coda su disco se il collettore è fermo (handoff, sezione 5). Amministra l'host l'IT Manager; l'MSP vi accede via NinjaOne.
+
+Definition of done:
+
+- [x] ricognizione in sola lettura dell'host: rsyslog assente, nomi dei programmi `sshd` e `pvedaemon`, access log da 8 MB
+- [x] `config/proxmox-host/etc/rsyslog.d/90-ads.conf.template` e prova in `debian:bookworm` verdi, con controllo negativo dimostrato
+- [x] rsyslog e rsyslog-gnutls 8.2302 installati sull'host il 2026-10-01
+- [x] il journal arriva a rsyslog sull'host: un login SSH compare in `/var/log/auth.log` (verificato il 2026-10-01)
+- [x] configurazione e CA copiate, `rsyslogd -N1` valido, rsyslog riavviato e attivo (2026-10-01)
+- [x] un login SSH e uno web riusciti all'host compaiono in `/srv/ads/<IP host>/` sul collettore, con i cinque campi (2026-10-01 e 2026-10-02); richieste periodiche e task esclusi
+- [x] un login SSH e uno web falliti compaiono (2026-10-02): `pvedaemon ... authentication failure; rhost=... user=...` e `sshd ... Failed password`; nessuna riga 401 perché la forma `extjs` dell'API risponde sempre 200; esito letto da `pvedaemon`. Collaudo punto 3 per l'host superato il 2026-10-02
+
 ## Riconciliazione
 
 Ultima verifica: 2026-09-30 al commit e3e6e69, con le modifiche di ADR-008 non ancora committate.
