@@ -14,6 +14,10 @@ stato: componente 1 scritto e provato in locale, da eseguire sugli host
 
 > La fonte di verità su cosa è fatto resta `memory/index.md` e il work-log, non le spunte di questo file. Ogni feature si descrive con lo schema fisso sotto, così il lavoro pendente è leggibile senza ricostruire il contesto da capo.
 
+## Modo di lavoro concordato con l'utente
+
+Direttive d'uso date dall'utente durante il lavoro sugli host, valide per ogni sessione finché non le cambia. Sugli apparati si procede un passo alla volta, e ogni risposta finisce con il passo successivo da fare, non soltanto con l'esito registrato. I comandi verso collettore e host si consegnano per la PowerShell di Windows via SSH, non per la console noVNC. L'utente lancia i comandi e trasmette screenshot dalla cartella di Screenpresso; l'agente li legge, registra esiti e misure nel work-log e nel runbook della sorgente nello stesso giro. I runbook si scrivono perché `D:/compilatore-documenti` possa ricavarne in ogni momento un documento per un cliente. Si resta sullo scopo del collettore: i difetti degli apparati emersi strada facendo, come la lentezza di INTRA2, si misurano quanto basta, si annotano e si portano in `D:/network-design`, senza proseguire la diagnosi qui. Da network-design e da compilatore-documenti si legge solo lo stretto necessario.
+
 ## Feature: componente 1, VM + Debian + nftables + chrony + TLS
 
 Cosa fa: prepara tutto ciò che serve a creare la VM del collettore e a portarla a una Debian 13 configurata e raggiungibile in TLS, cioè il punto 1 della sezione 7 dell'handoff, che la sezione 0 non blocca. Scadenza dello studio per i punti 1-4: 23/10/2026.
