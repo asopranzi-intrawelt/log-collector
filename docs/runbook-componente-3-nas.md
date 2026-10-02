@@ -48,3 +48,28 @@ Che cosa arriva sul collettore, nella cartella con l'indirizzo di INTRA2 e con i
 Ogni riga porta utente, postazione, tipo di connessione o applicazione, ed esito: i cinque campi ci sono, e arrivano anche le operazioni sull'apparato, come la modifica dell'ora appena fatta. Collaudo punto 3 superato per INTRA2 il 2026-10-02.
 
 Le due righe scritte prima della sincronizzazione con INRIM avevano uno scarto di 3-5 secondi fra ora dichiarata e ora di ricezione, la stessa deriva osservata su HERO; dopo la sincronizzazione un login è ricevuto alle 16:05:05.02 e dichiarato alle 16:05:05, e un login fallito ricevuto alle 16:16:11.81 è dichiarato alle 16:16:11: scarto entro il secondo, collaudo punto 7 superato per INTRA2.
+
+## INTRA
+
+Modello TS-410U con 503 MB di memoria, firmware QTS 4.2.6 build 20240618, letti il 2026-10-02 in `Control Panel > System Status > System Information`, con 591 giorni di attività senza riavvio. È un modello vecchio, la cui sostituzione nel 2027 per la ISO 27001 è già pianificata in `D:/network-design`. L'interfaccia, in inglese, si usa con l'account generico `admin` e in HTTP sulla 8080, come INTRA2.
+
+QTS 4.2 non ha QuLog Center. Prima di questo lavoro la registrazione dei log di connessione era spenta (`No connection logs or logging is not enabled`): gli accessi degli amministratori al pannello non restavano registrati da nessuna parte, nemmeno in locale.
+
+Configurazione, in `Control Panel > System > System Logs`. Nella scheda `System Connection Logs`, con `Options`, si registrano i soli tipi di connessione HTTP, SSH, Telnet e SMB (Windows), e si tolgono FTP, AFP, iSCSI, RADIUS e VPN; poi `Start Logging`. SMB si registra per scelta dell'utente, per vedere anche chi accede alle cartelle; NFS non è fra i tipi registrabili. Nella scheda `Syslog Client Management`: `Enable Syslog`, indirizzo del collettore, porta UDP 514, `System Event Logs` e `System Connection Logs`, `Apply All`.
+
+Rischio residuo dichiarato: QTS 4.2 invia soltanto in UDP, senza TCP né TLS, quindi le righe di INTRA viaggiano in chiaro sulla LAN e una riga persa non lascia traccia né sul NAS né sul collettore. È lo stesso canale del firewall, che non sa fare di meglio; il rischio si chiude con la sostituzione del NAS prevista nel 2027, quando il modello nuovo invierà in TLS come HERO e INTRA2.
+
+Ora, in `Control Panel > System > General Settings > Time`: sincronizzazione automatica con `ntp1.inrim.it`, intervallo 1 ora, fuso `(GMT+01:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna`. QTS 4.2 non offre la prova di connessione, quindi la sincronizzazione si verifica sulle righe ricevute.
+
+Che cosa arriva sul collettore, nella cartella con l'indirizzo di INTRA e con il sistema `NAS-INTRA`, programma `qlogd`:
+
+| Evento | Riga |
+|---|---|
+| login riuscito | `conn log: Users: <account>, Source IP: <postazione>, Computer name: ---, Connection type: HTTP, Accessed resources: Administration, Action: Login OK` |
+| login fallito | `conn log: ... Connection type: HTTP, Accessed resources: Administration, Action: Login Fail` |
+| logout | `conn log: ... Connection type: HTTP, Accessed resources: ---, Action: Logout` |
+| connessione SMB | `conn log: Users: <account>, Source IP: <host>, Computer name: <nome host>, Connection type: SAMBA, Accessed resources: ---, Action: Login OK` |
+
+Rispetto a QTS 5 il login riuscito si chiama `Login OK` invece di `Login Success`, e il login fallito arriva una volta sola, senza la riga gemella nel log degli eventi. Ogni riga porta utente, postazione, tipo di connessione ed esito: i cinque campi ci sono, collaudo punto 3 superato per INTRA il 2026-10-02. Un login fallito è dichiarato alle 17:09:37 e ricevuto alle 17:09:37.08, un login riuscito dichiarato alle 17:09:40 e ricevuto alle 17:09:40.27: scarto entro il secondo, ora legale applicata correttamente, collaudo punto 7 superato per INTRA.
+
+Effetto della registrazione di SMB, misurato nella prima prova: l'host Proxmox, che usa INTRA come archivio dei dump, apre una connessione SMB con l'account di servizio `backup` circa ogni 10 secondi, perché controlla periodicamente lo stato dello storage. Sono circa 8.600 righe al giorno, dell'ordine di 2 MB, contro poche decine di accessi amministrativi. Non sono dati di lavoratori, ma un account di servizio, e restano utili come prova: le credenziali di `backup` sono nella configurazione di Proxmox, che l'amministratore dell'host può leggere, e un loro uso da una postazione comparirebbe proprio qui. La decisione su come trattarle è aperta: tenerle tutte, filtrarle sul collettore oppure togliere SMB sul NAS.
