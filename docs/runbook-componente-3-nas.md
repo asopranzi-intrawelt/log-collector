@@ -25,3 +25,26 @@ Che cosa arriva sul collettore, nella cartella con l'indirizzo di HERO e con il 
 Ogni riga porta utente, postazione, tipo di connessione, risorsa ed esito: i cinque campi ci sono. Collaudo punto 3 superato per HERO il 2026-10-02.
 
 Ora. Le prime righe avevano uno scarto costante di 4-5 secondi fra ora dichiarata e ora di ricezione. In `Pannello di controllo > Sistema > Impostazioni generali > Ora` il NAS si sincronizzava con `pool.ntp.org` una volta al giorno, e fra due sincronizzazioni l'orologio derivava. Correzione: server `ntp1.inrim.it`, come prevede la decisione D5 e come collettore e firewall, verificato con `Test connessione` (esito `Riuscita`); intervallo di sincronizzazione 1 ora; fuso `(GMT+01:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna`, equivalente al precedente e coerente con il firewall. Dopo la correzione un login è ricevuto alle 15:24:17.17 e dichiarato alle 15:24:17: scarto entro il secondo, collaudo punto 7 superato per HERO.
+
+## INTRA2
+
+Modello TS-435XeU con 4 GB di RAM, firmware QTS 5.2.9.3451 build 20260327, letti il 2026-10-02 in `Pannello di controllo > Sistema > Stato del sistema`; il NAS ha sostituito pochi mesi fa un modello precedente guastato, quindi l'inventario di `D:/network-design` va corretto. Il 2026-10-02 il NAS segnalava aggiornamenti del firmware disponibili, non applicati in questo lavoro. L'interfaccia si usa con l'account generico `admin`, e in HTTP invece che in HTTPS: la password dell'amministratore viaggia in chiaro sulla rete a ogni accesso al pannello, rilievo portato in network-design.
+
+Il log di accesso locale, letto in `QuLog Center > Dispositivo locale > Log accessi`, conteneva 34 voci, tutte accessi amministrativi di `admin` alla risorsa `Administration`, e nessuna connessione di utenti ordinari alle cartelle: come su HERO, il problema della decisione D7 oggi non si pone.
+
+Configurazione dell'invio, in `QuLog Center > Servizio QuLog > Mittente log > Invia al server Syslog`, identica a HERO: una destinazione verso il collettore, porta 6514, protocollo TLS, formato RFC-3164, tipo di log `Log eventi e accessi`, interruttore generale `Invia log al server syslog remoto` acceso.
+
+Ora, in `Pannello di controllo > Sistema > Impostazioni generali > Ora`, impostata subito come su HERO: sincronizzazione automatica con `ntp1.inrim.it`, verificata con `Test connessione` (esito `Riuscita`), intervallo 1 ora, fuso `(GMT+01:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna`.
+
+Che cosa arriva sul collettore, nella cartella con l'indirizzo di INTRA2 e con il sistema `NAS-INTRA2`:
+
+| Evento | Riga |
+|---|---|
+| login riuscito | `conn log: Users: <account>, Source IP: <postazione>, ..., Connection type: HTTP, Accessed resources: Administration, Action: Login Success` |
+| login fallito | `conn log: ... Action: Login Fail`, e nel log eventi `Category: Login and Security, Content: [Users] Failed to log in via user account "<account>". Source IP address: <postazione>.` |
+| logout | `conn log: ... Action: Logout` |
+| modifica di configurazione | `event log: Users: <account>, Source IP: <postazione>, ..., Application: General Settings, Category: Date & Time, Content: [General Settings] Modified date/time settings.` |
+
+Ogni riga porta utente, postazione, tipo di connessione o applicazione, ed esito: i cinque campi ci sono, e arrivano anche le operazioni sull'apparato, come la modifica dell'ora appena fatta. Collaudo punto 3 superato per INTRA2 il 2026-10-02.
+
+Le due righe scritte prima della sincronizzazione con INRIM avevano uno scarto di 3-5 secondi fra ora dichiarata e ora di ricezione, la stessa deriva osservata su HERO; dopo la sincronizzazione un login è ricevuto alle 16:05:05.02 e dichiarato alle 16:05:05, e un login fallito ricevuto alle 16:16:11.81 è dichiarato alle 16:16:11: scarto entro il secondo, collaudo punto 7 superato per INTRA2.

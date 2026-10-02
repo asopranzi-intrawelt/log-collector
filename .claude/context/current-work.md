@@ -106,7 +106,8 @@ Definition of done:
 - [ ] domanda aperta: includere la categoria VPN se gli AdS o l'MSP accedono dall'esterno con la VPN del firewall
 - [ ] NAS: firmware di ciascuno letto sul dispositivo; HERO letto il 2026-10-02 (TS-h1677XU-RP, QuTS hero h5.2.10); INTRA3 nel perimetro (posta esportata, accesso amministrativo), da leggere dopo HERO
 - [x] HERO: invio TLS sulla 6514 di log eventi e accessi, NTP su INRIM ogni ora, fuso di Roma (2026-10-02)
-- [ ] INTRA2, INTRA, INTRA3: firmware, metodo di invio, NTP; filtro D7 se i log di accesso portano utenti ordinari
+- [x] INTRA2: invio TLS sulla 6514 di log eventi e accessi, NTP su INRIM ogni ora, fuso di Roma, collaudi punti 3 e 7 (2026-10-02)
+- [ ] INTRA, INTRA3: firmware, metodo di invio, NTP; filtro D7 se i log di accesso portano utenti ordinari
 - [x] collaudo punto 3 per il firewall: login riuscito, fallito e logout con i cinque campi (2026-10-02)
 - [x] collaudo punti 3 e 7 per HERO (2026-10-02)
 - [ ] collaudo punti 3 e 7 per gli altri NAS
