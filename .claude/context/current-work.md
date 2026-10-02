@@ -100,14 +100,16 @@ Definition of done:
 - [ ] decisione aperta: backup del disco di sistema della VM 210, che nessun job seleziona
 - [x] firewall: Remote Server 1 verso il collettore, categorie Authenticate e System; login riuscito, fallito e logout registrati con i cinque campi, nella categoria User (2026-10-02)
 - [x] firewall: sottocategoria System Monitoring spenta il 2026-10-02; nessun messaggio di stato dopo lo spegnimento
-- [ ] domanda aperta: account amministrativi personali sul firewall (oggi `admin` generico) e su Proxmox (oggi `root`), come ADR-008
+- [ ] domanda aperta: account amministrativi personali sul firewall e su HERO (oggi `admin` generico) e su Proxmox (oggi `root`), come ADR-008
 - [x] firewall: NTP su `ntp1.inrim.it`, fuso manuale di Roma, ora legale europea a mano (2026-10-02); [Non verificato] semantica dell'ora di fine, da controllare dopo il 25/10/2026
 - [x] collaudo punto 7 per il firewall: ora dichiarata e ora di ricezione coincidono entro il secondo (2026-10-02)
 - [ ] domanda aperta: includere la categoria VPN se gli AdS o l'MSP accedono dall'esterno con la VPN del firewall
-- [ ] NAS: firmware di ciascuno letto sul dispositivo; decisione su INTRA3, dismesso di fatto
-- [ ] NAS: invio configurato, filtro D7 rinviato all'elenco AdS
+- [ ] NAS: firmware di ciascuno letto sul dispositivo; HERO letto il 2026-10-02 (TS-h1677XU-RP, QuTS hero h5.2.10); INTRA3 nel perimetro (posta esportata, accesso amministrativo), da leggere dopo HERO
+- [x] HERO: invio TLS sulla 6514 di log eventi e accessi, NTP su INRIM ogni ora, fuso di Roma (2026-10-02)
+- [ ] INTRA2, INTRA, INTRA3: firmware, metodo di invio, NTP; filtro D7 se i log di accesso portano utenti ordinari
 - [x] collaudo punto 3 per il firewall: login riuscito, fallito e logout con i cinque campi (2026-10-02)
-- [ ] collaudo punto 3 per i NAS
+- [x] collaudo punti 3 e 7 per HERO (2026-10-02)
+- [ ] collaudo punti 3 e 7 per gli altri NAS
 
 ## Riconciliazione
 
