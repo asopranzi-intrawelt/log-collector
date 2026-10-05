@@ -127,6 +127,7 @@ Definition of done:
 - [ ] elenco delle VM nel perimetro, con quali sono AdS-rilevanti e chi vi accede; il censimento delle VM e dei loro account sta in `D:/network-design`
 - [ ] domanda aperta: le VM Linux si amministrano con un account locale condiviso, lo stesso nome su quattro macchine, quindi il collettore registrerebbe la postazione e non la persona; stesso problema di ADR-008 per firewall, HERO e Proxmox
 - [ ] VM 204: configurazione rsyslog di invio, template in `config/`, prova in contenitore, installazione e collaudi punti 3 e 7, runbook dedicato
+- [x] contesto, 2026-10-05: la VM 204 ha watchdog collaudato e presidi interni, e la postazione la sorveglia da fuori con notifiche di Windows sui cambi di stato; strumenti in `D:/network-design` (`scripts/vm-health/`, `scripts/Watch-VmHealth.ps1`), fonte unica per i progetti, ed estensione alle altre VM nel suo micro-step M29. È un controllo provvisorio della postazione, non sostituisce il controllo di silenzio qui sotto
 - [ ] heartbeat delle sorgenti Linux (D6): forma del messaggio, cadenza e come `ads-silence.sh` lo riconosce
 - [ ] `ads-silence.sh` anticipato e cadenza rivalutata rispetto al controllo notturno dell'handoff
 - [ ] relay SMTP scelto (bloccante già noto: `smtp_relay`, `mail_direzione`); condiviso con gli allarmi tecnici delle VM, che però non passano dal collettore

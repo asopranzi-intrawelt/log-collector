@@ -2,6 +2,10 @@
 
 > Append-only, in ordine cronologico inverso (la voce più recente in alto). Ogni passo significativo di codice e ogni intervento manuale rilevante lascia una voce con data, file toccati, motivo e commit di riferimento. Qui confluisce anche il log di riconciliazione dei documenti `.docx`, con il nome del documento sorgente e l'esito, così la data di allineamento sopravvive a un clone.
 
+## 2026-10-05 - Pilota della VM 204 chiuso in network-design
+
+Commit: da committare con `chiudi`. File toccati: `.claude/context/current-work.md`, questo work-log. Nessun comando eseguito sul collettore. In `D:/network-design` il pilota della VM 204 è chiuso: watchdog collaudato con un crash simulato, presidi interni e una sorveglianza esterna provvisoria dalla postazione, con notifiche di Windows solo sui cambi di stato. Per decisione dell'IT Manager gli script di utilità vivono in quel repository e i progetti li richiamano; qui non se ne tiene copia. Per lo scopo di questo progetto non cambia nulla: la feature di ADR-013 resta aperta, e il controllo di silenzio con heartbeat resta il controllo esterno definitivo.
+
 ## 2026-10-05 - Le macchine virtuali entrano fra le sorgenti (ADR-013)
 
 Commit: da committare con `chiudi` (messaggio in `_notes/COMMIT-MSG.txt`). File toccati: `.claude/memory/decisions.md` (ADR-013), `.claude/context/current-work.md` (feature nuova), `.claude/memory/index.md`, questo work-log. Nessun comando eseguito sul collettore né su sorgenti di questo progetto.
