@@ -118,6 +118,20 @@ Definition of done:
 - [x] collaudo punti 3 e 7 per HERO (2026-10-02)
 - [ ] collaudo punti 3 e 7 per gli altri NAS
 
+## Feature: punto 3, macchine virtuali di Proxmox come sorgenti (ADR-013)
+
+Cosa fa: ogni VM invia al collettore, in TLS sulla 6514 con coda su disco, i propri accessi amministrativi (`sshd`, `sudo`, `su`, login grafico) e un heartbeat periodico, così che il controllo di silenzio registri anche una VM ferma. Si comincia dalla VM 204, il convertitore dei ruolini, che dal 05/10/2026 è il pilota del presidio sulle VM registrato in `D:/network-design` (`docs/log-collector-integrazione.md`, sezione sul monitoraggio delle macchine virtuali). Amministra le VM l'IT Manager.
+
+Definition of done:
+
+- [ ] elenco delle VM nel perimetro, con quali sono AdS-rilevanti e chi vi accede; il censimento delle VM e dei loro account sta in `D:/network-design`
+- [ ] domanda aperta: le VM Linux si amministrano con un account locale condiviso, lo stesso nome su quattro macchine, quindi il collettore registrerebbe la postazione e non la persona; stesso problema di ADR-008 per firewall, HERO e Proxmox
+- [ ] VM 204: configurazione rsyslog di invio, template in `config/`, prova in contenitore, installazione e collaudi punti 3 e 7, runbook dedicato
+- [ ] heartbeat delle sorgenti Linux (D6): forma del messaggio, cadenza e come `ads-silence.sh` lo riconosce
+- [ ] `ads-silence.sh` anticipato e cadenza rivalutata rispetto al controllo notturno dell'handoff
+- [ ] relay SMTP scelto (bloccante già noto: `smtp_relay`, `mail_direzione`); condiviso con gli allarmi tecnici delle VM, che però non passano dal collettore
+- [ ] la VM 210 stessa: stesso profilo di rischio della VM 204 (2 GB con desktop, ADR-012); un blocco del collettore apre un buco nella prova per le sorgenti UDP, quindi watchdog e memoria della VM 210 vanno decisi con lo stesso criterio applicato alla 204 in `D:/network-design`
+
 ## Riconciliazione
 
 Ultima verifica: 2026-09-30 al commit e3e6e69, con le modifiche di ADR-008 non ancora committate.
