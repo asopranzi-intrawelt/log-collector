@@ -114,11 +114,16 @@ Definition of done:
 - [x] INTRA: QTS 4.2.6, invio UDP sulla 514 di log eventi e connessioni (HTTP, SSH, Telnet, SMB), NTP su INRIM ogni ora, collaudi punti 3 e 7 (2026-10-02)
 - [ ] domanda aperta: righe SMB dell'account `backup` di Proxmox su INTRA, una ogni 10 secondi circa: tenerle, filtrarle sul collettore o togliere SMB
 - [ ] INTRA3: firmware, metodo di invio, NTP; filtro D7 se i log di accesso portano utenti ordinari
+- [x] INTRA3: l'utente conferma il 2026-10-05 che l'interfaccia web del NAS è raggiungibile; la sola schermata informativa è stata letta, senza modificare impostazioni
+- [x] INTRA3: screenshot 13 del pannello `System Information` letto il 2026-10-05: TS-210, 249 MB di RAM, firmware 4.2.6 build 20240618, fuso di Roma; NTP e invio log ancora da verificare. L'utente dichiara che solo i due amministratori interni montano le condivisioni come unità di rete
+- [ ] INTRA3: verificare sul dispositivo l'uso attuale e i log locali. La vecchia voce di `D:/network-design/docs/vendor-management.md` lo descriveva vuoto e dismesso dopo la formattazione del 2025 ed è stata corretta con la dichiarazione d'uso dell'utente; la presenza della pagina web non dimostra i contenuti né le connessioni effettive
 - [x] collaudo punto 3 per il firewall: login riuscito, fallito e logout con i cinque campi (2026-10-02)
 - [x] collaudo punti 3 e 7 per HERO (2026-10-02)
 - [ ] collaudo punti 3 e 7 per gli altri NAS
 
 ## Feature: punto 3, macchine virtuali di Proxmox come sorgenti (ADR-013)
+
+Stato: rinviata per decisione dell'utente del 2026-10-05 finché `D:/network-design` non avrà allineato tutte le VM all'impianto tecnico del pilota, M29. I log e gli allarmi tecnici restano nel flusso separato di quel progetto; solo dopo l'allineamento si riprende qui l'invio di accessi AdS e heartbeat. La priorità corrente di questo progetto è il NAS INTRA3.
 
 Cosa fa: ogni VM invia al collettore, in TLS sulla 6514 con coda su disco, i propri accessi amministrativi (`sshd`, `sudo`, `su`, login grafico) e un heartbeat periodico, così che il controllo di silenzio registri anche una VM ferma. Si comincia dalla VM 204, il convertitore dei ruolini, che dal 05/10/2026 è il pilota del presidio sulle VM registrato in `D:/network-design` (`docs/log-collector-integrazione.md`, sezione sul monitoraggio delle macchine virtuali). Amministra le VM l'IT Manager.
 
