@@ -6,7 +6,7 @@ covers-paths:
   - bin/**
   - config/**
   - tests/**
-last-verified-commit: 039e562
+last-verified-commit: 8d834dd
 ---
 
 # Stack applicativo
@@ -15,7 +15,7 @@ last-verified-commit: 039e562
 
 ## Stack e runtime
 
-Dal 2026-09-30 il repository contiene il componente 1 dell'ordine di sviluppo (VM, Debian, nftables, chrony, TLS), scritto e provato in locale ma non ancora eseguito su un host reale. Lo stack osservato nel codice conferma quello dichiarato in `CLAUDE.md`: la destinazione è una VM Debian 13 su Proxmox; gli script Bash usano `set -euo pipefail`, passano `shellcheck` e si provano con `bats`; il Python è quello della distribuzione (3.13 su Debian 13), con la sola libreria standard nel componente 1, lint `ruff` con la configurazione di `ruff.toml` e test `pytest`. Le configurazioni di sistema stanno come albero in `config/collettore/`, che riproduce `/` del collettore.
+Al commit `8d834dd` il codice copre il componente 1, il ricevente rsyslog del componente 2 e l'host Proxmox come sorgente del punto 3; i runbook registrano l'installazione e i collaudi già eseguiti sulla VM Debian 13 e sulle sorgenti. Le configurazioni del collettore stanno in `config/collettore/`, quelle dell'host in `config/proxmox-host/`. Gli script Bash usano `set -euo pipefail` e si provano con Bats e nei container Debian; gli strumenti Python usano la libreria standard, mentre il bootstrap installa `python3-requests` per i componenti API previsti. `ruff` e `pytest` controllano il Python. Le impostazioni di firewall e NAS si eseguono dalle rispettive interfacce e sono descritte nei runbook, non implementate da script di questo repository.
 
 ## Alternative deliberatamente escluse
 
@@ -23,8 +23,10 @@ PyYAML per leggere `parametri.yaml`: escluso dal vincolo di una sola dipendenza 
 
 ## Flussi di codice e ruolo architetturale dei file
 
-Il flusso va dalla postazione dell'amministratore al collettore. Sulla postazione `config/parametri.yaml`, copia locale ignorata da git, fornisce i valori dell'ambiente; `bin/ads-render.py` produce da `config/collettore/` un albero in `build/`, anch'esso ignorato perché contiene valori reali, e lo fa tutto o niente: con un segnaposto vuoto elenca i mancanti e non scrive nulla. `bin/ads-vm-command.py` stampa il comando `qm create` della sezione 1 dell'handoff, con in più il lettore CD della ISO di installazione che l'handoff non prevede (`--iso`), senza eseguirlo, e `bin/ads-pki.sh` crea CA e certificato del collettore tenendo la chiave della CA sulla postazione. Sul collettore `bin/ads-bootstrap.sh`, come root dalla console di Proxmox, installa pacchetti, utente di servizio `ads`, un account personale per ogni amministratore di `etc/ads/amministratori` con la sua chiave e il gruppo `ads-admin` che `sshd` e `sudo` ammettono (ADR-008), cartelle della sezione 4 dell'handoff, file di configurazione e materiale TLS, controlla il ruleset con `nft -c` prima di caricarlo e si ferma se `/srv/ads` non è montato con `nodev,nosuid,noexec`; con `--prova` stampa i comandi senza eseguirli.
+Il flusso parte dalla postazione dell'amministratore. `config/parametri.yaml`, ignorato da git, fornisce i valori dell'ambiente; `bin/ads-render.py` genera da `config/collettore/` e `config/proxmox-host/` alberi distinti in `build/`, senza scrivere se mancano parametri o la destinazione esiste. `bin/ads-vm-command.py` stampa il comando `qm create`, con lettore CD opzionale per la ISO (`--iso`), senza eseguirlo; `bin/ads-pki.sh` crea CA e certificato del collettore tenendo la chiave della CA sulla postazione. Sul collettore `bin/ads-bootstrap.sh` installa pacchetti, account personali e chiavi SSH, gruppo `ads-admin`, configurazioni e materiale TLS; verifica il montaggio di `/srv/ads` con `nodev,nosuid,noexec`, `nft -c`, `sshd -t`, `visudo -c` e `rsyslogd -N1` prima di attivare i servizi. Con `--prova` stampa i comandi senza eseguirli.
+
+Il ricevente `config/collettore/etc/rsyslog.d/10-ads.conf` ascolta su 514/udp e 6514/tcp con TLS, instrada anche `sshd*`, `sudo`, `su`, `login`, `systemd-logind` e `gdm-password` locali e scrive `AdsLine` in `/srv/ads/<IP mittente>/<giorno>.log`, con permessi `root:ads` 0640 e cartelle 0750. Per i messaggi RFC 3164 e 5424 ricompone tag e testo in modo distinto; il parser RFC 3164 gestisce anche l'anno dopo l'ora delle righe Zyxel. `config/proxmox-host/etc/rsyslog.d/90-ads.conf.template` inoltra via TLS con verifica del nome del certificato i login SSH, `sudo`, `su`, `login`, le autenticazioni di `pvedaemon` e le richieste `/access/ticket` di `pveproxy`; usa code su disco e parte dalla fine dell'access log al primo avvio.
 
 ## Riferimenti a snippet
 
-`bin/adsparams.py:parse` e `bin/adsparams.py:require` per la lettura dei parametri; `bin/ads-render.py:render_text` per i segnaposto; `bin/ads-vm-command.py:build_command` per il comando della VM; `bin/ads-bootstrap.sh:check_inputs` per i controlli che precedono qualunque scrittura; `config/collettore/etc/nftables.conf.template` per il firewall locale; `config/collettore/etc/rsyslog.d/10-ads.conf` per la ricezione, il formato `AdsLine` e gli accessi al collettore stesso.
+`bin/adsparams.py:parse` e `bin/adsparams.py:require` per la lettura dei parametri; `bin/ads-render.py:render_text` e `render_tree` per i segnaposto e l'albero generato; `bin/ads-vm-command.py:build_command` per il comando della VM; `bin/ads-bootstrap.sh:check_inputs` e `check_data_mount` per i controlli iniziali; `config/collettore/etc/nftables.conf.template` per il firewall locale; `config/collettore/etc/rsyslog.d/10-ads.conf` per ricezione e `AdsLine`; `config/proxmox-host/etc/rsyslog.d/90-ads.conf.template` per i filtri e l'invio dell'host.

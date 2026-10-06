@@ -1,6 +1,154 @@
 # Work-log
 
+## 2026-10-06 - INTRA3: collaudo punto 7 superato
+
+Commit di riferimento: `8d834dd`. File toccati: `docs/runbook-componente-3-nas.md`, `.claude/memory/index.md`, `.claude/memory/progress.md`, `.claude/context/current-work.md`, `_notes/INTRA3-ricognizione-privata.md`, `_notes/RESUME-PROMPT.md` e `_notes/COMMIT-MSG.txt`. L'utente ha letto `chronyc tracking` sul collettore: riferimento `ntp2.inrim.it`, stratum 2, `System time` +0,000443351 secondi, `Last offset` +0,000479445 secondi, `Leap status: Normal`. I due eventi amministrativi noti di INTRA3, riuscito e fallito, sono ricevuti rispettivamente 0,736335 e 0,678072 secondi dopo l'ora dichiarata dal NAS. Il criterio operativo del punto 7 dell'handoff è soddisfatto insieme al punto 3; la differenza comprende anche trasporto e registrazione. Il contatto diretto del NAS con `ntp1.inrim.it` non è stato osservato. D7 resta aperto per elenco AdS approvato e destinazione del flusso ordinario; i 71 tentativi SMB falliti della postazione non AdS restano da diagnosticare separatamente.
+
 > Append-only, in ordine cronologico inverso (la voce più recente in alto). Ogni passo significativo di codice e ogni intervento manuale rilevante lascia una voce con data, file toccati, motivo e commit di riferimento. Qui confluisce anche il log di riconciliazione dei documenti `.docx`, con il nome del documento sorgente e l'esito, così la data di allineamento sopravvive a un clone.
+
+## 2026-10-06 - INTRA3: collaudo punto 3 superato
+
+Commit di riferimento: `8d834dd`. File toccati: `docs/runbook-componente-3-nas.md`, `.claude/memory/index.md`, `.claude/memory/progress.md`, `.claude/context/current-work.md`, `_notes/INTRA3-ricognizione-privata.md` e `_notes/RESUME-PROMPT.md`. Il tentativo web amministrativo fallito delle 14:25 è nel file del collettore: ora NAS 14:25:05, ricezione 14:25:05.678072, differenza 0,678072 secondi; cinque campi `AdsLine`, account, postazione, risorsa `Administration` e `Action: Login Fail`. Con il login riuscito delle 14:05:33 il collaudo punto 3 di INTRA3 è superato per i due esiti. I due confronti temporali sono sotto un secondo; per il punto 7 resta la lettura di `chronyc tracking` sul collettore. Consegnato un comando SSH di sola lettura dalla postazione amministrativa; esito in attesa.
+
+## 2026-10-06 - INTRA3: tentativo amministrativo fallito sul NAS
+
+Commit di riferimento: `8d834dd`. File toccati: `docs/runbook-componente-3-nas.md`, `.claude/memory/index.md`, `.claude/memory/progress.md`, `.claude/context/current-work.md`, `_notes/INTRA3-ricognizione-privata.md`, `_notes/RESUME-PROMPT.md` e screenshot privato. Lo `screenshot_45.png` delle 14:25 mostra il modulo QTS di INTRA3 dopo un solo tentativo con password intenzionalmente errata: messaggio «Your login credentials are incorrect or your account is no longer valid», campo password vuoto e nessun avviso di blocco. Il login riuscito dello stesso account era stato verificato sul collettore alle 14:05; il messaggio generico non dimostra account invalido. Screenshot copiato nel livello privato. Consegnato un comando SSH di sola lettura per cercare le ultime righe web `Login Fail` nel file giornaliero del NAS; esito in attesa.
+
+## 2026-10-06 - INTRA3: pagina login pronta per il caso fallito
+
+Commit di riferimento: `8d834dd`. File toccati: `docs/runbook-componente-3-nas.md`, `.claude/memory/index.md`, `.claude/memory/progress.md`, `.claude/context/current-work.md` e `_notes/RESUME-PROMPT.md`. Dopo la verifica sul collettore del login riuscito, l'utente conferma di essere uscito da QTS e di vedere la pagina di login di INTRA3. Consegnato un solo tentativo intenzionalmente fallito con l'account amministrativo già usato, senza riportare la password, e richiesta del messaggio mostrato con ora approssimativa. L'utente si ferma dopo il primo tentativo; la riga sul collettore si cerca dopo il riscontro. Esito in attesa.
+
+## 2026-10-06 - INTRA3: login amministrativo riuscito nel file del collettore
+
+Commit di riferimento: `8d834dd`. File toccati: `docs/runbook-componente-3-nas.md`, `.claude/memory/index.md`, `.claude/memory/progress.md`, `.claude/context/current-work.md`, `_notes/INTRA3-ricognizione-privata.md` e `_notes/RESUME-PROMPT.md`. La riga del login web riuscito su INTRA3 delle 14:05 è nel file giornaliero del collettore: ora dichiarata 14:05:33, ricezione 14:05:33.736335, differenza 0,736335 secondi. Presenti i cinque campi `AdsLine` e, nel messaggio, account amministrativo, postazione, tipo `HTTP`, risorsa `Administration`, esito `Login OK`. Il caso riuscito del punto 3 è verificato; resta il caso fallito. La differenza è sotto un secondo per questo evento, ma il contatto NTP del NAS e `chronyc tracking` del collettore restano da verificare per il punto 7. Chiesto all'utente di uscire da QTS e fermarsi alla pagina di login.
+
+## 2026-10-06 - INTRA3: login amministrativo riuscito sul NAS
+
+Commit di riferimento: `8d834dd`. File toccati: `docs/runbook-componente-3-nas.md`, `.claude/memory/index.md`, `.claude/memory/progress.md`, `.claude/context/current-work.md`, `_notes/INTRA3-ricognizione-privata.md` e `_notes/RESUME-PROMPT.md`. L'utente riferisce di aver effettuato il login amministrativo riuscito su INTRA3 alle 14:05 del 2026-10-06 e di vedere le 14:05 nel pannello QTS. La prova è per ora soltanto sul dispositivo. Consegnato un comando SSH di sola lettura dalla postazione amministrativa per estrarre le ultime righe `Action: Login OK` nel file giornaliero di INTRA3 sul collettore; si attende l'output per verificare i cinque campi e lo scarto temporale. Il tentativo fallito non è ancora stato eseguito.
+
+## 2026-10-06 - INTRA3: pagina login pronta per il collaudo AdS
+
+Commit di riferimento: `8d834dd`. File toccati: `docs/runbook-componente-3-nas.md`, `.claude/memory/index.md`, `.claude/memory/progress.md`, `.claude/context/current-work.md` e `_notes/RESUME-PROMPT.md`. L'utente conferma di vedere la pagina di login web di INTRA3 dalla postazione amministrativa. Consegnato un solo passo: effettuare un accesso riuscito con le credenziali amministrative già in uso, senza riportarle, e comunicare se il pannello si apre e l'ora locale approssimativa. La verifica della riga sul collettore e il login fallito seguono separatamente; nessun esito di questo nuovo tentativo è ancora disponibile.
+
+## 2026-10-06 - INTRA3: avvio collaudo controllato degli accessi AdS
+
+Commit di riferimento: `8d834dd`. File toccati: `docs/runbook-componente-3-nas.md`, `.claude/memory/index.md`, `.claude/memory/progress.md`, `.claude/context/current-work.md` e `_notes/RESUME-PROMPT.md`. Dopo la verifica dell'accesso SMB non AdS e delle relative righe sul collettore, la priorità torna al collaudo punto 3 di INTRA3: login amministrativo riuscito e fallito, con i cinque campi, e punto 7 sullo scarto temporale. Primo passo consegnato all'utente, un'azione alla volta: dalla postazione amministrativa aprire la pagina web di login di INTRA3, chiudendo l'eventuale sessione QTS attiva, e confermare che il modulo sia visibile. Nessun nuovo tentativo di login è stato ancora chiesto.
+
+## 2026-10-06 - INTRA3: orari delle azioni riuscite e anomalia SMB distinta
+
+Commit di riferimento: `8d834dd`. File toccati: `docs/runbook-componente-3-nas.md`, `.claude/memory/index.md`, `.claude/memory/progress.md`, `.claude/context/current-work.md`, `_notes/INTRA3-ricognizione-privata.md` e `_notes/RESUME-PROMPT.md`. L'utente ha estratto soltanto ora di ricezione e `Action` delle tre righe riuscite del NAS per la postazione non AdS: `Login OK` alle 12:11:40.114724 e 12:24:15.900765, `Read` alle 12:33:28.267900. Il `Read` è coerente con `LETTURA_OK` ma il test client non ha registrato un'ora propria, quindi l'associazione non è certa. I fallimenti della stessa postazione iniziano dieci secondi dopo il `Read` e proseguono fino alle 12:36:08; non è nota la loro causa. L'accesso a `B:` nella sessione provata è funzionante; i fallimenti restano anomalia distinta. Prossimo passo del componente 3: prova controllata di login amministrativo riuscito e fallito su INTRA3, poi confronto orario sul collettore.
+
+## 2026-10-06 - INTRA3: nel giorno anche login riusciti e lettura
+
+Commit di riferimento: `8d834dd`. File toccati: `docs/runbook-componente-3-nas.md`, `.claude/memory/index.md`, `.claude/memory/progress.md`, `.claude/context/current-work.md`, `_notes/INTRA3-ricognizione-privata.md` e `_notes/RESUME-PROMPT.md`. L'utente ha contato nel file del 2026-10-06 del collettore, filtrando le righe di INTRA3 sul `Source IP` della postazione non AdS e raggruppando il testo dopo `Action`: 71 `Login Fail`, 2 `Login OK`, 1 `Read` (74 righe). Il campione delle ultime dieci righe mostrava solo fallimenti perché non copriva tutto il giorno. I tre successi sono reali per la postazione, ma la loro ora rispetto a `LETTURA_OK` e la causa dei fallimenti non sono ancora note. Consegnata una query che stampa solo ora di ricezione e azione dei tre eventi riusciti.
+
+## 2026-10-06 - INTRA3: ultimi dieci eventi della postazione ancora falliti
+
+Commit di riferimento: `8d834dd`. File toccati: `docs/runbook-componente-3-nas.md`, `.claude/memory/index.md`, `.claude/memory/progress.md`, `.claude/context/current-work.md`, `_notes/INTRA3-ricognizione-privata.md` e `_notes/RESUME-PROMPT.md`. Dal file giornaliero di INTRA3 sul collettore, l'utente ha riportato le ultime dieci righe filtrate sulla postazione non AdS: tutte `SAMBA Login Fail` con `Users: User`, ricevute tra le 12:33:38 e le 12:36:08. Il campione non include un `Login Success` o un `Read`; non dimostra l'assenza di tali eventi altrove nel file. Consegnato un comando di sola lettura che conta l'intero file del giorno per valore di `Action` sulla stessa postazione, senza esporre risorse o account.
+
+## 2026-10-06 - INTRA3: verifica della lettura nel log del collettore
+
+Commit di riferimento: `8d834dd`. File toccati: `docs/runbook-componente-3-nas.md`, `.claude/memory/index.md`, `.claude/memory/progress.md`, `.claude/context/current-work.md`, `_notes/INTRA3-ricognizione-privata.md` e `_notes/RESUME-PROMPT.md`. Dopo `LETTURA_OK`, l'utente ha chiesto di proseguire con il collaudo e di gestire autonomamente in seguito la credenziale e la sessione SMB; nessun cambio di password è stato riferito. Consegnato un comando SSH di sola lettura da eseguire dalla postazione amministrativa per cercare nel file giornaliero di INTRA3 le ultime righe della postazione non AdS. Si attende la conferma di un'azione riuscita successiva alla lettura; i dati identificanti restano nella nota privata.
+
+## 2026-10-06 - INTRA3: lettura dalla condivisione riuscita
+
+Commit di riferimento: `8d834dd`. File toccati: `docs/runbook-componente-3-nas.md`, `.claude/memory/index.md`, `.claude/memory/progress.md`, `.claude/context/current-work.md`, `_notes/INTRA3-ricognizione-privata.md` e `_notes/RESUME-PROMPT.md`. Nella PowerShell «Utente connesso» a 64 bit, la prova che sceglie un file immediato non vuoto nella cartella dell'archivio e ne legge un byte senza stamparlo ha restituito `LETTURA_OK`. La mappatura `B:` permette quindi di leggere dati dalla condivisione nella sessione corrente della postazione non AdS. La riconnessione dopo un nuovo accesso Windows e il corrispondente log NAS non sono ancora verificati. La password esposta nello screenshot 41 va cambiata; chiesto all'utente se l'account NAS sia usato anche altrove prima di coordinare la rotazione.
+
+## 2026-10-06 - INTRA3: il percorso del primo test è una cartella
+
+Commit di riferimento: `8d834dd`. File toccati: `docs/runbook-componente-3-nas.md`, `.claude/memory/index.md`, `.claude/memory/progress.md`, `.claude/context/current-work.md`, `_notes/INTRA3-ricognizione-privata.md` e `_notes/RESUME-PROMPT.md`. `Get-Item` nella PowerShell che vede `B:` ha restituito `CARTELLA` per il percorso usato nel primo test di lettura. L'«accesso negato» di `Get-Content` era dunque un test su un oggetto sbagliato e non dimostra un problema di autorizzazione ai file. Consegnata una prova di sola lettura che sceglie un file immediato non vuoto nella cartella, ne legge un byte e restituisce solo successo, assenza di file idonei o errore; esito in attesa.
+
+## 2026-10-06 - INTRA3: primo percorso di lettura da classificare
+
+Commit di riferimento: `8d834dd`. File toccati: `docs/runbook-componente-3-nas.md`, `.claude/memory/index.md`, `.claude/memory/progress.md`, `.claude/context/current-work.md`, `_notes/INTRA3-ricognizione-privata.md` e `_notes/RESUME-PROMPT.md`. Nella PowerShell «Utente connesso» a 64 bit, l'utente ha inserito nel test `Get-Content` un percorso dell'archivio di `B:`; il comando ha risposto «Accesso al percorso negato». Poiché il percorso potrebbe essere una cartella, il risultato non è ancora una prova di permessi insufficienti sulla condivisione. Consegnato `Get-Item` sul percorso già conservato nella variabile `$p` per distinguere file e cartella senza mostrare contenuti; esito in attesa.
+
+## 2026-10-06 - Correzione: B: accessibile nella PowerShell a 64 bit
+
+Commit di riferimento: `8d834dd`. File toccati: `docs/runbook-componente-3-nas.md`, `.claude/memory/index.md`, `.claude/memory/progress.md`, `.claude/context/current-work.md`, `_notes/INTRA3-ricognizione-privata.md` e `_notes/RESUME-PROMPT.md`. L'utente ha ripetuto `Get-ChildItem B:\` nella PowerShell «Utente connesso» a 64 bit e ha ottenuto `ACCESSO_OK`, senza lanciare il nuovo `net use` suggerito. Il primo comando aveva invece restituito «unità B non esiste». Non è stabilito quale differenza fra le due sessioni spieghi il risultato; ritirata la diagnosi che attribuiva l'assenza alla sola elevazione. La radice è elencabile nella sessione attuale, ma la lettura di un file non è ancora verificata. Passo consegnato: leggere un byte di un file esistente non vuoto senza stamparne il contenuto. La password dello screenshot 41 va ancora ruotata.
+
+## 2026-10-06 - INTRA3: B: assente nella sessione Windows ordinaria
+
+Commit di riferimento: `8d834dd`. File toccati: `docs/runbook-componente-3-nas.md`, `.claude/memory/index.md`, `.claude/memory/progress.md`, `.claude/context/current-work.md`, `_notes/INTRA3-ricognizione-privata.md` e `_notes/RESUME-PROMPT.md`. Sulla postazione non AdS, la PowerShell ordinaria ha restituito per `Get-ChildItem B:\`: «Impossibile trovare l'unità. Un'unità con nome 'B' non esiste». Questo distingue la mappatura riuscita nella PowerShell elevata dallo stato della sessione usata dall'utente. Consegnato il passo di creare `B:` nella PowerShell ordinaria con `net use` e password richiesta interattivamente, senza includerla nel comando; esito in attesa. La rotazione della credenziale esposta nello screenshot 41 resta necessaria.
+
+## 2026-10-06 - Verifica dell'unità richiesta in PowerShell ordinaria
+
+Commit di riferimento: `8d834dd`. File toccati: `.claude/context/current-work.md`, `.claude/memory/progress.md`, `_notes/INTRA3-ricognizione-privata.md` e `_notes/RESUME-PROMPT.md`. L'utente preferisce verificare l'unità di rete da PowerShell anziché da Esplora file. Consegnato un comando di sola lettura da eseguire in una PowerShell non elevata sulla postazione non AdS: tenta di elencare la radice `B:` e stampa solo `ACCESSO_OK` o l'errore. L'esito è in attesa; lo stato `OK` visto nella precedente PowerShell amministratore non chiude questa verifica.
+
+## 2026-10-06 - INTRA3: mappatura B: ricreata nel terminale elevato
+
+Commit di riferimento: `8d834dd`. File toccati: `docs/runbook-componente-3-nas.md`, `.claude/memory/index.md`, `.claude/memory/progress.md`, `.claude/context/current-work.md`, `_notes/INTRA3-ricognizione-privata.md` e `_notes/RESUME-PROMPT.md`. Lo `screenshot_41.png` mostra che l'operatore ha rimosso e ricreato la mappatura persistente `B:` verso INTRA3 in PowerShell amministratore; `net use` riferisce successo e `Get-SmbMapping` mostra `OK`. Non è ancora provato l'uso da Esplora file nella sessione ordinaria. La schermata espone una password in chiaro e non viene copiata nel progetto; la credenziale va cambiata. Chiesto di aprire `B:` in Esplora file senza elevazione e riferire l'esito.
+
+## 2026-10-06 - Ripresa dopo il crash; priorità all'unità di rete di INTRA3
+
+Commit di riferimento: `8d834dd`. File toccati: `.claude/memory/index.md`, `.claude/memory/progress.md`, `.claude/memory/decisions.md`, `.claude/context/current-work.md`, `_notes/RESUME-PROMPT.md` e `_notes/COMMIT-MSG.txt`. `verifica-ripresa.py` ha trovato nove file modificati rispetto all'impronta delle 09:04, senza nuovi commit o file non tracciati; l'utente ha confermato di conservarli come lavoro della sessione interrotta. Il runbook NAS e lo studio contenevano già la decisione D7, mentre indice, work-log e scheda attiva si fermavano alla classificazione della postazione: riallineati. L'utente chiede ora di ripristinare l'unità di rete di INTRA3 sulla postazione non AdS. La causa dei `SAMBA Login Fail` non è ancora nota; primo passo diagnostico sul client Windows, prima di qualunque modifica.
+
+## 2026-10-06 - INTRA3: postazione non AdS e decisione sui due flussi
+
+Commit di riferimento: `8d834dd`. File toccati dalla sessione interrotta: `docs/runbook-componente-3-nas.md`, `docs/studio-collettore-ads.md`; in questa ripresa `.claude/memory/index.md`, `.claude/memory/progress.md`, `.claude/memory/decisions.md`, `.claude/context/current-work.md`. L'utente ha identificato come non AdS la postazione dei tre errori SMB e ha chiesto di mantenere il suo accesso e la registrazione dei relativi log in una categoria distinta. SMB è rimasto selezionato. D7 diventa separazione dei log AdS in `/srv/ads/` e degli altri accessi NAS in un flusso da definire; servono ancora elenco AdS approvato, destinazione e politica del secondo flusso. Le righe non AdS già finite in `/srv/ads/` restano una contaminazione documentata, senza cancellazione implicita (ADR-014).
+
+## 2026-10-06 - INTRA3: righe syslog ricevute, postazione da classificare
+
+Commit di riferimento: `8d834dd`. File toccati: `docs/runbook-componente-3-nas.md`, `.claude/context/current-work.md`, `.claude/memory/index.md`, questo work-log e nota privata. L'output `tail` eseguito dall'utente sul collettore mostra tre righe `NAS-INTRA3/qlogd` con `SAMBA Login Fail` in circa due secondi da account e postazione non ancora classificati. Consegna UDP verificata; i cinque campi sono presenti e l'ora dichiarata differisce meno di un secondo da quella di ricezione nelle tre righe. Non è prova del contatto NTP né del collaudo completo degli accessi amministrativi. Chiesto all'utente se la postazione appartenga a un AdS per decidere D7 e trattamento di SMB.
+
+## 2026-10-06 - INTRA3: file recente sul collettore individuato
+
+Commit di riferimento: `8d834dd`. File toccati: `docs/runbook-componente-3-nas.md`, `.claude/context/current-work.md`, `.claude/memory/index.md`, questo work-log e nota privata. Il comando PowerShell di sola lettura eseguito dall'utente via SSH elenca il file del giorno nella cartella del collettore corrispondente all'indirizzo di INTRA3, aggiornato negli ultimi dieci minuti. Il contenuto non è stato ancora letto. Consegnato il comando `tail -n 5` sul file per verificare formato, evento e orari; attesa dell'output.
+
+## 2026-10-06 - INTRA3: invio syslog applicato secondo l'operatore
+
+Commit di riferimento: `8d834dd`. File toccati: `docs/runbook-componente-3-nas.md`, `.claude/context/current-work.md`, `.claude/memory/index.md`, questo work-log e note private. Lo screenshot 38 mostra il modulo completo prima del salvataggio: server del collettore, UDP 514, eventi e connessioni selezionati. L'utente riferisce `Changes applied` dopo `Apply All` e stessi valori alla riapertura, senza seconda schermata. La ricezione resta da verificare. Consegnato un comando PowerShell di sola lettura via SSH per individuare file recenti sotto `/srv/ads/` sul collettore; attesa dell'output.
+
+## 2026-10-06 - INTRA3: campi del client syslog disponibili
+
+Commit di riferimento: `8d834dd`. File toccati: `docs/runbook-componente-3-nas.md`, `.claude/context/current-work.md`, `.claude/memory/index.md`, questo work-log e prova privata. Lo screenshot 36 mostra che spuntando `Enable Syslog` si attivano campo server, UDP 514 e casella `System Connection Logs`; `System Event Logs` resta selezionato. Nessuna impostazione remota è ancora applicata. Consegnata la compilazione dei valori e richiesta schermata prima di `Apply All`.
+
+## 2026-10-06 - INTRA3: client syslog ancora spento
+
+Commit di riferimento: `8d834dd`. File toccati: `docs/runbook-componente-3-nas.md`, `.claude/context/current-work.md`, `.claude/memory/index.md`, questo work-log e prova privata. Lo screenshot 35, dopo l'avvio dei log locali, mostra `Enable Syslog` spento e tutti i campi e le caselle di invio inattivi. Consegnato il passo di selezionare solo `Enable Syslog` e inviare la schermata dei campi disponibili, senza compilare né premere `Apply All`.
+
+## 2026-10-06 - INTRA3: prime righe SMB locali verificate
+
+Commit di riferimento: `8d834dd`. File toccati: `docs/runbook-componente-3-nas.md`, `.claude/context/current-work.md`, `.claude/memory/index.md`, questo work-log e prova privata. Lo screenshot 32 mostra `Stop Logging`, 326 righe totali e operazioni `SAMBA` sui file; account, postazione e risorsa sono presenti. L'inclusione di SMB produce più eventi per file, ma il tasso giornaliero non è misurato. D7 resta aperto. Passo consegnato: leggere `Syslog Client Management` con registrazione locale attiva, senza applicare ancora l'invio remoto.
+
+## 2026-10-06 - INTRA3: registrazione locale attiva
+
+Commit di riferimento: `8d834dd`. File toccati: `docs/runbook-componente-3-nas.md`, `.claude/context/current-work.md`, `.claude/memory/index.md`, questo work-log e note private. Dopo `Start Logging`, l'utente conferma che il pulsante è diventato `Stop Logging`, senza errore visibile. Richiesta schermata della tabella aggiornata per vedere le prime righe e verificare SMB; invio syslog ancora da configurare.
+
+## 2026-10-06 - INTRA3: opzioni log applicate secondo l'operatore
+
+Commit di riferimento: `8d834dd`. File toccati: `docs/runbook-componente-3-nas.md`, `.claude/memory/index.md`, questo work-log e note private di ripresa. L'utente riferisce di aver premuto `Apply` in `Options` con HTTP, SSH, Telnet e SMB attivi e FTP spento; non ha fornito schermata di riscontro. Consegnato il passo `Start Logging` e richiesta conferma del pulsante `Stop Logging` o dell'errore. La registrazione non è ancora confermata e le prime righe restano da leggere.
+
+## 2026-10-06 - INTRA3: NTP su INRIM visibile, opzioni log consegnate
+
+Commit di riferimento: `8d834dd`. File toccati: `docs/runbook-componente-3-nas.md`, `.claude/context/current-work.md`, `.claude/memory/index.md`, questo work-log, `_notes/INTRA3-ricognizione-privata.md`, `_notes/RESUME-PROMPT.md` e la copia privata dello screenshot 30. Dopo `Apply` nella pagina `Time`, l'utente ha fornito una schermata con sincronizzazione automatica su `ntp1.inrim.it` ogni ora e fuso invariato, senza messaggio d'errore visibile. Il contatto effettivo con NTP e lo scarto restano da misurare nel collaudo 7. Secondo passo consegnato: in `System Connection Logs > Options` lasciare HTTP, SSH e Telnet, togliere FTP, aggiungere SMB, lasciare spenta l'archiviazione automatica e premere `Apply`, senza ancora `Start Logging`; riscontro in attesa. La modifica NTP è stata riportata anche in `D:/network-design` come stato della sorgente.
+
+## 2026-10-06 - INTRA3: configurazione autorizzata, primo passo NTP
+
+Commit di riferimento: `8d834dd`. File toccati: `docs/runbook-componente-3-nas.md`, `.claude/context/current-work.md`, `.claude/memory/index.md`, questo work-log e `_notes/RESUME-PROMPT.md`. Dopo la ricognizione in sola lettura l'utente ha chiesto di procedere con la configurazione come sugli altri NAS. Per mantenere il metodo di un'azione e un riscontro alla volta, il primo intervento consegnato è NTP: sostituire `pool.ntp.org` con `ntp1.inrim.it`, impostare 1 ora e premere `Apply` nella scheda `Time`, senza usare `Update`. L'esecuzione è in attesa di riscontro; nessuna modifica sul NAS è ancora verificata. In seguito: opzioni HTTP, SSH, Telnet e SMB come su INTRA, avvio dei log locali, lettura delle prime righe, invio remoto e collaudi 3 e 7. D7 si valuta solo sui log effettivi.
+
+## 2026-10-06 - INTRA3: ricognizione in sola lettura conclusa
+
+Commit di riferimento: `8d834dd`. File toccati: `docs/runbook-componente-3-nas.md`, `.claude/context/current-work.md`, `.claude/memory/index.md`, questo work-log, `_notes/INTRA3-ricognizione-privata.md`, `_notes/RESUME-PROMPT.md` e la copia privata dello screenshot 29. `Daylight Saving Time` mostra l'adeguamento automatico attivo, offset di 60 minuti e periodo 29/03/2026 02:00 - 25/10/2026 03:00; la tabella personalizzata è disattivata. Nessun `Apply` o `Apply All`. Con gli screenshot 21, 22, 27 e 28 la ricognizione in sola lettura ha accertato che registrazione locale e invio remoto sono spenti, SMB non è selezionato, NTP punta a `pool.ntp.org` ogni 7 giorni; non dimostra uso effettivo delle condivisioni né scarto dell'orologio. I fatti sono stati riportati anche in `D:/network-design` nello stesso giro. Restano decisioni dell'utente: allineamento a D5, attivazione dei log locali e remoti, inclusione di SMB. D7 e collaudi 3 e 7 si valutano su righe reali successive.
+
+## 2026-10-06 - INTRA3: impostazioni dell'ora lette
+
+Commit di riferimento: `8d834dd`. File toccati: `docs/runbook-componente-3-nas.md`, `.claude/context/current-work.md`, `.claude/memory/index.md`, questo work-log, `_notes/INTRA3-ricognizione-privata.md`, `_notes/RESUME-PROMPT.md` e la copia privata dello screenshot 28. La pagina `Time` mostra sincronizzazione automatica con `pool.ntp.org` ogni 7 giorni e fuso di Roma. Non mostra quando sia avvenuta l'ultima sincronizzazione e l'ora indicata dal NAS non è confrontabile con un riferimento indipendente nello screenshot; il collaudo punto 7 resta aperto. La configurazione differisce dalla scelta D5 già applicata alle altre sorgenti (`ntp1.inrim.it` ogni ora). Nessun valore modificato, nessun `Update` o `Apply`. Prossimo passo in sola lettura: `Daylight Saving Time`, richiesto all'utente. Il fatto è stato riportato anche in `D:/network-design` come stato della sorgente, senza modificare la baseline dei commit.
+
+## 2026-10-06 - INTRA3: invio syslog spento
+
+Commit di riferimento: `8d834dd`. File toccati: `docs/runbook-componente-3-nas.md`, `.claude/context/current-work.md`, `.claude/memory/index.md`, questo work-log, `_notes/INTRA3-ricognizione-privata.md`, `_notes/RESUME-PROMPT.md` e la copia privata dello screenshot 27. La scheda `Syslog Client Management` mostra `Enable Syslog` spento, server IP vuoto e porta UDP 514 disabilitata; `System Event Logs` è selezionato ma disabilitato, `System Connection Logs` non selezionato e disabilitato, con la nota che richiede di avviare prima i log locali delle connessioni. Il pannello non mostra TCP o TLS, ma la schermata non basta per escluderli in ogni funzione del firmware. Nessuna impostazione modificata e nessun `Apply All`. Il risultato è stato riportato anche in `D:/network-design` come stato della sorgente. Prossimo passo in sola lettura: schermata NTP, richiesta all'utente; attivazione dei log da decidere separatamente.
+
+## 2026-10-06 - INTRA3: opzioni della registrazione lette
+
+Commit di riferimento: `8d834dd`. File toccati: `docs/runbook-componente-3-nas.md`, `.claude/context/current-work.md`, `.claude/memory/index.md`, questo work-log, `_notes/INTRA3-ricognizione-privata.md`, `_notes/RESUME-PROMPT.md` e la copia privata dello screenshot 22. Il pannello `Options` mostra selezionati HTTP, SSH, FTP e Telnet; SMB (Windows), iSCSI, AFP, RADIUS, VPN e archiviazione automatica dopo 10.000 log sono disattivati. Il pulsante `Start Logging` rimane visibile sullo sfondo: nessun log è stato avviato, nessuna opzione salvata. Senza SMB i montaggi delle condivisioni non sarebbero registrati con queste selezioni; il bisogno di D7 non è ancora valutabile. I fatti degli screenshot 21 e 22 sono stati riportati nel medesimo giro anche in `D:/network-design`: `docs/log-collector-integrazione.md`, `docs/vendor-management.md`, `docs/pendenze-aperte.md`, `.claude/memory/index.md` e `.claude/memory/progress.md`, senza avanzare la baseline dei commit della fonte. Prossimo passo in sola lettura: `Cancel`, poi schermata `Syslog Client Management`, richiesta all'utente.
+
+## 2026-10-06 - Schede riconciliate e log locali di INTRA3 letti
+
+Commit di riferimento: `8d834dd`. File toccati: le cinque schede con percorsi coperti in `.claude/context/`, `.claude/memory/index.md`, questo work-log, `docs/runbook-componente-3-nas.md`, `_notes/INTRA3-ricognizione-privata.md`, `_notes/RESUME-PROMPT.md` e l'evidenza privata. Dal confronto con il codice: le schede descrivono ora il ricevente rsyslog, l'invio dell'host Proxmox, i confini di sicurezza e quattro livelli di prova; 44 casi pytest sono passati e gli script Bats contengono 22 prove, non rieseguite in questo giro. La prima esecuzione pytest nella sandbox ha avuto 15 errori di setup per accesso negato alle cartelle temporanee; fuori dalla sandbox tutti i 44 casi sono passati. `roadmap.md` resta non applicabile al confronto perché non copre percorsi. Il gate sul modello di separazione degli ambienti resta aperto, documentato senza assegnargli una scelta non fatta. Screenshot 21 fornito dall'utente: `System Connection Logs` di INTRA3 vuoto con `Start Logging`, quindi registrazione spenta; la scheda `Syslog Client Management` è presente ma non letta. Nessuna impostazione sul NAS è stata modificata. Non è possibile misurare gli accessi reali o valutare D7 da una tabella vuota con registrazione spenta. Prossimo passo in sola lettura: schermata di `Options`, richiesta all'utente.
+
+## 2026-10-06 - Ripresa della ricognizione di INTRA3
+
+Commit di riferimento: `8d834dd`. File toccati: `.claude/memory/index.md`, questo work-log e `_notes/RESUME-PROMPT.md`. La verifica di ripresa ha trovato l'indice fermo a `3f94e7b`, mentre HEAD e l'impronta privata erano già a `8d834dd`; l'albero era pulito e il commit nuovo conteneva la ricognizione di INTRA3 già descritta dal work-log, quindi non risulta lavoro perso. Riallineato il solo riferimento dell'indice. `sync-context` segnala modifiche nelle aree coperte dalle cinque schede tecniche rispetto ai rispettivi `last-verified-commit`; la scheda `roadmap.md` non ha percorsi coperti. Nessuna scheda è stata dichiarata verificata. Per leggere i log locali di INTRA3 manca ancora la schermata `System Connection Logs`, richiesta all'utente senza modificare impostazioni.
 
 ## 2026-10-06 - Handoff di sessione dopo il riallineamento di network-design
 

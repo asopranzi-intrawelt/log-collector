@@ -6,8 +6,8 @@ covers-paths:
   - bin/**
   - config/collettore/**
   - tests/**
-last-verified-commit: 039e562
-stato: componente 1 scritto e provato in locale, da eseguire sugli host
+last-verified-commit: 8d834dd
+stato: componenti 1 e 2 in esercizio; punto 3 sui NAS, INTRA3 in configurazione
 ---
 
 # Lavoro in corso
@@ -108,18 +108,60 @@ Definition of done:
 - [x] firewall: NTP su `ntp1.inrim.it`, fuso manuale di Roma, ora legale europea a mano (2026-10-02); [Non verificato] semantica dell'ora di fine, da controllare dopo il 25/10/2026
 - [x] collaudo punto 7 per il firewall: ora dichiarata e ora di ricezione coincidono entro il secondo (2026-10-02)
 - [ ] domanda aperta: includere la categoria VPN se gli AdS o l'MSP accedono dall'esterno con la VPN del firewall
-- [ ] NAS: firmware di ciascuno letto sul dispositivo; HERO letto il 2026-10-02 (TS-h1677XU-RP, QuTS hero h5.2.10); INTRA3 nel perimetro (posta esportata, accesso amministrativo), da leggere dopo HERO
+- [x] NAS: modello e firmware letti sui quattro dispositivi; per INTRA3 la schermata informativa del 2026-10-05 conferma TS-210 e QTS 4.2.6 build 20240618
 - [x] HERO: invio TLS sulla 6514 di log eventi e accessi, NTP su INRIM ogni ora, fuso di Roma (2026-10-02)
 - [x] INTRA2: invio TLS sulla 6514 di log eventi e accessi, NTP su INRIM ogni ora, fuso di Roma, collaudi punti 3 e 7 (2026-10-02)
 - [x] INTRA: QTS 4.2.6, invio UDP sulla 514 di log eventi e connessioni (HTTP, SSH, Telnet, SMB), NTP su INRIM ogni ora, collaudi punti 3 e 7 (2026-10-02)
 - [ ] domanda aperta: righe SMB dell'account `backup` di Proxmox su INTRA, una ogni 10 secondi circa: tenerle, filtrarle sul collettore o togliere SMB
-- [ ] INTRA3: firmware, metodo di invio, NTP; filtro D7 se i log di accesso portano utenti ordinari
+- [x] INTRA3: invio syslog UDP 514 di eventi e connessioni applicato secondo l'operatore; file e righe del NAS ricevuti sul collettore
+- [x] INTRA3: collaudi 3 e 7 superati con accessi amministrativi controllati, confronto degli orari e `chronyc tracking` sul collettore; contatto NTP del NAS non osservato direttamente
+- [ ] D7: separare gli accessi AdS dagli altri log NAS; servono elenco AdS approvato, destinazione e politica del flusso ordinario (ADR-014)
 - [x] INTRA3: l'utente conferma il 2026-10-05 che l'interfaccia web del NAS è raggiungibile; la sola schermata informativa è stata letta, senza modificare impostazioni
 - [x] INTRA3: screenshot 13 del pannello `System Information` letto il 2026-10-05: TS-210, 249 MB di RAM, firmware 4.2.6 build 20240618, fuso di Roma; NTP e invio log ancora da verificare. L'utente dichiara che solo i due amministratori interni montano le condivisioni come unità di rete
-- [ ] INTRA3: verificare sul dispositivo l'uso attuale e i log locali. La vecchia voce di `D:/network-design/docs/vendor-management.md` lo descriveva vuoto e dismesso dopo la formattazione del 2025 ed è stata corretta con la dichiarazione d'uso dell'utente; la presenza della pagina web non dimostra i contenuti né le connessioni effettive
+- [x] INTRA3: il 2026-10-06 la scheda `System Connection Logs` è vuota e mostra `Start Logging`, quindi la registrazione delle connessioni è spenta; nessuna impostazione è stata cambiata. Non si possono ancora osservare le connessioni effettive o decidere D7. Evidenza privata `_notes/evidenze/NAS-INTRA3-connessioni-2026-10-06.png`
+- [x] INTRA3: `Options` letto il 2026-10-06 senza salvare: selezionati HTTP, SSH, FTP e Telnet; SMB, iSCSI, AFP, RADIUS, VPN e archiviazione automatica dei log non selezionati. Evidenza privata `_notes/evidenze/NAS-INTRA3-opzioni-log-2026-10-06.png`
+- [x] INTRA3: `Syslog Client Management` letto il 2026-10-06 senza salvare: invio remoto disattivato, server vuoto, porta UDP 514 mostrata ma disabilitata; eventi selezionati ma disabilitati, connessioni non selezionate e disabilitate finché non si avviano i log locali. Evidenza privata `_notes/evidenze/NAS-INTRA3-syslog-2026-10-06.png`
+- [x] INTRA3: pagina `Time` letta il 2026-10-06 senza modifiche: sincronizzazione automatica con `pool.ntp.org` ogni 7 giorni, fuso di Roma; successo dell'ultima sincronizzazione e scarto temporale non dimostrati. Evidenza privata `_notes/evidenze/NAS-INTRA3-tempo-2026-10-06.png`
+- [x] INTRA3: `Daylight Saving Time` letto il 2026-10-06 senza modifiche: adeguamento automatico attivo, offset di 60 minuti, periodo mostrato 29/03/2026 02:00 - 25/10/2026 03:00, tabella personalizzata disattivata. Evidenza privata `_notes/evidenze/NAS-INTRA3-ora-legale-2026-10-06.png`
+- [x] INTRA3: dopo l'autorizzazione dell'utente a configurare come gli altri NAS, lo screenshot 30 del 2026-10-06 mostra nella pagina `Time` `ntp1.inrim.it` e intervallo di 1 ora dopo `Apply`; non prova ancora l'esito della sincronizzazione né lo scarto. Evidenza privata `_notes/evidenze/NAS-INTRA3-ntp-inrim-2026-10-06.png`
+- [x] INTRA3: l'utente riferisce di aver applicato `Options` con HTTP, SSH, Telnet e SMB attivi e FTP spento; nessuna schermata di riscontro delle opzioni
+- [x] INTRA3: dopo `Start Logging`, l'utente conferma che il pulsante ora dice `Stop Logging`; registrazione locale attiva
+- [x] INTRA3: screenshot 32 della tabella aggiornata mostra `Stop Logging`, 326 righe totali e operazioni SMB sui file (`Write`, `Add`, `Delete`, `Read`, `MakeDir`); account, postazione e risorsa sono presenti, ma tasso giornaliero e assenza di utenti non AdS non sono dimostrati. Evidenza privata `_notes/evidenze/NAS-INTRA3-connessioni-attive-2026-10-06.png`
+- [x] INTRA3: screenshot 35 di `Syslog Client Management` dopo l'avvio: client ancora spento, campi e caselle disabilitati, inclusa `System Connection Logs`; verificare se si abilita dopo aver spuntato `Enable Syslog`. Evidenza privata `_notes/evidenze/NAS-INTRA3-syslog-dopo-avvio-2026-10-06.png`
+- [x] INTRA3: screenshot 36 con `Enable Syslog` spuntato ma non applicato: server vuoto, UDP 514 attivo, eventi selezionati, connessioni selezionabili ma non ancora selezionate. Evidenza privata `_notes/evidenze/NAS-INTRA3-syslog-campi-abilitati-2026-10-06.png`
+- [x] INTRA3: screenshot 38 prima di `Apply All` con server del collettore, UDP 514 ed entrambe le categorie selezionate. Evidenza privata `_notes/evidenze/NAS-INTRA3-syslog-preapply-corretto-2026-10-06.png`
+- [x] INTRA3: l'utente riferisce `Changes applied` dopo `Apply All` e stessi valori alla riapertura della scheda; persistenza riferita, senza seconda schermata
+- [x] INTRA3: l'output del comando `find` eseguito dall'utente mostra un file del giorno aggiornato negli ultimi dieci minuti nella cartella del collettore corrispondente all'indirizzo di INTRA3; contenuto delle righe ancora da leggere
+- [x] INTRA3: ultime righe sul collettore da `NAS-INTRA3/qlogd` mostrano tre `SAMBA Login Fail` ripetuti in circa due secondi da una postazione e un account non ancora classificati; per le tre righe ora dichiarata e ricevuta differiscono meno di un secondo. Dettagli identificanti nella nota privata
+- [x] INTRA3: la postazione dei tentativi SMB è non AdS; l'utente ha chiesto di conservarne accesso e log, separati da quelli AdS. SMB resta selezionato
+- [x] Accesso `B:` di INTRA3 ripristinato nella PowerShell «Utente connesso» a 64 bit della postazione non AdS: radice elencabile e file non vuoto leggibile; riconnessione dopo nuovo accesso Windows non ancora provata
+- [x] `screenshot_41.png`: mappatura persistente `B:` ricreata in PowerShell amministratore; `net use` riuscito e `Get-SmbMapping` con stato `OK`. La schermata contiene una password e non è stata copiata nel progetto
+- [x] Su richiesta dell'utente, verificato `B:` da PowerShell «Utente connesso» a 64 bit con esito `ACCESSO_OK` e `LETTURA_OK`; la differenza rispetto alla prima shell che non vedeva l'unità resta non chiarita
+- [x] Una PowerShell ha restituito «unità B non esiste»; ripetendo lo stesso comando in PowerShell «Utente connesso» a 64 bit, l'utente ha ottenuto `ACCESSO_OK` senza creare una nuova mappatura. La differenza fra le sessioni non è ancora accertata
+- [x] Letto un byte da un file non vuoto di `B:` senza mostrarne il contenuto; sul NAS risulta un `Read` dalla medesima postazione, temporalmente coerente ma non associabile con certezza alla prova
+- [x] `Get-Item` conferma `CARTELLA` per il percorso del primo `Get-Content`: l'«accesso negato» non dimostra un problema di permessi SMB
+- [x] La prova di lettura di un byte da un file non vuoto della condivisione ha restituito `LETTURA_OK` nella PowerShell «Utente connesso» a 64 bit: accesso ripristinato nella sessione corrente
+- [ ] Verificare la riconnessione di `B:` dopo un nuovo accesso Windows. L'utente gestisce separatamente la credenziale esposta nello screenshot 41; non risulta ancora cambiata
+- [x] Ultime dieci righe del giorno filtrate sulla postazione non AdS: tutte `SAMBA Login Fail` tra le 12:33:38 e le 12:36:08, con `Users: User`; il campione non contiene eventi riusciti
+- [x] Conteggio del 2026-10-06 per la postazione non AdS nel file di INTRA3 sul collettore: 71 `Login Fail`, 2 `Login OK`, 1 `Read`, filtrati per `Source IP` e raggruppati per `Action`
+- [x] Orari delle azioni riuscite della postazione non AdS: `Login OK` 12:11:40 e 12:24:15, `Read` 12:33:28; le righe `Login Fail` successive iniziano alle 12:33:38 e la causa resta sconosciuta
+- [ ] Diagnostica separata dei 71 `Login Fail` della postazione non AdS, senza attribuirli alla mappatura funzionante sulla sola base dell'indirizzo; l'utente ha chiesto di proseguire il collaudo NAS
 - [x] collaudo punto 3 per il firewall: login riuscito, fallito e logout con i cinque campi (2026-10-02)
 - [x] collaudo punti 3 e 7 per HERO (2026-10-02)
-- [ ] collaudo punti 3 e 7 per gli altri NAS
+- [x] collaudo punti 3 e 7 per INTRA3; gli stessi punti sono già superati per HERO, INTRA2 e INTRA
+- [x] Primo passo del collaudo di INTRA3: dalla postazione amministrativa raggiungere la pagina di login web del NAS, uscendo dalla sessione QTS se aperta; modulo confermato dall'utente
+- [x] L'utente conferma la pagina di login QTS di INTRA3 visibile dalla postazione amministrativa
+- [x] Effettuare un solo login amministrativo riuscito con le credenziali già in uso, riferire pannello aperto e ora locale approssimativa; riga verificata nel file del giorno sul collettore
+- [x] L'utente riferisce login amministrativo riuscito su INTRA3 alle 14:05 del 2026-10-06, pannello aperto e ora QTS 14:05
+- [x] Login web amministrativo `Login OK` ricevuto alle 14:05:33.736335 con ora NAS 14:05:33, cinque campi `AdsLine`, account, postazione e risorsa `Administration`; differenza osservata 0,736335 s
+- [x] Uscire da QTS, confermare la pagina di login, poi eseguire un solo tentativo fallito controllato e cercarlo nel file del collettore
+- [x] L'utente conferma di essere uscito da QTS e di vedere di nuovo la pagina di login di INTRA3
+- [x] Un solo tentativo con account amministrativo e password volutamente errata; messaggio e ora registrati, `Login Fail` trovato nel file del collettore
+- [x] Screenshot 45 delle 14:25: unico tentativo amministrativo con password volutamente errata rifiutato da QTS; messaggio generico di credenziali errate o account non valido, senza blocco visibile. Prova privata copiata
+- [x] Cercare nel file del collettore la riga web `Login Fail` delle 14:25, verificarne cinque campi e differenza fra ora NAS e ricezione
+- [x] `Login Fail` web amministrativo di INTRA3 ricevuto alle 14:25:05.678072 con ora NAS 14:25:05, cinque campi e differenza 0,678072 s; con il `Login OK` delle 14:05 il collaudo punto 3 è superato
+- [x] `chronyc tracking` sul collettore: riferimento `ntp2.inrim.it`, `System time` +0,000443351 s, `Last offset` +0,000479445 s, `Leap status: Normal`; con i due confronti degli eventi sotto un secondo il punto 7 di INTRA3 è superato
+- [ ] Verificare separatamente il contatto effettivo del NAS con `ntp1.inrim.it`: la configurazione QTS e il confronto degli orari non mostrano direttamente una risposta NTP
 
 ## Feature: punto 3, macchine virtuali di Proxmox come sorgenti (ADR-013)
 
@@ -140,4 +182,4 @@ Definition of done:
 
 ## Riconciliazione
 
-Ultima verifica: 2026-09-30 al commit e3e6e69, con le modifiche di ADR-008 non ancora committate.
+Ultima verifica delle aree di codice coperte: 2026-10-06 al commit `8d834dd`. Non ci sono modifiche locali a codice o configurazioni coperte; i file modificati sono documenti e memoria e restano invisibili al confronto fra commit di `sync-context`. La configurazione di INTRA3 si basa sulle schermate fino alla 38 e sulle righe syslog lette dall'utente. La connessione dalla postazione non AdS è stata provata nella sessione corrente con elenco della radice e lettura di un byte; il log del NAS contiene un `Read` temporalmente coerente, mentre 71 `Login Fail` del giorno restano da attribuire.
