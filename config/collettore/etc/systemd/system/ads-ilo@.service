@@ -1,0 +1,17 @@
+[Unit]
+Description=Raccolta IEL Redfish da iLO %i
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=ads
+Group=ads
+UMask=0027
+ExecStart=/usr/bin/python3 /opt/ads/bin/ads-ilo.py --host %i --password-file /etc/ads/secrets/ilo/%i.password --ca-file /etc/ads/certs/ilo/%i.pem --fingerprint-file /etc/ads/certs/ilo/%i.sha256
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ReadWritePaths=/var/lib/ads/ilo /srv/ads/%i
+

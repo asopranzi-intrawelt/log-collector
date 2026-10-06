@@ -1,0 +1,11 @@
+[Unit]
+Description=Lettura oraria IEL Redfish da iLO %i
+
+[Timer]
+OnCalendar=hourly
+RandomizedDelaySec=5m
+Persistent=true
+Unit=ads-ilo@%i.service
+
+[Install]
+WantedBy=timers.target

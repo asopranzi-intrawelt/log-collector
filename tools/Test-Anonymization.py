@@ -89,6 +89,8 @@ BLOCCANTI = {"IP REALE", "MAC REALE", "NOME PROPRIO", "SEGRETO LETTERALE",
 IPV4 = re.compile(r"\b(?:\d{1,3}\.){3}\d{1,3}(?:/\d{1,2})?\b")
 MAC = re.compile(r"\b(?:[0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2}\b")
 EMAIL = re.compile(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b")
+# Chiave OData standard: la forma somiglia a un indirizzo email, ma non lo è.
+REDFISH_ANNOTAZIONI = {"Members@odata.nextLink"}
 # I prefissi telefonici da cercare non possono stare qui: un numero di telefono è un dato
 # personale solo se è di qualcuno, e quali prefissi appartengano al progetto lo sa il file
 # dei pattern. Se la chiave `prefissi_telefonici` manca, si ripiega sul solo formato
@@ -248,7 +250,8 @@ def analizza(pat, files):
                 mail = m.group(0)
                 locale = mail.split("@")[0]
                 dominio = mail.split("@")[-1].lower()
-                if (mail.lower() in mail_ok
+                if (mail in REDFISH_ANNOTAZIONI
+                        or mail.lower() in mail_ok
                         or MAIL_PLACEHOLDER.match(locale)
                         or dominio.endswith(DOMINI_DOC)):
                     continue

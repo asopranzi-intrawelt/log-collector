@@ -7,7 +7,7 @@ covers-paths:
   - config/collettore/**
   - tests/**
 last-verified-commit: 8d834dd
-stato: componenti 1 e 2 in esercizio; punto 3 sui NAS, INTRA3 in configurazione
+stato: componenti 1 e 2 in esercizio; INTRA3 collaudato, iLO in sviluppo, D7 bloccato
 ---
 
 # Lavoro in corso
@@ -17,6 +17,8 @@ stato: componenti 1 e 2 in esercizio; punto 3 sui NAS, INTRA3 in configurazione
 ## Modo di lavoro concordato con l'utente
 
 Direttive d'uso date dall'utente durante il lavoro sugli host, valide per ogni sessione finché non le cambia. Sugli apparati si procede un passo alla volta, e ogni risposta finisce con il passo successivo da fare, non soltanto con l'esito registrato. I comandi verso collettore e host si consegnano per la PowerShell di Windows via SSH, non per la console noVNC. L'utente lancia i comandi e trasmette screenshot dalla cartella di Screenpresso; l'agente li legge, registra esiti e misure nel work-log e nel runbook della sorgente nello stesso giro. I runbook si scrivono perché `D:/compilatore-documenti` possa ricavarne in ogni momento un documento per un cliente. Si resta sullo scopo del collettore: i difetti degli apparati emersi strada facendo, come la lentezza di INTRA2, si misurano quanto basta, si annotano e si portano in `D:/network-design`, senza proseguire la diagnosi qui. Da network-design e da compilatore-documenti si legge solo lo stretto necessario.
+
+Il 2026-10-06 l'utente ha precisato che gli ultimi comandi su `B:` partivano da NinjaOne RMM, che offre diversi contesti di esecuzione. Poiché il contesto effettivamente mostrato era sempre elevato, ulteriori prove nella stessa modalità non misurerebbero la sessione ordinaria. L'utente ha chiesto di interrompere quella diagnostica e tornare allo sviluppo del collettore. La riconnessione di `B:` dopo un login Windows reale resta un controllo operativo futuro, senza bloccare il codice del componente seguente.
 
 ## Feature: componente 1, VM + Debian + nftables + chrony + TLS
 
@@ -115,7 +117,7 @@ Definition of done:
 - [ ] domanda aperta: righe SMB dell'account `backup` di Proxmox su INTRA, una ogni 10 secondi circa: tenerle, filtrarle sul collettore o togliere SMB
 - [x] INTRA3: invio syslog UDP 514 di eventi e connessioni applicato secondo l'operatore; file e righe del NAS ricevuti sul collettore
 - [x] INTRA3: collaudi 3 e 7 superati con accessi amministrativi controllati, confronto degli orari e `chronyc tracking` sul collettore; contatto NTP del NAS non osservato direttamente
-- [ ] D7: separare gli accessi AdS dagli altri log NAS; servono elenco AdS approvato, destinazione e politica del flusso ordinario (ADR-014)
+- [ ] D7: separare gli accessi AdS dagli altri log NAS; l'utente conferma che non esistono ancora nomina formale firmata né elenco AdS approvato. Servono inoltre destinazione e politica del flusso ordinario (ADR-014)
 - [x] INTRA3: l'utente conferma il 2026-10-05 che l'interfaccia web del NAS è raggiungibile; la sola schermata informativa è stata letta, senza modificare impostazioni
 - [x] INTRA3: screenshot 13 del pannello `System Information` letto il 2026-10-05: TS-210, 249 MB di RAM, firmware 4.2.6 build 20240618, fuso di Roma; NTP e invio log ancora da verificare. L'utente dichiara che solo i due amministratori interni montano le condivisioni come unità di rete
 - [x] INTRA3: il 2026-10-06 la scheda `System Connection Logs` è vuota e mostra `Start Logging`, quindi la registrazione delle connessioni è spenta; nessuna impostazione è stata cambiata. Non si possono ancora osservare le connessioni effettive o decidere D7. Evidenza privata `_notes/evidenze/NAS-INTRA3-connessioni-2026-10-06.png`
@@ -146,6 +148,31 @@ Definition of done:
 - [x] Conteggio del 2026-10-06 per la postazione non AdS nel file di INTRA3 sul collettore: 71 `Login Fail`, 2 `Login OK`, 1 `Read`, filtrati per `Source IP` e raggruppati per `Action`
 - [x] Orari delle azioni riuscite della postazione non AdS: `Login OK` 12:11:40 e 12:24:15, `Read` 12:33:28; le righe `Login Fail` successive iniziano alle 12:33:38 e la causa resta sconosciuta
 - [ ] Diagnostica separata dei 71 `Login Fail` della postazione non AdS, senza attribuirli alla mappatura funzionante sulla sola base dell'indirizzo; l'utente ha chiesto di proseguire il collaudo NAS
+- [x] Primo controllo dopo il ripristino di `B:`: le ultime otto righe SMB della postazione non AdS nel file del giorno sono tutte `Users: User`, `Login Fail` fra le 13:41:25 e le 13:41:29; al momento della query non risultano righe SMB successive per quella postazione
+- [ ] Nella PowerShell ordinaria a 64 bit della postazione non AdS leggere mappatura `B:` e connessioni SMB attive, mostrando solo percorso remoto, stato e identità usata; cercare poi l'origine dei tentativi falliti senza attribuirli automaticamente alla mappatura
+- [x] L'ultimo `Get-SmbMapping -LocalPath B:` non trova la mappatura e `Get-SmbConnection` mostra `Public` su INTRA3 con `UserName` riferito alla postazione amministrativa; il comando non include `hostname`, quindi non si può attribuire con certezza l'assenza di `B:` alla postazione non AdS. Verificare prima il nome del computer nella stessa PowerShell
+- [x] Un nuovo `hostname` nella PowerShell con prompt `C:\WINDOWS\system32` restituisce `<POSTAZIONE_NON_ADS>`; il prompt del precedente controllo era `C:\Users\Utente`, quindi non è provato che i due comandi siano stati eseguiti nella stessa finestra
+- [x] Nella PowerShell appena identificata come `<POSTAZIONE_NON_ADS>`, controllare identità, architettura ed elevazione della sessione, poi mappatura `B:` e connessioni a INTRA3 includendo il campo `Credential`; non mostrare password
+- [x] Nella PowerShell di <POSTAZIONE_NON_ADS> l'utente ha riportato `User=<POSTAZIONE_NON_ADS>\User`, `Process64Bit=True`, `Elevated=True`; nel messaggio non compaiono risultati delle query su mappatura e connessioni
+- [ ] Aprire una PowerShell ordinaria su <POSTAZIONE_NON_ADS>, confermare `Elevated=False` e `Process64Bit=True`, poi ripetere lì la verifica di `B:` e delle connessioni SMB; la finestra elevata può avere mappature di unità diverse
+- [x] Ripetuto il controllo nella PowerShell indicata dall'utente: ancora `<POSTAZIONE_NON_ADS>\User`, 64 bit, `Elevated=True`; non risulta una finestra ordinaria distinta
+- [x] Verificare direttamente nella finestra corrente di <POSTAZIONE_NON_ADS> mappatura `B:`, connessione SMB con campo `Credential` e accesso in sola lettura alla radice, senza stampare nomi di file; se l'unità manca, attribuire il risultato solo a questa sessione elevata
+- [x] Nella finestra elevata a 64 bit di <POSTAZIONE_NON_ADS> `Get-SmbMapping` mostra `B:` verso la condivisione di INTRA3 con stato `OK` e l'elenco della radice restituisce `ACCESSO_OK`; la query `Get-SmbConnection` eseguita prima dell'elenco non ha mostrato righe
+- [x] Dopo l'accesso alla radice di `B:`, ripetere `Get-SmbConnection` nella stessa finestra per leggere `Credential` dell'eventuale connessione ora attiva, senza password
+- [x] Dopo l'accesso a `B:`, `Get-SmbConnection` mostra `NAS-INTRA3/Public` attivo con `Credential` dell'account NAS previsto per la postazione, distinto dall'account Windows locale (`UserName`); dialetto SMB 2.1 e due aperture
+- [x] Leggere in sola lettura `HKCU:\Network\B` nella stessa sessione per verificare se Windows ha registrato la mappatura da riconnettere al prossimo accesso; la prova reale della riconnessione dopo nuovo login resta separata
+- [x] Nella sessione elevata di <POSTAZIONE_NON_ADS> la voce `HKCU:\Network\B` è assente: la mappatura attiva di `B:` non risulta registrata lì per la riconnessione al login
+- [x] Elencare in sola lettura le connessioni correnti con `net use` prima di valutare `net use /persistent:yes`, che secondo Microsoft salva le connessioni correnti per i login successivi; non applicarlo senza sapere quali altre connessioni includerebbe
+- [x] `net use` sulla sessione elevata di <POSTAZIONE_NON_ADS> elenca una sola connessione, `B:` verso la condivisione INTRA3, con stato `OK`; indica che le nuove connessioni saranno memorizzate, ma `HKCU:\Network\B` resta assente nel controllo precedente
+- [x] Eseguire `net use /persistent:yes` nella stessa sessione e verificare subito se compare `HKCU:\Network\B`; il comando riguarda la sola connessione corrente elencata e non deve interromperla
+- [x] `net use /persistent:yes` risponde «Esecuzione comando riuscita», ma `HKCU:\Network\B` resta assente: l'impostazione generale non ha registrato la mappatura `B:` già attiva
+- [x] Ricreata in modo mirato solo `B:` nella PowerShell elevata: `net use B: /delete` riuscito, nuova mappatura con `/persistent:yes` e password richiesta interattivamente riuscita; la radice restituisce `ACCESSO_OK`
+- [x] La lettura immediata di `HKCU:\Network\B` dopo la nuova mappatura dà ancora `PathNotFound`: in questa sessione la registrazione per la riconnessione non è visibile; la causa non è accertata
+- [ ] Alla prossima apertura ordinaria di Windows verificare se `B:` si riconnette. Non ripetere cancellazione e rimappatura ora; l'accesso corrente è funzionante
+- [x] Sul collettore le ultime otto righe SMB della postazione non AdS mostrano sette `Login Fail` con `Users: User` fra le 16:32:20 e le 16:32:25, seguiti da `Login OK` con l'account NAS previsto alle 16:34:00; nessuna riga successiva nel campione al momento della query
+- [x] Il controllo successivo sul client restituisce ancora `Elevated=True` e `ACCESSO_OK`: conferma l'accesso nella finestra amministrativa, senza aggiungere prova per la sessione ordinaria
+- [ ] Aprire PowerShell dal desktop con `Win+R`, senza elevazione, e provare `B:` solo se il nuovo processo risulta `Elevated=False`; se è ancora elevato, fermare i controlli ripetuti e chiarire la configurazione UAC
+- [ ] Attribuire i fallimenti SMB precedenti solo se ricompaiono dopo il login riuscito o se emergono prove dal client; la sequenza attuale conferma un accesso riuscito ma non identifica la causa dei tentativi falliti
 - [x] collaudo punto 3 per il firewall: login riuscito, fallito e logout con i cinque campi (2026-10-02)
 - [x] collaudo punti 3 e 7 per HERO (2026-10-02)
 - [x] collaudo punti 3 e 7 per INTRA3; gli stessi punti sono già superati per HERO, INTRA2 e INTRA
@@ -163,9 +190,23 @@ Definition of done:
 - [x] `chronyc tracking` sul collettore: riferimento `ntp2.inrim.it`, `System time` +0,000443351 s, `Last offset` +0,000479445 s, `Leap status: Normal`; con i due confronti degli eventi sotto un secondo il punto 7 di INTRA3 è superato
 - [ ] Verificare separatamente il contatto effettivo del NAS con `ntp1.inrim.it`: la configurazione QTS e il confronto degli orari non mostrano direttamente una risposta NTP
 
+## Feature: componente 4, iLO 5 via Redfish
+
+Stato: sviluppo locale del lettore IEL, dopo il collaudo di INTRA3. Il componente non dipende dall'elenco AdS approvato né dalla scelta della TSA; l'installazione e il collaudo su iLO reali dipendono da licenza, account di lettura, certificato e raggiungibilità.
+
+Cosa fa: `ads-ilo.py` legge ogni ora l'iLO Event Log, registra le nuove voci e gli incrementi di `Count` nel formato `AdsLine`, conserva lo stato e segnala gli errori. Procedura e limiti in `docs/runbook-componente-4-ilo.md`.
+
+Definition of done:
+
+- [x] Codice, unità systemd e prove locali preparati; sessione Redfish con logout, paginazione, TLS con CA e impronta, checkpoint dopo il log, riga di stato del giro
+- [ ] Verificare sul dispositivo `License Type`: con Remote Syslog effettivamente disponibile la scelta del polling va rivalutata
+- [ ] Verificare che l'account dedicato con il solo privilegio `Login` possa leggere l'IEL e che `Updated` sia valorizzato nelle voci ripetute
+- [ ] Preparare certificato iLO, impronta, password privata, cartelle e rete; installare il codice e le unità sul collettore senza attivare subito il timer
+- [ ] Collaudare due giri senza nuovi eventi, un accesso amministrativo riuscito e uno fallito, un errore di lettura, logout, cinque campi e file di stato; poi attivare il timer
+
 ## Feature: punto 3, macchine virtuali di Proxmox come sorgenti (ADR-013)
 
-Stato: rinviata per decisione dell'utente del 2026-10-05 finché `D:/network-design` non avrà allineato tutte le VM all'impianto tecnico del pilota, M29. I log e gli allarmi tecnici restano nel flusso separato di quel progetto; solo dopo l'allineamento si riprende qui l'invio di accessi AdS e heartbeat. La priorità corrente di questo progetto è il NAS INTRA3.
+Stato: rinviata per decisione dell'utente del 2026-10-05 finché `D:/network-design` non avrà allineato tutte le VM all'impianto tecnico del pilota, M29. I log e gli allarmi tecnici restano nel flusso separato di quel progetto; solo dopo l'allineamento si riprende qui l'invio di accessi AdS e heartbeat. La priorità corrente di questo progetto è il componente iLO.
 
 Cosa fa: ogni VM invia al collettore, in TLS sulla 6514 con coda su disco, i propri accessi amministrativi (`sshd`, `sudo`, `su`, login grafico) e un heartbeat periodico, così che il controllo di silenzio registri anche una VM ferma. Si comincia dalla VM 204, il convertitore dei ruolini, che dal 05/10/2026 è il pilota del presidio sulle VM registrato in `D:/network-design` (`docs/log-collector-integrazione.md`, sezione sul monitoraggio delle macchine virtuali). Amministra le VM l'IT Manager.
 
@@ -182,4 +223,4 @@ Definition of done:
 
 ## Riconciliazione
 
-Ultima verifica delle aree di codice coperte: 2026-10-06 al commit `8d834dd`. Non ci sono modifiche locali a codice o configurazioni coperte; i file modificati sono documenti e memoria e restano invisibili al confronto fra commit di `sync-context`. La configurazione di INTRA3 si basa sulle schermate fino alla 38 e sulle righe syslog lette dall'utente. La connessione dalla postazione non AdS è stata provata nella sessione corrente con elenco della radice e lettura di un byte; il log del NAS contiene un `Read` temporalmente coerente, mentre 71 `Login Fail` del giorno restano da attribuire.
+Ultima verifica delle aree di codice coperte: 2026-10-06 fra `8d834dd` e HEAD `585ac08`; nessun file coperto dalle schede è cambiato e l'albero era pulito dopo `chiudi`. I `last-verified-commit` a `8d834dd` restano validi senza aggiornamento formale. La configurazione di INTRA3 si basa sulle schermate fino alla 38 e sulle righe syslog lette dall'utente; i collaudi punti 3 e 7 sono superati. La connessione dalla postazione non AdS è stata provata con elenco della radice e lettura di un byte; il log del NAS contiene un `Read` temporalmente coerente, mentre 71 `Login Fail` del giorno restano da attribuire. D7 è bloccato perché non esistono ancora nomina formale firmata né elenco AdS approvato.
