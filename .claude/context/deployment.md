@@ -5,7 +5,7 @@ generated-date: 2026-09-30
 covers-paths:
   - config/**
   - docs/handoff-sviluppo-collettore.md
-last-verified-commit: a031a4c
+last-verified-commit: 934aebd
 ---
 
 # Deployment

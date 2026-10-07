@@ -6,8 +6,8 @@ covers-paths:
   - bin/**
   - config/collettore/**
   - tests/**
-last-verified-commit: a031a4c
-stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai punti 3 e 7; catena locale provata in WSL, non installata; D7 e trattamento eventi iLO non AdS aperti
+last-verified-commit: 934aebd
+stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai punti 3 e 7; catena locale provata in WSL, non installata; D7 bloccato da nomina ed elenco AdS, eventi iLO tecnici ancora da separare
 ---
 
 # Lavoro in corso
@@ -245,5 +245,7 @@ Definition of done:
 - [ ] la VM 210 stessa: stesso profilo di rischio della VM 204 (2 GB con desktop, ADR-012); un blocco del collettore apre un buco nella prova per le sorgenti UDP, quindi watchdog e memoria della VM 210 vanno decisi con lo stesso criterio applicato alla 204 in `D:/network-design`
 
 ## Riconciliazione
+
+Al 07/10/2026 il perimetro NAS dichiarato dall'IT Manager include anche l'accesso amministrativo QTS dei PM su HERO e INTRA2, oltre ai permessi completi su file specifici; la sottocartella amministrativa di INTRA2 è dichiarata limitata a due persone. La mappatura reale è privata nel progetto di rete. Per D7 restano da verificare account, gruppi QTS, ACL e l'ambito effettivo della GUI; senza nomina individuale e elenco approvato non si installa un filtro per account. `D:/network-design` ha registrato l'avanzamento parziale ISO-30 e la regola per allineare a ogni avanzamento l'HTML di progetto e la copia sul Desktop.
 
 Le cinque schede con `covers-paths` sono state riconciliate con il commit `a031a4c`: descrivono gli script e il test della catena D-1 versionati. Il codice Redfish iLO ha superato le prove locali ma non è installato; Remote Syslog del dispositivo reale ha superato i punti 3 e 7. Anche INTRA3 ha superato i punti 3 e 7. La connessione dalla postazione non AdS è stata provata con elenco della radice e lettura di un byte; 71 `Login Fail` del giorno restano da attribuire. D7 è bloccato perché non esistono ancora nomina formale firmata né elenco AdS approvato. La catena locale D-1 ha superato la prova in WSL; prima dell'installazione restano lo smistamento dei flussi e il collaudo sulla VM.

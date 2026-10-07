@@ -6,7 +6,7 @@ covers-paths:
   - bin/**
   - config/**
   - tests/**
-last-verified-commit: a031a4c
+last-verified-commit: 934aebd
 ---
 
 # Stack applicativo

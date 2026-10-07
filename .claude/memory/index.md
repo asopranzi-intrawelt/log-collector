@@ -6,7 +6,7 @@
 
 ```
 Branch attivo:        main
-Commit di riferimento: a031a4c
+Commit di riferimento: 934aebd
 Data snapshot:        2026-10-07
 Albero autorevole:    unico
 Remoto:               git@github-corp:asopranzi-intrawelt/log-collector.git (primo push di 9ee87b4 il 2026-09-30)
@@ -17,14 +17,16 @@ Template:             E:\template-claude-developing @ ffcbdb3
 
 | Scheda | last-verified | Stato |
 |---|---|---|
-| STACK.md | a031a4c | componenti 1 e 2, Proxmox e iLO Syslog in esercizio; catena D-1 locale provata in WSL |
-| design-and-security.md | a031a4c | limiti UDP e attribuzione iLO, catena locale ancora senza ancora esterna |
-| deployment.md | a031a4c | iLO Syslog collaudato; unità D-1 e Redfish non installate; gate ambienti aperto |
-| dev-testing.md | a031a4c | quattro livelli; 66 pytest, 22 Bats storici, D-1 in WSL e filtro iLO in Debian 13 |
-| current-work.md | a031a4c | iLO e INTRA3 collaudati; catena locale provata, non installata; D7 bloccato |
+| STACK.md | 934aebd | componenti 1 e 2, Proxmox e iLO Syslog in esercizio; filtro iLO provato, non installato |
+| design-and-security.md | 934aebd | limiti UDP e attribuzione iLO, catena locale ancora senza ancora esterna |
+| deployment.md | 934aebd | iLO Syslog collaudato; filtro iLO e unità D-1 non installati; gate ambienti aperto |
+| dev-testing.md | 934aebd | quattro livelli; 66 pytest, 22 Bats storici, D-1 in WSL e filtro iLO in Debian 13 |
+| current-work.md | 934aebd | iLO e INTRA3 collaudati; catena locale provata, non installata; D7 bloccato |
 | roadmap.md | 9ee87b4 | solo struttura |
 
 ## Punto di ripresa
+
+L'utente ha eseguito `chiudi` dopo lo smistamento iLO preparato: HEAD `934aebd`, albero pulito alla ripresa. Le cinque schede coperte dal commit sono state riconciliate con HEAD. Il 07/10/2026 l'IT Manager ha dichiarato che i PM hanno sia controllo completo sui file sia accesso alla GUI amministrativa di NAS HERO e NAS INTRA2 per condivisioni specifiche; due persone sono indicate per la sottocartella amministrativa di INTRA2. I percorsi e i nominativi reali sono nel livello privato di `D:/network-design`; le ACL, i gruppi QTS e la reale possibilità di limitare l'amministrazione GUI alle cartelle non sono verificati. Non esistono nomina AdS individuale scritta e firmata né elenco approvato: il ruolo operativo dell'IT Manager non chiude il gap. D7 resta bloccato. In `D:/network-design` ISO-30 è avanzato a `in_corso` con prove NAS/iLO e lacune esplicite; HTML di progetto, Desktop e archivio privato sono stati allineati. A.8.15 e A.8.17 hanno evidenze parziali; A.8.16 richiede monitoraggio in esercizio.
 
 Lo smistamento iLO è preparato nel template rsyslog, ma non installato sul collettore. La lettura reale del 07/10 ha contato 38 righe: 24 `iLO5`, 8 `Network`, 5 `SecurityConfiguration`, 1 `DenialofService`. Fra gli 11 testi distinti `iLO5`, tre prefissi Browser indicano accessi e otto indicano eventi tecnici, di sicurezza o configurazione; l'alert con la parola `login` non è il login. Il filtro usa l'IP privato di `sorgenti.ilo`, scrive gli accessi espliciti in `/srv/ads/` e conserva il resto in `/var/log/ads-ilo-other/`. Test renderer 15/15, prova WSL e test integrato Debian 13 con rsyslog 8.2504 passati. Restano politica e rotazione del file distinto, verifica degli altri canali di accesso iLO, backup/rollback e collaudo reale. Per D7 NAS restano elenco AdS approvato, destinazione e politica del flusso separato.
 
