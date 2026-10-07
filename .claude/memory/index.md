@@ -6,7 +6,7 @@
 
 ```
 Branch attivo:        main
-Commit di riferimento: b516232
+Commit di riferimento: a031a4c
 Data snapshot:        2026-10-07
 Albero autorevole:    unico
 Remoto:               git@github-corp:asopranzi-intrawelt/log-collector.git (primo push di 9ee87b4 il 2026-09-30)
@@ -17,16 +17,18 @@ Template:             E:\template-claude-developing @ ffcbdb3
 
 | Scheda | last-verified | Stato |
 |---|---|---|
-| STACK.md | b516232 | componenti 1 e 2, Proxmox e iLO Syslog in esercizio; catena D-1 locale provata in WSL |
-| design-and-security.md | b516232 | limiti UDP e attribuzione iLO, catena locale ancora senza ancora esterna |
-| deployment.md | b516232 | iLO Syslog collaudato; unità D-1 e Redfish non installate; gate ambienti aperto |
-| dev-testing.md | b516232 | quattro livelli; 63 pytest, 22 Bats storici e prova D-1 in WSL |
-| current-work.md | b516232 | iLO e INTRA3 collaudati; catena locale provata, non installata; D7 bloccato |
+| STACK.md | a031a4c | componenti 1 e 2, Proxmox e iLO Syslog in esercizio; catena D-1 locale provata in WSL |
+| design-and-security.md | a031a4c | limiti UDP e attribuzione iLO, catena locale ancora senza ancora esterna |
+| deployment.md | a031a4c | iLO Syslog collaudato; unità D-1 e Redfish non installate; gate ambienti aperto |
+| dev-testing.md | a031a4c | quattro livelli; 66 pytest, 22 Bats storici, D-1 in WSL e filtro iLO in Debian 13 |
+| current-work.md | a031a4c | iLO e INTRA3 collaudati; catena locale provata, non installata; D7 bloccato |
 | roadmap.md | 9ee87b4 | solo struttura |
 
 ## Punto di ripresa
 
-Lo stadio locale del componente 5 è stato ripreso dalla sessione caduta: `bin/ads-nightly.sh`, `bin/ads-verify.sh`, servizio e timer sono ancora file non tracciati e non installati. La nuova prova `tests/test-nightly.sh` è passata in WSL Ubuntu il 07/10/2026 su due giorni fittizi: idempotenza, alterazione di un byte del log D-1 rilevata e ripristino verde, copia mutata del verificatore senza confronto che lascerebbe passare il difetto, manifest precedente alterato rilevato. Il runbook è `docs/runbook-componente-5-catena.md`. Prima del timer reale restano separazione degli eventi iLO tecnici e dei log SMB non AdS, collaudo sul collettore, TSA, WORM e impronta alla Direzione. D7 è bloccato dall'elenco AdS approvato.
+Lo smistamento iLO è preparato nel template rsyslog, ma non installato sul collettore. La lettura reale del 07/10 ha contato 38 righe: 24 `iLO5`, 8 `Network`, 5 `SecurityConfiguration`, 1 `DenialofService`. Fra gli 11 testi distinti `iLO5`, tre prefissi Browser indicano accessi e otto indicano eventi tecnici, di sicurezza o configurazione; l'alert con la parola `login` non è il login. Il filtro usa l'IP privato di `sorgenti.ilo`, scrive gli accessi espliciti in `/srv/ads/` e conserva il resto in `/var/log/ads-ilo-other/`. Test renderer 15/15, prova WSL e test integrato Debian 13 con rsyslog 8.2504 passati. Restano politica e rotazione del file distinto, verifica degli altri canali di accesso iLO, backup/rollback e collaudo reale. Per D7 NAS restano elenco AdS approvato, destinazione e politica del flusso separato.
+
+Lo stadio locale del componente 5 è stato ripreso dalla sessione caduta e versionato nel commit `a031a4c`: `bin/ads-nightly.sh`, `bin/ads-verify.sh`, servizio, timer e `tests/test-nightly.sh` sono nel repository ma non installati sul collettore. La prova è passata in WSL Ubuntu il 07/10/2026 su due giorni fittizi: idempotenza, alterazione di un byte del log D-1 rilevata e ripristino verde, copia mutata del verificatore senza confronto che lascerebbe passare il difetto, manifest precedente alterato rilevato. Il runbook è `docs/runbook-componente-5-catena.md`. Prima del timer reale restano separazione degli eventi iLO tecnici e dei log SMB non AdS, collaudo sul collettore, TSA, WORM e impronta alla Direzione. D7 è bloccato dall'elenco AdS approvato.
 
 Al 2026-10-07 l’utente ha chiuso con `chiudi` la milestone documentale (`b516232`) e ha collaudato la raccolta dall’iLO fisico del DL380 Gen10. iLO 5 3.09 con licenza Advanced invia Remote Syslog al collettore su UDP 514. Nel file giornaliero sono arrivati due login web riusciti e un fallimento controllato: punto 3 superato, con account tentato assente dal messaggio di errore e account di successo generico. I primi test mostravano iLO circa 4 minuti e 34 secondi indietro; dopo SNTP su INRIM tre eventi di sincronizzazione hanno scarti osservati di 0,063083, 0,323815 e 0,283542 secondi. `chronyc tracking` odierno del collettore mostra `System time` +0,000148728 s e `Leap status: Normal`: punto 7 superato. Il lettore Redfish `ads-ilo.py` resta non installato. Sono aperti il trattamento degli eventi iLO non AdS, la perdita possibile di datagrammi UDP e la persistenza GUI del valore `Every Failure`. Dettagli in `docs/runbook-componente-4-ilo.md`.
 

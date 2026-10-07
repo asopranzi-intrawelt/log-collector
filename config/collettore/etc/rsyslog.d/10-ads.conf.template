@@ -17,6 +17,9 @@ global(DefaultNetstreamDriverCAFile="/etc/rsyslog.d/tls/ca.pem"
        DefaultNetstreamDriverKeyFile="/etc/rsyslog.d/tls/collector.key")
 
 template(name="AdsFile" type="string" string="/srv/ads/%fromhost-ip%/%$year%-%$month%-%$day%.log")
+# Gli eventi iLO diversi dagli accessi espliciti vanno in un flusso separato. La destinazione
+# comprende anche eventi non ancora classificati: va ispezionata prima dell'attivazione reale.
+template(name="AdsIloOtherFile" type="string" string="/var/log/ads-ilo-other/%fromhost-ip%/%$year%-%$month%-%$day%.log")
 # Il campo messaggio e' $!ads_msg, calcolato nel ruleset: tag e testo riattaccati esattamente come
 # erano nella riga RFC 3164, e separati da uno spazio nei messaggi RFC 5424, dove sono due campi
 # distinti. Una regola "spazio se manca" era sbagliata: con il firewall Zyxel, che non scrive un
@@ -36,9 +39,30 @@ ruleset(name="ads" parser=["rsyslog.rfc5424", "ads.rfc3164anno"]) {
     } else {
         set $!ads_msg = $syslogtag & $msg;
     }
-    action(type="omfile" dynaFile="AdsFile" template="AdsLine"
-           fileOwner="root" fileGroup="ads" fileCreateMode="0640"
-           dirOwner="root" dirGroup="ads" dirCreateMode="0750")
+    if {{ rsyslog_ip_match(sorgenti.ilo) }} then {
+        # Corrispondenze osservate sul dispositivo: Browser login, failure, logout. Le forme
+        # SSH e Remote console sono documentate da HPE ma non ancora provate su questa iLO.
+        if $!ads_msg startswith "iLO5 Browser login:" or
+           $!ads_msg startswith "iLO5 Browser login failure from:" or
+           $!ads_msg startswith "iLO5 Browser logout:" or
+           $!ads_msg startswith "iLO5 SSH login:" or
+           $!ads_msg startswith "iLO5 SSH login failure from:" or
+           $!ads_msg startswith "iLO5 SSH logout:" or
+           $!ads_msg startswith "iLO5 Remote console login:" or
+           $!ads_msg startswith "iLO5 Remote console login failure from:" then {
+            action(type="omfile" dynaFile="AdsFile" template="AdsLine"
+                   fileOwner="root" fileGroup="ads" fileCreateMode="0640"
+                   dirOwner="root" dirGroup="ads" dirCreateMode="0750")
+        } else {
+            action(type="omfile" dynaFile="AdsIloOtherFile" template="AdsLine"
+                   fileOwner="root" fileGroup="adm" fileCreateMode="0640"
+                   dirOwner="root" dirGroup="adm" dirCreateMode="0750")
+        }
+    } else {
+        action(type="omfile" dynaFile="AdsFile" template="AdsLine"
+               fileOwner="root" fileGroup="ads" fileCreateMode="0640"
+               dirOwner="root" dirGroup="ads" dirCreateMode="0750")
+    }
 }
 
 input(type="imudp" port="514" ruleset="ads")

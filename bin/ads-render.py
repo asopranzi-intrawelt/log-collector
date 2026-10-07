@@ -16,6 +16,8 @@ un rendering non si mescola mai con uno precedente.
 from __future__ import annotations
 
 import argparse
+import ipaddress
+import json
 import re
 import shutil
 import sys
@@ -28,6 +30,7 @@ import adsparams  # noqa: E402
 
 PLACEHOLDER = re.compile(r"\{\{\s*([^{}]*?)\s*\}\}")
 DOTTED = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*\.[A-Za-z_][A-Za-z0-9_]*$")
+RSYSLOG_IP_MATCH = re.compile(r"^rsyslog_ip_match\(([^()]*)\)$")
 SUFFIX = ".template"
 
 
@@ -40,6 +43,22 @@ def render_text(text: str, params: adsparams.Params, where: str, errors: list[st
 
     def substitute(match: re.Match[str]) -> str:
         expr = match.group(1)
+        if ip_match := RSYSLOG_IP_MATCH.fullmatch(expr):
+            key = ip_match.group(1).strip()
+            if not DOTTED.fullmatch(key):
+                errors.append(f"{where}: chiave IP non valida {{{{ {expr} }}}}")
+                return match.group(0)
+            try:
+                value = adsparams.lookup(params, key)
+                addresses = [str(ipaddress.ip_address(item)) for item in _values(value) if item]
+            except (adsparams.ParamsError, ValueError) as exc:
+                errors.append(f"{where}: {key}: indirizzo IP non valido: {exc}")
+                return match.group(0)
+            return (
+                "(" + " or ".join(f"$fromhost-ip == {json.dumps(ip)}" for ip in addresses) + ")"
+                if addresses
+                else '($fromhost-ip == "0.0.0.0" and $fromhost-ip == "::")'
+            )
         keys = [part.strip() for part in expr.split("+")]
         collected: list[str] = []
         for key in keys:

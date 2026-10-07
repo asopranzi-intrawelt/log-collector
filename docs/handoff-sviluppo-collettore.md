@@ -176,8 +176,8 @@ if $programname == ["pvedaemon","pveproxy","sshd","sudo","su","login","pveproxy-
 6. `ads-silence.sh`
 7. Pilota Windows (2 postazioni + 1 server) con Fluent Bit → misura volumi → ridimensionamento `scsi1` e WORM
 8. `ads-m365.py`, `ads-ninja.py`, `ads-gravityzone.py` (studio, D9)
-
-Stato al 07/10/2026: iLO Remote Syslog ha superato i punti 3 e 7 sul dispositivo reale. Lo stadio locale di `ads-nightly.sh` e `ads-verify.sh` ha superato una prova funzionale in WSL, compresa l'alterazione di un byte del log D-1 richiesta dal punto 5; timer e servizio non sono installati. Prima dell'attivazione va definito il trattamento separato degli eventi tecnici iLO e delle connessioni SMB non AdS; D7 richiede ancora l'elenco AdS approvato. La prova su VM reale e l'ancoraggio esterno TSA/WORM restano aperti.
 9. Collaudo completo sezione 6 → estensione Windows dopo il parere privacy
+
+Stato al 07/10/2026: iLO Remote Syslog ha superato i punti 3 e 7 sul dispositivo reale. Lo smistamento iLO per IP sorgente e prefissi di accesso è preparato e ha superato il test integrato Debian 13, ma non è installato; conservazione e rotazione del file separato restano da definire. Lo stadio locale di `ads-nightly.sh` e `ads-verify.sh` ha superato una prova funzionale in WSL, compresa l'alterazione di un byte del log D-1 richiesta dal punto 5; timer e servizio non sono installati. Prima dell'attivazione va completato il trattamento delle connessioni SMB non AdS; D7 richiede ancora l'elenco AdS approvato. La prova su VM reale e l'ancoraggio esterno TSA/WORM restano aperti.
 
 Scadenze dello studio: punti 1-4 entro il 23/10/2026, il resto entro il 13/11/2026.

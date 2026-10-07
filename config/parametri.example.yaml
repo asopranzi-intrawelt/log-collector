@@ -16,7 +16,7 @@ collettore:
   fqdn: ""
   amministratori: []       # account personali degli amministratori non MSP (ADR-008)
   ip: ""
-sorgenti:                  # elenco atteso per il controllo di silenzio
+sorgenti:                  # elenco atteso per il controllo di silenzio; ilo identifica anche lo smistamento rsyslog
   firewall_usg_flex: ""
   nebula_switch_ap: []
   qnap: []

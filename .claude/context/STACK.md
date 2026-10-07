@@ -6,7 +6,7 @@ covers-paths:
   - bin/**
   - config/**
   - tests/**
-last-verified-commit: b516232
+last-verified-commit: a031a4c
 ---
 
 # Stack applicativo
@@ -27,7 +27,7 @@ PyYAML per leggere `parametri.yaml`: escluso dal vincolo di una sola dipendenza 
 
 Il flusso parte dalla postazione dell'amministratore. `config/parametri.yaml`, ignorato da git, fornisce i valori dell'ambiente; `bin/ads-render.py` genera da `config/collettore/` e `config/proxmox-host/` alberi distinti in `build/`, senza scrivere se mancano parametri o la destinazione esiste. `bin/ads-vm-command.py` stampa il comando `qm create`, con lettore CD opzionale per la ISO (`--iso`), senza eseguirlo; `bin/ads-pki.sh` crea CA e certificato del collettore tenendo la chiave della CA sulla postazione. Sul collettore `bin/ads-bootstrap.sh` installa pacchetti, account personali e chiavi SSH, gruppo `ads-admin`, configurazioni e materiale TLS; verifica il montaggio di `/srv/ads` con `nodev,nosuid,noexec`, `nft -c`, `sshd -t`, `visudo -c` e `rsyslogd -N1` prima di attivare i servizi. Con `--prova` stampa i comandi senza eseguirli.
 
-Il ricevente `config/collettore/etc/rsyslog.d/10-ads.conf` ascolta su 514/udp e 6514/tcp con TLS, instrada anche `sshd*`, `sudo`, `su`, `login`, `systemd-logind` e `gdm-password` locali e scrive `AdsLine` in `/srv/ads/<IP mittente>/<giorno>.log`, con permessi `root:ads` 0640 e cartelle 0750. Per i messaggi RFC 3164 e 5424 ricompone tag e testo in modo distinto; il parser RFC 3164 gestisce anche l'anno dopo l'ora delle righe Zyxel. `config/proxmox-host/etc/rsyslog.d/90-ads.conf.template` inoltra via TLS con verifica del nome del certificato i login SSH, `sudo`, `su`, `login`, le autenticazioni di `pvedaemon` e le richieste `/access/ticket` di `pveproxy`; usa code su disco e parte dalla fine dell'access log al primo avvio.
+Il ricevente `config/collettore/etc/rsyslog.d/10-ads.conf.template` ascolta su 514/udp e 6514/tcp con TLS, instrada anche `sshd*`, `sudo`, `su`, `login`, `systemd-logind` e `gdm-password` locali e scrive `AdsLine` in `/srv/ads/<IP mittente>/<giorno>.log`, con permessi `root:ads` 0640 e cartelle 0750. Per i messaggi RFC 3164 e 5424 ricompone tag e testo in modo distinto; il parser RFC 3164 gestisce anche l'anno dopo l'ora delle righe Zyxel. Il nuovo template, non installato, separa per IP iLO gli accessi espliciti dagli altri eventi e conserva questi ultimi in `/var/log/ads-ilo-other/`; la prova integrata Debian 13 passa. `config/proxmox-host/etc/rsyslog.d/90-ads.conf.template` inoltra via TLS con verifica del nome del certificato i login SSH, `sudo`, `su`, `login`, le autenticazioni di `pvedaemon` e le richieste `/access/ticket` di `pveproxy`; usa code su disco e parte dalla fine dell'access log al primo avvio.
 
 Il nuovo `ads-ilo.py` crea una sessione Redfish, percorre tutte le pagine dell'IEL, converte `Id`, `Created`, `Count`, `Updated`, `Code` e `Message` in righe `AdsLine` sotto `/srv/ads/<IP_ILO>/` e salva lo stato dopo aver sincronizzato il log. Il timer orario è soltanto preparato: non è installato né abilitato. Il runbook del componente 4 descrive prerequisiti e prove sul dispositivo.
 
@@ -35,6 +35,6 @@ Sul dispositivo reale iLO Advanced è stata abilitata via Remote Syslog UDP 514:
 
 ## Riferimenti a snippet
 
-`bin/adsparams.py:parse` e `bin/adsparams.py:require` per la lettura dei parametri; `bin/ads-render.py:render_text` e `render_tree` per i segnaposto e l'albero generato; `bin/ads-vm-command.py:build_command` per il comando della VM; `bin/ads-bootstrap.sh:check_inputs` e `check_data_mount` per i controlli iniziali; `config/collettore/etc/nftables.conf.template` per il firewall locale; `config/collettore/etc/rsyslog.d/10-ads.conf` per ricezione e `AdsLine`; `config/proxmox-host/etc/rsyslog.d/90-ads.conf.template` per i filtri e l'invio dell'host.
+`bin/adsparams.py:parse` e `bin/adsparams.py:require` per la lettura dei parametri; `bin/ads-render.py:render_text` e `render_tree` per i segnaposto e l'albero generato; `bin/ads-vm-command.py:build_command` per il comando della VM; `bin/ads-bootstrap.sh:check_inputs` e `check_data_mount` per i controlli iniziali; `config/collettore/etc/nftables.conf.template` per il firewall locale; `config/collettore/etc/rsyslog.d/10-ads.conf.template` per ricezione, `AdsLine` e filtro iLO; `config/proxmox-host/etc/rsyslog.d/90-ads.conf.template` per i filtri e l'invio dell'host.
 
 `bin/ads-ilo.py:read_entries` per la paginazione IEL, `plan_entries` per il confronto dei contatori, `poll` per l'ordine fra scrittura e checkpoint; `config/collettore/etc/systemd/system/ads-ilo@.service` per il processo orario non ancora attivato.

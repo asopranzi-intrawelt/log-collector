@@ -6,7 +6,7 @@ covers-paths:
   - bin/**
   - config/collettore/**
   - tests/**
-last-verified-commit: b516232
+last-verified-commit: a031a4c
 stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai punti 3 e 7; catena locale provata in WSL, non installata; D7 e trattamento eventi iLO non AdS aperti
 ---
 
@@ -72,7 +72,7 @@ Cosa fa: riceve i log delle sorgenti su 514/udp e 6514/tcp in TLS e li scrive in
 
 Definition of done:
 
-- [x] configurazione `config/collettore/etc/rsyslog.d/10-ads.conf`, installata e controllata dal bootstrap
+- [x] configurazione generata da `config/collettore/etc/rsyslog.d/10-ads.conf.template`, installata e controllata dal bootstrap nella versione precedente al filtro iLO
 - [x] verifica in container `debian:trixie`: ricezione UDP e TLS, TCP in chiaro scartato, accessi locali instradati, cinque campi, permessi
 - [x] bootstrap rieseguito sul collettore con il pacchetto nuovo il 2026-10-01, senza errori e senza pacchetti nuovi (rieseguibile)
 - [x] sul collettore vero: un accesso SSH di un amministratore compare in `/srv/ads/127.0.0.1/` come `sshd-session ... Accepted publickey`, con impronta della chiave (2026-10-01, dopo la correzione del filtro)
@@ -194,7 +194,9 @@ Definition of done:
 
 Stato: lettore IEL, test e unità systemd versionati nel commit `30b4c1c`, ma non installati. Il 2026-10-07 il collettore ha negoziato TLS 1.3 con l'iLO fisico sulla porta 443 senza verificarne la catena del certificato. L'utente ha recuperato la credenziale ed è entrato nella GUI; gli screenshot privati 102-104 mostrano ProLiant DL380 Gen10, iLO 5 3.09, **licenza iLO Advanced** e pagina Remote Syslog inizialmente disabilitata. La funzione è stata abilitata verso UDP 514 del collettore: nel file giornaliero della sorgente sono arrivate una riga di modifica e due righe di test. I primi test mostravano iLO indietro di circa 4 minuti e 34 secondi. Dopo aver configurato SNTP con i server INRIM e fuso di Roma, l'operatore ha letto tre eventi di sincronizzazione nel file del collettore; gli scarti rispetto alla ricezione sono 0,063083, 0,323815 e 0,283542 secondi. La scelta originaria Redfish si basava sull'indicazione errata che Advanced fosse assente. La Security Dashboard mostra stato Risk per RBSU senza login, Secure Boot disabilitato, complessità password disabilitata, SNMPv1 abilitato e certificato predefinito; questi rilievi sono riportati anche a `D:/network-design`. L'archivio KeePassXC che la sua documentazione dichiarava attivo non esiste e la rettifica è stata propagata.
 
-Cosa fa ora: Remote Syslog invia le nuove voci al ricevente del collettore, che le scrive in `/srv/ads/<IP_ILO>/` nel formato `AdsLine`. Due login web riusciti e un fallimento controllato sono stati ricevuti; il punto 3 è superato, con account tentato assente dal messaggio di fallimento. Tre eventi NTP sotto un secondo e `chronyc tracking` normale superano il punto 7. UDP non offre ritrasmissione. Il timer `ads-ilo.py` resta alternativo e non installato. La separazione degli eventi iLO non AdS è aperta. Procedura e limiti in `docs/runbook-componente-4-ilo.md`.
+Cosa fa ora: Remote Syslog invia le nuove voci al ricevente del collettore, che le scrive in `/srv/ads/<IP_ILO>/` nel formato `AdsLine`. Due login web riusciti e un fallimento controllato sono stati ricevuti; il punto 3 è superato, con account tentato assente dal messaggio di fallimento. Tre eventi NTP sotto un secondo e `chronyc tracking` normale superano il punto 7. UDP non offre ritrasmissione. Il timer `ads-ilo.py` resta alternativo e non installato. Lo smistamento iLO è preparato nel nuovo template rsyslog ma non installato; la destinazione separata richiede ancora politica e collaudo Debian 13. Procedura e limiti in `docs/runbook-componente-4-ilo.md`.
+
+Ricognizione per lo smistamento: il file reale del 07/10 contiene, al momento della lettura, 38 righe ripartite per primo token del messaggio in 24 `iLO5`, 8 `Network`, 5 `SecurityConfiguration` e 1 `DenialofService`. Fra gli 11 testi distinti `iLO5` sono stati osservati i tre prefissi Browser di accesso e otto testi tecnici, di sicurezza o di configurazione. La nuova regola usa l'IP privato della sorgente e prefissi di accesso espliciti; conserva tutti gli altri messaggi in `/var/log/ads-ilo-other/` per revisione. La prova locale WSL con rsyslog 8.2312 ha scritto due accessi e due messaggi tecnici nei file attesi. La prima prova Debian 13 ha trovato e fatto correggere la condizione vuota non valida; la seconda è passata con rsyslog 8.2504: tre accessi nel file AdS, tre eventi tecnici o ignoti nel file distinto.
 
 Definition of done:
 
@@ -208,11 +210,13 @@ Definition of done:
 - [x] Ricerca nel file iLO: due `Browser login` riusciti con account e IP della postazione, più evento di modifica `AuthenticationFailureLogging`, tutti ricevuti nel formato `AdsLine`
 - [x] Dopo Logout un solo tentativo con password volutamente errata è stato rifiutato dalla GUI, senza blocco visibile
 - [x] Un solo login iLO volutamente errato rifiutato dalla GUI e ricevuto alle 14:43:16.550058 nel file del collettore con cinque campi `AdsLine`; scarto 0,550058 s, IP della postazione ma nessun account tentato nel messaggio. Collaudo punto 3 superato.
+- [x] Ricognizione dei testi iLO reali e filtro parametrico preparato; test del renderer 15/15, prova locale rsyslog 8.2312 e test integrato Debian 13 con rsyslog 8.2504 passati
+- [ ] Politica del file `/var/log/ads-ilo-other/`, verifica degli altri canali di accesso iLO e collaudo della regola sul collettore reale
 - [ ] Se Remote Syslog non copre gli accessi, collaudare il lettore Redfish con account dedicato, certificato verificato e timer
 
 ## Feature: componente 5, catena locale D-1
 
-Stato: `bin/ads-nightly.sh`, `bin/ads-verify.sh` e le unità systemd sono stati ripresi dalla sessione interrotta; il codice è ancora non tracciato e non installato. `tests/test-nightly.sh` ha superato in WSL Ubuntu il 07/10/2026 la prova su due giorni, con seconda esecuzione idempotente, byte alterato nel log D-1 rilevato, mutazione del verificatore che farebbe passare il difetto, e manifest precedente alterato rilevato. Il test non usa il collettore reale.
+Stato: `bin/ads-nightly.sh`, `bin/ads-verify.sh`, le unità systemd e `tests/test-nightly.sh` sono versionati nel commit `a031a4c` del 07/10/2026, ma non installati sul collettore. Il test ha superato in WSL Ubuntu la prova su due giorni, con seconda esecuzione idempotente, byte alterato nel log D-1 rilevato, mutazione del verificatore che farebbe passare il difetto, e manifest precedente alterato rilevato. Il test non usa il collettore reale.
 
 Cosa fa: comprime i file del giorno precedente, scrive un manifest SHA-256 concatenato al precedente e verifica archivio e log originario. È lo stadio locale della sezione 5 dello studio; non costituisce ancora la prova indipendente prevista con TSA, WORM e impronta alla Direzione. La ricezione attuale mescola nello stesso albero accessi AdS, eventi tecnici iLO e connessioni SMB non AdS di INTRA3: prima di attivare il timer va definita la separazione, senza cancellare le righe già raccolte. D7 richiede l'elenco AdS approvato. Il runbook è `docs/runbook-componente-5-catena.md`.
 
@@ -242,4 +246,4 @@ Definition of done:
 
 ## Riconciliazione
 
-Le cinque schede con `covers-paths` hanno ancora come ancora `b516232`: `verifica-schede.py --rigoroso` non segnala drift rispetto a HEAD, ma la verifica per commit non vede gli script del componente 5 ancora non tracciati. Le schede pertinenti sono state aggiornate per contenuto nell'albero di lavoro. Il codice Redfish iLO ha superato le prove locali ma non è installato; Remote Syslog del dispositivo reale ha superato i punti 3 e 7. Anche INTRA3 ha superato i punti 3 e 7. La connessione dalla postazione non AdS è stata provata con elenco della radice e lettura di un byte; 71 `Login Fail` del giorno restano da attribuire. D7 è bloccato perché non esistono ancora nomina formale firmata né elenco AdS approvato. La catena locale D-1 ha superato la prova in WSL; prima dell'installazione restano lo smistamento dei flussi e il collaudo sulla VM.
+Le cinque schede con `covers-paths` sono state riconciliate con il commit `a031a4c`: descrivono gli script e il test della catena D-1 versionati. Il codice Redfish iLO ha superato le prove locali ma non è installato; Remote Syslog del dispositivo reale ha superato i punti 3 e 7. Anche INTRA3 ha superato i punti 3 e 7. La connessione dalla postazione non AdS è stata provata con elenco della radice e lettura di un byte; 71 `Login Fail` del giorno restano da attribuire. D7 è bloccato perché non esistono ancora nomina formale firmata né elenco AdS approvato. La catena locale D-1 ha superato la prova in WSL; prima dell'installazione restano lo smistamento dei flussi e il collaudo sulla VM.

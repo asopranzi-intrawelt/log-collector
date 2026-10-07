@@ -49,10 +49,38 @@ def test_file_statici_copiati_identici(tmp_path):
         "etc/ssh/sshd_config.d/10-ads.conf",
         "etc/apt/apt.conf.d/52ads-unattended-upgrades",
         "etc/sudoers.d/ads-admin",
-        "etc/rsyslog.d/10-ads.conf",
     ]:
         assert (dest / rel).read_bytes() == (SOURCE / rel).read_bytes()
     assert not list(dest.rglob("*.template"))
+
+
+def test_filtro_ilo_vuoto_disattiva_lo_smistamento(tmp_path):
+    code, dest = run(tmp_path, FIXTURES / "parametri-completi.yaml")
+    assert code == 0
+    conf = (dest / "etc" / "rsyslog.d" / "10-ads.conf").read_text(encoding="utf-8")
+    assert 'if ($fromhost-ip == "0.0.0.0" and $fromhost-ip == "::") then {' in conf
+    assert "{{" not in conf
+
+
+def test_filtro_ilo_usa_solo_indirizzi_validati(tmp_path, params_text):
+    f = tmp_path / "p.yaml"
+    f.write_text(
+        params_text.replace("ilo: []", 'ilo: ["192.0.2.8", "192.0.2.9"]'),
+        encoding="utf-8",
+    )
+    code, dest = run(tmp_path, f)
+    assert code == 0
+    conf = (dest / "etc" / "rsyslog.d" / "10-ads.conf").read_text(encoding="utf-8")
+    assert 'if ($fromhost-ip == "192.0.2.8" or $fromhost-ip == "192.0.2.9") then {' in conf
+
+
+def test_filtro_ilo_rifiuta_valori_che_iniettano_configurazione(tmp_path, params_text, capsys):
+    f = tmp_path / "p.yaml"
+    f.write_text(params_text.replace("ilo: []", 'ilo: ["192.0.2.8; stop"]'), encoding="utf-8")
+    code, dest = run(tmp_path, f)
+    assert code == 1
+    assert not dest.exists()
+    assert "sorgenti.ilo: indirizzo IP non valido" in capsys.readouterr().err
 
 
 def test_un_solo_amministratore_scritto_come_scalare(tmp_path, params_text):

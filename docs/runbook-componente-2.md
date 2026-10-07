@@ -4,7 +4,7 @@
 
 ## Che cosa fa
 
-La configurazione `config/collettore/etc/rsyslog.d/10-ads.conf` riceve su 514/udp e su 6514/tcp in TLS e scrive ogni riga in `/srv/ads/<IP di provenienza>/<AAAA-MM-GG>.log` nel formato `AdsLine`: ora di ricezione, sorgente, ora dichiarata, sistema, messaggio. Instrada nello stesso ruleset anche gli accessi al collettore stesso, cioè i messaggi dei programmi il cui nome comincia con `sshd` e di `sudo`, `su`, `login`, `systemd-logind` e `gdm-password`, che finiscono in `/srv/ads/127.0.0.1/`. File e cartelle sono `root:ads`, 0640 e 0750, così che i job notturni, che girano come `ads`, li leggano senza poterli scrivere.
+La configurazione generata da `config/collettore/etc/rsyslog.d/10-ads.conf.template` riceve su 514/udp e su 6514/tcp in TLS e scrive ogni riga in `/srv/ads/<IP di provenienza>/<AAAA-MM-GG>.log` nel formato `AdsLine`: ora di ricezione, sorgente, ora dichiarata, sistema, messaggio. Instrada nello stesso ruleset anche gli accessi al collettore stesso, cioè i messaggi dei programmi il cui nome comincia con `sshd` e di `sudo`, `su`, `login`, `systemd-logind` e `gdm-password`, che finiscono in `/srv/ads/127.0.0.1/`. File e cartelle sono `root:ads`, 0640 e 0750, così che i job notturni, che girano come `ads`, li leggano senza poterli scrivere. Il template più recente prepara anche il filtro iLO, non ancora installato; il runbook del componente 4 ne descrive la prova.
 
 ## Due difetti trovati dalle prove, e corretti
 

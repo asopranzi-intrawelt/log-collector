@@ -5,7 +5,7 @@ generated-date: 2026-09-30
 covers-paths:
   - bin/**
   - config/**
-last-verified-commit: b516232
+last-verified-commit: a031a4c
 ---
 
 # Design e sicurezza applicativa
@@ -17,6 +17,8 @@ last-verified-commit: b516232
 `bin/adsparams.py` interpreta solo il sottoinsieme di YAML usato da `parametri.yaml` e segnala gli errori con la riga; `bin/ads-render.py` sostituisce i segnaposto nei due alberi di configurazione senza scrivere un albero parziale o sovrascrivere una destinazione esistente. `bin/ads-vm-command.py` genera un comando da eseguire manualmente, non opera sull'host. `bin/ads-pki.sh` emette CA e certificato sulla postazione amministrativa, mentre `bin/ads-bootstrap.sh` valida gli ingressi e installa la configurazione sulla VM. Questa separazione permette di provare generazione e configurazione in container prima dell'installazione reale.
 
 Sul collettore rsyslog riceve da sorgenti UDP e TLS nello stesso ruleset, aggiunge ora di ricezione e IP osservato e salva i cinque campi di `AdsLine`. L'host Proxmox filtra in origine i soli messaggi di autenticazione e li inoltra con due code su disco, una per il journal e una per l'access log di `pveproxy`. I NAS e il firewall sono configurati nelle loro interfacce; i runbook documentano l'esito di ogni sorgente.
+
+Il template rsyslog del collettore ora riceve da `ads-render.py` un confronto di IP validati per `sorgenti.ilo`; con lista vuota genera una condizione impossibile accettata da rsyslog 8.2504. Per gli IP iLO, i prefissi espliciti Browser, SSH e Remote console entrano nel flusso AdS; i restanti messaggi vanno in `/var/log/ads-ilo-other/` per revisione, senza perdita. Solo i tre prefissi Browser sono stati osservati sulla iLO fisica. La prova Debian 13 passa, ma la regola non è stata installata e la destinazione separata non ha ancora politica di rotazione e conservazione.
 
 Nel componente iLO versionato il client Redfish separa recupero delle pagine, trasformazione delle voci e scrittura del checkpoint. L'intero giro è esclusivo per sorgente tramite lock sul collettore Linux. Il log viene sincronizzato prima del checkpoint atomico: un arresto fra i due può duplicare una riga, identificabile da `Id` e `Count`, ma non far avanzare lo stato oltre eventi mai scritti. Un giro fallito scrive `status=error` e termina con codice non zero; il controllo di silenzio futuro dovrà leggere l'esito, non soltanto vedere se esiste un file.
 

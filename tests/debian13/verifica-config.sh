@@ -27,14 +27,19 @@ for candidate in python3 python; do
 done
 "$py" "$root/bin/ads-render.py" --parametri "$root/tests/fixtures/parametri-completi.yaml" \
     --sorgente "$root/config/collettore" --destinazione "$work/tree" >/dev/null
+sed 's/ilo: \[\]/ilo: ["127.0.0.1"]/' "$root/tests/fixtures/parametri-completi.yaml" >"$work/parametri-ilo.yaml"
+"$py" "$root/bin/ads-render.py" --parametri "$work/parametri-ilo.yaml" \
+    --sorgente "$root/config/collettore" --destinazione "$work/ilo-tree" >/dev/null
 
 # Su Git Bash il percorso va passato a Docker in forma Windows.
 mount_src=$work/tree
+mount_ilo=$work/ilo-tree
 if command -v cygpath >/dev/null; then
     mount_src=$(cygpath -w "$work/tree")
+    mount_ilo=$(cygpath -w "$work/ilo-tree")
 fi
 
-MSYS_NO_PATHCONV=1 docker run --rm --cap-add NET_ADMIN -v "$mount_src:/tree:ro" "$IMAGE" bash -c '
+MSYS_NO_PATHCONV=1 docker run --rm --cap-add NET_ADMIN -v "$mount_src:/tree:ro" -v "$mount_ilo:/ilo-tree:ro" "$IMAGE" bash -c '
 set -euo pipefail
 fail() { echo "FALLITO: $*"; exit 1; }
 ok() { echo "ok  $*"; }
@@ -113,7 +118,7 @@ cp /etc/rsyslog.d/tls/collector.pem /etc/rsyslog.d/tls/ca.pem
 chmod 0600 /etc/rsyslog.d/tls/collector.key
 chown root:ads /srv/ads && chmod 0750 /srv/ads
 rsyslogd -N1 >/dev/null 2>&1 || { rsyslogd -N1; fail "rsyslogd -N1 rifiuta la configurazione"; }
-rsyslogd -iNONE
+rsyslogd -i /run/rsyslogd-ads.pid
 for i in 1 2 3 4 5 6 7 8 9 10; do [ -S /dev/log ] && break; sleep 0.5; done
 sleep 1
 logger -n 127.0.0.1 -P 514 -d -t prova-udp "messaggio udp"
@@ -151,6 +156,34 @@ bad=$(grep -cvE "^$rfc 127\.0\.0\.1 $rfc [^ ]+ [^ ]+" "$f" || true)
 [ "$(stat -c "%U:%G %a" "$f")" = "root:ads 640" ] || fail "permessi del file: $(stat -c "%U:%G %a" "$f")"
 [ "$(stat -c "%U:%G %a" "$(dirname "$f")")" = "root:ads 750" ] || fail "permessi della cartella: $(stat -c "%U:%G %a" "$(dirname "$f")")"
 ok "rsyslog: UDP (RFC 5424 e 3164, riga Zyxel identica con sistema giusto) e TLS ricevuti, TCP in chiaro scartato, accessi sshd-session, sshd-auth e sudo nel ruleset ads, $(wc -l < "$f") righe AdsLine, permessi root:ads"
+
+# Seconda istanza con IP della sorgente iLO impostato: usa i testi osservati sul dispositivo,
+# non messaggi inventati intorno alla regola. Un evento sconosciuto deve restare nel file di
+# revisione, mentre i login Browser devono essere gli unici tre eventi in AdsFile.
+kill "$(cat /run/rsyslogd-ads.pid)"
+for i in 1 2 3 4 5 6 7 8 9 10; do [ ! -e /run/rsyslogd-ads.pid ] && break; sleep 0.2; done
+install -m 0644 /ilo-tree/etc/rsyslog.d/10-ads.conf /etc/rsyslog.d/
+rsyslogd -N1 >/dev/null 2>&1 || { rsyslogd -N1; fail "rsyslogd -N1 rifiuta il filtro iLO"; }
+mv "$f" "$f.baseline"
+rsyslogd -i /run/rsyslogd-ads.pid
+sleep 1
+printf "<134>Oct  7 14:43:16 ilo-test iLO5 Browser login: administrator - 192.0.2.73(DNS name not found).\n" > /dev/udp/127.0.0.1/514
+printf "<134>Oct  7 14:43:17 ilo-test iLO5 Browser login failure from: 192.0.2.73(DNS name not found).\n" > /dev/udp/127.0.0.1/514
+printf "<134>Oct  7 14:43:18 ilo-test iLO5 Browser logout: Administrator - 192.0.2.73(DNS name not found).\n" > /dev/udp/127.0.0.1/514
+printf "<134>Oct  7 14:43:19 ilo-test iLO5 iLO clock has been synchronized with 192.0.2.123.\n" > /dev/udp/127.0.0.1/514
+printf "<134>Oct  7 14:43:20 ilo-test Network HPE Ethernet adapter status changed to OK.\n" > /dev/udp/127.0.0.1/514
+printf "<134>Oct  7 14:43:21 ilo-test iLO5 Future login format from: 192.0.2.73.\n" > /dev/udp/127.0.0.1/514
+sleep 2
+other=/var/log/ads-ilo-other/127.0.0.1/$(date +%Y-%m-%d).log
+[ -f "$f" ] && [ -f "$other" ] || fail "manca uno dei due flussi iLO"
+[ "$(wc -l < "$f")" -eq 3 ] || { cat "$f"; fail "attesi tre accessi iLO nel flusso AdS"; }
+[ "$(wc -l < "$other")" -eq 3 ] || { cat "$other"; fail "attesi tre altri eventi iLO nel flusso di revisione"; }
+grep -qF "Browser login failure from:" "$f" || fail "fallimento Browser assente dal flusso AdS"
+grep -qF "iLO clock has been synchronized" "$other" || fail "NTP iLO assente dal flusso distinto"
+grep -qF "Future login format" "$other" || fail "formato nuovo iLO non conservato per revisione"
+grep -qF "iLO clock has been synchronized" "$f" && fail "NTP iLO entrato nel flusso AdS"
+[ "$(stat -c "%U:%G %a" "$other")" = "root:adm 640" ] || fail "permessi del flusso distinto"
+ok "iLO: tre accessi nel flusso AdS, tre eventi tecnici o ignoti nel file distinto, nessuna riga persa"
 
 echo "tutte le verifiche superate"
 '
