@@ -1,0 +1,17 @@
+# Componente 5 - Catena locale dei log giornalieri
+
+## Stato e perimetro
+
+Al 07/10/2026 `bin/ads-nightly.sh`, `bin/ads-verify.sh` e le unità `ads-nightly.service` e `ads-nightly.timer` sono preparati nel repository, ma **non installati né attivati** sul collettore. Il primo stadio comprime i file del giorno D-1 e crea manifest concatenati con SHA-256. Marca temporale RFC 3161, copia WORM e invio dell'impronta alla Direzione sono stadi successivi, bloccati dalle scelte e credenziali indicate nell'handoff. Una catena che vive soltanto sulla stessa VM segnala alterazioni accidentali o non coordinate, ma non fornisce da sola una prova indipendente contro chi controlla VM, file e manifest.
+
+## Flusso preparato
+
+Il timer è previsto alle 00:15 ora del collettore e avvia un servizio `oneshot` come utente `ads`. Lo script accetta solo la data corrente da orologio o dalla variabile di prova `ADS_TODAY`, calcola D-1 e legge `/srv/ads/<sorgente>/<data>.log` senza modificarlo. Per ogni file crea `/var/lib/ads/archives/<sorgente>/<data>.log.gz` con `gzip -n -9`; il manifest `/var/lib/ads/manifests/manifest-<data>.txt` contiene l'hash del manifest precedente o `GENESIS`, poi l'hash di ogni archivio. Un lock `flock` impedisce due esecuzioni simultanee. `ads-verify.sh` ricalcola gli hash, confronta ogni archivio con il log originario e controlla la continuità dei manifest; un errore produce uscita non zero. Il servizio systemd ha accesso in scrittura soltanto a `/var/lib/ads`; il log originario è montato in sola lettura nel servizio. Il bootstrap ha già predisposto `/var/lib/ads` per l'utente `ads`.
+
+## Prova locale ripetibile
+
+`tests/test-nightly.sh` crea in `/tmp` due sorgenti fittizie per il 06/10 e una per il 07/10, avvia i job con date controllate e verifica due manifest consecutivi. Un secondo avvio dello stesso giorno restituisce `already-closed`. Cambiare un byte nel log già chiuso fa fallire `ads-verify.sh` con `log di origine diverso`; ripristinare il file fa tornare verde la verifica. Il test elimina su una copia temporanea del verificatore il confronto fra archivio e log: con il byte alterato quel verificatore passa, quindi la prova cade se si reintroduce il difetto. Alterare il manifest del primo giorno dopo la chiusura del secondo spezza il legame ed è rilevato. Eseguita in WSL Ubuntu il 07/10/2026: `test-nightly: OK (due giorni, idempotenza, log alterato, catena alterata)`. La prova usa file temporanei e non legge né modifica il collettore reale.
+
+## Prima dell'installazione
+
+Il ricevente attuale scrive nel medesimo albero `/srv/ads/` anche gli eventi tecnici iLO e le connessioni SMB non AdS di INTRA3. Il job archivierebbe qualunque riga presente, quindi il perimetro del flusso da conservare come accessi AdS va definito e applicato **prima** di attivare il timer. La decisione D7 sulle righe non AdS di INTRA3 è bloccata dall'elenco degli account AdS approvato dalla Direzione; per iLO vanno definiti il trattamento degli eventi tecnici, il limite di attribuzione dell'account generico e quello dei fallimenti senza account tentato. Non si cancellano implicitamente righe già ricevute. Il collaudo sul collettore vero, la ripartenza dopo un'interruzione e la verifica con permessi reali dell'utente `ads` restano da eseguire. La prova di resistenza ad alterazioni indipendente dalla VM richiede poi TSA, WORM e impronta inviata alla Direzione.

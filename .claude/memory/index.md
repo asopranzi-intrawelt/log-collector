@@ -6,8 +6,8 @@
 
 ```
 Branch attivo:        main
-Commit di riferimento: 30b4c1c
-Data snapshot:        2026-10-06
+Commit di riferimento: b516232
+Data snapshot:        2026-10-07
 Albero autorevole:    unico
 Remoto:               git@github-corp:asopranzi-intrawelt/log-collector.git (primo push di 9ee87b4 il 2026-09-30)
 Template:             E:\template-claude-developing @ ffcbdb3
@@ -17,14 +17,22 @@ Template:             E:\template-claude-developing @ ffcbdb3
 
 | Scheda | last-verified | Stato |
 |---|---|---|
-| STACK.md | 30b4c1c | componenti 1 e 2, Proxmox e lettore iLO versionato; installazione iLO aperta |
-| design-and-security.md | 30b4c1c | confini di fiducia, verifica TLS iLO e rischi residui descritti |
-| deployment.md | 30b4c1c | ambienti osservati e unità iLO solo preparate; gate separazione-ambienti aperto |
-| dev-testing.md | 30b4c1c | quattro livelli di prova, 63 pytest passati e 22 Bats censiti; collaudo iLO reale aperto |
-| current-work.md | 30b4c1c | INTRA3 collaudato; codice iLO versionato ma non installato, D7 bloccato, VM rinviate dopo M29 (ADR-013) |
+| STACK.md | b516232 | componenti 1 e 2, Proxmox e iLO Syslog in esercizio; catena D-1 locale provata in WSL |
+| design-and-security.md | b516232 | limiti UDP e attribuzione iLO, catena locale ancora senza ancora esterna |
+| deployment.md | b516232 | iLO Syslog collaudato; unità D-1 e Redfish non installate; gate ambienti aperto |
+| dev-testing.md | b516232 | quattro livelli; 63 pytest, 22 Bats storici e prova D-1 in WSL |
+| current-work.md | b516232 | iLO e INTRA3 collaudati; catena locale provata, non installata; D7 bloccato |
 | roadmap.md | 9ee87b4 | solo struttura |
 
 ## Punto di ripresa
+
+Lo stadio locale del componente 5 è stato ripreso dalla sessione caduta: `bin/ads-nightly.sh`, `bin/ads-verify.sh`, servizio e timer sono ancora file non tracciati e non installati. La nuova prova `tests/test-nightly.sh` è passata in WSL Ubuntu il 07/10/2026 su due giorni fittizi: idempotenza, alterazione di un byte del log D-1 rilevata e ripristino verde, copia mutata del verificatore senza confronto che lascerebbe passare il difetto, manifest precedente alterato rilevato. Il runbook è `docs/runbook-componente-5-catena.md`. Prima del timer reale restano separazione degli eventi iLO tecnici e dei log SMB non AdS, collaudo sul collettore, TSA, WORM e impronta alla Direzione. D7 è bloccato dall'elenco AdS approvato.
+
+Al 2026-10-07 l’utente ha chiuso con `chiudi` la milestone documentale (`b516232`) e ha collaudato la raccolta dall’iLO fisico del DL380 Gen10. iLO 5 3.09 con licenza Advanced invia Remote Syslog al collettore su UDP 514. Nel file giornaliero sono arrivati due login web riusciti e un fallimento controllato: punto 3 superato, con account tentato assente dal messaggio di errore e account di successo generico. I primi test mostravano iLO circa 4 minuti e 34 secondi indietro; dopo SNTP su INRIM tre eventi di sincronizzazione hanno scarti osservati di 0,063083, 0,323815 e 0,283542 secondi. `chronyc tracking` odierno del collettore mostra `System time` +0,000148728 s e `Leap status: Normal`: punto 7 superato. Il lettore Redfish `ads-ilo.py` resta non installato. Sono aperti il trattamento degli eventi iLO non AdS, la perdita possibile di datagrammi UDP e la persistenza GUI del valore `Every Failure`. Dettagli in `docs/runbook-componente-4-ilo.md`.
+
+Dopo Logout l’operatore ha provato un solo login volutamente errato: GUI rifiutata, poi riga `iLO5 Browser login failure from: <IP_POSTAZIONE>` ricevuta alle 14:43:16.550058 con ora UTC dichiarata 12:43:16Z e differenza osservata 0,550058 s. Le due righe di allerta adiacenti sugli accessi non autorizzati non misurano il numero di tentativi di questa prova.
+
+L'utente ha recuperato la credenziale iLO ed è entrato nell'interfaccia il 2026-10-07. Gli screenshot 102-109 sono stati trovati nella cartella Screenpresso e copiati nel livello privato del progetto. Lo screenshot 106 mostra SNTP da DHCPv6 attivo, server manuali vuoti e fuso GMT; il 107 mostra i due server INRIM salvati ma ancora GMT, prima del reset. L'operatore riferisce di avere eseguito il reset del solo controller iLO dopo i server INRIM, di aver inviato un test, poi di aver selezionato e applicato il fuso di Roma e di aver eseguito il secondo reset richiesto da iLO. L'output successivo del collettore mostra tre sincronizzazioni NTP con scarto inferiore al secondo; il nuovo messaggio di test non è nelle ultime otto righe, senza che questo ne dimostri l'assenza. L'utente ha corretto l'affermazione del repository collegato: non esiste alcun archivio KeePassXC `.kdbx` sul NAS, e il password manager è ancora futuro. La credenziale è in possesso dell'utente; non è stata letta né trascritta dall'agente.
 
 Al 2026-10-02 i componenti 1 e 2 sono installati e verificati sul collettore vero, e l'host Proxmox invia al collettore i propri accessi: collaudo punto 3 superato per l'host (login web e SSH, riusciti e falliti, con i cinque campi). Procedure ed esiti nei tre runbook di `docs/`. Il 2026-10-02 il firewall USG FLEX è completo come sorgente (collaudi punti 3 e 7 superati, runbook `docs/runbook-componente-3-firewall.md`); dei NAS QNAP sono completi come sorgenti HERO e INTRA2 (TLS sulla 6514) e INTRA (TS-410U, solo UDP sulla 514, rischio residuo fino alla sostituzione del 2027), tutti con NTP su INRIM e collaudi punti 3 e 7 superati, runbook `docs/runbook-componente-3-nas.md`; aperta la decisione sulle righe SMB periodiche dell'account `backup` di Proxmox su INTRA; resta INTRA3 (TS-210, nel perimetro), da leggere sul dispositivo. Rinviati: filtro D7 del QNAP (elenco AdS bloccante), prova negativa del collaudo punto 2. Decisioni aperte: memoria della VM (ADR-012), custode della prova e analisi (ADR-010), Wazuh (ADR-009). Portato in network-design il 2026-10-02 (ADR-004) tutto quanto fatto fino ad allora: VM 210, regole del collettore, host Proxmox e firewall come sorgenti, modifiche agli apparati, fatti emersi. Da portare ancora: NAS quando configurati, con la correzione dell'inventario (INTRA2 è un TS-435XeU con QTS 5.2.9, non un TS-451U), la lentezza dell'interfaccia di INTRA2 con le misure del 02/10 per NAS-003 (diagnosi fermata qui per restare sullo scopo), l'accesso HTTP in chiaro e il firmware non aggiornato di INTRA2, nome DNS quando registrato, alias SSH Windows quando aggiunto, decisione sul backup della VM 210.
 

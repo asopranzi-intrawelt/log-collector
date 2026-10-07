@@ -11,7 +11,7 @@ Integra il foglio "Collettore" (verifica documentale del 29/09/2026). Verifica a
 | D1 | **Fluent Bit solo su Windows** (postazioni e server). Linux, Proxmox e VM restano su rsyslog come da foglio. | Un solo agent aggiuntivo da mantenere; rsyslog copre già Linux. |
 | D2 | **Filtro per elenco nominativo AdS**, non per euristica sui privilegi. L'elenco approvato dalla Direzione diventa un Custom Field NinjaOne e genera la query degli eventi. | Il filtro coincide con l'atto di nomina: niente log di utenti non AdS sulle postazioni (tema del parere privacy). |
 | D3 | **Sostituire l'HMAC con marca temporale RFC 3161 di una TSA qualificata** sul manifest giornaliero. Resta l'invio dell'impronta alla Direzione. | Il foglio prevede una firma "con una chiave fuori dal collettore", ma la firma notturna gira sul collettore: la chiave deve esserci nel momento in cui firma, quindi chi controlla il collettore la può usare. La marca temporale non richiede chiavi locali e, se qualificata, gode della presunzione di esattezza di data e integrità (Reg. UE 910/2014, art. 41). |
-| D4 | **Aggiungere iLO 5 dei server HP Gen10** (assente nel foglio). Licenza iLO Advanced assente (indicazione del 30/09/2026, da confermare sul campo "License Type" di iLO): **lettura oraria dell'iLO Event Log (IEL) via Redfish dal collettore**, dettaglio in sezione 4.1. Nessun acquisto di licenza. | [V] Remote Syslog richiede iLO Advanced (HPE licensing guide). [V] L'IEL è esposto in Redfish su `/redfish/v1/Managers/1/LogServices/IEL/Entries` e le voci di login hanno categoria Security/Administration (HPE iLO 5 Redfish docs). |
+| D4 | **Aggiungere iLO 5 dei server HP Gen10** (assente nel foglio). Il 07/10/2026 il DL380 Gen10 ha mostrato licenza iLO Advanced; Remote Syslog verso 514/udp ha consegnato login web riusciti e falliti. Dopo SNTP tre eventi iLO hanno scarto dalla ricezione sotto un secondo e `chronyc tracking` del collettore è normale. Il lettore Redfish preparato resta alternativo e non installato. | [V] Licenza, ricezione, login riusciti e falliti e collaudo temporale punti 3 e 7. [Limite] Il login fallito non contiene l’account tentato; l’account riuscito è generico e UDP non garantisce consegna. |
 | D5 | **NTP unico: INRIM** (`ntp1.inrim.it`, `ntp2.inrim.it`) su collettore, firewall, NAS, Proxmox, iLO; Windows via script NinjaOne (`w32tm`). | Il foglio segnala il rischio NTP ma non prevede l'attività. |
 | D6 | **Controllo di silenzio per sorgente**: ogni notte il collettore confronta l'elenco sorgenti attese con i file del giorno. Per Windows, dato che il filtro D2 produce giornate vuote legittime, serve un **heartbeat** dell'agent. | Senza heartbeat "nessun file" non distingue "nessun accesso AdS" da "agent fermo". |
 | D7 | **QNAP: separare gli accessi AdS dagli altri accessi al NAS prima della scrittura su file.** Solo i primi entrano in `/srv/ads/`; gli altri restano registrati in un flusso distinto, con destinazione e politica proprie da definire. | Il 06/10/2026 le righe reali di INTRA3 hanno mostrato accessi SMB da una postazione non AdS che deve conservare l'accesso alla condivisione. L'utente ha chiesto di registrare anche questi accessi come altra categoria di log. L'elenco degli account AdS approvato è ancora bloccante per attribuire le righe al flusso giusto. |
@@ -29,6 +29,7 @@ Integra il foglio "Collettore" (verifica documentale del 29/09/2026). Verifica a
 | Switch/AP Nebula | - | - | - | - | - | Vedi D8. |
 | QNAP (QuLog) | campo utente access log | tipo accesso | IP NAS | campo IP access log | ora evento + ora ricezione | Funzione [V] nel foglio; contenuto del messaggio **[Non verificato]**. |
 | Proxmox | `user@realm` (pvedaemon), utente sshd | successful auth / authentication failure / sshd accepted | hostname | `rhost` (fallimenti), IP sshd; per i login web riusciti l'IP è in `/var/log/pveproxy/access.log` | ora journal | **[Non verificato]** formato esatto dei messaggi; il login web riuscito potrebbe richiedere l'unione di due righe. |
+| iLO 5 (Remote Syslog) | `administrator` nel successo; assente nel fallimento | `Browser login` / `Browser login failure` | IP e hostname iLO | IP postazione nel messaggio | ora UTC dichiarata + ricezione locale | [V] Sul dispositivo reale, due successi e un fallimento; fallimento senza account tentato, account riuscito generico. UDP senza garanzia di consegna. |
 | iLO 5 (Redfish IEL) | nel campo `Message` (es. login REST di un utente) | `Message` + `Oem.Hpe.Code` | IP iLO | nel `Message` per i login da browser/SSH **[Non verificato]** | `Created` (UTC) | [V] struttura della voce. Attenzione: l'IEL **accorpa gli eventi ripetuti** in una voce con `Count` (sezione 4.1). |
 | Microsoft 365 | `UserId` | `Operation` (UserLoggedIn, UserLoginFailed) | `Workload` | `ClientIP` | `CreationTime` (UTC) | Campi dello schema Management Activity **[Non verificato]** in questa sessione; filtrare sugli UPN dell'elenco AdS. |
 | NinjaOne | `user` dell'activity | `type`/`activityType` | `deviceId` → nome dispositivo | **probabile assenza** | `activityTime` | **[Non verificato]** presenza dell'IP: se manca, il 4° campo non è coperto e va dichiarato nel documento. Gli accessi remoti dei tecnici alle postazioni tramite la sessione dell'utente collegato non generano un 4624 col nome del tecnico **[Inferenza]**: la loro traccia dipende solo da questo export. |
@@ -148,7 +149,13 @@ input(type="imtcp" port="6514" ruleset="ads")
 - [V] Sintassi dei parametri TLS verificata il 2026-10-01 in container `debian:trixie` con rsyslog 8.2504, la versione installata sul collettore: `rsyslogd -N1` accetta la configurazione, un messaggio inviato in TLS sulla 6514 arriva, uno inviato in TCP in chiaro sulla stessa porta viene scartato (`tests/debian13/verifica-config.sh`).
 - Correzione del 2026-10-01, provata nello stesso container: con `%syslogtag%%msg%` i messaggi RFC 5424, il cui tag non finisce con `:` e il cui testo non comincia con uno spazio, uscivano con tag e messaggio fusi (`prova-udpmessaggio udp`); la forma `%msg:::sp-if-no-1st-sp%%msg:::drop-last-lf%`, quella del formato tradizionale di rsyslog, separa i due campi in entrambi i formati. Seconda correzione, del 2026-10-02, che supera la prima: con il firewall Zyxel, che dopo il nome del sistema non scrive un nome di programma, rsyslog prende `src="<ip>:` per tag, e la regola dello spazio aggiunto se manca lo infilava dentro l'indirizzo (`src="192.0.2.73: 0"`), alterando la prova. Il campo messaggio è ora `$!ads_msg`, calcolato nel ruleset: per RFC 3164 tag e testo riattaccati esattamente, per RFC 5424 separati da uno spazio (`$protocol-version`). Inoltre ZLD scrive l'anno dopo l'ora, e senza il parser `pmrfc3164` con `detect.YearAfterTimestamp="on"` il campo sistema valeva `2026`.
 
-### 4.1 iLO 5 senza licenza Advanced: raccolta via Redfish
+### 4.1 iLO 5: Remote Syslog in prova, Redfish come alternativa
+
+La premessa del 30/09/2026, cioè che iLO Advanced fosse assente, è stata smentita dalla pagina Overview il 07/10/2026. Sul DL380 Gen10 con iLO 5 3.09, Remote Syslog è stato abilitato verso il collettore su UDP 514; modifica della configurazione e due messaggi di test sono arrivati nel file giornaliero della sorgente. I test iniziali mostravano iLO circa 4 minuti e 34 secondi indietro. Dopo `ntp1.inrim.it`, `ntp2.inrim.it`, fuso di Roma e due reset del solo controller iLO, tre eventi `iLO clock has been synchronized` hanno mostrato differenze fra ora dichiarata e ricevuta di 0,063083, 0,323815 e 0,283542 secondi. `chronyc tracking` del collettore il 07/10 indica `System time` +0,000148728 secondi e `Leap status: Normal`: il punto 7 è superato. Il trasporto UDP non conferma o ritrasmette i messaggi.
+
+Il file iLO contiene due `Browser login` riusciti con account generico `administrator` e IP della postazione, ricevuti alle 12:45:24.778078 e 14:26:17.014716, e un `Browser login failure from: <IP_POSTAZIONE>` ricevuto alle 14:43:16.550058 dopo un solo tentativo controllato rifiutato dalla GUI. Le tre righe hanno i cinque campi `AdsLine`; lo scarto osservato sul fallimento è 0,550058 secondi. Il cambio di `Authentication Failure Logging` da `Every 3rd Failure` a `Every Failure` è stato salvato dalla GUI e registrato nel Syslog alle 14:32:58.889734; la persistenza del valore dopo riapertura non è stata verificata direttamente. Il fallimento Syslog non contiene l’account tentato, mentre l’account riuscito è generico: questi limiti di attribuzione vanno riportati nel documento AdS. Il flusso include anche eventi tecnici di sicurezza e rete, da separare prima della catena di conservazione degli accessi.
+
+Il lettore Redfish seguente è già versionato ma non installato; diventa l'alternativa se Remote Syslog non offre la copertura necessaria. Non attivare contemporaneamente le due vie senza definire una deduplicazione.
 
 Script Python sul collettore (`python3-requests`), eseguito ogni ora da un timer systemd:
 1. **Account iLO dedicato** `ads-reader`, con il solo privilegio di login. **[Non verificato]** che il solo privilegio "Login" basti a leggere l'IEL: provarlo, e aggiungere il minimo privilegio necessario solo se la lettura fallisce.
@@ -164,7 +171,7 @@ Script Python sul collettore (`python3-requests`), eseguito ogni ora da un timer
 
 Rete: il collettore deve raggiungere la porta 443 dell'interfaccia iLO; se l'iLO è su una rete di management separata, serve una regola dedicata sul firewall.
 
-Verifica della licenza (1 minuto): pagina iLO **Information → Overview**, campo **License Type**, oppure `GET /redfish/v1/Managers/1/LicenseService/`. Se risultasse iLO Advanced, si passa al Remote Syslog verso 514/udp del collettore e lo script non serve.
+Licenza osservata: **iLO Advanced** nella pagina **Information → Overview** dello screenshot 102 del 07/10/2026. Il test Remote Syslog sul dispositivo decide se il lettore Redfish serva ancora.
 
 ---
 
@@ -177,6 +184,8 @@ Job alle 00:15 sul giorno D-1 (file chiusi):
 4. Copia su cartella WORM Compliance del NAS-HERO di `.log.gz`, manifest e `.tsr`. **[Non verificato]** se la cartella WORM consente il rename finale che rsync esegue per default: provare, altrimenti `rsync --inplace`.
 5. Mail alla casella della Direzione con impronta del manifest e numero di serie della marca.
 6. Controllo di silenzio (D6) ed eliminazione dal collettore dei file oltre 213 giorni.
+
+Stato al 07/10/2026: il solo stadio locale di compressione `gzip -n -9`, manifest concatenati e verifica degli hash è preparato in `bin/ads-nightly.sh` e `bin/ads-verify.sh`, con servizio e timer ancora non installati. `tests/test-nightly.sh` ha superato in WSL una prova su due giorni fittizi: seconda esecuzione idempotente, un byte alterato nel log D-1 rilevato, legame del manifest precedente alterato rilevato. Una copia mutata del verificatore senza confronto fra archivio e log passa sul byte alterato, confermando che la prova esercita proprio quel controllo. Lo stadio locale non è ancora una prova indipendente: mancano marca TSA, WORM e impronta alla Direzione. Prima di attivarlo va definita la separazione degli eventi iLO tecnici e delle connessioni SMB non AdS già presenti in `/srv/ads/`; la decisione D7 resta bloccata dall'elenco AdS approvato. Dettaglio in `docs/runbook-componente-5-catena.md`.
 
 Verifica mensile con verbale: ricalcolo della catena dall'inizio, `openssl ts -verify -in D.tsr -data manifest-D.txt -CAfile <CA TSA>` su tutti i giorni, confronto collettore / WORM / mail.
 
@@ -198,12 +207,12 @@ Il collettore deve poter raggiungere la TSA in uscita (HTTP/HTTPS): regola da ap
 
 | Voce aggiunta | gg-p min | gg-p max |
 |---|---|---|
-| iLO via Redfish (script, account, certificato, prova) | 0,5 | 0,75 |
+| iLO via Remote Syslog (configurazione e prova) | 0,25 | 0,5 |
 | NTP su tutte le sorgenti | 0,25 | 0,25 |
 | Criteri di controllo, dimensione log, filtro da Custom Field | 0,25 | 0,5 |
 | Heartbeat e controllo di silenzio | 0,25 | 0,5 |
 | Marca temporale al posto dell'HMAC (differenza) | 0 | 0,25 |
-| **Totale aggiornato (foglio 7,5-9,5)** | **8,75** | **11,75** |
+| **Totale aggiornato (foglio 7,5-9,5)** | **8,5** | **11,5** |
 
 [Inferenza] Compatibile con il 13/11/2026 se sono dedicati almeno 2 gg-p a settimana da ottobre. Entro il 23/10 aggiungere NTP e iLO; entro il 13/11 marca temporale e heartbeat.
 
@@ -211,7 +220,7 @@ Il collettore deve poter raggiungere la TSA in uscita (HTTP/HTTPS): regola da ap
 
 ## 8. Punti da confermare prima di procedere
 
-1. ~~Licenza iLO Advanced~~ → indicata come assente: scelta Redfish (D4). Resta da confermare il campo License Type.
+1. **D4: collaudi iLO 5 punti 3 e 7 superati** sul dispositivo reale il 07/10/2026: licenza Advanced, login web riusciti e fallito nel file `AdsLine`, tre eventi NTP coerenti e `chronyc tracking` normale. Restano aperti il trattamento degli eventi tecnici non AdS, l’attribuzione personale dell’account generico e la perdita possibile di datagrammi UDP.
 2. Chi amministra **NAS-HERO** e la **casella della Direzione**: MSP o interno? (sezione 6)
 3. Budget per una **TSA qualificata** (circa 365 marche/anno)? Il fornitore va scelto; prezzi e condizioni **[Non verificato]**.
 4. Esistono **postazioni Linux** o solo Proxmox e VM? (D1)
@@ -225,6 +234,9 @@ Il collettore deve poter raggiungere la TSA in uscita (HTTP/HTTPS): regola da ap
 - docs.fluentbit.io - input Windows Event logs (winevtlog), pagina corrente: `event_data_as_map`, `event_query` XPath/XML Query, `db`, privilegi per il canale Security.
 - docs.fluentbit.io - output Syslog: modalità udp/tcp/tls/dtls, `syslog_message_key`, formato rfc5424.
 - [HPE iLO 5 Licensing Guide](https://support.hpe.com/hpesc/public/docDisplay?docId=sd00001039en_us&docLocale=en_US): matrice delle funzioni per licenza, da confrontare con `License Type` sul dispositivo prima di scegliere definitivamente fra Remote Syslog e polling.
+- [HPE iLO 5 User Guide, iLO details](https://support.hpe.com/hpesc/public/docDisplay?docId=a00105236en_us&docLocale=en_US&page=GUID-33F615FB-B545-4045-9EBF-20569EB01EBF.html): `License Type` e versione firmware in Overview, confrontati con lo screenshot 102 il 07/10/2026.
+- [HPE iLO 5 User Guide, Remote syslog options](https://support.hpe.com/hpesc/public/docDisplay?docId=a00105236en_us&docLocale=en_US&page=GUID-D7147C7F-2016-0901-06D0-000000001272.html): server e porta configurabili; porta predefinita 514.
+- [HPE iLO 5 User Guide, Configuring iLO SNTP settings](https://support.hpe.com/hpesc/public/docDisplay?docId=a00105236en_us&docLocale=en_US&page=GUID-D7147C7F-2016-0901-06D0-0000000010B0.html): scelta tra server DHCP e manuali, fuso orario e possibile reset del controller dopo Apply.
 - [HPE iLO 5 Redfish API Reference](https://hewlettpackard.github.io/ilo-rest-api-docs/ilo5/), sezione IEL verificata il 06/10/2026: percorso `/redfish/v1/Managers/1/LogServices/IEL/Entries/`, campi `Id`, `Created`, `Message`, `Oem.Hpe.Categories`, `Code`, `Count` e `Updated` nell'esempio pubblicato; presenza e valori effettivi restano da collaudare sul dispositivo.
 - [HPE Redfish authentication and sessions](https://servermanagementportal.ext.hpe.com/docs/concepts/redfishauthentication), verificata il 06/10/2026: il token arriva in `X-Auth-Token` e la `Location` identifica la sessione da cancellare con `DELETE`.
 - Reg. UE 910/2014 (eIDAS), art. 41: effetti giuridici della validazione temporale elettronica qualificata.

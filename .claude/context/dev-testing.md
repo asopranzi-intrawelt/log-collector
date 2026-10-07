@@ -4,7 +4,7 @@ generated-from-branch: main
 generated-date: 2026-09-30
 covers-paths:
   - tests/**
-last-verified-commit: 30b4c1c
+last-verified-commit: b516232
 ---
 
 # Test di sviluppo
@@ -13,13 +13,15 @@ last-verified-commit: 30b4c1c
 
 ## Test runner e comandi
 
-Quattro livelli, dal più rapido al più vicino agli apparati. Il primo è `python -m pytest -q tests`, che copre lettura dei parametri, rendering dei due alberi, comando della VM, nuovo lettore IEL e distinzione tra chiave Redfish ed email nel controllo di anonimizzazione: 63 casi passati il 2026-10-06, senza rete. Il secondo è `bats tests/*.bats`, 22 prove su PKI e bootstrap in modalità di prova, già eseguite in Git Bash su Windows e Ubuntu 24.04 in WSL; su NTFS da Git Bash il permesso 0600 non si conserva e quel controllo si salta. Il terzo comprende due script con Docker: `bash tests/debian13/verifica-config.sh` controlla in `debian:trixie` nftables, SSH, sudo, guest agent, aggiornamenti di sicurezza, chrony e il ricevente rsyslog; `bash tests/debian12/verifica-sorgente-proxmox.sh` controlla in `debian:bookworm` l'invio TLS dell'host con la PKI del progetto. Entrambi richiedono rete per immagine e pacchetti. Il quarto è il collaudo manuale sulla VM e sulle sorgenti reali, documentato nei runbook; i container non sostituiscono la verifica delle righe realmente prodotte dagli apparati.
+Quattro livelli, dal più rapido al più vicino agli apparati. Il primo è `python -m pytest -q tests`, che copre lettura dei parametri, rendering dei due alberi, comando della VM, lettore IEL e distinzione tra chiave Redfish ed email nel controllo di anonimizzazione: 63 casi passati il 2026-10-06, senza rete. Il secondo comprende `bats tests/*.bats`, 22 prove su PKI e bootstrap, e `bash tests/test-nightly.sh`, che prova la catena locale su file temporanei; su NTFS da Git Bash il permesso 0600 non si conserva e quel controllo si salta. Il terzo comprende due script con Docker: `bash tests/debian13/verifica-config.sh` controlla in `debian:trixie` nftables, SSH, sudo, guest agent, aggiornamenti di sicurezza, chrony e il ricevente rsyslog; `bash tests/debian12/verifica-sorgente-proxmox.sh` controlla in `debian:bookworm` l'invio TLS dell'host con la PKI del progetto. Entrambi richiedono rete per immagine e pacchetti. Il quarto è il collaudo manuale sulla VM e sulle sorgenti reali, documentato nei runbook; i container non sostituiscono la verifica delle righe realmente prodotte dagli apparati.
 
 La verifica Debian 13 usa nomi `sshd-session` e `sshd-auth` osservati sul collettore e una riga Zyxel con l'anno dopo l'ora: controlla che `AdsLine` conservi i cinque campi e il messaggio del firewall, che il TCP in chiaro sulla 6514 e i messaggi locali estranei non siano registrati, e che file e directory abbiano i permessi previsti. La verifica Debian 12 controlla login SSH, autenticazioni di `pvedaemon` e richieste di login web; prova anche che non arrivino task, richieste periodiche, storico dell'access log o messaggi inviati con un nome di certificato non permesso. I messaggi delle prove sono derivati dai log reali con identificativi sostituiti: la prima prova di rsyslog usava `logger -t sshd` ed era verde mentre sul collettore i login, scritti da `sshd-session`, non arrivavano.
 
 `tests/test_ilo.py` usa la forma di una voce IEL pubblicata da HPE per verificare `Count`, `Updated`, riuso di `Id`, esclusione del login del lettore e rifiuto dei contatori non validi. Un percorso completo fittizio verifica che il secondo giro non duplici la voce e che una scrittura fallita non faccia avanzare il checkpoint; un altro prova `POST` della sessione e `DELETE` esplicito. La configurazione del pool verifica l'impronta, ma nessuna finzione dimostra la negoziazione TLS o i permessi dell'account sull'iLO reale: questi sono criteri del collaudo del componente 4.
 
 Due prove di non vacuità fatte il 2026-09-30. Togliendo da `ads-render.py` il filtro dei valori vuoti cadono 4 prove di rendering, togliendo la condizione sul tag VLAN ne cade 1; togliendo la riga `#clear` dalla configurazione di unattended-upgrades la verifica in container fallisce sull'origine non di sicurezza che Debian 13 abilita di default.
+
+Il 07/10/2026 `bash tests/test-nightly.sh` in WSL Ubuntu ha provato lo stadio locale della catena su due giorni fittizi, idempotenza, alterazione di un byte nel log D-1 e alterazione del manifest precedente: esito `OK`. Il fallimento sul byte contiene `log di origine diverso` e il ripristino torna verde. La copia mutata di `ads-verify.sh` senza il confronto archivio/log passa sul log alterato: la prova fallirebbe se quel controllo sparisse. Sono file temporanei in `/tmp`, non una prova dei permessi o del timer sul collettore reale.
 
 ## Rotte e dati mockati
 

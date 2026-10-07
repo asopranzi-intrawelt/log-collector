@@ -1,0 +1,10 @@
+[Unit]
+Description=Chiusura notturna dei log AdS alle 00:15
+
+[Timer]
+OnCalendar=*-*-* 00:15:00
+Persistent=true
+Unit=ads-nightly.service
+
+[Install]
+WantedBy=timers.target

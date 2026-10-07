@@ -6,8 +6,8 @@ covers-paths:
   - bin/**
   - config/collettore/**
   - tests/**
-last-verified-commit: 30b4c1c
-stato: componenti 1 e 2 in esercizio; INTRA3 collaudato, codice iLO versionato e da collaudare sul dispositivo, D7 bloccato
+last-verified-commit: b516232
+stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai punti 3 e 7; catena locale provata in WSL, non installata; D7 e trattamento eventi iLO non AdS aperti
 ---
 
 # Lavoro in corso
@@ -190,23 +190,42 @@ Definition of done:
 - [x] `chronyc tracking` sul collettore: riferimento `ntp2.inrim.it`, `System time` +0,000443351 s, `Last offset` +0,000479445 s, `Leap status: Normal`; con i due confronti degli eventi sotto un secondo il punto 7 di INTRA3 è superato
 - [ ] Verificare separatamente il contatto effettivo del NAS con `ntp1.inrim.it`: la configurazione QTS e il confronto degli orari non mostrano direttamente una risposta NTP
 
-## Feature: componente 4, iLO 5 via Redfish
+## Feature: componente 4, iLO 5 via Remote Syslog
 
-Stato: lettore IEL, test e unità systemd versionati nel commit `30b4c1c`, dopo il collaudo di INTRA3. Il componente non dipende dall'elenco AdS approvato né dalla scelta della TSA; l'installazione e il collaudo su iLO reali dipendono da licenza, account di lettura, certificato e raggiungibilità.
+Stato: lettore IEL, test e unità systemd versionati nel commit `30b4c1c`, ma non installati. Il 2026-10-07 il collettore ha negoziato TLS 1.3 con l'iLO fisico sulla porta 443 senza verificarne la catena del certificato. L'utente ha recuperato la credenziale ed è entrato nella GUI; gli screenshot privati 102-104 mostrano ProLiant DL380 Gen10, iLO 5 3.09, **licenza iLO Advanced** e pagina Remote Syslog inizialmente disabilitata. La funzione è stata abilitata verso UDP 514 del collettore: nel file giornaliero della sorgente sono arrivate una riga di modifica e due righe di test. I primi test mostravano iLO indietro di circa 4 minuti e 34 secondi. Dopo aver configurato SNTP con i server INRIM e fuso di Roma, l'operatore ha letto tre eventi di sincronizzazione nel file del collettore; gli scarti rispetto alla ricezione sono 0,063083, 0,323815 e 0,283542 secondi. La scelta originaria Redfish si basava sull'indicazione errata che Advanced fosse assente. La Security Dashboard mostra stato Risk per RBSU senza login, Secure Boot disabilitato, complessità password disabilitata, SNMPv1 abilitato e certificato predefinito; questi rilievi sono riportati anche a `D:/network-design`. L'archivio KeePassXC che la sua documentazione dichiarava attivo non esiste e la rettifica è stata propagata.
 
-Cosa farà dopo l'attivazione: il timer avvierà `ads-ilo.py` ogni ora per leggere l'iLO Event Log, registrare le nuove voci e gli incrementi di `Count` nel formato `AdsLine`, conservare lo stato e segnalare gli errori. Procedura e limiti in `docs/runbook-componente-4-ilo.md`.
+Cosa fa ora: Remote Syslog invia le nuove voci al ricevente del collettore, che le scrive in `/srv/ads/<IP_ILO>/` nel formato `AdsLine`. Due login web riusciti e un fallimento controllato sono stati ricevuti; il punto 3 è superato, con account tentato assente dal messaggio di fallimento. Tre eventi NTP sotto un secondo e `chronyc tracking` normale superano il punto 7. UDP non offre ritrasmissione. Il timer `ads-ilo.py` resta alternativo e non installato. La separazione degli eventi iLO non AdS è aperta. Procedura e limiti in `docs/runbook-componente-4-ilo.md`.
 
 Definition of done:
 
-- [x] Codice, unità systemd e prove locali preparati; sessione Redfish con logout, paginazione, TLS con CA e impronta, checkpoint dopo il log, riga di stato del giro
-- [ ] Verificare sul dispositivo `License Type`: con Remote Syslog effettivamente disponibile la scelta del polling va rivalutata
-- [ ] Verificare che l'account dedicato con il solo privilegio `Login` possa leggere l'IEL e che `Updated` sia valorizzato nelle voci ripetute
-- [ ] Preparare certificato iLO, impronta, password privata, cartelle e rete; installare il codice e le unità sul collettore senza attivare subito il timer
-- [ ] Collaudare due giri senza nuovi eventi, un accesso amministrativo riuscito e uno fallito, un errore di lettura, logout, cinque campi e file di stato; poi attivare il timer
+- [x] Lettore Redfish, unità e prove locali preparati; non installati
+- [x] Licenza Advanced, modello e firmware letti sulla GUI; pagina Remote Syslog osservata disabilitata con porta 514
+- [x] Destinazione Remote Syslog salvata; modifica di configurazione e due messaggi di test ricevuti nella cartella dell'iLO sul collettore
+- [x] Dopo i due reset del solo controller iLO, tre eventi periodici di sincronizzazione sono arrivati sul collettore con differenza fra ora dichiarata e ricezione inferiore a un secondo
+- [x] `chronyc tracking` del 07/10/2026: riferimento `ntp2.inrim.it`, stratum 2, `System time` +0,000148728 s, `Last offset` +0,000056946 s, `Leap status: Normal`; con i tre eventi NTP iLO sotto un secondo, collaudo punto 7 superato. La ricerca mirata dell’eventuale test dopo il secondo reset resta facoltativa.
+- [x] Screenshot 110: `Authentication Failure Logging` è `Enabled - Every 3rd Failure`, ritardo 10 secondi dopo la soglia; un solo errore può non comparire nei log
+- [x] `Account Service settings have been saved.` dopo la modifica a `Enabled - Every Failure`; modifica registrata nel Syslog e singolo fallimento successivo ricevuto. La persistenza del valore dopo riapertura non è stata verificata direttamente.
+- [x] Ricerca nel file iLO: due `Browser login` riusciti con account e IP della postazione, più evento di modifica `AuthenticationFailureLogging`, tutti ricevuti nel formato `AdsLine`
+- [x] Dopo Logout un solo tentativo con password volutamente errata è stato rifiutato dalla GUI, senza blocco visibile
+- [x] Un solo login iLO volutamente errato rifiutato dalla GUI e ricevuto alle 14:43:16.550058 nel file del collettore con cinque campi `AdsLine`; scarto 0,550058 s, IP della postazione ma nessun account tentato nel messaggio. Collaudo punto 3 superato.
+- [ ] Se Remote Syslog non copre gli accessi, collaudare il lettore Redfish con account dedicato, certificato verificato e timer
+
+## Feature: componente 5, catena locale D-1
+
+Stato: `bin/ads-nightly.sh`, `bin/ads-verify.sh` e le unità systemd sono stati ripresi dalla sessione interrotta; il codice è ancora non tracciato e non installato. `tests/test-nightly.sh` ha superato in WSL Ubuntu il 07/10/2026 la prova su due giorni, con seconda esecuzione idempotente, byte alterato nel log D-1 rilevato, mutazione del verificatore che farebbe passare il difetto, e manifest precedente alterato rilevato. Il test non usa il collettore reale.
+
+Cosa fa: comprime i file del giorno precedente, scrive un manifest SHA-256 concatenato al precedente e verifica archivio e log originario. È lo stadio locale della sezione 5 dello studio; non costituisce ancora la prova indipendente prevista con TSA, WORM e impronta alla Direzione. La ricezione attuale mescola nello stesso albero accessi AdS, eventi tecnici iLO e connessioni SMB non AdS di INTRA3: prima di attivare il timer va definita la separazione, senza cancellare le righe già raccolte. D7 richiede l'elenco AdS approvato. Il runbook è `docs/runbook-componente-5-catena.md`.
+
+Definition of done:
+
+- [x] Stadio locale e unità systemd preparati; prova WSL con alterazione effettiva superata
+- [ ] Definire e attuare il trattamento degli eventi iLO non AdS e delle connessioni SMB non AdS; per D7 attendere l'elenco approvato
+- [ ] Collaudare permessi, D-1, timer e verifica sul collettore vero, un comando autorizzato alla volta
+- [ ] Integrare TSA, WORM e invio dell'impronta quando disponibili destinazioni e credenziali
 
 ## Feature: punto 3, macchine virtuali di Proxmox come sorgenti (ADR-013)
 
-Stato: rinviata per decisione dell'utente del 2026-10-05 finché `D:/network-design` non avrà allineato tutte le VM all'impianto tecnico del pilota, M29. I log e gli allarmi tecnici restano nel flusso separato di quel progetto; solo dopo l'allineamento si riprende qui l'invio di accessi AdS e heartbeat. La priorità corrente di questo progetto è il componente iLO.
+Stato: rinviata per decisione dell'utente del 2026-10-05 finché `D:/network-design` non avrà allineato tutte le VM all'impianto tecnico del pilota, M29. I log e gli allarmi tecnici restano nel flusso separato di quel progetto; solo dopo l'allineamento si riprende qui l'invio di accessi AdS e heartbeat. La priorità corrente di questo progetto è la catena locale e la separazione dei flussi.
 
 Cosa fa: ogni VM invia al collettore, in TLS sulla 6514 con coda su disco, i propri accessi amministrativi (`sshd`, `sudo`, `su`, login grafico) e un heartbeat periodico, così che il controllo di silenzio registri anche una VM ferma. Si comincia dalla VM 204, il convertitore dei ruolini, che dal 05/10/2026 è il pilota del presidio sulle VM registrato in `D:/network-design/docs/log-collector-integrazione.md`, sezione sul monitoraggio delle macchine virtuali. Amministra le VM l'IT Manager.
 
@@ -223,4 +242,4 @@ Definition of done:
 
 ## Riconciliazione
 
-Ultima verifica delle aree di codice coperte: 2026-10-06 al commit `30b4c1c`; le cinque schede con `covers-paths` descrivono il lettore iLO versionato, mentre `roadmap.md` non ha percorsi coperti. Il codice iLO ha superato le prove locali, ma non è stato installato né collaudato sul dispositivo. La configurazione di INTRA3 si basa sulle schermate fino alla 38 e sulle righe syslog lette dall'utente; i collaudi punti 3 e 7 sono superati. La connessione dalla postazione non AdS è stata provata con elenco della radice e lettura di un byte; il log del NAS contiene un `Read` temporalmente coerente, mentre 71 `Login Fail` del giorno restano da attribuire. D7 è bloccato perché non esistono ancora nomina formale firmata né elenco AdS approvato.
+Le cinque schede con `covers-paths` hanno ancora come ancora `b516232`: `verifica-schede.py --rigoroso` non segnala drift rispetto a HEAD, ma la verifica per commit non vede gli script del componente 5 ancora non tracciati. Le schede pertinenti sono state aggiornate per contenuto nell'albero di lavoro. Il codice Redfish iLO ha superato le prove locali ma non è installato; Remote Syslog del dispositivo reale ha superato i punti 3 e 7. Anche INTRA3 ha superato i punti 3 e 7. La connessione dalla postazione non AdS è stata provata con elenco della radice e lettura di un byte; 71 `Login Fail` del giorno restano da attribuire. D7 è bloccato perché non esistono ancora nomina formale firmata né elenco AdS approvato. La catena locale D-1 ha superato la prova in WSL; prima dell'installazione restano lo smistamento dei flussi e il collaudo sulla VM.

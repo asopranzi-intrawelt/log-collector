@@ -5,7 +5,7 @@ generated-date: 2026-09-30
 covers-paths:
   - bin/**
   - config/**
-last-verified-commit: 30b4c1c
+last-verified-commit: b516232
 ---
 
 # Design e sicurezza applicativa
@@ -28,7 +28,9 @@ L'accesso SSH al collettore richiede una chiave personale, un indirizzo amminist
 
 La porta 6514/tcp accetta TLS ma il ricevente non autentica il certificato del mittente: `StreamDriver.AuthMode="anon"`; nftables limita gli IP alle reti configurate. L'host Proxmox verifica invece il nome del certificato del collettore con `x509/name` e conserva i messaggi in coda durante un'interruzione. La porta 514/udp serve gli apparati che non offrono TLS e trasporta i log in chiaro, senza conferma di consegna. Finché la LAN è un'unica subnet, nftables ammette i messaggi syslog da tutta quella rete: l'indirizzo del mittente non è da solo una prova di autenticità. I log sono scritti `root:ads`, file 0640 e directory 0750; la protezione contro alterazioni da parte degli amministratori del collettore è ancora una decisione aperta sulla custodia esterna della prova (ADR-010).
 
-Per l'iLO il client richiede sia una CA attendibile sia l'impronta SHA-256 del certificato presentato durante ogni handshake HTTPS. Non eredita proxy né segue redirect; rifiuta URI Redfish di origine diversa. La password è letta da un file privato con permessi 0600 sul collettore, il token della sessione non entra nei log e la sessione è cancellata a fine giro. Il sistema `ilo5` scrive file propri come utente `ads`, in una directory della sorgente posseduta da `ads:ads`; i file prodotti da rsyslog restano `root:ads`. La sicurezza e la compatibilità del certificato devono essere provate contro l'iLO reale prima dell'attivazione.
+L'iLO reale ha licenza Advanced e Remote Syslog sulla porta 514/udp ha superato il collaudo degli accessi e degli orologi: eredita i limiti del trasporto in chiaro senza conferma di consegna descritti sopra, con file prodotti da rsyslog come `root:ads`. Il login fallito non riporta l'account tentato; i successi riportano l'account generico `administrator`. Il flusso contiene anche eventi tecnici non AdS e non va catenato indiscriminatamente come prova dei soli accessi. La pagina Security Dashboard del 2026-10-07 segnala certificato SSL predefinito, SNMPv1 attivo, Secure Boot e complessità password disabilitati e login iLO RBSU non richiesto; la correzione di questi rilievi appartiene al progetto di rete. Il client Redfish alternativo richiede sia una CA attendibile sia l'impronta SHA-256 del certificato presentato durante ogni handshake HTTPS. Non eredita proxy né segue redirect; rifiuta URI Redfish di origine diversa. La password è letta da un file privato con permessi 0600 sul collettore, il token della sessione non entra nei log e la sessione è cancellata a fine giro. Il sistema `ilo5` scriverebbe file propri come utente `ads`, in una directory della sorgente posseduta da `ads:ads`; la sicurezza e la compatibilità del certificato andrebbero provate prima dell'attivazione.
+
+La catena locale preparata in `ads-nightly.sh` e `ads-verify.sh` rileva modifiche ai log dopo la chiusura D-1 confrontando origine, gzip e manifest concatenati. I manifest e i log restano però sulla stessa VM e un amministratore che possa riscriverli entrambi può creare una nuova catena coerente: l'indipendenza della prova dipende da TSA, WORM e impronta comunicata alla Direzione, che non sono ancora implementati. Il servizio systemd previsto scrive solo in `/var/lib/ads` e legge `/srv/ads` in sola lettura; il test dei permessi reali e l'installazione restano aperti.
 
 ## Diagrammi
 

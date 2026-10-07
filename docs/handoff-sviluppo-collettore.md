@@ -10,7 +10,7 @@ Riferimento funzionale: `studio-collettore-ads.md`. Questo file dice **come e in
 |---|---|
 | VM, Debian, rsyslog, TLS, nftables, NTP | Filtri Windows, QNAP, M365 → **elenco AdS approvato dalla Direzione** |
 | Sorgenti firewall, NAS, Proxmox | Estensione Windows oltre il pilota → **parere del consulente privacy** |
-| Script iLO (Redfish) | Passo 3 della catena notturna → **scelta della TSA** |
+| iLO Remote Syslog; lettore Redfish alternativo | Passo 3 della catena notturna → **scelta della TSA** |
 | Struttura dei job notturni (senza marca) | Mail alla Direzione → **relay SMTP da usare** |
 | | Copia WORM → **cartella WORM Compliance creata su NAS-HERO** e credenziale di scrittura |
 
@@ -171,11 +171,13 @@ if $programname == ["pvedaemon","pveproxy","sshd","sudo","su","login","pveproxy-
 1. VM + Debian + nftables + chrony + TLS (0,5-1 gg-p)
 2. rsyslog ricevente + accessi al collettore stesso
 3. Firewall, NAS, Proxmox host → collaudo punti 2-3
-4. `ads-ilo.py` → collaudo punto 3 su iLO
+4. iLO Remote Syslog → collaudo punti 3 e 7; `ads-ilo.py` resta alternativo se serve
 5. `ads-nightly.sh` senza marca e senza WORM, poi aggiunta WORM, poi TSA quando scelta
 6. `ads-silence.sh`
 7. Pilota Windows (2 postazioni + 1 server) con Fluent Bit → misura volumi → ridimensionamento `scsi1` e WORM
 8. `ads-m365.py`, `ads-ninja.py`, `ads-gravityzone.py` (studio, D9)
+
+Stato al 07/10/2026: iLO Remote Syslog ha superato i punti 3 e 7 sul dispositivo reale. Lo stadio locale di `ads-nightly.sh` e `ads-verify.sh` ha superato una prova funzionale in WSL, compresa l'alterazione di un byte del log D-1 richiesta dal punto 5; timer e servizio non sono installati. Prima dell'attivazione va definito il trattamento separato degli eventi tecnici iLO e delle connessioni SMB non AdS; D7 richiede ancora l'elenco AdS approvato. La prova su VM reale e l'ancoraggio esterno TSA/WORM restano aperti.
 9. Collaudo completo sezione 6 → estensione Windows dopo il parere privacy
 
 Scadenze dello studio: punti 1-4 entro il 23/10/2026, il resto entro il 13/11/2026.
