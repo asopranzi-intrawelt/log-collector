@@ -6,7 +6,7 @@ covers-paths:
   - bin/**
   - config/**
   - tests/**
-last-verified-commit: 8d834dd
+last-verified-commit: 30b4c1c
 ---
 
 # Stack applicativo
@@ -15,9 +15,9 @@ last-verified-commit: 8d834dd
 
 ## Stack e runtime
 
-Al commit `8d834dd` il codice copre il componente 1, il ricevente rsyslog del componente 2 e l'host Proxmox come sorgente del punto 3; i runbook registrano l'installazione e i collaudi già eseguiti sulla VM Debian 13 e sulle sorgenti. Le configurazioni del collettore stanno in `config/collettore/`, quelle dell'host in `config/proxmox-host/`. Gli script Bash usano `set -euo pipefail` e si provano con Bats e nei container Debian; gli strumenti Python usano la libreria standard, mentre il bootstrap installa `python3-requests` per i componenti API previsti. `ruff` e `pytest` controllano il Python. Le impostazioni di firewall e NAS si eseguono dalle rispettive interfacce e sono descritte nei runbook, non implementate da script di questo repository.
+Al commit `30b4c1c` il codice copre il componente 1, il ricevente rsyslog del componente 2, l'host Proxmox come sorgente del punto 3 e il lettore iLO 5 del componente 4; i runbook distinguono le installazioni e i collaudi già eseguiti sulla VM Debian 13 e sulle sorgenti dal codice iLO ancora da installare e collaudare. Le configurazioni del collettore stanno in `config/collettore/`, quelle dell'host in `config/proxmox-host/`. Gli script Bash usano `set -euo pipefail` e si provano con Bats e nei container Debian; gli strumenti Python usano la libreria standard e `requests`, installato dal bootstrap come `python3-requests`. `ruff` e `pytest` controllano il Python. Le impostazioni di firewall e NAS si eseguono dalle rispettive interfacce e sono descritte nei runbook, non implementate da script di questo repository.
 
-Nel lavoro locale non ancora committato del 2026-10-06 è stato aggiunto il componente 4: `bin/ads-ilo.py` usa `requests` per l'IEL Redfish di iLO 5, con test in `tests/test_ilo.py` e unità `ads-ilo@.service` e `ads-ilo@.timer`. Il codice non è installato sul collettore; modello e permessi reali dell'iLO restano da collaudare.
+Il componente 4 è versionato dal 2026-10-06: `bin/ads-ilo.py` usa `requests` per l'IEL Redfish di iLO 5, con test in `tests/test_ilo.py` e unità `ads-ilo@.service` e `ads-ilo@.timer`. Il codice non è installato sul collettore; modello e permessi reali dell'iLO restano da collaudare.
 
 ## Alternative deliberatamente escluse
 

@@ -58,6 +58,8 @@ Caso osservato: un'interfaccia di persistenza con semantica di *fusione*, dove u
 
 La domanda da porsi prima di fermarsi al carico: fra quello che consegno e l'effetto che voglio, c'è qualcosa che interpreta? Se sì, la prova va scritta al livello dove quell'interpretazione è osservabile, non a quello che ci sta sopra.
 
+Esiste anche il caso speculare, e non lo vede nessuna delle prove di componente. Chi scrive il contenuto dà per scontato che il destinatario interpreti, e invece il destinatario è trasparente. Caso osservato: testi di interfaccia in una risorsa di traduzione, con il grassetto scritto in sintassi Markdown, stampati da un componente che rende il testo così com'è. A video comparivano gli asterischi in entrambe le lingue, con la suite verde. Il cieco era la finzione della funzione di traduzione, che restituisce la chiave e non il valore: così ogni prova di componente è strutturalmente incapace di guardare il contenuto della risorsa. La prova che misura sta sulla risorsa stessa, dove il difetto nasce, e verifica che nessun valore contenga una sintassi che nessun componente interpreta.
+
 ## Un'asserzione di assenza passa anche per la ragione sbagliata
 
 Provare che una cosa c'è e provare che una cosa non c'è non sono simmetrici, e la differenza è il genere di errore che ciascuna ammette. Un'asserzione di presenza fallisce se il selettore è sbagliato, quindi un selettore sbagliato si manifesta subito. Un'asserzione di assenza **passa** se il selettore è sbagliato, perché un selettore che non sa cercare non trova niente, esattamente come non trova niente quando la cosa è stata davvero rimossa. I due casi producono lo stesso verde e non sono distinguibili guardandolo.
@@ -101,6 +103,42 @@ Il secondo modo è la precondizione sul dato. Un passo chiedeva di modificare un
 Ne discende che una casella di una sequenza manuale porta tre cose e non una. Il gesto, cioè che cosa fare. Il **luogo**, cioè dove si guarda il risultato, disambiguato quando l'interfaccia riusa lo stesso nome. E la **precondizione**, cioè quale proprietà deve avere il dato su cui si opera perché il passo eserciti davvero il codice, scritta accanto al passo e non in una premessa che chi esegue ha letto dieci minuti prima.
 
 Il criterio per scriverla, quando la sequenza la si sta redigendo: si prova a immaginare un'esecuzione che segue ogni parola della casella e che tuttavia non toccherebbe il difetto. Se quell'esecuzione esiste, alla casella manca il luogo o la precondizione.
+
+### Una precondizione che non si può osservare è un'assunzione, e il tempo la logora
+
+Aggiunto dopo che anche la prescrizione qui sopra è stata applicata e la verifica ha trovato un terzo modo di non concludere. La precondizione era scritta accanto al passo, con i numeri attesi, e chi eseguiva l'ha letta. Mancava una cosa sola: **il modo di guardarla**. La proprietà richiesta era l'assenza di un campo su certi record, e quel campo non è mostrato da nessuna schermata, perché si scrive solo alla creazione e in modifica non compare. Chi eseguiva poteva quindi vedere il risultato ma non la premessa, e la premessa restava un'assunzione travestita da controllo.
+
+Una precondizione porta perciò un quarto elemento oltre al gesto, al luogo e alla proprietà: **dove si osserva quella proprietà**, con lo stesso grado di precisione del luogo del risultato. Se la risposta è che non si osserva da nessuna parte, il passo non è verificabile come scritto e la sequenza deve dire cosa fare al suo posto, per esempio leggere il dato alla fonte invece che nell'interfaccia, oppure costruire deliberatamente un record che abbia la proprietà voluta.
+
+Il caso ha portato con sé una seconda osservazione, più banale e altrettanto costosa. Fra la scrittura della sequenza e la sua esecuzione era passato un giorno, e **i dati reali erano cambiati**: un record confermato in meno, e la categoria che il passo nominava passata da uno a zero. I numeri attesi scritti nella casella non corrispondevano più, e senza il modo di osservare la precondizione non c'era modo di dire se lo scostamento fosse il dato che si era mosso o il codice che sbagliava. Ne discende che una sequenza manuale scritta su dati vivi dichiara **la data della fotografia** da cui i numeri attesi provengono, e che l'invariante, cioè la relazione fra i numeri, vale più dei numeri stessi: la somma delle categorie deve fare il totale, qualunque sia il totale di oggi.
+
+## Prima di estendere un campo, si contano i suoi lettori e la sua popolazione
+
+Caso osservato: una voce di lavoro chiedeva di aggiungere un terzo valore a un campo che ne ammetteva due. La richiesta era sensata come scritta, e due misure di dieci minuti l'hanno cambiata di natura prima che si toccasse una riga.
+
+La prima misura è **chi legge il campo**, cercato in tutto il codice e non nel punto che si sta per modificare. Risultato: nessuno. Il solo consumatore semantico era stato tolto poco prima da una correzione indipendente, e i due usi rimasti erano entrambi di forma identitaria, cioè il campo compariva dentro una chiave di confronto e dentro una chiave di riconciliazione dell'interfaccia. Un campo senza lettori non ha bisogno di un valore in più: ha bisogno di una decisione sulla propria esistenza, che è una domanda per chi possiede il prodotto e non per chi scrive il codice.
+
+La seconda misura è **quanto il campo sia popolato nei dati veri**. Risultato: sette unità su centonovantotto, cioè il novantasei per cento assente. Ne discendeva subito che la chiave di confronto che lo includeva non stava disambiguando niente per quasi tutti, perchè per loro quel termine confrontava un valore assente con un valore assente. Una protezione che i dati rendono inerte è indistinguibile da una assente finchè qualcuno non la conta.
+
+La terza, che è la verifica dell'alternativa: **la chiave funzionerebbe senza quel campo?** Contate le coppie residue, erano tutte distinte, e non per fortuna, perchè l'identificatore del documento era costruito con gli stessi due elementi e quindi una collisione sarebbe già stata impossibile a monte. La protezione era ridondante per costruzione, non solo inerte nei fatti.
+
+La regola che ne discende è breve. Davanti a una richiesta di estendere un tipo enumerato si contano tre cose prima di scrivere: **chi legge**, **quanto è popolato**, **che cosa resta se lo si toglie**. Nessuna delle tre si deduce dal codice che si sta per modificare, e tutte e tre possono trasformare un'aggiunta in una rimozione.
+
+C'è un secondo corollario, scoperto scrivendo la correzione e non prevedendolo: **rendere modificabile un campo obbliga a toglierlo da ogni chiave che lo contiene**, e le chiavi sono più di quelle che si cercano. Nel caso osservato erano due e di natura diversa: una chiave di identità applicativa, usata per ritrovare un record dentro una lista e aggiornarlo, e una chiave di riconciliazione dell'interfaccia, cioè la chiave con cui il motore di rendering decide se un elemento è lo stesso di prima. La prima, lasciata com'era, avrebbe fatto sparire dal proprio posto la persona che si stava correggendo; la seconda avrebbe ricostruito il componente a ogni battuta, facendo perdere il fuoco a chi scriveva. Nessuna delle due si manifesta come errore: la prima produce un dato sbagliato, la seconda un fastidio che si attribuisce al browser.
+
+Ne discende una verifica meccanica da fare prima di rendere scrivibile un campo che prima non lo era: si cerca il nome del campo in tutto il progetto e si guarda **ogni occorrenza dentro una concatenazione, un confronto di uguaglianza o una chiave**, non solo dentro i calcoli. Un campo immutabile può stare ovunque; un campo modificabile può stare solo dove, cambiando, non rompe un legame.
+
+C'è un corollario sul significato, che è la trappola più silenziosa. Quando il campo è opzionale, l'assenza **già significa** "non specificato": aggiungere un valore esplicito con quel nome crea due rappresentazioni dello stesso stato, che è la stessa famiglia di difetti dei due contatori che contano la stessa cosa e danno risposte diverse. Il valore esplicito si giustifica solo se distingue davvero due stati, per esempio "nessuno ha ancora compilato" da "la persona ha scelto di non dirlo", e quella distinzione va chiesta a chi possiede il prodotto, non dedotta: se nessuno legge il campo, la distinzione non è osservabile da nessuna parte e quindi non esiste ancora.
+
+## Una prova scritta sul modello mentale del codice ne eredita il punto cieco
+
+Caso osservato, e vale per la via con cui il difetto è emerso più che per il difetto. Una funzionalità chiedeva che uno stato sopravvivesse a un ricaricamento. La correzione lo ha messo in un posto che il ricaricamento rilegge, e lo ha letto **all'avvio**. Tutte le prove passavano, automatiche e manuali, perché erano scritte sulla stessa domanda del codice: "dopo un ricaricamento, lo stato c'è ancora?". Nessuna chiedeva chi ALTRO potesse cambiare quello stato, e per quali vie; esisteva una via che non passa dall'avvio, e per quella via lo schermo e la fonte divergevano in silenzio.
+
+Due conseguenze, entrambe sul metodo.
+
+La prima: il difetto l'ha trovato **il passo di non regressione, non quello discriminante**. Il passo discriminante era costruito per confermare la correzione e la confermava; quello di ripiego, messo in lista solo per verificare che un valore sbagliato non rompesse niente, ha esercitato la via che nessuno aveva considerato. È un argomento concreto per non saltare i passi di ripiego perché "tanto passano": il loro valore non è confermare, è arrivare dove il progetto del passo discriminante non guardava.
+
+La seconda, che si può applicare a tavolino senza aspettare una verifica: davanti a uno stato che si vuole rendere persistente o condiviso, si elencano **tutte le vie per cui quello stato può cambiare**, non solo quella che si sta implementando. Una prova scritta guardando il codice copre le vie che il codice conosce, e quelle sono per costruzione le vie in cui il codice è già corretto.
 
 ## Un avviso che ricompare sempre uguale smette di essere un avviso
 

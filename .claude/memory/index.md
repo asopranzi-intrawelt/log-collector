@@ -6,22 +6,22 @@
 
 ```
 Branch attivo:        main
-Commit di riferimento: 585ac08
+Commit di riferimento: 30b4c1c
 Data snapshot:        2026-10-06
 Albero autorevole:    unico
 Remoto:               git@github-corp:asopranzi-intrawelt/log-collector.git (primo push di 9ee87b4 il 2026-09-30)
-Template:             E:\template-claude-developing @ d732a25
+Template:             E:\template-claude-developing @ ffcbdb3
 ```
 
 ## Stato di verifica delle schede
 
 | Scheda | last-verified | Stato |
 |---|---|---|
-| STACK.md | 8d834dd | componenti 1 e 2, Proxmox e nuovo lettore iLO locale descritti; codice iLO non ancora in HEAD |
-| design-and-security.md | 8d834dd | confini di fiducia, nuovo pin TLS iLO e rischi residui descritti; codice locale non ancora in HEAD |
-| deployment.md | 8d834dd | ambienti osservati e unità iLO solo preparate; gate separazione-ambienti aperto |
-| dev-testing.md | 8d834dd | quattro livelli di prova, 63 pytest passati e 22 Bats censiti; nuovi test iLO locali |
-| current-work.md | 8d834dd | INTRA3 collaudato; iLO in sviluppo, D7 bloccato, VM rinviate dopo M29 (ADR-013) |
+| STACK.md | 30b4c1c | componenti 1 e 2, Proxmox e lettore iLO versionato; installazione iLO aperta |
+| design-and-security.md | 30b4c1c | confini di fiducia, verifica TLS iLO e rischi residui descritti |
+| deployment.md | 30b4c1c | ambienti osservati e unità iLO solo preparate; gate separazione-ambienti aperto |
+| dev-testing.md | 30b4c1c | quattro livelli di prova, 63 pytest passati e 22 Bats censiti; collaudo iLO reale aperto |
+| current-work.md | 30b4c1c | INTRA3 collaudato; codice iLO versionato ma non installato, D7 bloccato, VM rinviate dopo M29 (ADR-013) |
 | roadmap.md | 9ee87b4 | solo struttura |
 
 ## Punto di ripresa
@@ -130,4 +130,4 @@ Il controllo successivo sul collettore mostra nelle ultime otto righe SMB della 
 
 Un nuovo controllo dal client restituisce `Elevated=True` e `ACCESSO_OK`: è ancora la finestra amministrativa, dunque non aggiunge prova sulla sessione ordinaria. Il prossimo controllo va lanciato aprendo PowerShell dal desktop con `Win+R`, senza elevazione; eseguire il test di `B:` solo se il nuovo processo risulta `Elevated=False`. Se resta elevato anche così, non ripetere il test: chiarire prima la configurazione UAC.
 
-L'utente ha chiarito che i comandi sulla postazione partivano da NinjaOne RMM, che offre quattro opzioni di esecuzione, e ha chiesto di interrompere la verifica ripetitiva della mappatura per tornare allo sviluppo del log collector. L'ultimo controllo rimane valido solo per la sessione elevata; non si richiedono altre prove su `B:` in questa fase. Secondo l'ordine dell'handoff, il prossimo componente non bloccato è `ads-ilo.py` per iLO 5. Il codice locale ora include lettura Redfish paginata dell'IEL, confronto `Id`/`Count`, `Updated` quando disponibile, esclusione dei login del lettore, TLS verificato con CA e impronta, logout esplicito, righe `AdsLine`, checkpoint dopo sincronizzazione del log e unità systemd non attivate. La suite locale passa con 63 pytest e Ruff sui nuovi file; il controllo di anonimizzazione passa dopo una correzione mirata per la chiave OData standard. Nessun iLO reale è stato interrogato. Il collaudo dipende da `License Type`, privilegi dell'account, certificato e accessibilità dell'IEL, descritti in `docs/runbook-componente-4-ilo.md`. Le schede tecniche sono state aggiornate per le modifiche locali non committate, lasciando `last-verified-commit` al commit del codice già verificato; il confronto per commit non vede ancora il nuovo componente.
+L'utente ha chiarito che i comandi sulla postazione partivano da NinjaOne RMM, che offre quattro opzioni di esecuzione, e ha chiesto di interrompere la verifica ripetitiva della mappatura per tornare allo sviluppo del log collector. L'ultimo controllo rimane valido solo per la sessione elevata; non si richiedono altre prove su `B:` in questa fase. Secondo l'ordine dell'handoff, il componente successivo non bloccato era `ads-ilo.py` per iLO 5. Il codice ora versionato include lettura Redfish paginata dell'IEL, confronto `Id`/`Count`, `Updated` quando disponibile, esclusione dei login del lettore, TLS verificato con CA e impronta, logout esplicito, righe `AdsLine`, checkpoint dopo sincronizzazione del log e unità systemd non attivate. La suite locale passa con 63 pytest e Ruff sui nuovi file; il controllo di anonimizzazione passa dopo una correzione mirata per la chiave OData standard. Nessun iLO reale è stato interrogato. Il collaudo dipende da `License Type`, privilegi dell'account, certificato e accessibilità dell'IEL, descritti in `docs/runbook-componente-4-ilo.md`. Dopo `chiudi`, la sincronizzazione ha portato le cinque schede con percorsi coperti al commit `30b4c1c`; la scheda `roadmap.md` resta non applicabile al confronto perché ha `covers-paths: []`.

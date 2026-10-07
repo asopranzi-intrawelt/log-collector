@@ -52,12 +52,15 @@ ALLOW_EMPTY_KEEP="${ALLOW_EMPTY_KEEP:-0}"
 
 # --- modo di esecuzione -----------------------------------------------------
 MODE="wipe"
-case "${1:-}" in
-  "")        ;;
-  --dry-run) MODE="dry"  ;;
-  --list)    MODE="list" ;;
-  *) echo "uso: $(basename "$0") [--dry-run|--list]" >&2; exit 2 ;;
-esac
+FORZA=0
+for arg in "$@"; do
+  case "$arg" in
+    --dry-run) MODE="dry"  ;;
+    --list)    MODE="list" ;;
+    --forza)   FORZA=1     ;;
+    *) echo "uso: $(basename "$0") [--dry-run|--list] [--forza]" >&2; exit 2 ;;
+  esac
+done
 
 # --- diario -----------------------------------------------------------------
 # L'hook SessionEnd gira senza che nessuno ne veda l'output, quindi un rifiuto a partire
@@ -151,6 +154,43 @@ if [ "$total" -gt 0 ] && [ "$kept" -eq 0 ] && [ "$ALLOW_EMPTY_KEEP" != "1" ]; th
   abort "nessuno dei $total slug in $PROJ corrisponde a KEEP_PREFIXES ('$KEEP_PREFIXES'): la configurazione e' di un'altra macchina. Esegui '--list' e correggi i prefissi; se l'insieme vuoto e' voluto, imposta ALLOW_EMPTY_KEEP=1."
 fi
 log "Progetti: $total totali, $kept preservati, $((total - kept)) da rimuovere."
+
+# 0.4 nessun'altra sessione di Claude Code aperta. Aggiunta il 2026-10-05: la radice degli
+# scratchpad ($TMPDIR/claude) e le cartelle effimere dell'account sono comuni a tutte le
+# sessioni, quindi un wipe lanciato dalla chiusura di una sessione cancellava scratchpad,
+# piani e task di quelle ancora aperte. Regola: chi chiude per ultimo pulisce. Si contano i
+# processi il cui comando e' il binario 'claude' o il pacchetto @anthropic-ai/claude-code,
+# si escludono i processi ausiliari (--type=) e la catena di antenati di questo script,
+# cioe' la sessione che sta chiudendo. --forza salta la guardia. Vedi la gemella .ps1.
+altre_sessioni() {
+  ps -eo pid=,ppid=,args= 2>/dev/null | awk -v self="$$" '
+    {
+      pid[$1] = $2
+      a = $0
+      sub(/^[ \t]*[0-9]+[ \t]+[0-9]+[ \t]+/, "", a)
+      args[$1] = a
+    }
+    END {
+      p = self; n = 0
+      while ((p in pid) && n < 64) { anc[p] = 1; p = pid[p]; n++ }
+      for (k in args) {
+        if (k in anc) continue
+        s = args[k]
+        if (s ~ /--type=/) continue
+        if (s ~ /(^|\/)claude( |$)/ || s ~ /@anthropic-ai\/claude-code/) printf "%s ", k
+      }
+    }'
+}
+ALTRE="$(altre_sessioni)"
+ALTRE="${ALTRE% }"
+if [ -n "$ALTRE" ] && [ "$FORZA" != "1" ]; then
+  log "Rimandato: altre sessioni di Claude Code aperte (PID $ALTRE). Le cartelle effimere e gli scratchpad sono condivisi, e cancellarli ora li toglierebbe a sessioni ancora al lavoro: pulira' l'ultima sessione che si chiude, oppure un'esecuzione manuale con --forza."
+  if [ "$MODE" != "dry" ]; then
+    log "Nessuna rimozione eseguita."
+    exit 0
+  fi
+  log "  [dry-run] in un'esecuzione reale lo script si fermerebbe qui; segue cio' che farebbe con --forza."
+fi
 
 rm_path() {
   if [ "$MODE" = "dry" ]; then

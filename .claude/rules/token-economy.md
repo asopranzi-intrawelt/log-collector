@@ -33,6 +33,14 @@ Prima **togliere elementi**: la parte deterministica di una mappatura non deve v
 Il pacchetto `lavoro-a-lotti` è l'attuazione di questi quattro punti; `agenti-terminale` fornisce le flotte su cui il terzo poggia.
 
 
+### Il lavoro locale non costa token, e la sua uscita va letta per intero
+
+Conversione, OCR, impronte e indicizzazione girano con strumenti locali e non consumano token: all'agente costano il lancio e la lettura di un riepilogo di poche righe, quindi si lanciano in background e non si rifanno a mano. Il riepilogo però va letto per intero e non solo nel codice di uscita. In un caso reale un OCR su 424 scansioni è uscito con zero e ha riportato 455 documenti assenti, perché il disco esterno era stato scollegato. L'uscita di un lavoro lungo si scrive in una cartella ignorata del progetto e non nella cartella temporanea della sessione. Un'altra sessione dell'agente sulla stessa macchina, nella sua pulizia d'avvio, può cancellare la temporanea, ed è successo tre volte nella stessa giornata. Quando gli elementi da giudicare sono molti e piccoli vale la sezione sulle etichette chiuse del pacchetto `lavoro-a-lotti`.
+
+## Il modello si sceglie dal compito
+
+Lezione generale nata il 2026-10-06 in un progetto istanziato. Un compito che consuma molti token ma non richiede giudizio fine va al modello più economico che lo sa fare, e il modello più capace si riserva alla parte che ne ha bisogno. La scelta si fa per compito e non per sessione, e si misura su un lotto piccolo prima di estenderla. Nello stesso caso il costo è dipeso più dal numero di turni degli agenti che dalla lunghezza del testo letto: i numeri e la procedura stanno nel pacchetto `lavoro-a-lotti`.
+
 ## Disclosure progressiva su documenti voluminosi
 
 Un corpus documentale è troppo grande per entrare in contesto: cento documenti possono valere oltre un milione di token, e l'ottanta per cento serve come riferimento ricercabile, non come materiale di ragionamento attivo. Invece di caricare tutto, si accede ai documenti per livelli crescenti di dettaglio, scendendo solo dove serve.

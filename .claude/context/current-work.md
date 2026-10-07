@@ -6,8 +6,8 @@ covers-paths:
   - bin/**
   - config/collettore/**
   - tests/**
-last-verified-commit: 8d834dd
-stato: componenti 1 e 2 in esercizio; INTRA3 collaudato, iLO in sviluppo, D7 bloccato
+last-verified-commit: 30b4c1c
+stato: componenti 1 e 2 in esercizio; INTRA3 collaudato, codice iLO versionato e da collaudare sul dispositivo, D7 bloccato
 ---
 
 # Lavoro in corso
@@ -192,9 +192,9 @@ Definition of done:
 
 ## Feature: componente 4, iLO 5 via Redfish
 
-Stato: sviluppo locale del lettore IEL, dopo il collaudo di INTRA3. Il componente non dipende dall'elenco AdS approvato né dalla scelta della TSA; l'installazione e il collaudo su iLO reali dipendono da licenza, account di lettura, certificato e raggiungibilità.
+Stato: lettore IEL, test e unità systemd versionati nel commit `30b4c1c`, dopo il collaudo di INTRA3. Il componente non dipende dall'elenco AdS approvato né dalla scelta della TSA; l'installazione e il collaudo su iLO reali dipendono da licenza, account di lettura, certificato e raggiungibilità.
 
-Cosa fa: `ads-ilo.py` legge ogni ora l'iLO Event Log, registra le nuove voci e gli incrementi di `Count` nel formato `AdsLine`, conserva lo stato e segnala gli errori. Procedura e limiti in `docs/runbook-componente-4-ilo.md`.
+Cosa farà dopo l'attivazione: il timer avvierà `ads-ilo.py` ogni ora per leggere l'iLO Event Log, registrare le nuove voci e gli incrementi di `Count` nel formato `AdsLine`, conservare lo stato e segnalare gli errori. Procedura e limiti in `docs/runbook-componente-4-ilo.md`.
 
 Definition of done:
 
@@ -208,7 +208,7 @@ Definition of done:
 
 Stato: rinviata per decisione dell'utente del 2026-10-05 finché `D:/network-design` non avrà allineato tutte le VM all'impianto tecnico del pilota, M29. I log e gli allarmi tecnici restano nel flusso separato di quel progetto; solo dopo l'allineamento si riprende qui l'invio di accessi AdS e heartbeat. La priorità corrente di questo progetto è il componente iLO.
 
-Cosa fa: ogni VM invia al collettore, in TLS sulla 6514 con coda su disco, i propri accessi amministrativi (`sshd`, `sudo`, `su`, login grafico) e un heartbeat periodico, così che il controllo di silenzio registri anche una VM ferma. Si comincia dalla VM 204, il convertitore dei ruolini, che dal 05/10/2026 è il pilota del presidio sulle VM registrato in `D:/network-design` (`docs/log-collector-integrazione.md`, sezione sul monitoraggio delle macchine virtuali). Amministra le VM l'IT Manager.
+Cosa fa: ogni VM invia al collettore, in TLS sulla 6514 con coda su disco, i propri accessi amministrativi (`sshd`, `sudo`, `su`, login grafico) e un heartbeat periodico, così che il controllo di silenzio registri anche una VM ferma. Si comincia dalla VM 204, il convertitore dei ruolini, che dal 05/10/2026 è il pilota del presidio sulle VM registrato in `D:/network-design/docs/log-collector-integrazione.md`, sezione sul monitoraggio delle macchine virtuali. Amministra le VM l'IT Manager.
 
 Definition of done:
 
@@ -223,4 +223,4 @@ Definition of done:
 
 ## Riconciliazione
 
-Ultima verifica delle aree di codice coperte: 2026-10-06 fra `8d834dd` e HEAD `585ac08`; nessun file coperto dalle schede è cambiato e l'albero era pulito dopo `chiudi`. I `last-verified-commit` a `8d834dd` restano validi senza aggiornamento formale. La configurazione di INTRA3 si basa sulle schermate fino alla 38 e sulle righe syslog lette dall'utente; i collaudi punti 3 e 7 sono superati. La connessione dalla postazione non AdS è stata provata con elenco della radice e lettura di un byte; il log del NAS contiene un `Read` temporalmente coerente, mentre 71 `Login Fail` del giorno restano da attribuire. D7 è bloccato perché non esistono ancora nomina formale firmata né elenco AdS approvato.
+Ultima verifica delle aree di codice coperte: 2026-10-06 al commit `30b4c1c`; le cinque schede con `covers-paths` descrivono il lettore iLO versionato, mentre `roadmap.md` non ha percorsi coperti. Il codice iLO ha superato le prove locali, ma non è stato installato né collaudato sul dispositivo. La configurazione di INTRA3 si basa sulle schermate fino alla 38 e sulle righe syslog lette dall'utente; i collaudi punti 3 e 7 sono superati. La connessione dalla postazione non AdS è stata provata con elenco della radice e lettura di un byte; il log del NAS contiene un `Read` temporalmente coerente, mentre 71 `Login Fail` del giorno restano da attribuire. D7 è bloccato perché non esistono ancora nomina formale firmata né elenco AdS approvato.

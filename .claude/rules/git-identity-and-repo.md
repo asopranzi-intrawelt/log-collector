@@ -1,3 +1,9 @@
+---
+paths:
+  - .git/**
+  - .githooks/**
+---
+
 # Identità git e bootstrap del repository
 
 > Regola modulare. Definisce come scegliere l'identità git con cui si commetteranno e pusheranno le modifiche, come collegare il repository locale a GitHub tramite l'alias SSH corretto, e come proteggersi dal commit involontario con l'identità sbagliata su una macchina condivisa. Il commit e il push restano sempre operazioni manuali dell'utente: questa regola e la skill di inizializzazione preparano la configurazione, non committano e non pushano mai.

@@ -77,7 +77,8 @@
 # ============================================================================
 param(
   [switch]$DryRun,   # stampa cosa verrebbe rimosso, senza rimuovere niente
-  [switch]$List      # sola lettura: elenca gli slug presenti marcati KEEP/WIPE
+  [switch]$List,     # sola lettura: elenca gli slug presenti marcati KEEP/WIPE
+  [switch]$Forza     # salta la guardia 0.4 sulle altre sessioni aperte
 )
 $ErrorActionPreference = 'SilentlyContinue'
 
@@ -190,6 +191,52 @@ if ($all.Count -gt 0 -and $keptList.Count -eq 0 -and -not $allowEmptyKeep) {
   Stop-Wipe ("nessuno dei {0} slug in {1} corrisponde a keepPrefixes ('{2}'): la configurazione e di un'altra macchina. Esegui con -List e correggi i prefissi; se l'insieme vuoto e voluto, imposta `$allowEmptyKeep = `$true." -f $all.Count, $projects, ($keepPrefixes -join ' '))
 }
 Write-Log ("Progetti: {0} totali, {1} preservati, {2} da rimuovere." -f $all.Count, $keptList.Count, ($all.Count - $keptList.Count))
+
+# 0.4 nessun'altra sessione di Claude Code aperta. Aggiunta il 2026-10-05, dopo averlo
+# visto accadere: la radice degli scratchpad (%LOCALAPPDATA%\Temp\claude) e comune a tutti
+# gli account della stessa utenza Windows, e le cartelle effimere di un account ('plans',
+# 'tasks', 'sessions', 'file-history'...) sono comuni a tutte le sue sessioni. Un wipe
+# lanciato dalla chiusura di una sessione cancellava quindi anche lo scratchpad, i piani e
+# i task delle sessioni ANCORA APERTE, che se li vedevano sparire sotto i piedi a meta
+# lavoro. Il danno osservato e stato piccolo, perche la memoria di quel progetto stava su
+# disco, ma la forma del difetto e quella di un wipe che sbaglia bersaglio.
+#
+# La regola e "chi chiude per ultimo pulisce": se e viva un'altra sessione di Claude Code,
+# di questo account o di un altro, il wipe si rimanda e lo scrive nel diario. Si contano i
+# processi claude.exe di Claude Code (riga di comando, estensione dell'editor) e le
+# installazioni via node; si escludono l'app desktop di claude.ai, che vive sotto
+# WindowsApps e non e una sessione di Claude Code, i suoi processi ausiliari (--type=), e
+# la catena di antenati di questo script, cioe la sessione che sta chiudendo e chi l'ha
+# lanciata. -Forza salta la guardia, per chi sa che le altre sessioni non contano.
+function Get-AltreSessioniClaude {
+  $tutti = @(Get-CimInstance Win32_Process -ErrorAction SilentlyContinue)
+  $perPid = @{}
+  foreach ($p in $tutti) { $perPid[[int]$p.ProcessId] = $p }
+  $antenati = @{}
+  $cur = [int]$PID
+  $passi = 0
+  while ($perPid.ContainsKey($cur) -and $passi -lt 64) {
+    $antenati[$cur] = $true
+    $cur = [int]$perPid[$cur].ParentProcessId
+    $passi++
+  }
+  @($tutti | Where-Object {
+    $cmd = [string]$_.CommandLine
+    $exe = [string]$_.ExecutablePath
+    $claudeCode = (($_.Name -eq 'claude.exe') -and ($exe -notmatch '\\WindowsApps\\') -and ($cmd -notmatch '--type=')) -or
+                  (($_.Name -match '^node(\.exe)?$') -and ($cmd -match '@anthropic-ai[\\/]claude-code'))
+    $claudeCode -and -not $antenati.ContainsKey([int]$_.ProcessId)
+  })
+}
+$altre = @(Get-AltreSessioniClaude)
+if ($altre.Count -gt 0 -and -not $Forza) {
+  Write-Log ("Rimandato: {0} altre sessioni di Claude Code aperte (PID {1}). Le cartelle effimere e gli scratchpad sono condivisi, e cancellarli ora li toglierebbe a sessioni ancora al lavoro: pulira l'ultima sessione che si chiude, oppure un'esecuzione manuale con -Forza." -f $altre.Count, (($altre | ForEach-Object { $_.ProcessId }) -join ', '))
+  if (-not $DryRun) {
+    Write-Log 'Nessuna rimozione eseguita.'
+    exit 0
+  }
+  Write-Log '  [dry-run] in un''esecuzione reale lo script si fermerebbe qui; segue cio che farebbe con -Forza.'
+}
 
 # GUARDIA DI ULTIMA ISTANZA. Tutto lo script e gia costruito per agire solo dentro
 # $base e dentro la radice degli scratchpad, ma "corretto per costruzione" non e una

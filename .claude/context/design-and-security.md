@@ -5,12 +5,12 @@ generated-date: 2026-09-30
 covers-paths:
   - bin/**
   - config/**
-last-verified-commit: 8d834dd
+last-verified-commit: 30b4c1c
 ---
 
 # Design e sicurezza applicativa
 
-> Stato letto dal codice e dalle configurazioni al commit `8d834dd`. Le scelte di custodia della prova restano in `docs/modello-di-custodia.md` e ADR-010.
+> Stato letto dal codice e dalle configurazioni al commit `30b4c1c`. Le scelte di custodia della prova restano in `docs/modello-di-custodia.md` e ADR-010.
 
 ## Paradigmi di software design
 
@@ -18,7 +18,7 @@ last-verified-commit: 8d834dd
 
 Sul collettore rsyslog riceve da sorgenti UDP e TLS nello stesso ruleset, aggiunge ora di ricezione e IP osservato e salva i cinque campi di `AdsLine`. L'host Proxmox filtra in origine i soli messaggi di autenticazione e li inoltra con due code su disco, una per il journal e una per l'access log di `pveproxy`. I NAS e il firewall sono configurati nelle loro interfacce; i runbook documentano l'esito di ogni sorgente.
 
-Nel componente iLO preparato localmente il client Redfish separa recupero delle pagine, trasformazione delle voci e scrittura del checkpoint. L'intero giro è esclusivo per sorgente tramite lock sul collettore Linux. Il log viene sincronizzato prima del checkpoint atomico: un arresto fra i due può duplicare una riga, identificabile da `Id` e `Count`, ma non far avanzare lo stato oltre eventi mai scritti. Un giro fallito scrive `status=error` e termina con codice non zero; il controllo di silenzio futuro dovrà leggere l'esito, non soltanto vedere se esiste un file.
+Nel componente iLO versionato il client Redfish separa recupero delle pagine, trasformazione delle voci e scrittura del checkpoint. L'intero giro è esclusivo per sorgente tramite lock sul collettore Linux. Il log viene sincronizzato prima del checkpoint atomico: un arresto fra i due può duplicare una riga, identificabile da `Id` e `Count`, ma non far avanzare lo stato oltre eventi mai scritti. Un giro fallito scrive `status=error` e termina con codice non zero; il controllo di silenzio futuro dovrà leggere l'esito, non soltanto vedere se esiste un file.
 
 ## Sicurezza applicativa
 

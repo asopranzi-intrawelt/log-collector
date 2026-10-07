@@ -224,6 +224,7 @@ Il collettore deve poter raggiungere la TSA in uscita (HTTP/HTTPS): regola da ap
 - Garante privacy, provvedimento 27/11/2008 (mod. 25/06/2009): access log con completezza, inalterabilità, verificabilità dell'integrità; conservazione non inferiore a sei mesi; verifica almeno annuale dell'operato degli AdS.
 - docs.fluentbit.io - input Windows Event logs (winevtlog), pagina corrente: `event_data_as_map`, `event_query` XPath/XML Query, `db`, privilegi per il canale Security.
 - docs.fluentbit.io - output Syslog: modalità udp/tcp/tls/dtls, `syslog_message_key`, formato rfc5424.
-- HPE, iLO standard and licensed features: Remote Syslog incluso in iLO Advanced, non in iLO Standard.
-- HPE iLO 5 Redfish API docs (logging): IEL su `/redfish/v1/Managers/1/LogServices/IEL/Entries`, campi `Created`, `Message`, `Oem.Hpe.Categories`, `Code`, `Count`.
+- [HPE iLO 5 Licensing Guide](https://support.hpe.com/hpesc/public/docDisplay?docId=sd00001039en_us&docLocale=en_US): matrice delle funzioni per licenza, da confrontare con `License Type` sul dispositivo prima di scegliere definitivamente fra Remote Syslog e polling.
+- [HPE iLO 5 Redfish API Reference](https://hewlettpackard.github.io/ilo-rest-api-docs/ilo5/), sezione IEL verificata il 06/10/2026: percorso `/redfish/v1/Managers/1/LogServices/IEL/Entries/`, campi `Id`, `Created`, `Message`, `Oem.Hpe.Categories`, `Code`, `Count` e `Updated` nell'esempio pubblicato; presenza e valori effettivi restano da collaudare sul dispositivo.
+- [HPE Redfish authentication and sessions](https://servermanagementportal.ext.hpe.com/docs/concepts/redfishauthentication), verificata il 06/10/2026: il token arriva in `X-Auth-Token` e la `Location` identifica la sessione da cancellare con `DELETE`.
 - Reg. UE 910/2014 (eIDAS), art. 41: effetti giuridici della validazione temporale elettronica qualificata.

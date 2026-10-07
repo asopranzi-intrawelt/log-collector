@@ -5,12 +5,12 @@ generated-date: 2026-09-30
 covers-paths:
   - config/**
   - docs/handoff-sviluppo-collettore.md
-last-verified-commit: 8d834dd
+last-verified-commit: 30b4c1c
 ---
 
 # Deployment
 
-> Stato osservato nel repository e nei runbook al commit `8d834dd`. Commit, push e interventi sugli host restano operazioni manuali dell'utente.
+> Stato osservato nel repository e nei runbook al commit `30b4c1c`. Commit, push e interventi sugli host restano operazioni manuali dell'utente.
 
 ## Modello di separazione fra test e produzione
 

@@ -4,7 +4,7 @@ generated-from-branch: main
 generated-date: 2026-09-30
 covers-paths:
   - tests/**
-last-verified-commit: 8d834dd
+last-verified-commit: 30b4c1c
 ---
 
 # Test di sviluppo
