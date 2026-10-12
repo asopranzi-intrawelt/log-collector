@@ -1,0 +1,11 @@
+[Unit]
+Description=Acquisizione periodica accessi locali dello switch Nebula %i
+
+[Timer]
+OnBootSec=2min
+OnUnitInactiveSec=60s
+AccuracySec=5s
+Unit=ads-nebula@%i.service
+
+[Install]
+WantedBy=timers.target

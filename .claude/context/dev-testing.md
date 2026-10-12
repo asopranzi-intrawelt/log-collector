@@ -4,7 +4,7 @@ generated-from-branch: main
 generated-date: 2026-09-30
 covers-paths:
   - tests/**
-last-verified-commit: 2ce4cb2
+last-verified-commit: 2456511
 ---
 
 # Test di sviluppo
@@ -25,7 +25,9 @@ Due prove di non vacuità fatte il 2026-09-30. Togliendo da `ads-render.py` il f
 
 Il 07/10/2026 `bash tests/test-nightly.sh` in WSL Ubuntu ha provato lo stadio locale della catena su due giorni fittizi, idempotenza, alterazione di un byte nel log D-1 e alterazione del manifest precedente: esito `OK`. Il fallimento sul byte contiene `log di origine diverso` e il ripristino torna verde. La copia mutata di `ads-verify.sh` senza il confronto archivio/log passa sul log alterato: la prova fallirebbe se quel controllo sparisse. Sono file temporanei in `/tmp`, non una prova dei permessi o del timer sul collettore reale.
 
-L'08/10/2026 `tests/test_ilo_other_retain.sh` è passato in WSL Ubuntu: con data 08/10/2026 il file del 10/07 è scaduto, quello del 11/07 rimane, `--dry-run` non cancella, `--apply` tocca soltanto l'albero iLO tecnico e un link simbolico causa errore senza cancellare la destinazione. `tests/debian13/verifica-config.sh` è passato via Docker Desktop da Git Bash: sette righe base, tre accessi iLO, tre eventi tecnici, file distinto `root:root 0640`. `tests/test_render.py` passa 15/15; due tentativi iniziali erano bloccati dai permessi della sandbox sulle directory temporanee di pytest, senza eseguire le prove, quindi è stato ripetuto fuori sandbox. Script e unità di ritenzione non sono installati sul collettore e la soglia di capienza non ha un allarme esterno.
+L'08/10/2026 `tests/test_ilo_other_retain.sh` è passato in WSL Ubuntu: con data 08/10/2026 il file del 10/07 è scaduto, quello del 11/07 rimane, `--dry-run` non cancella, `--apply` tocca soltanto l'albero iLO tecnico e un link simbolico causa errore senza cancellare la destinazione. `tests/debian13/verifica-config.sh` è passato via Docker Desktop da Git Bash: sette righe base, tre accessi iLO, tre eventi tecnici, file distinto `root:root 0640`. `tests/test_render.py` passa 15/15; due tentativi iniziali erano bloccati dai permessi della sandbox sulle directory temporanee di pytest, senza eseguire le prove, quindi è stato ripetuto fuori sandbox. Script e unità di ritenzione sono installati e collaudati sul collettore dal 08/10; la soglia di capienza non ha un allarme esterno.
+
+Il 12/10 il poller Nebula ha superato 35 test specifici su Linux WSL, con file temporanei sul filesystem Linux e permessi 0640/0600 verificati. La suite completa Windows ha superato 100 casi con una prova POSIX saltata. `tests/fixtures/nebula-switch-events.json` deriva dalla risposta reale anonimizzata: cinque accessi HTTP(s) e un evento tecnico, con provenienza dichiarata nel file Markdown accanto. Si verificano byte dei log, secondo giro, ritardi nella sovrapposizione, checkpoint, risposte sature, buchi, errori e ripresa dopo append parziale o fsync. Tre mutazioni dei controlli di deduplicazione, ripresa e TLS fanno fallire i rispettivi test; ogni ripristino ha SHA-256 verificato. La rete è sostituita da risposte registrate e adapter Requests: non si dichiara verificata la retention cloud, l'identità TLS reale Nebula o l'installazione. Tooling di prova privato sotto `_notes/`; Ruff controlla i due nuovi file. Dettaglio e gate nel runbook Nebula.
 
 ## Rotte e dati mockati
 

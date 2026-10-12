@@ -5,12 +5,12 @@ generated-date: 2026-09-30
 covers-paths:
   - config/**
   - docs/handoff-sviluppo-collettore.md
-last-verified-commit: 2ce4cb2
+last-verified-commit: 2456511
 ---
 
 # Deployment
 
-> Stato osservato nel repository e nei runbook al commit `30b4c1c`. Commit, push e interventi sugli host restano operazioni manuali dell'utente.
+> Stato riconciliato al commit `2456511`, con poller Nebula preparato nel lavoro locale del 12/10. Commit, push e interventi sugli host restano operazioni manuali dell'utente.
 
 ## Modello di separazione fra test e produzione
 
@@ -35,5 +35,7 @@ Il nuovo script `bin/ads-ilo.py` usa un'istanza per IP iLO e le unità `config/c
 Lo stadio locale `bin/ads-nightly.sh` legge `/srv/ads` e scrive `/var/lib/ads`; `ads-nightly.service` lo esegue come `ads` e `ads-nightly.timer` lo pianifica alle 00:15. Prima dell'installazione vanno separati gli eventi tecnici e gli accessi non AdS, quindi verificati permessi e funzionamento sulla VM reale. Gli script e le unità del componente 5 sono versionati in `a031a4c`; il filtro iLO è versionato in `934aebd` e la configurazione generata è installata sul collettore dal 08/10.
 
 ## Variabili d'ambiente e segreti
+
+Nebula: script, esempio JSON e unità `ads-nebula@` preparati e provati localmente, non installati. La futura configurazione privata è `/etc/ads/nebula/<SOURCE_LABEL>.json`, la chiave distinta dalla postazione è `/etc/ads/secrets/nebula/<SOURCE_LABEL>.key` (`root:root 0600`), consegnata al servizio con `LoadCredential`. Occorre predisporre stato e log `ads:ads 0750` e far coincidere etichetta `source` e nome dell'istanza. L'esempio blocca l'avvio finché mancano istante iniziale e finestra di recupero espliciti. Nessuna attivazione prima dei gate nel runbook Nebula, compresi completezza cloud, notifica esterna e interazione con D-1.
 
 I valori di rete, sorgenti, amministratori e API sono raccolti in `config/parametri.yaml`, ignorato da git e compilato a partire da `config/parametri.example.yaml`. Gli alberi prodotti in `build/` possono contenerli e restano ignorati da git. Le credenziali dei componenti futuri appartengono a `/etc/ads/secrets/` sul collettore; i certificati TLS e le chiavi private seguono la procedura descritta nella scheda di sicurezza. `ADS_ROOT` è usata da `ads-bootstrap.sh` per indirizzare l'installazione in un albero di prova, non contiene un segreto.

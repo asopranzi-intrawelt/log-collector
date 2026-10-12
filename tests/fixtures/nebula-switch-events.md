@@ -1,0 +1,5 @@
+# Provenienza della risposta Nebula
+
+`nebula-switch-events.json` deriva dalla risposta reale del 09/10/2026 descritta in `docs/runbook-componente-3-nebula.md`. Il file grezzo resta privato in `_notes/nebula-auth-20261009/`. La fixture contiene i cinque eventi `AAA/authentication` del 30HP e un evento `Interface`; conserva timestamp, categorie, tag, priorità e struttura dei messaggi di accesso. Identificativo dispositivo, MAC, account e IP sono sostituiti da segnaposto fra parentesi angolari. Il messaggio tecnico è sostituito interamente. I due account tentati distinti sono entrambi anonimizzati come `<ACCOUNT>`; i timestamp dei tre fallimenti restano distinti.
+
+Il contenitore `Count/value` del JSON diagnostico PowerShell viene rimosso: la [specifica ufficiale Zyxel](https://zyxelnetworks.github.io/NebulaOpenAPI/doc/openapi.html) documenta una risposta HTTP come array. Questa normalizzazione riguarda il contenitore prodotto dal consumer PowerShell, non una paginazione dell'API. Le fixture non provano retention, completezza delle risposte, latenza di pubblicazione o disponibilità dello storico con switch offline.

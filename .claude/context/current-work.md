@@ -6,11 +6,21 @@ covers-paths:
   - bin/**
   - config/collettore/**
   - tests/**
-last-verified-commit: 2ce4cb2
+last-verified-commit: 2456511
 stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai punti 3 e 7; eventi iLO tecnici separati con ritenzione 90 giorni attiva; catena locale provata in WSL, non installata; D7 bloccato da nomina ed elenco AdS
 ---
 
 # Lavoro in corso
+
+## Poller HTTPS Nebula preparato, 12/10/2026
+
+La ripresa ha trovato `main` a `2456511`, un solo albero e nessuna modifica non committata; wrapper delle skill allineati e impronta di ripresa coerente. Il confronto rigoroso ha trovato cinque schede con ancora `2ce4cb2` superata: riconciliate per contenuto, correggendo soprattutto iLO e ritenzione già installati, e ancorate a HEAD. Il nuovo lavoro locale è il poller `bin/ads-nebula.py`, con esempio JSON, unità per istanza, diario SQLite prima dell'append, checkpoint, deduplicazione, finestre sovrapposte e arresto sui buchi o sui formati AAA ignoti. Suite Windows 100 passate e una POSIX saltata; suite Nebula Linux 35/35, tre mutazioni rilevate e ripristino SHA-256 verificato. Nessuna credenziale o sorgente è stata installata. Prove e gate in `docs/runbook-componente-3-nebula.md` e ADR-018.
+
+Il prossimo passo è misurare retention, limiti delle risposte e ritardo cloud su eventi reali prima di compilare finestra iniziale e orizzonte di recupero; poi prova con switch offline e collaudo controllato sulla VM. Le notifiche esterne e il coordinamento del diario pendente con D-1 restano da completare prima dell'esercizio. Il lavoro locale non è ancora committato.
+
+## Pendenze da mantenere aperte a ogni ripresa
+
+Il task Proxmox pianificato non è ancora collaudato con il consumer TLS aggiornato; PowerShell 7 resta da provare. I dieci endpoint guest-agent che rispondono 403 al token di sola lettura restano una lacuna opzionale da valutare senza aumentare i privilegi implicitamente. L'audit retrospettivo delle fonti delle ADR di entrambi i progetti resta aperto: le fonti del nuovo poller sono registrate, ma non chiudono quel lavoro generale. La ripresa Nebula non cambia questi quattro stati. Rimangono inoltre i gate già dichiarati su D7 NAS, custodia esterna della prova e altre sorgenti.
 
 ## Chiusura TLS dello snapshot Proxmox e ripresa Nebula, 12/10/2026
 

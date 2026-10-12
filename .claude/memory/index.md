@@ -4,6 +4,8 @@
 
 ## Stato
 
+**Poller HTTPS Nebula, 12/10/2026.** `bin/ads-nebula.py`, esempio JSON e unità systemd per istanza preparati nel lavoro locale, non installati. Diario SQLite prima dell'append, deduplicazione, checkpoint e finestre sovrapposte verificati su risposta registrata anonimizzata: cinque accessi e zero eventi tecnici nei log AdS. Suite completa Windows 100 passate e una prova POSIX saltata; suite Nebula Linux 35/35, tre mutazioni rilevate e originale ripristinato con SHA-256. Le cinque schede superate rispetto a `2ce4cb2` sono state riconciliate per contenuto e ancorate a HEAD `2456511`; lo strumento di drift per commit non comprende il nuovo lavoro non committato. Restano retention e limiti cloud, ritardi, offline reale, notifica esterna, coordinamento D-1 e collaudo sulla VM con credenziale distinta. Il task Proxmox pianificato, PowerShell 7, i dieci endpoint guest-agent con 403 e l'audit retrospettivo delle fonti ADR rimangono aperti per direttiva dell'utente. Dettaglio in runbook Nebula, ADR-018 e `current-work.md`.
+
 **TLS snapshot Proxmox, 12/10/2026.** Il consumer PowerShell del progetto rete usa ora verifica TLS per connessione con CA, nome e pin della foglia; bypass globale e `-SkipCertificateCheck` rimossi. Preflight senza HTTP/token e casi negativi passati su Windows PowerShell 5.1. Primo dry-run fallito per corpo vuoto della GET, difetto corretto; secondo dry-run reale riuscito e snapshot valido non promosso. Dieci endpoint guest-agent rispondono 403 al token di sola lettura. Task pianificato e PowerShell 7 non collaudati; revoca non verificata. Dossier e prove in `D:/network-design/docs/dossier-sicurezza-mcp-proxmox.md` §10; roadmap ISO-41 e timeline propagate. La raccolta Syslog Proxmox sul collettore resta collaudata separatamente. Prossimo passo del progetto: poller HTTPS Nebula dagli eventi AAA già dimostrati via OpenAPI.
 
 **MCP Proxmox, esito del 09/10/2026.** I due rischi del client sono sanati nel runtime attuale: `PROXMOX_ALLOW_DANGER=false`, `PROXMOX_VERIFY_SSL=true`, CA pubblica autenticata con impronta letta dalla Shell, nome del certificato risolto in Windows, catalogo ristretto a dieci tool di lettura, `delete_instance` respinto e `list_nodes` riuscito anche dopo il cutover attivo. `claude mcp list` segnala `Connected`. SEC-025 chiuso nel progetto rete; ISO-41 resta in corso per gli altri gate. Il client PowerShell `Get-ProxmoxSnapshot.ps1` usa ancora un bypass TLS distinto; Python 3.13 rigoroso rifiuta la CA senza `keyUsage`. Evidenze e fonti in `D:/network-design/docs/evidenze-sicurezza-mcp-proxmox.md` e nel runbook Proxmox di questo progetto. La voce seguente è cronologia del preflight, non stato corrente.
@@ -58,8 +60,8 @@
 
 ```
 Branch attivo:        main
-Commit di riferimento: 2ce4cb2
-Data snapshot:        2026-10-07
+Commit di riferimento: 2456511
+Data snapshot:        2026-10-12
 Albero autorevole:    unico
 Remoto:               git@github-corp:asopranzi-intrawelt/log-collector.git (primo push di 9ee87b4 il 2026-09-30)
 Template:             E:\template-claude-developing @ ffcbdb3
@@ -69,14 +71,16 @@ Template:             E:\template-claude-developing @ ffcbdb3
 
 | Scheda | last-verified | Stato |
 |---|---|---|
-| STACK.md | 2ce4cb2 | componenti 1 e 2, Proxmox e iLO Syslog in esercizio; filtro iLO provato, non installato |
-| design-and-security.md | 2ce4cb2 | limiti UDP e attribuzione iLO, catena locale ancora senza ancora esterna |
-| deployment.md | 2ce4cb2 | iLO Syslog collaudato; filtro iLO e unità D-1 non installati; gate ambienti aperto |
-| dev-testing.md | 2ce4cb2 | quattro livelli; 15 prove renderer, D-1 in WSL e filtro iLO in Debian 13 |
-| current-work.md | 2ce4cb2 | iLO e INTRA3 collaudati; catena locale provata, non installata; D7 bloccato |
+| STACK.md | 2456511 | iLO e ritenzione tecnica in esercizio; poller Nebula preparato nel lavoro locale, non installato |
+| design-and-security.md | 2456511 | filtro iLO attivo; diario Nebula e limiti cloud espliciti; ancoraggio esterno aperto |
+| deployment.md | 2456511 | iLO e ritenzione attivi; unità Nebula e D-1 preparate; gate cloud e ambienti aperti |
+| dev-testing.md | 2456511 | Windows 100 passate e una POSIX saltata; Nebula Linux 35/35; tre mutazioni rilevate |
+| current-work.md | 2456511 | poller Nebula locale provato; quattro pendenze di ripresa aperte; D7 bloccato |
 | roadmap.md | 9ee87b4 | solo struttura |
 
 ## Punto di ripresa
+
+Stato corrente del 12/10: poller Nebula locale preparato e provato; prima del collaudo VM misurare completezza delle risposte, retention, ritardo cloud e lettura con switch offline. Configurazione operativa e chiave dedicata non presenti sul collettore. La segnalazione dei buchi è un errore esplicito nel journal, senza notifica esterna ancora collegata. Task Proxmox, PowerShell 7, guest-agent 403 e audit fonti ADR restano aperti. I paragrafi successivi sono cronologia: gli stati precedenti del filtro iLO e della ritenzione non sostituiscono la fotografia corrente.
 
 L'utente ha esteso il mandato a **tutti i nodi dell'inventario**, inclusi apparati del fornitore, telefoni, stampanti e OT (ADR-015). `docs/matrice-sorgenti-rete.md` e `data/copertura-rete-20261008.json` classificano i 57 nodi correnti; `tools/verifica-copertura-rete.py` ha verificato 57/57. Le due multifunzione hanno ora nodi individuali nella revisione 14 di `D:/network-design/data/network-topology.json`; la Kyocera Piano Terra è sulla porta 6 del 30HP, la porta Canon Piano 1 resta da attribuire. Lo snapshot Proxmox del mattino aggiunge la vista individuale di 11 VM dietro il nodo aggregato. La matrice distingue accessi AdS, eventi tecnici e nodi senza login autonomo; nessuna sorgente nuova è stata installata. La ricognizione di `D:/sviluppo-ninjaOne/telegram-notifications` ha trovato un relay di alert NinjaOne verso Telegram, non un lettore di accessi AdS: non serve sulla Debian per completare la raccolta. Il campione privato Nebula dei due switch contiene 18.753 eventi tecnici senza messaggi di login; il registro delle modifiche NCC è esportabile via GUI, ma login NCC e accessi locali restano da verificare. Fatti propagati a `D:/network-design`; ISO-30 e ISO-35 restano in corso e le copie HTML sono allineate.
 

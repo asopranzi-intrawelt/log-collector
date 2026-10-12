@@ -1,0 +1,56 @@
+[
+  {
+    "timestamp": 1791471223000,
+    "category": "AAA",
+    "devId": "<SWITCH_ID>",
+    "mac": "<SWITCH_MAC>",
+    "message": "HTTP(s) authentication failure [username: <ACCOUNT>, IP address = <CLIENT_IP>]",
+    "priority": "NO",
+    "tag": "authentication"
+  },
+  {
+    "timestamp": 1791471251000,
+    "category": "AAA",
+    "devId": "<SWITCH_ID>",
+    "mac": "<SWITCH_MAC>",
+    "message": "HTTP(s) authentication failure [username: <ACCOUNT>, IP address = <CLIENT_IP>]",
+    "priority": "NO",
+    "tag": "authentication"
+  },
+  {
+    "timestamp": 1791471257000,
+    "category": "AAA",
+    "devId": "<SWITCH_ID>",
+    "mac": "<SWITCH_MAC>",
+    "message": "HTTP(s) authentication failure [username: <ACCOUNT>, IP address = <CLIENT_IP>]",
+    "priority": "NO",
+    "tag": "authentication"
+  },
+  {
+    "timestamp": 1791471347000,
+    "category": "AAA",
+    "devId": "<SWITCH_ID>",
+    "mac": "<SWITCH_MAC>",
+    "message": "HTTP(s) user <ACCOUNT> login [IP address = <CLIENT_IP>]",
+    "priority": "IN",
+    "tag": "authentication"
+  },
+  {
+    "timestamp": 1791471989000,
+    "category": "AAA",
+    "devId": "<SWITCH_ID>",
+    "mac": "<SWITCH_MAC>",
+    "message": "HTTP(s) user <ACCOUNT> logout due to session timeout [IP address = <CLIENT_IP>]",
+    "priority": "IN",
+    "tag": "authentication"
+  },
+  {
+    "timestamp": 1791457886000,
+    "category": "Interface",
+    "devId": "<SWITCH_ID>",
+    "mac": "<SWITCH_MAC>",
+    "message": "<TECHNICAL_MESSAGE>",
+    "priority": "DE",
+    "tag": "interface"
+  }
+]

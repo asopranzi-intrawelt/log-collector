@@ -16,7 +16,7 @@ Raccogliere e verificare gli accessi amministrativi di tutte le sorgenti applica
 
 ## Priorità
 
-1. Completare le sorgenti del componente 3 secondo `docs/matrice-sorgenti-rete.md`: la OpenAPI ha restituito i cinque accessi reali del 30HP, perciò progettare e collaudare il poller HTTPS con credenziale dedicata e controllo dei buchi; proseguire con 54HP, AP e gli altri nodi applicabili. La matrice include 57 nodi, ma la maggior parte non è ancora una sorgente collaudata.
+1. Completare le sorgenti del componente 3 secondo `docs/matrice-sorgenti-rete.md`: il poller HTTPS Nebula è preparato e provato localmente su cinque accessi reali anonimizzati; misurare retention, limiti e offline cloud, collegare notifica esterna e coordinamento D-1, quindi collaudare con credenziale dedicata sulla VM; proseguire con 54HP, AP e gli altri nodi applicabili. La matrice include 57 nodi, ma la maggior parte non è ancora una sorgente collaudata.
 2. Chiudere la separazione NAS D7 quando esisteranno nomina ed elenco AdS approvato, poi collaudare il componente 5 sul collettore e completare custodia e ancoraggio della prova.
 3. Eseguire un intervento di hardening della VM con baseline, controlli negativi e verifica di accessi, aggiornamenti, backup e monitoraggio; requisiti precisi da definire sullo stato reale prima dei cambi.
 4. Progettare e collaudare una GUI web minima, raggiungibile solo dalla LAN e autenticata per l'unico sysadmin autorizzato, con tracciamento della consultazione e permessi di sola lettura sui log. Il nome dell'account e la forma di autenticazione sono ancora da decidere.

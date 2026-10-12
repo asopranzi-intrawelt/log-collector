@@ -1,0 +1,18 @@
+[Unit]
+Description=Accessi locali dello switch Nebula %i
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+TimeoutStartSec=15min
+User=ads
+Group=ads
+UMask=0027
+LoadCredential=api-key:/etc/ads/secrets/nebula/%i.key
+ExecStart=/usr/bin/python3 /opt/ads/bin/ads-nebula.py --config /etc/ads/nebula/%i.json --api-key-file %d/api-key
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ReadWritePaths=/var/lib/ads/nebula/%i /srv/ads/%i

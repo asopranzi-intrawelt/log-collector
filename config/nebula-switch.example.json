@@ -1,0 +1,13 @@
+{
+  "site_id": "<SITE_ID>",
+  "device_id": "<SWITCH_ID>",
+  "source": "<SOURCE_LABEL>",
+  "system": "<SYSTEM_LABEL>",
+  "initial_start_ms": 0,
+  "recovery_horizon_ms": 0,
+  "chunk_ms": 300000,
+  "overlap_ms": 600000,
+  "settle_ms": 60000,
+  "response_guard": 1000,
+  "max_requests": 200
+}
