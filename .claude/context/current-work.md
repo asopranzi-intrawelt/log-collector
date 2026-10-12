@@ -6,11 +6,23 @@ covers-paths:
   - bin/**
   - config/collettore/**
   - tests/**
-last-verified-commit: 98c5dbd
+last-verified-commit: 8dba118
 stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai punti 3 e 7; eventi iLO tecnici separati con ritenzione 90 giorni attiva; catena locale provata in WSL, non installata; D7 bloccato da nomina ed elenco AdS
 ---
 
 # Lavoro in corso
+
+## Tracciabilità richiesta dall'operatore, 12/10/2026
+
+Ogni singolo passo di implementazione deve essere documentabile. Registrare nel runbook del componente data, motivo, modifica, file coinvolti, metodo di verifica ed esito; includere difetti osservati e correzioni, distinguendo prove locali, misure sull'ambiente e lavoro preparato. Memoria e schede rinviano al runbook, che alimenta il progetto compilatore-documenti. Payload e identificativi restano privati. Vincolo da conservare nelle riprese successive.
+
+## Confronto delle finestre misurato, 12/10/2026
+
+L'utente ha eseguito il confronto alle 10:40:39.310815 UTC del 12/10: dieci POST riusciti. Nella finestra 14:50-15:10 UTC dell'08/10 il 30HP restituisce gli stessi cinque accessi nella risposta ampia precedente filtrata, nella richiesta unica e nei quattro segmenti, senza duplicati o differenze nei sette campi. Il 54HP restituisce zero eventi in tutte le letture: concordanza vuota, senza collaudo degli accessi. Report privato in `_notes/nebula-windows-20261012-124035900/comparison.json`, ricalcolato e coincidente. Inoltro esplicito dell'output del wrapper corretto e provato nella pipeline senza altre API. Pronto `_notes/check-nebula-boundaries.ps1`: tre POST sul primo accesso noto per misurare i due estremi, ancora non eseguiti; 30 test locali verdi e mutazioni rilevate con SHA ripristinati. Inclusività, retention massima, completezza fisica, ritardo cloud, offline e copertura AdS del 54HP restano aperti. Conservazione del campione misurata a 90,51408 ore. Misura propagata in network-design, timeline a 181 eventi e tre copie HTML ISO allineate, ISO-30 in_corso.
+
+## Prima misura reale dello storico superata, 12/10/2026
+
+L'utente ha committato la verifica in `8dba118` e lanciato il wrapper reale. I cinque accessi dell'08/10 sono ancora disponibili e identici il 12/10 alle 09:24:33.688147 UTC; età del più vecchio 90,51408 ore. Report ricalcolato dal grezzo, con 370 eventi 30HP e 586 54HP, nessun warning o duplicato esatto; nessun AAA nel 54HP. Il gate sul campione è superato, mentre retention massima, completezza, offline e copertura del 54HP restano non dimostrati. Il passo successivo confronta lo stesso periodo in una richiesta e in segmenti di cinque minuti; la risposta di 120 ore serve come terzo campione filtrato. Le pendenze elencate sotto mantengono il loro stato.
 
 ## Verifica dello storico Nebula pronta per l'operatore, 12/10/2026
 

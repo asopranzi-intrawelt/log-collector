@@ -4,7 +4,7 @@ generated-from-branch: main
 generated-date: 2026-09-30
 covers-paths:
   - tests/**
-last-verified-commit: 98c5dbd
+last-verified-commit: 8dba118
 ---
 
 # Test di sviluppo
@@ -31,7 +31,11 @@ Il 12/10 il poller Nebula ha superato 35 test specifici su Linux WSL, con file t
 
 ## Rotte e dati mockati
 
-`tests/test_nebula_history.py` aggiunge 13 prove al confronto dello storico: evento identico, variazioni dei singoli campi, riferimento senza accessi, candidato vuoto, risposta mancante, conteggio incoerente, dispositivo assente e report senza identificativi. Tutte passate il 12/10/2026; una mutazione che omette il messaggio dalla chiave fa fallire il caso `[message]`, poi il ripristino SHA-256 e il nuovo giro tornano verdi. Sono prove locali del misuratore, non una misura di retention Nebula; l'esecuzione API preparata è ancora attesa. Il wrapper PowerShell è stato soltanto analizzato dal parser.
+`tests/test_nebula_windows.py` supera dieci prove il 12/10; insieme ai tredici casi dello storico e sette degli estremi sono 30/30 senza rete. Confronta anche i tecnici, deduplica ai confini e rileva buchi, errori e mapping diversi. La mutazione che filtra soltanto AAA fa fallire il caso del tecnico perso; ripristino SHA-256 verificato. Le dieci letture reali sono riuscite: cinque accessi 30HP identici nelle tre risposte, 54HP vuoto. Il primo test del trasporto aveva misurato stdout ereditato dagli strumenti, senza la console reale. Dopo la correzione la prova cattura stdout nella pipeline PowerShell con output ereditato nullo, verifica stderr esteso e codice di uscita 7. Mutazione senza inoltro rilevata e SHA ripristinato, senza rete o token reale.
+
+`tests/test_nebula_boundaries.py` rileva estremi esclusivi, controllo mancante, record cambiato e errore HTTP. La mutazione che presume il riferimento presente nel controllo fallisce; ripristino SHA-256 e nuovo giro di 30 prove verdi. I tre POST preparati non sono ancora eseguiti: il test locale misura il verificatore, non l'inclusività API. Piano e wrapper privati sono descritti nel runbook.
+
+`tests/test_nebula_history.py` aggiunge 13 prove al confronto dello storico: evento identico, variazioni dei singoli campi, riferimento senza accessi, candidato vuoto, risposta mancante, conteggio incoerente, dispositivo assente e report senza identificativi. Tutte passate il 12/10/2026; una mutazione che omette il messaggio dalla chiave fa fallire il caso `[message]`, poi il ripristino SHA-256 e il nuovo giro tornano verdi. Sono prove locali del misuratore; la misura reale successiva ha ritrovato cinque accessi dopo 90,51408 ore, senza determinare retention massima.
 
 `tests/fixtures/parametri-completi.yaml` è un `parametri.yaml` compilato solo con indirizzi di documentazione (RFC 5737) e domini `example.com`, mai valori reali: lo richiede il controllo di anonimizzazione, che blocca il commit se un prefisso reale compare in un file pubblicabile. Il bootstrap non si prova contro un sistema vero ma nella sua modalità `--prova`, che stampa i comandi; il terzo livello verifica i file contro Debian 13 in container, e la prova sul collettore vero resta il collaudo della sezione 6 dell'handoff.
 

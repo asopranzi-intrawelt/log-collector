@@ -5,7 +5,7 @@ generated-date: 2026-09-30
 covers-paths:
   - bin/**
   - config/**
-last-verified-commit: 98c5dbd
+last-verified-commit: 8dba118
 ---
 
 # Design e sicurezza applicativa
@@ -25,6 +25,8 @@ Il poller Nebula locale usa una sola origine HTTPS, TLS verificato, nessun proxy
 Nel componente iLO versionato il client Redfish separa recupero delle pagine, trasformazione delle voci e scrittura del checkpoint. L'intero giro è esclusivo per sorgente tramite lock sul collettore Linux. Il log viene sincronizzato prima del checkpoint atomico: un arresto fra i due può duplicare una riga, identificabile da `Id` e `Count`, ma non far avanzare lo stato oltre eventi mai scritti. Un giro fallito scrive `status=error` e termina con codice non zero; il controllo di silenzio futuro dovrà leggere l'esito, non soltanto vedere se esiste un file.
 
 ## Sicurezza applicativa
+
+La prima misura reale Nebula ha ritrovato cinque accessi AAA identici dopo oltre 90 ore, senza stabilire retention massima; le dieci letture successive confermano la coerenza delle finestre sul campione 30HP, mentre il 54HP resta senza accessi noti. I verificatori di finestre ed estremi conservano payload e mapping privati e riusano TLS e origine del poller. Il wrapper passa la chiave via stdin UTF-8 e inoltra stdout esplicitamente; stderr resta privato. La prova con token finto misura passaggio fuori da argomenti e ambiente, esito nella pipeline e propagazione del codice di uscita; non isola i due processi dello stesso account. Inclusività, completezza, offline e ritardi cloud restano da misurare; nessuna chiave sulla VM.
 
 L'accesso SSH al collettore richiede una chiave personale, un indirizzo amministrativo ammesso da nftables e l'appartenenza a `ads-admin`; il login di root e l'autenticazione SSH con password sono disabilitati. `sudo` richiede la password locale dell'account personale. Il bootstrap controlla nomi e chiavi pubbliche prima di installare gli account e ricaricare SSH; ne verifica la sintassi e quella di sudoers e nftables. L'utente di servizio `ads` non ha shell di login né privilegi sudo. Il guest agent permette le sole RPC elencate in `allow-rpcs`, escludendo l'esecuzione di comandi e la gestione di file o credenziali dalla console dell'hypervisor.
 

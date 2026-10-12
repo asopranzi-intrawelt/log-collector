@@ -6,7 +6,7 @@ covers-paths:
   - bin/**
   - config/**
   - tests/**
-last-verified-commit: 98c5dbd
+last-verified-commit: 8dba118
 ---
 
 # Stack applicativo
@@ -14,6 +14,8 @@ last-verified-commit: 98c5dbd
 > Documento di recupero più importante: tracciato, perché un collega che clona deve vederlo. Popolare leggendo il codice attuale, non inventare. Affinare `covers-paths` man mano.
 
 ## Stack e runtime
+
+La verifica dello storico è versionata in `8dba118` e ha ritrovato cinque accessi dopo 90,51408 ore. Il nuovo `tools/check-nebula-windows.py` riusa client HTTPS e validatore del poller: le dieci letture reali del 12/10 coincidono nei cinque accessi del 30HP fra risposta ampia filtrata, finestra unica e segmenti; 54HP vuoto, non collaudato per AdS. `tools/check-nebula-boundaries.py` prepara tre letture sugli estremi di un accesso noto. Mapping dallo snapshot privato, token via stdin, output inoltrato esplicitamente dal wrapper e riepilogo senza identificativi. Prova degli estremi ancora attesa.
 
 Al commit `2456511` il codice copre il componente 1, il ricevente rsyslog del componente 2, l'host Proxmox come sorgente del punto 3 e il lettore Redfish iLO 5 alternativo. Remote Syslog, filtro iLO e ritenzione tecnica sono installati sul collettore, mentre Redfish e catena locale D-1 restano non installati. Il lavoro locale del 12/10 aggiunge il poller HTTPS Nebula, preparato e provato senza attivazione. Le configurazioni del collettore stanno in `config/collettore/`, quelle dell'host in `config/proxmox-host/`. Gli script Bash usano `set -euo pipefail` e si provano con test locali e container Debian; gli strumenti Python usano la libreria standard e `requests`, installato dal bootstrap come `python3-requests`. `ruff` e `pytest` controllano il Python. Le impostazioni di firewall e NAS si eseguono dalle rispettive interfacce e sono descritte nei runbook.
 
@@ -35,7 +37,7 @@ Il nuovo `ads-ilo.py` crea una sessione Redfish, percorre tutte le pagine dell'I
 
 `bin/ads-nebula.py` legge gli eventi di un solo switch dalla OpenAPI con TLS verificato e credenziale separata. Configurazione privata JSON, intervalli temporali sovrapposti e deduplicazione SHA-256 alimentano un diario SQLite prima dell'append delle righe `AdsLine`. `collect` gestisce suddivisione temporale e selezione degli accessi; `recover` completa i byte pendenti e conferma il checkpoint. Servizio e timer per istanza sono preparati, con `LoadCredential`; nessuna installazione o notifica esterna. Limiti API e gate in `docs/runbook-componente-3-nebula.md` e ADR-018.
 
-Il poller è versionato in `98c5dbd`; il lavoro successivo prepara `tools/compare-nebula-history.py`, lettore locale senza rete dei JSON diagnostici. Confronta tutti i sette campi degli accessi già noti e produce solo tempi, conteggi ed esiti, distinguendo età del campione ritrovato da retention massima e completezza non dimostrate. Il wrapper di acquisizione rimane nel livello privato e si esegue manualmente dalla postazione; collaudo reale ancora atteso.
+Il poller è versionato in `98c5dbd`; `tools/compare-nebula-history.py`, in `8dba118`, legge localmente i JSON diagnostici. Confronta tutti i sette campi degli accessi già noti e produce solo tempi, conteggi ed esiti, distinguendo età del campione ritrovato da retention massima e completezza non dimostrate. Storico e coerenza delle finestre sono misurati sul campione reale; i wrapper di acquisizione rimangono privati e manuali dalla postazione. Esercizio del poller sulla VM ancora atteso.
 
 Sul dispositivo reale iLO Advanced è stata abilitata via Remote Syslog UDP 514: due login web riusciti, un fallimento ed eventi SNTP sono arrivati sul collettore, superando i collaudi punti 3 e 7. Il lettore Redfish resta non installato. Il successivo stadio locale è in `bin/ads-nightly.sh` e `bin/ads-verify.sh`: comprime D-1, scrive manifest SHA-256 concatenati e verifica che log originari e archivi coincidano. `ads-nightly.service` e `.timer` sono preparati ma non installati. La prova in `tests/test-nightly.sh` usa dati temporanei; restano la separazione dei log non AdS e l'ancoraggio esterno TSA/WORM prima della catena definitiva.
 

@@ -5,7 +5,7 @@ generated-date: 2026-09-30
 covers-paths:
   - config/**
   - docs/handoff-sviluppo-collettore.md
-last-verified-commit: 98c5dbd
+last-verified-commit: 8dba118
 ---
 
 # Deployment
@@ -28,6 +28,8 @@ Un solo albero di lavoro, `D:/log-collector` su `main`; non è un ambiente di pr
 
 ## Comandi
 
+Il confronto storico è versionato in `8dba118`; il 12/10 ha ritrovato 5/5 accessi identici dopo 90,51408 ore. Anche i dieci POST delle finestre sono riusciti: cinque accessi 30HP identici, 54HP vuoto. Output Python inizialmente assente dalla console reale: inoltro esplicito corretto e provato senza API. Prossimo comando manuale: `_notes/check-nebula-boundaries.ps1`, tre POST read-only sul primo accesso noto del 30HP per misurare gli estremi. Token dal loader locale via stdin, mapping dallo snapshot privato e output in una cartella nuova. Nessuna installazione sulla VM.
+
 Sulla postazione di sviluppo, `python bin/ads-render.py --parametri config/parametri.yaml --sorgente config/collettore --destinazione <cartella-privata>` genera la configurazione del collettore; la stessa utility con `--sorgente config/proxmox-host` genera quella dell'host. `bin/ads-vm-command.py` stampa il comando per creare la VM e `bin/ads-pki.sh` emette i certificati sulla postazione amministrativa. `bin/ads-bootstrap.sh --prova <albero-generato> <cartella-tls> <cartella-chiavi>` mostra le azioni previste; l'esecuzione reale e ogni intervento sugli host richiedono un passo esplicito dell'utente e sono registrati nei runbook. I controlli prima dell'attivazione sono `nft -c`, `sshd -t`, `visudo -c` e `rsyslogd -N1`. Non c'è uno script di rilascio o rollback verificato nel repository; gli aggiornamenti eseguiti finora sono descritti nel runbook corrispondente.
 
 Il nuovo script `bin/ads-ilo.py` usa un'istanza per IP iLO e le unità `config/collettore/etc/systemd/system/ads-ilo@.service` e `.timer`. I file di password, CA e impronta hanno percorsi privati sulla VM; prima dell'attivazione si esegue un giro manuale e si controllano formato delle righe, checkpoint e logout. L'installazione non è automatizzata dal bootstrap attuale. Il filtro rsyslog iLO è generato dal template usando `sorgenti.ilo` del file privato ed è stato installato l'08/10 sul collettore reale dopo backup, verifica delle impronte e validazione `rsyslogd -N1`. Il test inviato dalla iLO fisica è arrivato una volta nel file tecnico e zero volte nel file AdS; i login Browser riusciti, falliti e il logout restano nel file AdS. Per il flusso tecnico è attiva la ritenzione locale di 90 giorni: file giornalieri `root:root 0640`, directory `0750`, script di scadenza e timer alle 03:00. Il dry-run e un avvio manuale del service hanno trovato zero file scaduti; il timer è `enabled` e `active`. Restano da verificare gli altri canali di accesso iLO e la capienza nel tempo. Comandi, impronte e rollback sono nel `docs/runbook-componente-4-ilo.md`.
@@ -38,6 +40,6 @@ Lo stadio locale `bin/ads-nightly.sh` legge `/srv/ads` e scrive `/var/lib/ads`; 
 
 Nebula: script, esempio JSON e unità `ads-nebula@` preparati e provati localmente, non installati. La futura configurazione privata è `/etc/ads/nebula/<SOURCE_LABEL>.json`, la chiave distinta dalla postazione è `/etc/ads/secrets/nebula/<SOURCE_LABEL>.key` (`root:root 0600`), consegnata al servizio con `LoadCredential`. Occorre predisporre stato e log `ads:ads 0750` e far coincidere etichetta `source` e nome dell'istanza. L'esempio blocca l'avvio finché mancano istante iniziale e finestra di recupero espliciti. Nessuna attivazione prima dei gate nel runbook Nebula, compresi completezza cloud, notifica esterna e interazione con D-1.
 
-Il commit manuale `98c5dbd` contiene il poller e le unità. La prima verifica reale successiva è preparata nel wrapper privato `_notes/check-nebula-retention.ps1`: dalla postazione richiama il consumer del progetto rete con 120 ore di eventi, conserva output grezzo privato e invoca il confronto locale dei cinque accessi noti. Non installa file o credenziali sulla VM. Il proprietario esegue il singolo comando e riferisce soltanto l'esito aggregato e il percorso di output, come prescritto per i comandi reali.
+Il commit manuale `98c5dbd` contiene il poller e le unità. La prima verifica reale successiva è stata eseguita il 12/10 con `_notes/check-nebula-retention.ps1`: consumer del progetto rete per 120 ore di eventi e confronto locale dei cinque accessi noti, superato. Il proprietario esegue i singoli comandi e riferisce soltanto l'esito aggregato e il percorso privato, come prescritto per i comandi reali. Nessun file o credenziale installato sulla VM.
 
 I valori di rete, sorgenti, amministratori e API sono raccolti in `config/parametri.yaml`, ignorato da git e compilato a partire da `config/parametri.example.yaml`. Gli alberi prodotti in `build/` possono contenerli e restano ignorati da git. Le credenziali dei componenti futuri appartengono a `/etc/ads/secrets/` sul collettore; i certificati TLS e le chiavi private seguono la procedura descritta nella scheda di sicurezza. `ADS_ROOT` è usata da `ads-bootstrap.sh` per indirizzare l'installazione in un albero di prova, non contiene un segreto.
