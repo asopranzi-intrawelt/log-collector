@@ -6,7 +6,7 @@ covers-paths:
   - bin/**
   - config/**
   - tests/**
-last-verified-commit: 2456511
+last-verified-commit: 98c5dbd
 ---
 
 # Stack applicativo
@@ -34,6 +34,8 @@ Il nuovo `ads-ilo.py` crea una sessione Redfish, percorre tutte le pagine dell'I
 `bin/ads-ilo-other-retain.sh` è il job separato del flusso tecnico iLO. La rotazione avviene già nel nome giornaliero prodotto da rsyslog; il job confronta la data nel nome con la finestra di 90 giorni inclusivi e scade solo i file più vecchi. `--dry-run` e `--apply` distinguono simulazione e cancellazione; `ads-ilo-other-retain.service` e `.timer` sono installati e il timer è attivo dal 08/10, con un giro manuale riuscito e zero scadenze. Questo albero usa `root:root`, separato da `/srv/ads/` e dalla sua catena D-1.
 
 `bin/ads-nebula.py` legge gli eventi di un solo switch dalla OpenAPI con TLS verificato e credenziale separata. Configurazione privata JSON, intervalli temporali sovrapposti e deduplicazione SHA-256 alimentano un diario SQLite prima dell'append delle righe `AdsLine`. `collect` gestisce suddivisione temporale e selezione degli accessi; `recover` completa i byte pendenti e conferma il checkpoint. Servizio e timer per istanza sono preparati, con `LoadCredential`; nessuna installazione o notifica esterna. Limiti API e gate in `docs/runbook-componente-3-nebula.md` e ADR-018.
+
+Il poller è versionato in `98c5dbd`; il lavoro successivo prepara `tools/compare-nebula-history.py`, lettore locale senza rete dei JSON diagnostici. Confronta tutti i sette campi degli accessi già noti e produce solo tempi, conteggi ed esiti, distinguendo età del campione ritrovato da retention massima e completezza non dimostrate. Il wrapper di acquisizione rimane nel livello privato e si esegue manualmente dalla postazione; collaudo reale ancora atteso.
 
 Sul dispositivo reale iLO Advanced è stata abilitata via Remote Syslog UDP 514: due login web riusciti, un fallimento ed eventi SNTP sono arrivati sul collettore, superando i collaudi punti 3 e 7. Il lettore Redfish resta non installato. Il successivo stadio locale è in `bin/ads-nightly.sh` e `bin/ads-verify.sh`: comprime D-1, scrive manifest SHA-256 concatenati e verifica che log originari e archivi coincidano. `ads-nightly.service` e `.timer` sono preparati ma non installati. La prova in `tests/test-nightly.sh` usa dati temporanei; restano la separazione dei log non AdS e l'ancoraggio esterno TSA/WORM prima della catena definitiva.
 

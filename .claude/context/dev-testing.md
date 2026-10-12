@@ -4,7 +4,7 @@ generated-from-branch: main
 generated-date: 2026-09-30
 covers-paths:
   - tests/**
-last-verified-commit: 2456511
+last-verified-commit: 98c5dbd
 ---
 
 # Test di sviluppo
@@ -30,6 +30,8 @@ L'08/10/2026 `tests/test_ilo_other_retain.sh` è passato in WSL Ubuntu: con data
 Il 12/10 il poller Nebula ha superato 35 test specifici su Linux WSL, con file temporanei sul filesystem Linux e permessi 0640/0600 verificati. La suite completa Windows ha superato 100 casi con una prova POSIX saltata. `tests/fixtures/nebula-switch-events.json` deriva dalla risposta reale anonimizzata: cinque accessi HTTP(s) e un evento tecnico, con provenienza dichiarata nel file Markdown accanto. Si verificano byte dei log, secondo giro, ritardi nella sovrapposizione, checkpoint, risposte sature, buchi, errori e ripresa dopo append parziale o fsync. Tre mutazioni dei controlli di deduplicazione, ripresa e TLS fanno fallire i rispettivi test; ogni ripristino ha SHA-256 verificato. La rete è sostituita da risposte registrate e adapter Requests: non si dichiara verificata la retention cloud, l'identità TLS reale Nebula o l'installazione. Tooling di prova privato sotto `_notes/`; Ruff controlla i due nuovi file. Dettaglio e gate nel runbook Nebula.
 
 ## Rotte e dati mockati
+
+`tests/test_nebula_history.py` aggiunge 13 prove al confronto dello storico: evento identico, variazioni dei singoli campi, riferimento senza accessi, candidato vuoto, risposta mancante, conteggio incoerente, dispositivo assente e report senza identificativi. Tutte passate il 12/10/2026; una mutazione che omette il messaggio dalla chiave fa fallire il caso `[message]`, poi il ripristino SHA-256 e il nuovo giro tornano verdi. Sono prove locali del misuratore, non una misura di retention Nebula; l'esecuzione API preparata è ancora attesa. Il wrapper PowerShell è stato soltanto analizzato dal parser.
 
 `tests/fixtures/parametri-completi.yaml` è un `parametri.yaml` compilato solo con indirizzi di documentazione (RFC 5737) e domini `example.com`, mai valori reali: lo richiede il controllo di anonimizzazione, che blocca il commit se un prefisso reale compare in un file pubblicabile. Il bootstrap non si prova contro un sistema vero ma nella sua modalità `--prova`, che stampa i comandi; il terzo livello verifica i file contro Debian 13 in container, e la prova sul collettore vero resta il collaudo della sezione 6 dell'handoff.
 

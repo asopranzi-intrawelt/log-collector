@@ -5,7 +5,7 @@ generated-date: 2026-09-30
 covers-paths:
   - config/**
   - docs/handoff-sviluppo-collettore.md
-last-verified-commit: 2456511
+last-verified-commit: 98c5dbd
 ---
 
 # Deployment
@@ -37,5 +37,7 @@ Lo stadio locale `bin/ads-nightly.sh` legge `/srv/ads` e scrive `/var/lib/ads`; 
 ## Variabili d'ambiente e segreti
 
 Nebula: script, esempio JSON e unità `ads-nebula@` preparati e provati localmente, non installati. La futura configurazione privata è `/etc/ads/nebula/<SOURCE_LABEL>.json`, la chiave distinta dalla postazione è `/etc/ads/secrets/nebula/<SOURCE_LABEL>.key` (`root:root 0600`), consegnata al servizio con `LoadCredential`. Occorre predisporre stato e log `ads:ads 0750` e far coincidere etichetta `source` e nome dell'istanza. L'esempio blocca l'avvio finché mancano istante iniziale e finestra di recupero espliciti. Nessuna attivazione prima dei gate nel runbook Nebula, compresi completezza cloud, notifica esterna e interazione con D-1.
+
+Il commit manuale `98c5dbd` contiene il poller e le unità. La prima verifica reale successiva è preparata nel wrapper privato `_notes/check-nebula-retention.ps1`: dalla postazione richiama il consumer del progetto rete con 120 ore di eventi, conserva output grezzo privato e invoca il confronto locale dei cinque accessi noti. Non installa file o credenziali sulla VM. Il proprietario esegue il singolo comando e riferisce soltanto l'esito aggregato e il percorso di output, come prescritto per i comandi reali.
 
 I valori di rete, sorgenti, amministratori e API sono raccolti in `config/parametri.yaml`, ignorato da git e compilato a partire da `config/parametri.example.yaml`. Gli alberi prodotti in `build/` possono contenerli e restano ignorati da git. Le credenziali dei componenti futuri appartengono a `/etc/ads/secrets/` sul collettore; i certificati TLS e le chiavi private seguono la procedura descritta nella scheda di sicurezza. `ADS_ROOT` è usata da `ads-bootstrap.sh` per indirizzare l'installazione in un albero di prova, non contiene un segreto.

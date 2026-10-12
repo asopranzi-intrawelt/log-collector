@@ -1,5 +1,15 @@
 # Work-log
 
+## 2026-10-12 - Preparata la prima misura dello storico Nebula
+
+Ripresa dopo il commit manuale `98c5dbd`: albero del collettore pulito, impronta coerente e wrapper delle skill allineati. Il progetto rete è ancora a `0847ac6`, con gli otto file della propagazione precedente non committati; preservati. Le cinque schede del collettore sono state riconciliate al commit del poller, distinguendo questa verifica dal lavoro locale nuovo.
+
+Preparati `tools/compare-nebula-history.py` e `_notes/check-nebula-retention.ps1`. Il wrapper userà il consumer esistente da PowerShell della postazione per cinque giorni di eventi e un giorno di connettività, con grezzo e output nel livello privato. La chiave non viene passata per argomenti o ambiente; il consumer la legge dalla propria fonte privata. Il confronto richiede tutti i sette campi identici dei cinque accessi AAA noti, non un numero di righe o una parola nel messaggio. Una risposta mancante fallisce; una risposta vuota valida dà zero corrispondenze. Il report contiene soltanto tempi, conteggi ed esiti. Un successo misurerà l'età del campione ritrovato, non la retention massima o la completezza dell'intervallo.
+
+Verifica locale: 13 test passati senza rete, Ruff verde e parser PowerShell senza errori; il wrapper non è stato eseguito. La mutazione che esclude `message` dalla chiave fa fallire il test dell'evento con messaggio cambiato; originale ripristinato con SHA-256 verificato e 13 prove nuovamente verdi. Nessuna chiamata API, credenziale letta o installazione. Il prossimo passo è il singolo comando reale dell'utente, poi analisi del report; task Proxmox pianificato, PowerShell 7, guest-agent 403 e audit retrospettivo delle fonti ADR restano aperti.
+
+Controlli di chiusura verdi con `chiudi-sessione.ps1 -SoloControlli`; schede senza drift rispetto ai commit, anonimizzazione senza riscontri bloccanti. Messaggio proposto «Preparata la verifica dello storico Nebula su cinque accessi noti», file di ripresa aggiornato e contenuti nuovi riletti. Nessun commit eseguito dall'agente. La preparazione è versionabile con `chiudi`; l'acquisizione reale richiede ancora il comando manuale specifico dell'utente. La guardia del wrapper impedisce una prova tardiva in cui il riferimento sia fuori dalle 120 ore richieste.
+
 ## 2026-10-12 - Poller HTTPS Nebula preparato e provato localmente
 
 Ripresa su `main` a `2456511`, un solo albero, nessuna modifica non committata e impronta coerente. Wrapper Codex allineati. Il controllo rigoroso ha trovato cinque schede superate rispetto a `2ce4cb2`, senza difetti dei percorsi; riconciliate per contenuto e ancorate a HEAD, correggendo i riferimenti a filtro iLO e ritenzione ancora descritti come non installati. Per direttiva dell'utente restano aperti task Proxmox pianificato, PowerShell 7, dieci endpoint guest-agent con 403 e audit retrospettivo delle fonti ADR.

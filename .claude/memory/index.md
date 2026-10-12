@@ -4,6 +4,8 @@
 
 ## Stato
 
+**Verifica dello storico Nebula pronta, 12/10/2026.** L'utente ha committato il poller in `98c5dbd`, albero pulito all'inizio di questo giro e impronta coerente. Le cinque schede sono state riconciliate a quel commit. Il lavoro successivo prepara `tools/compare-nebula-history.py` e un wrapper privato per rileggere 120 ore tramite il consumer della postazione: confronto esatto dei cinque accessi AAA noti, report privo di identificativi e misura dell'età del campione eventualmente ritrovato. 13 prove locali passate, omissione del messaggio rilevata dalla mutazione e ripristino SHA-256 verificato. Esecuzione reale ancora attesa dall'utente; nessuna retention o completezza nuova dimostrata. Task Proxmox, PowerShell 7, guest-agent 403 e audit fonti ADR ancora aperti. Nel progetto rete resta non committata la propagazione del giro precedente.
+
 **Poller HTTPS Nebula, 12/10/2026.** `bin/ads-nebula.py`, esempio JSON e unità systemd per istanza preparati nel lavoro locale, non installati. Diario SQLite prima dell'append, deduplicazione, checkpoint e finestre sovrapposte verificati su risposta registrata anonimizzata: cinque accessi e zero eventi tecnici nei log AdS. Suite completa Windows 100 passate e una prova POSIX saltata; suite Nebula Linux 35/35, tre mutazioni rilevate e originale ripristinato con SHA-256. Le cinque schede superate rispetto a `2ce4cb2` sono state riconciliate per contenuto e ancorate a HEAD `2456511`; lo strumento di drift per commit non comprende il nuovo lavoro non committato. Restano retention e limiti cloud, ritardi, offline reale, notifica esterna, coordinamento D-1 e collaudo sulla VM con credenziale distinta. Il task Proxmox pianificato, PowerShell 7, i dieci endpoint guest-agent con 403 e l'audit retrospettivo delle fonti ADR rimangono aperti per direttiva dell'utente. Dettaglio in runbook Nebula, ADR-018 e `current-work.md`.
 
 **TLS snapshot Proxmox, 12/10/2026.** Il consumer PowerShell del progetto rete usa ora verifica TLS per connessione con CA, nome e pin della foglia; bypass globale e `-SkipCertificateCheck` rimossi. Preflight senza HTTP/token e casi negativi passati su Windows PowerShell 5.1. Primo dry-run fallito per corpo vuoto della GET, difetto corretto; secondo dry-run reale riuscito e snapshot valido non promosso. Dieci endpoint guest-agent rispondono 403 al token di sola lettura. Task pianificato e PowerShell 7 non collaudati; revoca non verificata. Dossier e prove in `D:/network-design/docs/dossier-sicurezza-mcp-proxmox.md` §10; roadmap ISO-41 e timeline propagate. La raccolta Syslog Proxmox sul collettore resta collaudata separatamente. Prossimo passo del progetto: poller HTTPS Nebula dagli eventi AAA già dimostrati via OpenAPI.
@@ -60,7 +62,7 @@
 
 ```
 Branch attivo:        main
-Commit di riferimento: 2456511
+Commit di riferimento: 98c5dbd
 Data snapshot:        2026-10-12
 Albero autorevole:    unico
 Remoto:               git@github-corp:asopranzi-intrawelt/log-collector.git (primo push di 9ee87b4 il 2026-09-30)
@@ -71,14 +73,16 @@ Template:             E:\template-claude-developing @ ffcbdb3
 
 | Scheda | last-verified | Stato |
 |---|---|---|
-| STACK.md | 2456511 | iLO e ritenzione tecnica in esercizio; poller Nebula preparato nel lavoro locale, non installato |
-| design-and-security.md | 2456511 | filtro iLO attivo; diario Nebula e limiti cloud espliciti; ancoraggio esterno aperto |
-| deployment.md | 2456511 | iLO e ritenzione attivi; unità Nebula e D-1 preparate; gate cloud e ambienti aperti |
-| dev-testing.md | 2456511 | Windows 100 passate e una POSIX saltata; Nebula Linux 35/35; tre mutazioni rilevate |
-| current-work.md | 2456511 | poller Nebula locale provato; quattro pendenze di ripresa aperte; D7 bloccato |
+| STACK.md | 98c5dbd | poller versionato, non installato; confronto locale dello storico preparato |
+| design-and-security.md | 98c5dbd | diario Nebula e limiti cloud espliciti; ancoraggio esterno aperto |
+| deployment.md | 98c5dbd | unità Nebula non installate; wrapper privato per prima misura reale pronto |
+| dev-testing.md | 98c5dbd | prove poller già registrate; 13 nuove prove del confronto e una mutazione rilevata |
+| current-work.md | 98c5dbd | attesa del comando API manuale; quattro pendenze aperte; D7 bloccato |
 | roadmap.md | 9ee87b4 | solo struttura |
 
 ## Punto di ripresa
+
+Verifica preparata: l'utente esegue `_notes/check-nebula-retention.ps1` dalla postazione Windows e trasmette l'esito aggregato e il percorso della nuova cartella privata; l'agente confronta il nuovo JSON con i cinque accessi dell'08/10 e registra soltanto ciò che la misura dimostra. La raccolta di produzione resta non attivata. La propagazione documentale precedente di network-design è ancora non committata.
 
 Stato corrente del 12/10: poller Nebula locale preparato e provato; prima del collaudo VM misurare completezza delle risposte, retention, ritardo cloud e lettura con switch offline. Configurazione operativa e chiave dedicata non presenti sul collettore. La segnalazione dei buchi è un errore esplicito nel journal, senza notifica esterna ancora collegata. Task Proxmox, PowerShell 7, guest-agent 403 e audit fonti ADR restano aperti. I paragrafi successivi sono cronologia: gli stati precedenti del filtro iLO e della ritenzione non sostituiscono la fotografia corrente.
 

@@ -5,7 +5,7 @@ generated-date: 2026-09-30
 covers-paths:
   - bin/**
   - config/**
-last-verified-commit: 2456511
+last-verified-commit: 98c5dbd
 ---
 
 # Design e sicurezza applicativa

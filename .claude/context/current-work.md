@@ -6,11 +6,15 @@ covers-paths:
   - bin/**
   - config/collettore/**
   - tests/**
-last-verified-commit: 2456511
+last-verified-commit: 98c5dbd
 stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai punti 3 e 7; eventi iLO tecnici separati con ritenzione 90 giorni attiva; catena locale provata in WSL, non installata; D7 bloccato da nomina ed elenco AdS
 ---
 
 # Lavoro in corso
+
+## Verifica dello storico Nebula pronta per l'operatore, 12/10/2026
+
+Il proprietario ha versionato il poller in `98c5dbd`; alla ripresa `main` è pulito e l'impronta è coerente. Le cinque schede sono state riconciliate al commit del poller, già descritto nel lavoro precedente. Preparato il confronto locale di tutti i sette campi dei cinque accessi AAA dell'08/10, con 13 prove e una mutazione rilevata. Il wrapper privato richiama il consumer esistente della postazione per 120 ore, conserva gli identificativi nel solo output privato e stampa un esito aggregato. Nessuna lettura API nuova ancora eseguita. Prossimo passo dell'utente: lanciare il singolo comando del wrapper e trasmettere esito e percorso; poi l'agente leggerà il report e registrerà la misura, senza confonderla con retention massima o completezza. Le quattro pendenze elencate sotto rimangono aperte.
 
 ## Poller HTTPS Nebula preparato, 12/10/2026
 
