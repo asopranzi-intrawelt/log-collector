@@ -1,0 +1,10 @@
+[Unit]
+Description=Controllo giornaliero della ritenzione eventi iLO tecnici
+
+[Timer]
+OnCalendar=*-*-* 03:00:00
+Persistent=true
+Unit=ads-ilo-other-retain.service
+
+[Install]
+WantedBy=timers.target

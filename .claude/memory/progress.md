@@ -1,5 +1,205 @@
 # Work-log
 
+## 2026-10-12 - TLS dello snapshot Proxmox verificato nella postazione
+
+Il progetto rete ha rimosso il bypass TLS distinto dal MCP in `Get-ProxmoxSnapshot.ps1`: client .NET circoscritto alla connessione, CA autenticata, nome, validità e pin foglia nel livello privato. Il preflight Windows PowerShell 5.1 senza HTTP/token ha verificato il nodo reale; i test locali hanno respinto nome, host, porta e pin errati. Il primo dry-run reale ha trovato la conversione di `$null` in stringa vuota e il corpo indebito della GET; dopo la correzione, il secondo dry-run delle 09:36 CEST ha validato lo snapshot senza promuoverlo. Dieci endpoint opzionali guest-agent hanno risposto 403: quei dati possono mancare. Task pianificato, PowerShell 7, revoca certificato e rotazione del pin restano da collaudare/gestire. Nel progetto rete aggiornati dossier, evidenze, STACK, pendenze, memoria, timeline SVG (178 eventi) e ISO-41 con HTML di progetto, Desktop e archivio identici. Qui aggiornato il runbook del componente 3. Il prossimo sviluppo del collettore resta il poller HTTPS Nebula; nessuna chiave è stata installata sulla VM.
+
+## 2026-10-09 - Due rischi MCP Proxmox sanati e documentati
+
+La CA pubblica letta dalla Shell Proxmox è stata autenticata confrontando l'impronta SHA-256 con la copia locale. Windows risolve ora il nome del certificato tramite una voce `hosts` installata da PowerShell elevata e verificata; `PROXMOX_URL` nel `.env` privato usa quel nome, con vecchio URL salvato per rollback. Il client HTTPX usa `verify=True` e il launcher passa `SSL_CERT_FILE` solo al processo figlio. Il filtro read-only verifica i byte del pacchetto prima dell'import, espone dieci tool e respinge `delete_instance`; una prova reale del candidato ha completato `list_nodes`. Dopo il cutover guardato di `.mcp.json`, `claude mcp list` ha mostrato `Connected` e la sonda vincolata all'hash del file attivo ha ripetuto catalogo, rifiuto modifica e `list_nodes` reale. I due flag MCP ora sono `PROXMOX_ALLOW_DANGER=false` e `PROXMOX_VERIFY_SSL=true`; SEC-025 chiuso nel perimetro MCP. Restano il bypass TLS dello script PowerShell Proxmox e la compatibilità della CA senza `keyUsage` con Python 3.13. Registro audit, runbook, pendenze, ISO-41 e timeline del progetto rete aggiornati; nessun token copiato sul collettore.
+
+## 2026-10-09 - Causa MCP confermata e preflight TLS
+
+L'ispezione del pacchetto `proxmox-mcp` 0.1.0 effettivamente eseguito conferma che `safety_policy.json` manca dal wheel: con `PROXMOX_ALLOW_DANGER=false` la lista dei tool ammessi è vuota e blocca `list_nodes`. Una candidata privata con versione e moduli fissati da SHA-256 registra solo dieci tool GET; prove offline con credenziali finte confermano `list_nodes` ammesso, `delete_instance` respinto e nessun tool di modifica nel catalogo. La lettura del solo certificato TLS Proxmox senza token ha rilevato CA interna e mancata corrispondenza fra IP dell'URL API corrente e SAN del certificato; il nome DNS presente nel SAN non si risolve dalla postazione. Il PEM pubblico della CA copiato dalla Shell è incompleto di quattro caratteri Base64; chiesta la sola riga mancante. Rischi ancora aperti e configurazione attiva invariata. Aggiornato il runbook Proxmox; le fonti ufficiali Proxmox, HTTPX e del pacchetto MCP vi sono collegate.
+
+## 2026-10-09 - Gate del MCP Proxmox e rollback
+
+Provato `PROXMOX_ALLOW_DANGER=false` nel progetto rete: catalogo e connessione locale OK, `list_nodes` reale KO. Ripristinata la baseline `.mcp.json` esatta da backup; `list_nodes` sulla baseline OK. Il codice safety del pacchetto esaminato richiede una lista di tool sicuri, assente nella copia locale osservata: causa plausibile ancora da confermare. Il token `PVEAuditor` resta di sola lettura; `PROXMOX_ALLOW_DANGER=true` e `PROXMOX_VERIFY_SSL=false` sono rischi aperti. Prova, rollback, limite di `.env` per processi dello stesso account, ISO-41 e timeline propagati a `D:/network-design`; copie HTML allineate.
+
+## 2026-10-09 - Accessi switch reali nella OpenAPI Nebula
+
+`Get-NebulaConnectivityHistory.ps1` ha letto il `.env` privato da PowerShell ordinaria e prodotto il JSON grezzo solo in `_notes/`. Nella finestra di 24 ore ci sono 125 eventi 30HP e 170 54HP; i cinque `AAA/authentication` del 30HP coincidono con i tre fallimenti, il login e il logout osservati nella GUI, con account e IP nel messaggio. Prova API positiva per il campione; nessun poller o token installato sulla VM. Aggiornati runbook, matrice, studio, ADR-016, memoria, progetto rete, ISO-30 e timeline SVG. `chiudi` precedente si era fermato su quattro accenti e 28 trattini lunghi nei documenti: corretti i file, senza escludere casi veri dal gate.
+
+## 2026-10-09 - Copia storica bonificata nel progetto rete
+
+L'audit dei due valori segreti correnti in `D:/network-design` ha trovato `.env` e un backup storico del JSON Claude. Le quattro voci duplicate sono state tolte dal backup e il JSON rivalidato; la scansione ripetuta trova solo `.env`, zero file saltati. Nessuna chiave copiata sul collettore. Aggiornati runbook, timeline, ISO-41 e memoria nel progetto rete.
+
+## 2026-10-09 - Probe MCP post-cutover
+
+Il progetto rete ha riprovato il launcher MCP dopo la rimozione delle quattro chiavi da Claude: `initialize`, `tools/list` e `list_nodes` read-only riusciti sul Proxmox reale. Nessuna nuova sorgente log attivata sul collettore. Aggiornati runbook Nebula, indice, work-log e resume; ISO-41 e timeline nel progetto rete.
+
+## 2026-10-09 - Cutover M30 propagato al collettore
+
+Nel progetto rete `.mcp.json` ora avvia il launcher `.env`; `claude mcp list` e la chiamata `list_nodes` hanno funzionato. Il dry-run Nebula/Proxmox da PowerShell ordinaria ha validato entrambi gli snapshot senza promuoverli; il JSON Claude non contiene più le quattro chiavi. Prossimo gate M30: task pianificato e nuova sessione interattiva. Nessuna raccolta di accessi Nebula e nessuna chiave trasferita sulla VM. Aggiornati runbook, contesto, indice, work-log e resume in questo progetto, e timeline/ISO nel progetto rete.
+
+## 2026-10-09 - Staging M30 propagato al collettore
+
+Nel progetto rete creato `.env` privato con ACL per l'utente del task, SYSTEM e amministratori; quattro valori uguali alla vecchia fonte, non stampati. Installati loader, consumer Nebula/Proxmox, writer e launcher; i casi finti malformati vengono respinti. Il writer ha richiesto una correzione dopo una prima prova fallita, poi ha preservato ACL ristretto e valore finto aggiornato. `.mcp.json` live resta invariato; candidata e rollback preparati. Il runbook, ADR, gap, roadmap e pendenze del progetto rete sono stati aggiornati; timeline MD/SVG ora 164 eventi, ISO-41 e tre copie HTML allineate. Nessuna chiamata reale al NAS/Proxmox/Nebula eseguita in questo giro, né chiave copiata sulla VM. File scritti qui: runbook Nebula, current-work, indice, work-log e resume.
+
+## 2026-10-08 - Progetto M30 propagato alla rete
+
+Su richiesta dell'IT Manager, il disegno della custodia dei segreti locali è stato scritto nel progetto `D:/network-design` senza modificare il MCP live: ADR-031, runbook, SEC-052 (#209), M30, pendenze, integrazione collettore, regola permanente in CLAUDE.md, memoria e resume. La timeline Markdown è stata aggiunta e l'SVG rigenerato con 163 eventi; ISO-41 è rimasta in corso e le copie HTML nel progetto, sul Desktop e nell'archivio sono state verificate. Il primo tentativo di aggiornamento ISO è stato respinto dal glossario per le sigle nuove; la nota descrittiva è riuscita. Il controllo di anonimizzazione ha segnalato un intervallo orario scritto con trattino come MAC reale; la forma è stata riscritta senza cambiare la misura. File scritti qui: runbook Nebula, current-work, indice, work-log e resume. Nessun token, `.mcp.json` o consumer live è stato modificato; prova OpenAPI ancora aperta.
+
+## 2026-10-08 - Recupero del punto di custodia della chiave Nebula
+
+Alla richiesta dell'operatore, letto il codice di `Get-NebulaConnectivityHistory.ps1` e ADR-021 del progetto rete. Lo script risolve la chiave da parametro, variabile del processo o prompt SecureString; la sessione PowerShell ordinaria non contiene `NEBULA_API_KEY` e la variabile utente/macchina non è impostata. Verificata senza esporre il valore la presenza della chiave nel blocco `env` del file privato `D:/network-design/.claude/settings.local.json`. Preparata invocazione con variabile temporanea in memoria e `-ApiKey`; nessun endpoint API è stato chiamato e nessuna chiave è stata copiata in file tracciati. File scritti: runbook Nebula, current-work, work-log, indice e resume.
+
+## 2026-10-08 - Rettifica dello stato operativo Nebula e iLO
+
+Riletti runbook e schede dopo la prova dello screenshot 272. La chiusura del runbook Nebula era rimasta al passo precedente, quando la presenza dei login in NCC era da cercare; ora distingue la prova nella GUI dalla verifica ancora pendente dell'OpenAPI. La scheda `deployment.md` e il frontmatter di `current-work.md` riportavano ancora il filtro iLO come non installato o gli eventi tecnici come non separati; corretti secondo installazione, test reale e timer di ritenzione già registrati nel runbook iLO. `python tools/verifica-schede.py --rigoroso`: zero difetti e zero schede superate rispetto all'ancora; le modifiche correnti non sono ancora in commit. File scritti: runbook Nebula, schede deployment/current-work, indice, work-log e resume.
+
+## 2026-10-08 - Login switch presenti in NCC e ratio API/Syslog
+
+Screenshot 272, copia privata SHA-256 `3f53dbfaf0678e4f3712e5a6d1e0fd5e447108141cd0a9310a227c5a2fbc4ef`: cinque righe `AAA/authentication` nell'ora 16:10-17:10 CEST, di cui quattro coincidono con il System Log locale e una è logout per timeout. NCC mostra account/IP; API non ancora provata. Chiesto avvio del tool read-only già nel progetto rete, output privato e chiave immessa localmente. ADR-016 registra scelta condizionata e criteri tra API e Syslog. L'utente ha aggiunto come lavoro successivo hardening della VM e GUI web disponibile solo in LAN per il sysadmin; registrati in ADR-017 e roadmap. File scritti: runbook, matrice, decisioni, roadmap, contesto, indice, work-log e resume; integrazione rete e ISO-30 con HTML derivati aggiornate.
+
+La prima chiamata a `IsoRoadmap.py advance` con `ADR-016` nel campo evidenza è stata rifiutata dalla verifica del glossario (`Mancano le spiegazioni di: ADR-016`) prima di rigenerare la roadmap. La chiamata corretta, con il solo percorso del runbook, è riuscita e ha rigenerato HTML di progetto, Desktop e archivio. Non è stata introdotta una voce di glossario per una decisione ancora condizionata.
+
+## 2026-10-08 - Tipi Syslog Nebula e gate del collettore
+
+Screenshot 271, copia privata SHA-256 `a583532032737485b5eca2d94fc157c0d6c1cf4a93d69fc054e2ceead75fa964`: Switch log distinto da AP e Security appliance; nessun server o tipo salvato. Preflight locale: nftables consente UDP 514 dalla LAN `/19`, ma rsyslog invia nuovi mittenti non iLO al flusso AdS. Prima del site-wide Switch log serve separazione dei tecnici. Chiesto Cancel e ricerca authentication nel registro NCC dell'ultima ora; l'API resta da discriminare. File scritti: runbook, matrice, contesto, indice, work-log e resume; integrazione rete e ISO-30 con HTML derivati aggiornate.
+
+## 2026-10-08 - Campi del server Syslog NCC
+
+Screenshot 270 dopo `+ Add`, copia privata SHA-256 `22bcecf146c7b45aef59dfc34d407d5d2d8ab89412b117a16c10c97502a5707d`: Server IP e Types vuoti, Save disabilitato. Nessun cambio inviato; chiesta sola apertura del menu Types prima di decidere le famiglie di log. File scritti: runbook, matrice, contesto, indice, work-log e resume; integrazione rete e ISO-30 con HTML derivati aggiornate.
+
+## 2026-10-08 - Reporting Syslog Nebula senza server
+
+Screenshot 266 del sito NCC: `Reporting > Syslog server` vuoto, `+ Add` disponibile, `Save` disabilitato; timezone per syslog e AP traffic log OFF. Copia privata SHA-256 `5858f5d3698afb98ca1b00f4647df0d05ec19a31cc8565104ffc70dcc2a20062`. Richiesta apertura del modulo `+ Add` senza salvataggio. Gli accessi restano solo dimostrati nel buffer locale dello switch. File scritti: runbook, matrice, contesto, indice, work-log e resume; integrazione rete e ISO-30 con HTML derivati aggiornate.
+
+## 2026-10-08 - Syslog locale del 30HP spento
+
+Screenshot 264, copia privata SHA-256 `aa8e56c9bcd1326c094724a45b3532f977019c13266062a9827486875aafbd47`: `SYSTEM > Syslog Setup` OFF, categorie System/Interface/Switch/AAA/IP non selezionate, server vuoti. Nessun Apply. Fonte Zyxel documenta destinazione site-wide in NCC Reporting e invio diretto UDP 514. Richiesta quella pagina reale prima di configurare un flusso per switch e AP; categoria dei login e raccolta ancora non verificate. File scritti: runbook, matrice, contesto, indice, work-log e resume; integrazione rete e ISO-30 con HTML derivati aggiornate.
+
+## 2026-10-08 - Export completo del System Log switch
+
+`Download` da `MONITOR > System Log` senza Clear: file privato da 122.529 byte, SHA-256 `cf028a9827634e848cb740e3dd791de6f14d12f0bb989cf544633daad10e38ad`, 1.966 righe, quattro `authentication:`. Successo `admin` 14:55:47Z; fallimenti 14:54:17Z, 14:54:11Z, 14:53:43Z. Corrette le due letture sbagliate da screenshot 263. Le righe complete comprendono IP e account; tutti gli IP sono uguali, due account distinti nei fallimenti. Nessuna prova di consegna remota; chiesta `SYSTEM > Syslog Setup`. File scritti: runbook, matrice, contesto, indice, work-log e resume; integrazione rete e ISO-30 con HTML derivati aggiornate.
+
+## 2026-10-08 - Autenticazioni nel System Log locale del 30HP
+
+Screenshot 263, copia privata SHA-256 `b170c7a776720e0defb9982690c8f45ff2638e8bac40365e5bab9af49e5cd1f2`: `HTTP(s) user admin login` alle 14:55:47Z e tre `HTTP(s) authentication failure` alle 14:54:57Z, 14:54:41Z e 14:53:43Z. Il riquadro tronca account e IP; chiesto Download senza cancellare. Manuale ufficiale XGS2220: NCC invia configurazione, modifiche locali non risalgono a NCC; `SYSTEM > Syslog Setup` da leggere. Nessuna prova di trasporto degli eventi a NCC/API/collettore. File scritti: runbook, matrice, contesto, indice, work-log e resume; integrazione rete e ISO-30 con HTML derivati aggiornate.
+
+## 2026-10-08 - Dashboard locale e contatore login 30HP
+
+Screenshot 261-262 dopo `Exit` dal wizard: dashboard XGS2220-30HP in Cloud Mode, firmware V5.00(ABXO.1). Avviso di tre login falliti dall'ultimo successo, senza ora, IP o account; non attribuiti alla prova. `System Log` compare nei Quick Link ed è stato chiesto in sola lettura. L'orario mostrato è compatibile con UTC ma non ancora validato. Copie private e SHA nel runbook. File scritti: runbook, matrice, contesto, indice, work-log e resume; integrazione rete e ISO-30 con HTML derivati aggiornate.
+
+## 2026-10-08 - Wizard locale del 30HP dopo il login
+
+Screenshot 259 del `Setup Wizard` locale, copia privata SHA-256 `40c262d31c0e0eb6004b972128e53a0793a524b242294924af757999cefa1fb1`. La pagina segue il tentativo di accesso ed è compatibile con successo, ma non prova ancora la produzione di un evento nei log. Il wizard avverte che sovrascriverà la configurazione esistente; chiesto di usare `Exit`, senza `Apply & Save`, e mandare la pagina principale. ISO-30 in corso. File scritti: runbook, matrice, contesto, indice, work-log e resume; integrazione rete e roadmap ISO allineate.
+
+## 2026-10-08 - GUI locale del 30HP e credenziale NCC
+
+Screenshot 258 del login HTTPS locale: la pagina identifica il 30HP gestito da Nebula e richiede Local credentials dal sito NCC. SHA-256 `5ecc2954fbde1c22225d7bf9d4d7f7bd31a2012d46d493ffca79fc806825512c` nel livello privato. La guida NCC colloca la password in Site settings, generata alla creazione del sito. L'operatore non ricordava la credenziale; chiesto di leggerla localmente senza inviarla o modificarla, quindi un solo login. Nessuna password presunta o tentativo di accesso ancora eseguito. File scritti: runbook, matrice, contesto, indice, work-log, resume, integrazione rete e ISO-30 con HTML derivati.
+
+## 2026-10-08 - Dettaglio switch e script OpenAPI Nebula
+
+Screenshot 252-255 del 30HP Piano Terra: modello XGS2220-30HP, firmware V5.00(ABXO.1), management DHCP VLAN 1 e Live tool Remote SSH; nessuna opzione Syslog visibile nel dettaglio NCC. Copie private e SHA nel runbook. Riletto `D:/network-design/scripts/Get-NebulaConnectivityHistory.ps1`: usa GET organizzazioni/siti/dispositivi e POST connectivity/event-logs, salva JSON su richiesta; `Get-NebulaSnapshot.ps1` acquisisce inventario. Il collettore non esegue questi script e non importa i CSV della GUI. Prima di riusare il codice per AdS serve login locale discriminante. Chiesta pagina HTTPS locale senza credenziali. File scritti: runbook, matrice, contesto, indice, work-log, resume, integrazione rete e ISO-30 con HTML derivati.
+
+## 2026-10-08 - Ricerca System e CSV degli switch Nebula
+
+Screenshot 247: zero eventi System nelle 24 ore su 246 eventi totali. Screenshot 248: Range 09/09-08/10 UTC+2, 262 System su 6.533 eventi. CSV manuale reale 33.397 byte, SHA-256 `fa1799d221dd5ab9438aaf0d0cdbd79084d13712333a72484ea107f40dcdc4f5`; 262 righe dei due switch, zero malformate, Tag system 31 e switch 231, zero occorrenze di undici termini di accesso in Tag/Detail. File e schermate nel livello privato; impronte nel runbook. Non c'è ancora una prova locale controllata di login; chiesto il dettaglio di uno switch. File scritti: runbook, matrice, contesto, indice, work-log, resume, integrazione rete e ISO-30 con HTML derivati.
+
+## 2026-10-08 - Event log switch Nebula
+
+Screenshot privati 241, 242 e 243 acquisiti sul tenant reale. Event log raggiunto in `Site-wide > Monitor > Switches`; filtro default `Before` 1h e 10 eventi dei due switch, tag interface/stp, categorie Interface/Switch, nessun login nel campione. Menu Category con System, Interface, Switch, AAA, IP, Dropped. Impronte nel runbook. Richiesta ricerca System su 30 giorni; non si inferisce che AAA sia un accesso amministrativo. File scritti: runbook, contesto, indice, work-log, resume e integrazione rete con ISO-30 e HTML derivati.
+
+## 2026-10-08 - Login NCC riuscito nella vista personale
+
+Dopo Logout e un solo nuovo login, `Recent logins` mostra una nuova riga del 08/10/2026 13:35:15 UTC accanto a quella storica del 09/09; il piè di pagina indica un secondo dall'accesso. Screenshot 223 acquisito alle 16:26:29, copia privata con SHA-256 `f1ba448d0cae9bd71ae42840abba5769d2c8ed2eb11e35403f3927c72f72c358`. Questo successo è registrato nella vista personale; la prova non copre fallimenti o raccolta automatica. Chiesto l'Event log degli switch in NCC. File scritti: runbook, matrice, contesto, indice, work-log, resume e integrazione rete con ISO-30 e copie HTML.
+
+## 2026-10-08 - CSV reale del Change log Nebula
+
+L'operatore ha esportato il CSV della ricerca di settembre: 2.984 byte, SHA-256 `502ab9170431909934ba2d3162544135a5894f9121737278dd2b2ea14bce6d41`, copia privata in `_notes/evidenze/nebula-2026-10-08/`. `csv.DictReader` ha letto 15 righe e nove colonne senza errori; da 09/09/2026 08:27:49 a 10:00:29 UTC, un Admin distinto, quattro Page e sette Label, zero etichette di login/logout. Il controllo non ha stampato né versionato identificativi o valori precedente/nuovo. L'export resta manuale, senza acquisizione automatica dimostrata. File scritti: runbook, matrice, contesto, indice, work-log, resume e integrazione rete con ISO-30 e copie HTML.
+
+## 2026-10-08 - Verifiche del milestone Nebula
+
+`md-unwrap.py --check` sui cinque documenti toccati, `git diff --check` nei due progetti e `IsoRoadmap.py check --desktop` passano. `chiudi-sessione.ps1 -SoloControlli` si ferma su `fix-dashes.py`: segnala file del template, dello stesso strumento e dei suoi esempi; nessun nuovo documento Nebula è fra quelli segnalati. Il gate va classificato prima di proporre `chiudi`. La roadmap ISO di progetto, Desktop e archivio è allineata; ISO-30 resta in corso. File scritti: runbook Nebula, memoria e contesto, integrazione rete, registro ISO e HTML derivati, resume e messaggio di commit proposto nel livello privato.
+
+## 2026-10-08 - Formati Export Nebula
+
+Screenshot 212 del menu Export del Change log sul tenant reale: opzioni CSV e XML. Copia privata `_notes/evidenze/nebula-2026-10-08/screenshot_212.png`, SHA-256 `d83b79ca28ab9c9c4df07730549dcaea9083f6e4d54a13ee555e57d7a1384784`. Chiesto un campione CSV della ricerca 01-30/09; contenuto e possibilità di acquisizione automatica ancora da verificare. Nessun login NCC acquisito. File scritti: runbook Nebula, matrice, contesto, indice, work-log, resume e progetto rete con ISO-30.
+
+## 2026-10-08 - Quindici modifiche Nebula in settembre
+
+La ricerca Change log 01-30/09/2026 ha restituito 15 righe; screenshot 207 del 08/10 alle 15:58, copia privata `_notes/evidenze/nebula-2026-10-08/`, SHA-256 `2a83105e045ffb95e58ac9e642c44e492c24cd99a022dfd98cebc06670ad9172`. Le righe visibili sono modifiche di SSID, sicurezza Wi‑Fi e inventario con ora UTC/locale e account amministrativo; nessun login o logout in questo campione. Non trascritti identificativi o valori. Menu Export richiesto senza scaricare file. File scritti: runbook, matrice, indice, work-log, resume e progetto rete con ISO-30.
+
+## 2026-10-08 - Change log Nebula sul tenant reale
+
+Screenshot 205 acquisito alle 15:54, copia privata `_notes/evidenze/nebula-2026-10-08/`, SHA-256 `30d544a198da1bc4e118f77410b13882d8123b2d7127ec74ad40812e2239ca2d`. La pagina Change log è disponibile: filtro massimo 30 giorni, Export visibile, colonne ora UTC, ora sito, Admin, Site, SSID, Page, Label, Old/New value. Nel range preimpostato 01-08/10 ci sono zero modifiche; il portale indica storico dal 12/09/2024. Richiesta una ricerca di settembre 2026 per osservare un record reale. Questo è il registro delle modifiche, non una prova dei login NCC. File scritti: runbook Nebula, matrice, indice, work-log, resume e progetto rete con ISO-30.
+
+## 2026-10-08 - Recent logins Nebula dopo F5
+
+Screenshot 204 acquisito alle 15:50 dopo F5, copia privata in `_notes/evidenze/nebula-2026-10-08/`, SHA-256 `91ce7164f5b5c80f9f12b93390d794f77afbd994cd0ac18cb972caf0964b5172`. La tabella mostra ancora la riga del 09/09/2026 07:28:14Z; il piè di pagina ora dice `Last login: 15 minute ago`. Il refresh non ha aggiunto la sessione corrente alla tabella; la semantica resta da accertare. Richiesta schermata del `Change log` in sola lettura. File scritti: runbook Nebula, matrice, indice, work-log, resume e progetto rete con ISO-30.
+
+## 2026-10-08 - Primo riscontro reale di Recent logins Nebula
+
+L'operatore ha fornito `screenshot_203.png` da Screenpresso, acquisito alle 15:38. Copia privata `_notes/evidenze/nebula-2026-10-08/`, SHA-256 `0123e22fe444dd6649bd57fbca4674745250879b2c54340f475818af1654d9bc`. La GUI NCC 20.10 mostra una sola riga nella tabella IP/località/ora UTC, datata 09/09/2026 07:28:14Z, mentre il piè di pagina dice `Last login: 1 seconds ago`. Non sono visibili account per riga, esito o export. La discrepanza non viene interpretata senza refresh; richiesta F5 e nuovo screenshot. Creato il runbook Nebula con fonti, prova e criteri; la matrice è aggiornata. File scritti: runbook, matrice, indice, work-log, resume, indice documentale CLAUDE.md e progetto rete con ISO-30.
+
+## 2026-10-08 - Ricognizione delle fonti Nebula NCC
+
+La guida Zyxel NCC aggiornata descrive `More > Recent logins` come cronologia personale dell'account, con IPv4, località e ora; una risposta dello staff Zyxel distingue questa vista dal `Change log` dell'organizzazione, che registra modifiche di configurazione. Nessuna delle due fonti dimostra un export automatico centralizzato dei login di tutti gli amministratori o la presenza dei fallimenti in `Recent logins`. La matrice delle sorgenti ora distingue i due registri; richiesta all'operatore una schermata reale di `Recent logins` in sola lettura dalla cartella Screenpresso. File scritti: matrice, indice, work-log, resume e integrazione nel progetto rete con ISO-30.
+
+## 2026-10-08 - Ritenzione iLO eseguita sotto systemd
+
+Alle 15:29:04 il service di ritenzione tecnica iLO è stato avviato manualmente per il collaudo. Il journal riporta `status=ok mode=apply cutoff=2026-07-11 deleted=0 filesystem_used_pct=44`; systemd lo ha terminato senza errore e il timer resta `active`, prossimo giro 09/10 alle 03:00 CEST. La ritenzione di 90 giorni è quindi in esercizio per i file tecnici iLO; il volume a 90 giorni e l'allarme esterno sulla soglia 80% non sono verificati. File scritti: runbook, matrice, contesto, indice, work-log, resume, progetto rete e ISO-30.
+
+## 2026-10-08 - Timer di ritenzione iLO attivo
+
+L'operatore ha attivato `ads-ilo-other-retain.timer`: systemd ha creato il collegamento in `timers.target.wants`; `is-enabled` è `enabled`, `is-active` è `active`, prossima esecuzione 09/10/2026 03:00 CEST. `LAST` è vuoto, quindi il service non ha ancora eseguito un giro. Richiesta una esecuzione manuale controllata del service e lettura del journal; il dry-run precedente indicava zero file scaduti. File scritti: runbook, contesto, indice, work-log, resume, progetto rete e ISO-30.
+
+## 2026-10-08 - Ritenzione iLO installata, timer disabilitato
+
+Il comando corretto dell'operatore ha eseguito l'installatore sulla VM: `RITENZIONE_ILO_INSTALLATA_TIMER_DISABILITATO`. I tre target installati hanno le impronte previste; il dry-run reale segnala cutoff 11/07/2026 e zero file scaduti. Validazione delle unità e ricarica systemd sono passate; `systemctl is-enabled` mostra `disabled`. La pulizia automatica non è ancora in esercizio. Comando di attivazione consegnato all'operatore. File scritti: runbook, indice, work-log, resume e progetto rete con ISO-30.
+
+## 2026-10-08 - Installatore ritenzione non ancora eseguito
+
+Il primo comando copiato includeva backtick Markdown e testo della domanda: la shell remota ha restituito un errore di parsing prima dell'avvio dello script. Il secondo usava un percorso locale della chiave SSH con barre aggiuntive; OpenSSH non ha aperto la chiave e ha negato l'accesso. Nessun file di sistema è stato installato. Inviata una riga corretta con slash nel percorso Windows; in attesa dell'esito. File scritti: runbook iLO e work-log.
+
+## 2026-10-08 - File di ritenzione iLO trasferiti e verificati
+
+L'operatore ha trasferito script di ritenzione, service, timer e installatore privato nella propria home sul collettore. Le quattro impronte SHA-256 sulla VM coincidono con quelle locali documentate nel runbook e `bash -n` dell'installatore sulla VM passa. I tre target di sistema risultavano assenti al preflight; è stato consegnato il comando per l'installazione controllata, senza abilitare ancora il timer. File scritti: runbook iLO, work-log e resume; propagazione a network-design da fare insieme all'esito dell'installazione.
+
+## 2026-10-08 - Preflight della ritenzione iLO sulla VM
+
+L'operatore ha verificato `/opt/ads/bin` `root:root 0755`, `/var/log/ads-ilo-other` `root:root 0750`, i tre target script/service/timer assenti e fuso `Europe/Rome`. Le tre candidate locali hanno impronte SHA-256 registrate nel runbook. La prova WSL della soglia e la sintassi Bash dell'installatore privato sono passate. Preparato `_notes/ads-install-ilo-retain-20261008.sh` per installazione con verifica delle impronte, dry-run e timer ancora disabilitato; trasferimento alla VM richiesto all'operatore. File scritti: runbook iLO, work-log, resume e nota di propagazione nel progetto rete; ISO-30 resta in corso.
+
+## 2026-10-08 - Flussi iLO Browser e tecnico verificati sulla VM
+
+L'operatore ha letto il file AdS iLO dopo l'installazione del filtro: `Browser login failure` alle 12:16:33.783139+02:00, `Browser login` alle 12:16:38.180511+02:00 e `Browser logout` alle 12:50:13.475814+02:00. La marca UTC del test Syslog delle 12:17:07 è stata contata una volta nel file tecnico separato e zero volte nel file AdS. La prova misura i messaggi Browser osservati e quel test tecnico; non copre SSH, Redfish o console remota né garantisce assenza di perdite UDP. Il timer di ritenzione tecnica di 90 giorni non è installato. File scritti: runbook iLO, handoff, contesto, indice, work-log, resume e progetto rete con ISO-30.
+
+## 2026-10-08 - Screenshot Screenpresso e prova del flusso tecnico iLO
+
+Letto `screenshot_185.png` dalla cartella predefinita `%USERPROFILE%\Pictures\Screenpresso` e copiato soltanto nel livello privato `_notes/evidenze/ilo-2026-10-08/`, SHA-256 `A7F970E069B565C81BD695661F83A5D60E83CAE04F8E1EA1E10FE6814607278B`. La schermata conferma Remote Syslog attivo verso il collettore su UDP 514 e mostra `iLO Test Syslog has been sent.` La riga reale del test alle 12:17:07.283227+02:00 è nel file tecnico separato, con scarto 0,283227 s dall'ora UTC dichiarata; directory `root:root 0750` e file `root:root 0640`. Prova del percorso tecnico superata. Restano la verifica di un login post-cambio nel file AdS, l'assenza del test tecnico nello stesso file e l'installazione della ritenzione tecnica di 90 giorni. File scritti: runbook iLO, indice, work-log, resume e copia privata dello screenshot; aggiornamento contestuale nel progetto rete e ISO-30.
+
+## 2026-10-08 - Filtro iLO installato e multifunzione nella mappa
+
+L'operatore ha letto integralmente il file rsyslog attivo, creato un backup `root:root 0600` con SHA-256 identico alla baseline `6d2f7913d17ea68db7be5e86de03f17d3347f51ed14f6f2c0e9e0892ae688329`, trasferito la candidata privata da 4.778 byte e validato sul server con rsyslog 8.2504.0. Lo script privato `_notes/ads-install-ilo-filter-20261008.sh` ha SHA-256 identico sui due sistemi e sintassi Bash valida; il primo tentativo SSH non ha raggiunto il server per un percorso locale della chiave errato. Il secondo ha validato candidata e configurazione completa, sostituito atomicamente il file e riavviato rsyslog: `FILTRO_ILO_INSTALLATO`, hash attivo `7a43c3146006cf8f905894f0bc2dc7438597328442297b2ade44e6b3c80d7b89`; backup precedente conservato. Un rilancio accidentale è stato rifiutato dalla guardia dell'hash senza modifiche. Restano da provare sul sistema reale un evento tecnico e un accesso dopo il riavvio; il timer di ritenzione dei 90 giorni non è installato. Nel progetto rete l'utente ha chiesto di aggiungere le due multifunzione alla mappa: revisione 14, 57 nodi e 71 collegamenti. Kyocera Piano Terra collegata a sw30 porta 6 secondo la scheda fisica; Canon Piano 1 senza arco in attesa di prova della porta. `tools/verifica-copertura-rete.py` dà 57/57; `Test-TopologyDrift.py` dà 40 confronti e zero scostamenti. `D:/network-design` ha integrazione, guida mappa, scheda sicurezza, contesto e memoria aggiornati; ISO-35 e ISO-30 restano in corso, HTML progetto/Desktop/archivio riallineati. File scritti: runbook iLO, matrice e classificazione delle sorgenti, handoff, schede e memoria locali; fonte topologica, template mappa, HTML generato, documentazione, contesto, memoria e roadmap nel progetto rete.
+
+## 2026-10-08 - Campione Nebula e stampanti fuori dalla topologia
+
+Letto il file privato degli eventi di due switch Nebula: 18.753 eventi, di cui 9.641 `Interface/interface`, 9.096 `Switch/stp` e 16 `System/system`. Nessuno dei messaggi contiene `login`, `logon`, `auth`, `admin` o `ssh`; 14 contengono `config`. Questo campione non prova i login amministrativi NCC né quelli locali agli apparati. Il controllo incrociato della topologia ha trovato una lacuna: le due multifunzione già documentate in network-design, Kyocera al Piano Terra e Canon al Piano 1, non sono tra i 55 nodi. La matrice precisa che 55/55 misura il JSON corrente e aggiunge le due stampanti come asset ancora da censire. Il controllo ora stampa esplicitamente 55 nodi topologici più 2 asset fuori topologia; una prova con un nodo tolto dalla matrice ha restituito exit code 1 e identificato il nodo mancante. La scoperta è stata propagata a `D:/network-design/docs/log-collector-integrazione.md`; nessuna sorgente reale è stata configurata.
+
+## 2026-10-08 - Perimetro completo degli elementi di rete
+
+L'utente ha confermato la copertura di tutto l'inventario, comprese infrastrutture del fornitore, telefoni, stampanti e OT. La fonte `D:/network-design/data/network-topology.json` contiene 55 nodi; la nuova matrice `data/copertura-rete-20261008.json` li classifica tutti e il controllo `tools/verifica-copertura-rete.py` ha dato 55/55, senza omissioni. `docs/matrice-sorgenti-rete.md` documenta per famiglia sorgente dell'accesso, stato, prova necessaria e casi senza log autonomo; lo snapshot Proxmox del 08/10 alle 07:30 elenca 11 VM da espandere individualmente. La specifica Zyxel Nebula OpenAPI 0.1.36 documenta l'endpoint degli eventi tecnici degli switch, mentre la guida NCC documenta l'export GUI del registro delle modifiche; non è ancora provato che i login amministrativi NCC siano esportabili automaticamente. Il repository Telegram letto è un relay per alert attivi NinjaOne e non produce né raccoglie audit AdS, quindi non si copia nella VM del collettore. Nessuna configurazione live è stata modificata. File scritti: matrice, classificazione, controllo di completezza, handoff, CLAUDE.md, ADR-015, current-work, indice e work-log; propagazione a network-design in corso.
+
+## 2026-10-08 - Baseline del file rsyslog attivo
+
+L'operatore ha cercato `AdsIloOtherFile` nella configurazione reale e non ha ottenuto righe; `sha256sum` ha restituito `6d2f7913d17ea68db7be5e86de03f17d3347f51ed14f6f2c0e9e0892ae688329` per `/etc/rsyslog.d/10-ads.conf`. Il confronto con la candidata privata conferma che quella versione non è attiva. La misura è stata scritta nel runbook e nell'indice come baseline per il piano di backup e rollback. Nuovo mandato dell'utente: completare la raccolta degli accessi amministrativi dagli elementi della rete inventariati in `D:/network-design` e valutare il riuso di `D:/sviluppo-ninjaOne/telegram-notifications` su Debian. Prima di cambiare il perimetro operativo, classificare le sorgenti già verificate, quelle da progettare e le lacune dei dati reali; conservare separati log AdS e allarmi tecnici. File scritti: runbook iLO, indice, work-log; propagazione a network-design da completare.
+
+## 2026-10-08 - Candidata privata e tracciabilità delle prove WSL
+
+Il renderer ha creato 14 file sotto `_notes/ilo-policy-20261008`, ignorata da git. Il file rsyslog candidato ha SHA-256 `7A43C3146006CF8F905894F0BC2DC7438597328442297B2ADE44E6B3C80D7B89`, due marker `AdsIloOtherFile` e zero segnaposto residui; le due unità di ritenzione sono presenti. I due tentativi nel sandbox hanno fallito per permessi sullo staging; quello autorizzato è riuscito. Il runbook iLO ora registra il comando WSL, i file fittizi di confine, gli esiti di `--dry-run` e `--apply`, il rifiuto del symlink, e la prova Docker Debian 13 eseguita da Git Bash. La candidata non è stata copiata sulla VM. Il preflight è stato propagato a `D:/network-design`, ISO-30 è stato avanzato come `in_corso` e `check --desktop` ha verificato le tre copie HTML. File scritti: runbook iLO, indice, work-log, ripresa privata; nel progetto rete integrazione, memoria, ripresa privata, registro ISO e HTML derivati.
+
+## 2026-10-08 - Preflight della configurazione rsyslog sul collettore reale
+
+L'operatore ha eseguito una sola lettura via SSH sulla VM. `stat` mostra `/etc/rsyslog.d/10-ads.conf root:root 644` e riferisce che `/var/log/ads-ilo-other` non esiste; `systemctl is-active rsyslog` restituisce `active`. `df -P /var/log` indica filesystem `/dev/sda2`, 15.914.364 blocchi da 1 KiB totali, 6.493.756 usati, 8.590.400 disponibili, 44% occupato. L'assenza della directory è attesa prima dello smistamento, ma la lettura non ha ancora mostrato il contenuto della configurazione. La misura di spazio non stima il volume di 90 giorni. Il prossimo comando deve cercare il marker del filtro nel file corrente e registrare la sua impronta SHA-256, così il backup e il rollback potranno riferirsi a una versione precisa. Nessuna configurazione è stata cambiata sulla VM. File scritti: runbook iLO, current-work, indice, questo work-log e ripresa privata; propagazione a `D:/network-design` in corso.
+
+## 2026-10-08 - Ritenzione di 90 giorni per il flusso iLO tecnico
+
+L'IT Manager ha scelto 90 giorni locali per gli eventi iLO tecnici separati dagli accessi AdS, che conservano la politica distinta di 213 giorni. Preparati `bin/ads-ilo-other-retain.sh` e servizio/timer systemd alle 03:00. I file ruotano già per giorno nel nome; `--dry-run` mostra i candidati, `--apply` elimina soltanto file giornalieri più vecchi dei 90 giorni inclusivi. Il secondo flusso usa `root:root 0640` e directory `0750`; la soglia dell'80% emette solo una riga nel journal, non un allarme preso in carico. La prova WSL su dati fittizi ha conservato il file al confine e quello corrente, eliminato il giorno precedente e lasciato intatto un log AdS esterno; un symlink è stato rifiutato. La prova integrata Docker Debian 13 è passata con sette righe base e tre eventi per ciascuno dei due flussi iLO; il renderer passa 15/15. I primi tentativi pytest in sandbox non hanno eseguito test per permessi negati sui temporanei; il rerun fuori sandbox è verde. Nessun servizio è stato installato sul collettore reale.
+
+In `D:/network-design` è stato aggiunto il fatto tecnico e registrato un evento ISO-30 del 08/10 con stato `in_corso`; `IsoRoadmap.py check --desktop` conferma fonte e tre copie HTML coerenti. Nel frattempo l'utente ha eseguito `chiudi` sul lavoro documentale precedente: nuovo HEAD `2ce4cb2`, con cinque schede di contesto riallineate a quel commit. Il prossimo gate sul collettore è verificare i canali iLO non Browser e preparare backup/rollback della configurazione prima dell'installazione. File scritti: script e unità di ritenzione, prova, template e prova rsyslog, runbook iLO, studio, schede tecniche, indice, work-log, ripresa privata; nel progetto rete integrazione, sicurezza, memoria, registro ISO e HTML derivati.
+
 ## 2026-10-07 - Privilegi NAS, gap AdS e roadmap ISO riallineati
 
 Dopo `chiudi` dell'utente HEAD è `934aebd` e l'albero era pulito. Cinque schede di contesto coperte dal commit sono state confrontate con il codice e riallineate a HEAD; `roadmap.md` non ha percorsi coperti. L'IT Manager ha dichiarato che i PM hanno controllo completo sui file e accesso alla GUI amministrativa di NAS HERO e INTRA2 per condivisioni indicate, con la sottocartella amministrativa di INTRA2 attribuita a due persone. Mappatura reale nel livello privato di `D:/network-design`; nessuna ACL, gruppo QTS o account è stato letto. La possibilità di restringere l'amministrazione GUI alle sole cartelle resta da verificare. Non esistono nomina AdS individuale scritta e firmata né elenco approvato; l'IT Manager svolge operativamente quel ruolo. D7 resta bloccato e gli eventi amministrativi QTS dei PM sono candidati al perimetro AdS, distinti dalle operazioni SMB sui file.

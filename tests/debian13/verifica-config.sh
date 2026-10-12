@@ -182,7 +182,8 @@ grep -qF "Browser login failure from:" "$f" || fail "fallimento Browser assente 
 grep -qF "iLO clock has been synchronized" "$other" || fail "NTP iLO assente dal flusso distinto"
 grep -qF "Future login format" "$other" || fail "formato nuovo iLO non conservato per revisione"
 grep -qF "iLO clock has been synchronized" "$f" && fail "NTP iLO entrato nel flusso AdS"
-[ "$(stat -c "%U:%G %a" "$other")" = "root:adm 640" ] || fail "permessi del flusso distinto"
+[ "$(stat -c "%U:%G %a" "$other")" = "root:root 640" ] || fail "permessi del flusso distinto"
+[ "$(stat -c "%U:%G %a" "$(dirname "$other")")" = "root:root 750" ] || fail "permessi della directory iLO tecnica"
 ok "iLO: tre accessi nel flusso AdS, tre eventi tecnici o ignoti nel file distinto, nessuna riga persa"
 
 echo "tutte le verifiche superate"

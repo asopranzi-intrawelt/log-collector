@@ -5,7 +5,7 @@ generated-date: 2026-09-30
 covers-paths:
   - bin/**
   - config/**
-last-verified-commit: 934aebd
+last-verified-commit: 2ce4cb2
 ---
 
 # Design e sicurezza applicativa
@@ -18,7 +18,7 @@ last-verified-commit: 934aebd
 
 Sul collettore rsyslog riceve da sorgenti UDP e TLS nello stesso ruleset, aggiunge ora di ricezione e IP osservato e salva i cinque campi di `AdsLine`. L'host Proxmox filtra in origine i soli messaggi di autenticazione e li inoltra con due code su disco, una per il journal e una per l'access log di `pveproxy`. I NAS e il firewall sono configurati nelle loro interfacce; i runbook documentano l'esito di ogni sorgente.
 
-Il template rsyslog del collettore ora riceve da `ads-render.py` un confronto di IP validati per `sorgenti.ilo`; con lista vuota genera una condizione impossibile accettata da rsyslog 8.2504. Per gli IP iLO, i prefissi espliciti Browser, SSH e Remote console entrano nel flusso AdS; i restanti messaggi vanno in `/var/log/ads-ilo-other/` per revisione, senza perdita. Solo i tre prefissi Browser sono stati osservati sulla iLO fisica. La prova Debian 13 passa, ma la regola non è stata installata e la destinazione separata non ha ancora politica di rotazione e conservazione.
+Il template rsyslog del collettore ora riceve da `ads-render.py` un confronto di IP validati per `sorgenti.ilo`; con lista vuota genera una condizione impossibile accettata da rsyslog 8.2504. Per gli IP iLO, i prefissi espliciti Browser, SSH e Remote console entrano nel flusso AdS; i restanti messaggi vanno in `/var/log/ads-ilo-other/` per revisione, senza perdita. Solo i tre prefissi Browser sono stati osservati sulla iLO fisica. L'IT Manager ha scelto 90 giorni locali per il secondo flusso: file giornalieri `root:root 0640`, directory `0750` e job di scadenza separato, provato in WSL. Il nuovo controllo dei permessi e dei due flussi passa in Debian 13. La regola e il timer non sono installati; la presa in carico degli avvisi di capienza resta aperta.
 
 Nel componente iLO versionato il client Redfish separa recupero delle pagine, trasformazione delle voci e scrittura del checkpoint. L'intero giro è esclusivo per sorgente tramite lock sul collettore Linux. Il log viene sincronizzato prima del checkpoint atomico: un arresto fra i due può duplicare una riga, identificabile da `Id` e `Count`, ma non far avanzare lo stato oltre eventi mai scritti. Un giro fallito scrive `status=error` e termina con codice non zero; il controllo di silenzio futuro dovrà leggere l'esito, non soltanto vedere se esiste un file.
 

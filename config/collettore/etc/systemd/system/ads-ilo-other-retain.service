@@ -1,0 +1,14 @@
+[Unit]
+Description=Scadenza degli eventi iLO tecnici dopo 90 giorni
+Documentation=file:/opt/ads/bin/ads-ilo-other-retain.sh
+
+[Service]
+Type=oneshot
+User=root
+Group=root
+ExecStart=/usr/bin/bash /opt/ads/bin/ads-ilo-other-retain.sh --apply
+NoNewPrivileges=true
+ProtectSystem=strict
+ReadWritePaths=/var/log/ads-ilo-other
+ProtectHome=true
+PrivateTmp=true

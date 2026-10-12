@@ -4,7 +4,7 @@ generated-from-branch: main
 generated-date: 2026-09-30
 covers-paths:
   - tests/**
-last-verified-commit: 934aebd
+last-verified-commit: 2ce4cb2
 ---
 
 # Test di sviluppo
@@ -24,6 +24,8 @@ Il 07/10/2026 `tests/test_render.py` ha superato 15 casi, inclusi IP iLO vuoti, 
 Due prove di non vacuità fatte il 2026-09-30. Togliendo da `ads-render.py` il filtro dei valori vuoti cadono 4 prove di rendering, togliendo la condizione sul tag VLAN ne cade 1; togliendo la riga `#clear` dalla configurazione di unattended-upgrades la verifica in container fallisce sull'origine non di sicurezza che Debian 13 abilita di default.
 
 Il 07/10/2026 `bash tests/test-nightly.sh` in WSL Ubuntu ha provato lo stadio locale della catena su due giorni fittizi, idempotenza, alterazione di un byte nel log D-1 e alterazione del manifest precedente: esito `OK`. Il fallimento sul byte contiene `log di origine diverso` e il ripristino torna verde. La copia mutata di `ads-verify.sh` senza il confronto archivio/log passa sul log alterato: la prova fallirebbe se quel controllo sparisse. Sono file temporanei in `/tmp`, non una prova dei permessi o del timer sul collettore reale.
+
+L'08/10/2026 `tests/test_ilo_other_retain.sh` è passato in WSL Ubuntu: con data 08/10/2026 il file del 10/07 è scaduto, quello del 11/07 rimane, `--dry-run` non cancella, `--apply` tocca soltanto l'albero iLO tecnico e un link simbolico causa errore senza cancellare la destinazione. `tests/debian13/verifica-config.sh` è passato via Docker Desktop da Git Bash: sette righe base, tre accessi iLO, tre eventi tecnici, file distinto `root:root 0640`. `tests/test_render.py` passa 15/15; due tentativi iniziali erano bloccati dai permessi della sandbox sulle directory temporanee di pytest, senza eseguire le prove, quindi è stato ripetuto fuori sandbox. Script e unità di ritenzione non sono installati sul collettore e la soglia di capienza non ha un allarme esterno.
 
 ## Rotte e dati mockati
 

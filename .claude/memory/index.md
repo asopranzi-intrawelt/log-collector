@@ -4,9 +4,61 @@
 
 ## Stato
 
+**TLS snapshot Proxmox, 12/10/2026.** Il consumer PowerShell del progetto rete usa ora verifica TLS per connessione con CA, nome e pin della foglia; bypass globale e `-SkipCertificateCheck` rimossi. Preflight senza HTTP/token e casi negativi passati su Windows PowerShell 5.1. Primo dry-run fallito per corpo vuoto della GET, difetto corretto; secondo dry-run reale riuscito e snapshot valido non promosso. Dieci endpoint guest-agent rispondono 403 al token di sola lettura. Task pianificato e PowerShell 7 non collaudati; revoca non verificata. Dossier e prove in `D:/network-design/docs/dossier-sicurezza-mcp-proxmox.md` §10; roadmap ISO-41 e timeline propagate. La raccolta Syslog Proxmox sul collettore resta collaudata separatamente. Prossimo passo del progetto: poller HTTPS Nebula dagli eventi AAA già dimostrati via OpenAPI.
+
+**MCP Proxmox, esito del 09/10/2026.** I due rischi del client sono sanati nel runtime attuale: `PROXMOX_ALLOW_DANGER=false`, `PROXMOX_VERIFY_SSL=true`, CA pubblica autenticata con impronta letta dalla Shell, nome del certificato risolto in Windows, catalogo ristretto a dieci tool di lettura, `delete_instance` respinto e `list_nodes` riuscito anche dopo il cutover attivo. `claude mcp list` segnala `Connected`. SEC-025 chiuso nel progetto rete; ISO-41 resta in corso per gli altri gate. Il client PowerShell `Get-ProxmoxSnapshot.ps1` usa ancora un bypass TLS distinto; Python 3.13 rigoroso rifiuta la CA senza `keyUsage`. Evidenze e fonti in `D:/network-design/docs/evidenze-sicurezza-mcp-proxmox.md` e nel runbook Proxmox di questo progetto. La voce seguente è cronologia del preflight, non stato corrente.
+
+**MCP Proxmox, gate di sicurezza del 09/10/2026.** Con `PROXMOX_ALLOW_DANGER=false` avvio e catalogo passano ma `list_nodes` fallisce; il ripristino della baseline è verificato e `list_nodes` torna OK. La causa è ora confermata nel pacchetto 0.1.0 effettivamente avviato: manca `safety_policy.json`, quindi la lista sicura è vuota. Candidata privata e prova offline: dieci tool GET, modifica assente, `list_nodes` ammesso e `delete_instance` bloccato. Preflight TLS senza token: CA interna, URL IP non presente nei SAN del certificato e nome DNS presente ma non risolto; PEM pubblico copiato dalla Shell incompleto, chiesta la riga da correggere. Configurazione attiva invariata: `PROXMOX_ALLOW_DANGER=true` e `PROXMOX_VERIFY_SSL=false` restano aperti; nessuna credenziale è sulla VM. Dettaglio e fonti in `docs/runbook-componente-3-proxmox.md`; ISO-41 e timeline del progetto rete da aggiornare per questo nuovo preflight.
+
+**Nebula OpenAPI, 09/10/2026.** Lettura reale di 24 ore riuscita dalla postazione con chiave letta da `.env`: 125 eventi 30HP, 170 eventi 54HP, cinque `AAA/authentication` del 30HP corrispondenti ai tre fallimenti, al login e al logout già osservati in GUI, con account e IP nei messaggi. Il canale API è dimostrato per questo campione, ma il collettore non lo interroga ancora. ADR-016 orienta il prossimo sviluppo verso un poller HTTPS; conservazione dello storico, paginazione, offline e allarme sui buchi restano da provare. `chiudi` del 09/10 si era fermato sui controlli tipografici: corrette quattro forme accentate e 28 trattini lunghi nei documenti del lavoro in corso; commit ancora manuale.
+
+**M30, copia storica bonificata il 09/10/2026.** Nel progetto rete la scansione dei due valori segreti correnti ora trova soltanto `.env`, dopo la rimozione delle quattro voci da un backup storico. Nessuna chiave sul collettore; task pianificato e sessione Claude interattiva ancora da osservare.
+
+**M30 post-cutover, 09/10/2026.** Probe stdio reale riuscito su inizializzazione, catalogo strumenti MCP e `list_nodes` anche dopo il taglio dei quattro valori dal JSON Claude. Task Windows e sessione Claude interattiva ancora da osservare.
+
+**M30 dopo il cutover nel progetto rete, 09/10/2026.** `.env` è la fonte delle quattro chiavi locali; MCP connesso, `list_nodes` reale e dry-run delle due fonti riusciti; JSON Claude ripulito dai quattro valori. Rimangono il task pianificato con la nuova fonte e la nuova sessione Claude interattiva. Nessuna chiave sul collettore e nessuna ingestione Nebula nuova; ISO-41 e SEC-052 in corso nel progetto rete.
+
+**Staging M30 nel progetto rete, 09/10/2026.** Nuovo `.env` privato con ACL ristretto e quattro valori confrontati senza esposizione; loader e consumer locali in uso, writer e launcher collaudati su dati finti. MCP live e JSON locale precedenti invariati. Prove reali Proxmox/Nebula e cutover pendenti. Timeline 164 eventi, ISO-41 e tre HTML allineati.
+
+**Custodia chiavi del progetto rete, 08/10/2026.** M30 è progettato in `D:/network-design` (ADR-031, SEC-052, runbook e timeline MD/SVG); ISO-41 e le tre copie HTML sono allineate. `.mcp.json` e la fonte privata corrente non sono stati migrati. Il collettore non chiama ancora le API Nebula; un eventuale servizio sulla VM avrà una credenziale propria.
+
+**Chiave Nebula per la prova API, 08/10/2026.** Presente nel blocco `env` privato di `D:/network-design/.claude/settings.local.json`; la PowerShell ordinaria non la riceve automaticamente. Preparato passaggio in memoria tramite `-ApiKey`, senza mostrare il valore. JSON OpenAPI di collaudo ancora atteso.
+
+**Allineamento documentale, 08/10/2026.** Il runbook Nebula ora indica correttamente che i cinque eventi sono visibili nella GUI NCC e che resta da provare l'OpenAPI; la scheda deployment riporta il filtro iLO e il timer dei 90 giorni come installati e collaudati sul server reale. `verifica-schede.py --rigoroso` non rileva schede superate rispetto ai commit; il lavoro corrente non è ancora committato.
+
+**NCC conferma i login locali, 08/10/2026.** Screenshot 272: cinque righe `AAA/authentication` sul 30HP, quattro coincidenti con il System Log locale e un logout successivo. Chiesta chiamata API reale tramite tool già esistente; il canale primario è ancora da scegliere secondo ADR-016. L'utente ha aggiunto hardening VM e GUI web LAN per il solo sysadmin come fasi successive (ADR-017).
+
+**Tipi Syslog e gate del collettore, 08/10/2026.** Screenshot 271: `Switch log` selezionabile separatamente; nulla salvato. UDP 514 LAN consentito, ma rsyslog corrente mescolerebbe i tecnici switch in `/srv/ads/`. Serve filtro prima dell'invio. Chiesta ricerca login locale in Event log NCC/possibile API; ISO-30 in corso.
+
+**Modulo Syslog NCC, 08/10/2026.** Screenshot 270: `+ Add` apre Server IP e Types vuoti, Save disabilitato; chiesto menu Types in sola lettura. Nessuna configurazione applicata, ISO-30 in corso.
+
+**Reporting NCC, 08/10/2026.** Screenshot 266: nessun server Syslog del sito, `Save` disabilitato. Chiesto modulo `+ Add` in sola lettura; nessun invio diretto al collettore attualmente configurato. ISO-30 in corso.
+
+**Syslog switch e Nebula, 08/10/2026.** Screenshot 264: Syslog locale del 30HP OFF, cinque categorie disattivate, nessun server. Richiesta in sola lettura la sezione Reporting del sito NCC, che può configurare l'invio diretto degli apparati. Gli accessi sono nel log locale, non ancora sul collettore; ISO-30 in corso.
+
+**Export System Log switch, 08/10/2026.** 1.966 righe locali, quattro autenticazioni HTTPS complete con ora UTC, account, IP ed esito: un successo, tre fallimenti. I due orari letti inizialmente dallo screenshot erano errati e sono corretti nel runbook. Chiesta Syslog Setup in sola lettura; nessuna raccolta remota ancora dimostrata. ISO-30 in corso.
+
+**Login nel System Log locale, 08/10/2026.** Screenshot 263: un successo HTTPS `admin` e tre fallimenti con ora UTC nel buffer dello switch. Righe tronche; chiesto Download. Nessun trasporto a NCC/API o collettore ancora verificato; ISO-30 in corso.
+
+**Dashboard locale dello switch, 08/10/2026.** Screenshot 261-262: XGS2220-30HP Cloud Mode dopo `Exit` dal wizard, senza salvataggio; avviso di tre fallimenti da ultimo successo senza dettagli, `System Log` visibile e richiesto in sola lettura. Nessuna riga di login ancora verificata su collettore o API; ISO-30 in corso.
+
+**Wizard locale dello switch, 08/10/2026.** Screenshot 259 dopo il login: `Setup Wizard` avverte che sovrascriverà la configurazione. Accesso apparentemente riuscito, nessun log osservato. Chiesto `Exit` senza salvare e screenshot della pagina principale; ISO-30 in corso.
+
+**Event log switch Nebula, 08/10/2026.** Screenshot 241-243: navigazione reale al registro dei due switch, 10 eventi nell'ultima ora tutti di link/STP nel campione, categorie System/Interface/Switch/AAA/IP/Dropped. Nessun accesso amministrativo dimostrato; ricerca System su 30 giorni richiesta. Immagini private e SHA nel runbook; ISO-30 in corso.
+
+**Ricerca System switch, 08/10/2026.** Screenshot 247: zero System nelle ultime 24 ore su 246 eventi. Screenshot 248: 262 System su 6.533 eventi nel Range 09/09-08/10; CSV privato con 262 righe di due switch, zero termini di accesso in Tag/Detail. Non è una prova di login locale; chiesto dettaglio switch. ISO-30 in corso.
+
+**Dettaglio 30HP e tool API esistente, 08/10/2026.** Screenshot 252-255: firmware V5.00(ABXO.1), gestione DHCP su VLAN 1, Remote SSH live tool; Syslog non visibile in NCC. `D:/network-design/scripts/Get-NebulaConnectivityHistory.ps1` acquisisce già via OpenAPI eventi JSON dei due switch su richiesta; non è installato come job del collettore e non esporta Change log o login NCC. Chiesta pagina HTTPS locale, senza login per ora. ISO-30 in corso.
+
+**GUI locale 30HP, 08/10/2026.** Screenshot 258: login HTTPS raggiungibile, richiede password Local credentials di NCC. Nessun tentativo con credenziali presunte; lettura diretta in Site settings e login singolo richiesti. La password non va nella chat né nei file tracciati. ISO-30 in corso.
+
+**Prossima sorgente, 08/10/2026.** Nebula NCC: la guida Zyxel documenta `More > Recent logins` per il solo account corrente; il `Change log` dell'organizzazione copre le modifiche. Screenshot 203 e 204: la tabella login resta sulla sola riga del 09/09 anche dopo F5, mentre il piè di pagina passa da `Last login: 1 seconds ago` a `15 minute ago`. Dopo Logout e login controllato, screenshot 223 mostra una nuova riga del 08/10 alle 13:35:15 UTC: successo visibile nella vista personale, nessun account/esito/export per riga. Screenshot 205: Change log disponibile con Export e colonne di modifica, zero eventi nel range 01-08/10. Screenshot 207: ricerca di settembre con 15 modifiche, nessun login/logout nel campione. Screenshot 212: menu Export con CSV e XML. Il CSV reale ha 15 righe e nove colonne, zero etichette di accesso nel campione; conservato nel livello privato con SHA nel runbook. Export centrale dei login e tentativi falliti non sono dimostrati; richiesta pagina Event log switch. Dettagli in `docs/runbook-componente-3-nebula.md`.
+
+**Avanzamento del 08/10/2026.** La iLO fisica ha inviato `Send Test Syslog`: screenshot 185 di Screenpresso letto e conservato nel livello privato, riga corrispondente ricevuta nel file tecnico separato alle 12:17:07.283227+02:00. Directory e file verificati `root:root 0750` e `0640`. Nel file AdS post-cambio sono stati letti `Browser login failure`, `Browser login` e `Browser logout`; il test tecnico compare una volta nel file tecnico e zero nel file AdS. Lo smistamento dei messaggi Browser osservati e del test è collaudato. La ritenzione tecnica di 90 giorni è installata: timer `enabled`/`active`, prossimo giro 09/10 alle 03:00 CEST; avvio reale del service alle 15:29:04 con `status=ok`, cutoff 11/07/2026, zero eliminati e filesystem al 44%. Restano altri canali iLO, perdite possibili su UDP e monitoraggio effettivo degli avvisi di spazio. Dettagli in `docs/runbook-componente-4-ilo.md`.
+
 ```
 Branch attivo:        main
-Commit di riferimento: 934aebd
+Commit di riferimento: 2ce4cb2
 Data snapshot:        2026-10-07
 Albero autorevole:    unico
 Remoto:               git@github-corp:asopranzi-intrawelt/log-collector.git (primo push di 9ee87b4 il 2026-09-30)
@@ -17,14 +69,20 @@ Template:             E:\template-claude-developing @ ffcbdb3
 
 | Scheda | last-verified | Stato |
 |---|---|---|
-| STACK.md | 934aebd | componenti 1 e 2, Proxmox e iLO Syslog in esercizio; filtro iLO provato, non installato |
-| design-and-security.md | 934aebd | limiti UDP e attribuzione iLO, catena locale ancora senza ancora esterna |
-| deployment.md | 934aebd | iLO Syslog collaudato; filtro iLO e unità D-1 non installati; gate ambienti aperto |
-| dev-testing.md | 934aebd | quattro livelli; 66 pytest, 22 Bats storici, D-1 in WSL e filtro iLO in Debian 13 |
-| current-work.md | 934aebd | iLO e INTRA3 collaudati; catena locale provata, non installata; D7 bloccato |
+| STACK.md | 2ce4cb2 | componenti 1 e 2, Proxmox e iLO Syslog in esercizio; filtro iLO provato, non installato |
+| design-and-security.md | 2ce4cb2 | limiti UDP e attribuzione iLO, catena locale ancora senza ancora esterna |
+| deployment.md | 2ce4cb2 | iLO Syslog collaudato; filtro iLO e unità D-1 non installati; gate ambienti aperto |
+| dev-testing.md | 2ce4cb2 | quattro livelli; 15 prove renderer, D-1 in WSL e filtro iLO in Debian 13 |
+| current-work.md | 2ce4cb2 | iLO e INTRA3 collaudati; catena locale provata, non installata; D7 bloccato |
 | roadmap.md | 9ee87b4 | solo struttura |
 
 ## Punto di ripresa
+
+L'utente ha esteso il mandato a **tutti i nodi dell'inventario**, inclusi apparati del fornitore, telefoni, stampanti e OT (ADR-015). `docs/matrice-sorgenti-rete.md` e `data/copertura-rete-20261008.json` classificano i 57 nodi correnti; `tools/verifica-copertura-rete.py` ha verificato 57/57. Le due multifunzione hanno ora nodi individuali nella revisione 14 di `D:/network-design/data/network-topology.json`; la Kyocera Piano Terra è sulla porta 6 del 30HP, la porta Canon Piano 1 resta da attribuire. Lo snapshot Proxmox del mattino aggiunge la vista individuale di 11 VM dietro il nodo aggregato. La matrice distingue accessi AdS, eventi tecnici e nodi senza login autonomo; nessuna sorgente nuova è stata installata. La ricognizione di `D:/sviluppo-ninjaOne/telegram-notifications` ha trovato un relay di alert NinjaOne verso Telegram, non un lettore di accessi AdS: non serve sulla Debian per completare la raccolta. Il campione privato Nebula dei due switch contiene 18.753 eventi tecnici senza messaggi di login; il registro delle modifiche NCC è esportabile via GUI, ma login NCC e accessi locali restano da verificare. Fatti propagati a `D:/network-design`; ISO-30 e ISO-35 restano in corso e le copie HTML sono allineate.
+
+Il preflight reale del 08/10 ha letto `/etc/rsyslog.d/10-ads.conf` come `root:root 0644`, nessuna directory `/var/log/ads-ilo-other`, rsyslog `active` e filesystem `/dev/sda2` al 44% con 8.590.400 KiB liberi. Il secondo controllo non ha trovato `AdsIloOtherFile` nel file attivo e ne ha misurato SHA-256 `6d2f7913d17ea68db7be5e86de03f17d3347f51ed14f6f2c0e9e0892ae688329`, baseline per backup e rollback. La candidata privata locale è stata generata in 14 file, con un'impronta diversa registrata nel runbook e unità di ritenzione presenti; non è installata. Restano verifica degli accessi iLO non Browser e collaudo della candidata sulla VM. Il preflight è stato riportato anche in `D:/network-design` e in ISO-30 del 08/10; le copie HTML sono allineate.
+
+L'08/10/2026 l'IT Manager ha scelto 90 giorni locali per gli eventi iLO tecnici, distinti dai 213 giorni AdS. Sono preparati script di scadenza e unità systemd alle 03:00, ma non installati; i file giornalieri ruotano per nome, hanno permessi `root:root`, e l'occupazione dell'80% produrrà soltanto un avviso nel journal. La prova WSL ha verificato la soglia e l'isolamento dall'albero AdS; la prova Docker Debian 13 è passata con tre righe per flusso e 15 prove del renderer sono verdi. La roadmap `ISO-30` di `D:/network-design` è stata avanzata al 08/10 come `in_corso` e `check --desktop` ha confermato HTML di progetto, Desktop e archivio identici. Il commit manuale `2ce4cb2` ha versionato la documentazione NAS/ISO del giro precedente; le cinque schede sono state ancorate a quel commit. Restano verifica dei canali iLO non Browser, backup/rollback e collaudo del filtro sul collettore reale. D7 NAS è bloccato da nomina, account e approvazione dell'elenco.
 
 L'utente ha eseguito `chiudi` dopo lo smistamento iLO preparato: HEAD `934aebd`, albero pulito alla ripresa. Le cinque schede coperte dal commit sono state riconciliate con HEAD. Il 07/10/2026 l'IT Manager ha dichiarato che i PM hanno sia controllo completo sui file sia accesso alla GUI amministrativa di NAS HERO e NAS INTRA2 per condivisioni specifiche; due persone sono indicate per la sottocartella amministrativa di INTRA2. I percorsi e i nominativi reali sono nel livello privato di `D:/network-design`; le ACL, i gruppi QTS e la reale possibilità di limitare l'amministrazione GUI alle cartelle non sono verificati. Non esistono nomina AdS individuale scritta e firmata né elenco approvato: il ruolo operativo dell'IT Manager non chiude il gap. D7 resta bloccato. In `D:/network-design` ISO-30 è avanzato a `in_corso` con prove NAS/iLO e lacune esplicite; HTML di progetto, Desktop e archivio privato sono stati allineati. A.8.15 e A.8.17 hanno evidenze parziali; A.8.16 richiede monitoraggio in esercizio.
 

@@ -1,0 +1,35 @@
+{
+  "fonte": "D:/network-design/data/network-topology.json",
+  "rilevata_il": "2026-10-08",
+  "asset_documentati_fuori_topologia": [],
+  "gruppi": [
+    {
+      "stato": "ricezione_verificata",
+      "ids": ["firewall", "srv-gen10", "ilo", "nas-hero", "nas-intra", "nas-intra2", "nas-intra3"]
+    },
+    {
+      "stato": "nebula_da_collaudare",
+      "ids": ["sw54", "sw30", "ap-pt", "ap-p1", "ap-p2", "ap-esterno"]
+    },
+    {
+      "stato": "interno_da_ricognire",
+      "ids": ["pc-backup", "ollama", "ht812", "suprema", "irrigazione", "inverter", "tel-1", "tel-2", "tel-3", "tel-4", "tel-5", "vm209", "vm208", "vm207", "pg209", "mfp-pt", "mfp-p1"]
+    },
+    {
+      "stato": "fornitore_da_concordare",
+      "ids": ["antenna", "aconnic", "mikrotik", "r1000-1", "r1000-2", "s1000", "consegna-fonia", "softphone", "vps-aruba", "hosting-fastnet"]
+    },
+    {
+      "stato": "nessuna_sorgente_autonoma",
+      "ids": ["internet", "fibra", "vdsl", "iniettore", "swqnap", "ascensore", "wifi-staff", "wifi-guest", "vmbr0", "vmbr1", "vmbr2", "vmbr3"]
+    },
+    {
+      "stato": "aggregato_da_espandere",
+      "ids": ["postazioni-10g", "postazioni-lan", "vm-altre"]
+    },
+    {
+      "stato": "non_in_servizio_da_confermare",
+      "ids": ["ap-eol", "dmz-vm"]
+    }
+  ]
+}

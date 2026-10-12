@@ -5,7 +5,7 @@ generated-date: 2026-09-30
 covers-paths:
   - config/**
   - docs/handoff-sviluppo-collettore.md
-last-verified-commit: 934aebd
+last-verified-commit: 2ce4cb2
 ---
 
 # Deployment
@@ -30,9 +30,9 @@ Un solo albero di lavoro, `D:/log-collector` su `main`; non è un ambiente di pr
 
 Sulla postazione di sviluppo, `python bin/ads-render.py --parametri config/parametri.yaml --sorgente config/collettore --destinazione <cartella-privata>` genera la configurazione del collettore; la stessa utility con `--sorgente config/proxmox-host` genera quella dell'host. `bin/ads-vm-command.py` stampa il comando per creare la VM e `bin/ads-pki.sh` emette i certificati sulla postazione amministrativa. `bin/ads-bootstrap.sh --prova <albero-generato> <cartella-tls> <cartella-chiavi>` mostra le azioni previste; l'esecuzione reale e ogni intervento sugli host richiedono un passo esplicito dell'utente e sono registrati nei runbook. I controlli prima dell'attivazione sono `nft -c`, `sshd -t`, `visudo -c` e `rsyslogd -N1`. Non c'è uno script di rilascio o rollback verificato nel repository; gli aggiornamenti eseguiti finora sono descritti nel runbook corrispondente.
 
-Il nuovo script `bin/ads-ilo.py` usa un'istanza per IP iLO e le unità `config/collettore/etc/systemd/system/ads-ilo@.service` e `.timer`. I file di password, CA e impronta hanno percorsi privati sulla VM; prima dell'attivazione si esegue un giro manuale e si controllano formato delle righe, checkpoint e logout. L'installazione non è automatizzata dal bootstrap attuale. Il filtro rsyslog iLO è ora generato dal template usando `sorgenti.ilo` del file privato: la prova Debian 13 passa, ma il filtro non è installato. L'attivazione richiede una politica del flusso `/var/log/ads-ilo-other/`, un backup e una verifica di rollback, il controllo dei canali di accesso iLO e il collaudo sul collettore.
+Il nuovo script `bin/ads-ilo.py` usa un'istanza per IP iLO e le unità `config/collettore/etc/systemd/system/ads-ilo@.service` e `.timer`. I file di password, CA e impronta hanno percorsi privati sulla VM; prima dell'attivazione si esegue un giro manuale e si controllano formato delle righe, checkpoint e logout. L'installazione non è automatizzata dal bootstrap attuale. Il filtro rsyslog iLO è generato dal template usando `sorgenti.ilo` del file privato ed è stato installato l'08/10 sul collettore reale dopo backup, verifica delle impronte e validazione `rsyslogd -N1`. Il test inviato dalla iLO fisica è arrivato una volta nel file tecnico e zero volte nel file AdS; i login Browser riusciti, falliti e il logout restano nel file AdS. Per il flusso tecnico è attiva la ritenzione locale di 90 giorni: file giornalieri `root:root 0640`, directory `0750`, script di scadenza e timer alle 03:00. Il dry-run e un avvio manuale del service hanno trovato zero file scaduti; il timer è `enabled` e `active`. Restano da verificare gli altri canali di accesso iLO e la capienza nel tempo. Comandi, impronte e rollback sono nel `docs/runbook-componente-4-ilo.md`.
 
-Lo stadio locale `bin/ads-nightly.sh` legge `/srv/ads` e scrive `/var/lib/ads`; `ads-nightly.service` lo esegue come `ads` e `ads-nightly.timer` lo pianifica alle 00:15. Prima dell'installazione vanno separati gli eventi tecnici e gli accessi non AdS, quindi verificati permessi e funzionamento sulla VM reale. Gli script e le unità del componente 5 sono versionati in `a031a4c`; il filtro iLO è ancora solo nell'albero di lavoro.
+Lo stadio locale `bin/ads-nightly.sh` legge `/srv/ads` e scrive `/var/lib/ads`; `ads-nightly.service` lo esegue come `ads` e `ads-nightly.timer` lo pianifica alle 00:15. Prima dell'installazione vanno separati gli eventi tecnici e gli accessi non AdS, quindi verificati permessi e funzionamento sulla VM reale. Gli script e le unità del componente 5 sono versionati in `a031a4c`; il filtro iLO è versionato in `934aebd` e la configurazione generata è installata sul collettore dal 08/10.
 
 ## Variabili d'ambiente e segreti
 
