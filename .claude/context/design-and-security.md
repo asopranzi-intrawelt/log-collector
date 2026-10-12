@@ -5,7 +5,7 @@ generated-date: 2026-09-30
 covers-paths:
   - bin/**
   - config/**
-last-verified-commit: 8dba118
+last-verified-commit: 48be07b
 ---
 
 # Design e sicurezza applicativa
@@ -26,7 +26,11 @@ Nel componente iLO versionato il client Redfish separa recupero delle pagine, tr
 
 ## Sicurezza applicativa
 
-La prima misura reale Nebula ha ritrovato cinque accessi AAA identici dopo oltre 90 ore, senza stabilire retention massima; le dieci letture successive confermano la coerenza delle finestre sul campione 30HP, mentre il 54HP resta senza accessi noti. I verificatori di finestre ed estremi conservano payload e mapping privati e riusano TLS e origine del poller. Il wrapper passa la chiave via stdin UTF-8 e inoltra stdout esplicitamente; stderr resta privato. La prova con token finto misura passaggio fuori da argomenti e ambiente, esito nella pipeline e propagazione del codice di uscita; non isola i due processi dello stesso account. Inclusività, completezza, offline e ritardi cloud restano da misurare; nessuna chiave sulla VM.
+Il nuovo login 30HP del 12/10 è osservato nella quinta risposta API con ritardo apparente di 38,030 secondi rispetto all'ora dichiarata. Conferma umana successiva all'accesso e candidato unico coerente con account/IP noti, senza pubblicarne i valori. Screenshot, candidati e payload sono nel livello privato; il report ricalcolato coincide. Il campione non stabilisce scarto degli orologi, ritardo massimo, completezza generale o copertura 54HP: non si ridimensionano settle e overlap sulla sola misura.
+
+La prima misura reale Nebula ha ritrovato cinque accessi AAA identici dopo oltre 90 ore; una prova successiva include entrambi gli estremi per un riferimento ancora presente dopo 93,356911 ore, senza stabilire retention massima. Le finestre concordano sul campione 30HP, mentre il 54HP resta senza accessi noti. I verificatori di finestre, estremi e pubblicazione conservano grezzi e mapping privati e riusano TLS e origine del poller. Token via stdin UTF-8, stdout inoltrato e stderr privato; il trasporto non isola i processi dello stesso account. Il tempo di pubblicazione preparato è apparente: offset degli orologi e associazione del candidato all'azione dell'operatore richiedono verifica. Completezza, offline e ritardi cloud ancora aperti; nessuna chiave sulla VM.
+
+Venti risposte reali vuote con login confermato non autorizzano a dichiarare assenza dell'accesso o ritardo massimo. La rilettura diagnostica richiede il riferimento storico esatto, mantiene i candidati privati e distingue timestamp interrogato e idoneità al filtro originale. La causa resta aperta finché non si associa il record all'azione umana; nessun parametro del poller cambia per la sola FAQ sul tempo di sincronizzazione generale dei dispositivi.
 
 L'accesso SSH al collettore richiede una chiave personale, un indirizzo amministrativo ammesso da nftables e l'appartenenza a `ads-admin`; il login di root e l'autenticazione SSH con password sono disabilitati. `sudo` richiede la password locale dell'account personale. Il bootstrap controlla nomi e chiavi pubbliche prima di installare gli account e ricaricare SSH; ne verifica la sintassi e quella di sudoers e nftables. L'utente di servizio `ads` non ha shell di login né privilegi sudo. Il guest agent permette le sole RPC elencate in `allow-rpcs`, escludendo l'esecuzione di comandi e la gestione di file o credenziali dalla console dell'hypervisor.
 

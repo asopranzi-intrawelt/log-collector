@@ -6,19 +6,49 @@ covers-paths:
   - bin/**
   - config/collettore/**
   - tests/**
-last-verified-commit: 8dba118
+last-verified-commit: 48be07b
 stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai punti 3 e 7; eventi iLO tecnici separati con ritenzione 90 giorni attiva; catena locale provata in WSL, non installata; D7 bloccato da nomina ed elenco AdS
 ---
 
 # Lavoro in corso
 
+## Nuovo login 30HP osservato realmente, 12/10/2026
+
+L'utente ha eseguito il wrapper e inviato screenshot 423 e riepilogo `observed`: cinque richieste, quattro array vuoti e poi un solo login. Evento alle 17:24:38 locali, conferma umana alle 17:24:42,827975, prima risposta positiva alle 17:25:16,030664. Ritardo apparente sul timestamp del record: ultima richiesta negativa a +22,549 secondi, risposta positiva a +38,030; quest'ultima è 33,202689 secondi dopo la conferma. Target/site, candidato esatto, account/IP rispetto al login noto e report ricalcolato identico verificati senza rete. Screenshot e SHA privati; passi 38-39 nel runbook. Il nuovo campione prova la comparsa del login, senza stabilire clock offset, ritardo massimo o copertura 54HP. Il vecchio candidato resta non associato e non blocca il lavoro. Nessun cambio a settle/overlap o installazione VM.
+
+Misura propagata in network-design: integrazione, memoria, current-work, timeline e resume aggiornati; timeline SVG a 185 eventi, ISO-30 in_corso e tre viste HTML verificate allineate. Le modifiche precedenti di integrità-docs sono conservate; il loro messaggio di commit non è sovrascritto, proposta Nebula separata nel livello privato del progetto rete. Prossimo gesto dell'utente: `chiudi` nella radice del collettore dopo i controlli completi, messaggio pronto. Il lavoro successivo è la scheda del 54HP in Nebula per individuarne la GUI locale e predisporre il target del suo login. Le quattro pendenze elencate sotto e gli altri gate conservano il loro stato.
+
+## Nuovo login controllato richiesto dall'utente, 12/10/2026
+
+Il proprietario preferisce rifare un login per procedere prima. Il chiarimento dell'ora precedente resta irrisolto e non blocca il nuovo tentativo. Pronto `_notes/watch-nebula-publication-final.ps1`: pagina locale di login preparata prima dell'avvio, accesso soltanto dopo «Osservazione avviata», Invio nel terminale appena compare il pannello nel browser. `operator-confirmation.json` registra un'ora successiva all'accesso, senza inventare il secondo esatto del login. Osservazione di dieci minuti, massimo 41 POST più due diagnostici soltanto se vuota; nessun cambiamento ai parametri del poller sulla VM. Se la diagnosi trova un candidato dopo il timeout, il comando resta inconcludente per il ritardo.
+
+La preparazione lunga era già su disco prima del riavvio ma non nella memoria. Ritrovata una mutazione ancora applicata che promuoveva la diagnosi positiva a misura riuscita: prova discriminante rossa, ripristino dal backup verificato byte per byte e con SHA-256, poi 48/48 casi verdi dei quattro verificatori senza rete. Prova nativa del wrapper con chiave finta: conferma dopo ready, figlio fallito senza richiesta di login e codice 7 conservato; parser PowerShell verde. Passi 35-37 nel runbook. Nuova misura reale ancora attesa; quattro pendenze invariate.
+
+## Ripresa dopo riavvio, 12/10/2026
+
+Ricostruito il punto dai passi 32-33 già presenti nel runbook e dal diario. L'impronta delle 13:05 precede otto file modificati e due nuovi; nessun commit successivo, unico albero `main` a `48be07b`. Il report diagnostico è presente e la sua impronta SHA-256 coincide con quella registrata. Il vecchio resume e i rimandi che chiedevano ancora la rilettura sono stati aggiornati. Resta da chiarire l'ora umana del login, senza ripetere API o generare accessi per questa sola ripresa. Le quattro pendenze elencate sotto mantengono il loro stato.
+
+## Candidato ritrovato dopo la finestra originaria, 12/10/2026
+
+Rilettura reale alle 16:15:38 locali: due POST, vecchio riferimento presente, 22 eventi unici con un login e un logout. Report ricalcolato identico. Il candidato dichiara 15:12:23 locali, fuori dalle prime query terminate a 15:08:18.655 e dopo il comando finito a 15:08:25; account/IP coincidono con il login prima verificato. Nessuna misura del ritardo cloud da questi dati. L'utente aveva confermato il login durante l'osservazione: il chiarimento sull'ora reale resta irrisolto. La successiva richiesta esplicita di un nuovo login supera il precedente arresto operativo, mantenendo non associato questo candidato. Passi 32-33 e SHA nel runbook; quattro pendenze invariate.
+
+## Pubblicazione: venti risposte vuote con login confermato, 12/10/2026
+
+L'osservatore è stato eseguito dalle 15:03:25 alle 15:08:25 locali: venti array vuoti, zero candidati, nessuna misura del ritardo. Ultimo estremo interrogato 15:08:18.655. Target/site coincidono con riferimento e snapshot, modello XGS2220-30HP; report e metadati verificati localmente. Dopo chiarimento l'utente conferma anche il login locale nel browser durante il comando, non soltanto l'avvio PowerShell; ora precisa non fornita. La causa resta irrisolta. Pronto `_notes/check-nebula-publication-followup.ps1`: due POST, vecchio riferimento di controllo e finestra da due ore prima dell'avvio a ora corrente, senza nuovo login. Modalità diagnostica locale, sette nuovi casi e 45/45 complessivi senza rete; mutazione del controllo rilevata e SHA ripristinato. Non cambiare il minuto di attesa del poller da questo esito. Passi 24-29 nel runbook, rilettura reale ancora attesa.
+
 ## Tracciabilità richiesta dall'operatore, 12/10/2026
+
+Per preparare il login locale, leggere la password nel sito NCC del 30HP: `Site-wide > Configure > Site settings > Device configuration > Local credentials > Password`. Percorso riconfermato sulla guida ufficiale leggibile; fonte e passo 23 nel runbook. Nessun valore consultato dall'agente e nessun login nuovo attestato. Avviare l'osservatore prima del login di prova.
 
 Ogni singolo passo di implementazione deve essere documentabile. Registrare nel runbook del componente data, motivo, modifica, file coinvolti, metodo di verifica ed esito; includere difetti osservati e correzioni, distinguendo prove locali, misure sull'ambiente e lavoro preparato. Memoria e schede rinviano al runbook, che alimenta il progetto compilatore-documenti. Payload e identificativi restano privati. Vincolo da conservare nelle riprese successive.
 
 ## Confronto delle finestre misurato, 12/10/2026
 
-L'utente ha eseguito il confronto alle 10:40:39.310815 UTC del 12/10: dieci POST riusciti. Nella finestra 14:50-15:10 UTC dell'08/10 il 30HP restituisce gli stessi cinque accessi nella risposta ampia precedente filtrata, nella richiesta unica e nei quattro segmenti, senza duplicati o differenze nei sette campi. Il 54HP restituisce zero eventi in tutte le letture: concordanza vuota, senza collaudo degli accessi. Report privato in `_notes/nebula-windows-20261012-124035900/comparison.json`, ricalcolato e coincidente. Inoltro esplicito dell'output del wrapper corretto e provato nella pipeline senza altre API. Pronto `_notes/check-nebula-boundaries.ps1`: tre POST sul primo accesso noto per misurare i due estremi, ancora non eseguiti; 30 test locali verdi e mutazioni rilevate con SHA ripristinati. Inclusività, retention massima, completezza fisica, ritardo cloud, offline e copertura AdS del 54HP restano aperti. Conservazione del campione misurata a 90,51408 ore. Misura propagata in network-design, timeline a 181 eventi e tre copie HTML ISO allineate, ISO-30 in_corso.
+Milestone committata e pushata dall'utente in `48be07b`; HEAD e `origin/main` coincidenti. Il primo tentativo degli estremi era fermo prima dell'avvio per il percorso relativo; con percorso assoluto l'utente ha eseguito i tre POST alle 12:15:07.880462 UTC. Un record ciascuno, primo fallimento noto del 30HP identico nei sette campi, presente nel controllo e su entrambi gli estremi. Report ricalcolato identico e payload identici nei byte; quel record è ancora presente dopo 93,356911 ore, senza stabilire retention massima. Prossimo gate: comparsa cloud di un nuovo login locale 30HP. Usare percorsi assoluti per i comandi consegnati alla postazione.
+
+Pronto `_notes/watch-nebula-publication.ps1`: avvio prima del login locale, avviso in console soltanto dopo `ready.json` scritto da Python e osservazione per cinque minuti più richiesta in corso, massimo 21 POST con pausa 15 secondi. Un solo candidato nuovo è osservato; vuoto o più candidati sono inconcludenti. Tempi apparenti, associazione al login da confermare sul grezzo. Otto nuovi casi, 38/38 totali senza rete; mutazioni delle risposte vuote e dell'avviso prematuro rilevate con SHA ripristinati, Ruff e parser verdi. Nessuna API eseguita per prepararlo. Passi 13-21 in runbook; poller sulla VM e tutte le altre pendenze ancora aperti. Nuova misura propagata in network-design, timeline a 182 eventi e tre HTML ISO allineati, ISO-30 in_corso.
+
+Il confronto delle finestre alle 10:40:39.310815 UTC ha concluso dieci POST: cinque accessi 30HP identici in risposta precedente filtrata, finestra unica e quattro segmenti; 54HP vuoto, senza collaudo AdS. Report ricalcolato e coincidente, inoltro del wrapper corretto e provato senza altre API. Le tre richieste degli estremi sono poi riuscite come descritto sopra. Retention massima, completezza fisica, ritardo cloud, offline e copertura 54HP restano aperti. Misure delle finestre e degli estremi propagate in network-design, ISO-30 in_corso.
 
 ## Prima misura reale dello storico superata, 12/10/2026
 

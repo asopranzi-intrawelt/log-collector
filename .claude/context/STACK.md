@@ -6,7 +6,7 @@ covers-paths:
   - bin/**
   - config/**
   - tests/**
-last-verified-commit: 8dba118
+last-verified-commit: 48be07b
 ---
 
 # Stack applicativo
@@ -15,7 +15,11 @@ last-verified-commit: 8dba118
 
 ## Stack e runtime
 
-La verifica dello storico è versionata in `8dba118` e ha ritrovato cinque accessi dopo 90,51408 ore. Il nuovo `tools/check-nebula-windows.py` riusa client HTTPS e validatore del poller: le dieci letture reali del 12/10 coincidono nei cinque accessi del 30HP fra risposta ampia filtrata, finestra unica e segmenti; 54HP vuoto, non collaudato per AdS. `tools/check-nebula-boundaries.py` prepara tre letture sugli estremi di un accesso noto. Mapping dallo snapshot privato, token via stdin, output inoltrato esplicitamente dal wrapper e riepilogo senza identificativi. Prova degli estremi ancora attesa.
+La prova reale `--final-attempt` del 12/10 termina dopo cinque richieste: quattro array vuoti e un login 30HP. Report ricalcolato identico dai campioni; conferma umana successiva di 4,827975 secondi al timestamp del record. Prima risposta positiva a +38,030 secondi sul timestamp dichiarato, senza misura dello scarto dell'orologio. La diagnostica di timeout non è stata invocata. Misura e limiti nel runbook, nessun cambio al poller; il target del 54HP deve essere predisposto separatamente perché il wrapper seleziona dal riferimento storico 30HP.
+
+La nuova modalità `--final-attempt` di `tools/watch-nebula-publication.py` osserva fino a dieci minuti con budget 41 POST; dopo un esito vuoto aggiunge soltanto le due letture diagnostiche già disponibili. La diagnosi non promuove il timeout a misura riuscita. Il wrapper privato `_notes/watch-nebula-publication-final.ps1` conserva il trasporto via stdin e attende ready prima del login; un Invio umano dopo il pannello registra `operator-confirmation.json`. Preparazione recuperata e provata il 12/10, misura reale ancora attesa.
+
+La verifica dello storico è versionata in `8dba118`, finestre ed estremi in `48be07b`: cinque accessi concordanti e un riferimento su entrambi gli estremi dopo 93,356911 ore. Il 54HP resta senza accessi noti. `tools/watch-nebula-publication.py` osserva un login locale nuovo; il primo giro reale produce venti array vuoti con login confermato dall'operatore, quindi nessun ritardo misurato. La modalità `--observation` rilegge due ore precedenti l'avvio fino a ora corrente e un vecchio riferimento di controllo, con due POST. La rilettura reale delle 16:15:38 del 12/10 ritrova il controllo e 22 eventi unici, con un candidato login alle 15:12:23, fuori dalla prima finestra. Report ricalcolato identico; associazione all'ora umana ancora pendente. Candidati e grezzi privati, nessun identificativo nel riepilogo; nessuna installazione sulla VM.
 
 Al commit `2456511` il codice copre il componente 1, il ricevente rsyslog del componente 2, l'host Proxmox come sorgente del punto 3 e il lettore Redfish iLO 5 alternativo. Remote Syslog, filtro iLO e ritenzione tecnica sono installati sul collettore, mentre Redfish e catena locale D-1 restano non installati. Il lavoro locale del 12/10 aggiunge il poller HTTPS Nebula, preparato e provato senza attivazione. Le configurazioni del collettore stanno in `config/collettore/`, quelle dell'host in `config/proxmox-host/`. Gli script Bash usano `set -euo pipefail` e si provano con test locali e container Debian; gli strumenti Python usano la libreria standard e `requests`, installato dal bootstrap come `python3-requests`. `ruff` e `pytest` controllano il Python. Le impostazioni di firewall e NAS si eseguono dalle rispettive interfacce e sono descritte nei runbook.
 

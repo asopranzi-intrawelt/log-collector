@@ -5,7 +5,7 @@ generated-date: 2026-09-30
 covers-paths:
   - config/**
   - docs/handoff-sviluppo-collettore.md
-last-verified-commit: 8dba118
+last-verified-commit: 48be07b
 ---
 
 # Deployment
@@ -28,7 +28,11 @@ Un solo albero di lavoro, `D:/log-collector` su `main`; non è un ambiente di pr
 
 ## Comandi
 
-Il confronto storico è versionato in `8dba118`; il 12/10 ha ritrovato 5/5 accessi identici dopo 90,51408 ore. Anche i dieci POST delle finestre sono riusciti: cinque accessi 30HP identici, 54HP vuoto. Output Python inizialmente assente dalla console reale: inoltro esplicito corretto e provato senza API. Prossimo comando manuale: `_notes/check-nebula-boundaries.ps1`, tre POST read-only sul primo accesso noto del 30HP per misurare gli estremi. Token dal loader locale via stdin, mapping dallo snapshot privato e output in una cartella nuova. Nessuna installazione sulla VM.
+Il wrapper finale del 30HP è stato eseguito dalla postazione il 12/10: cinque richieste, un login osservato, conferma umana e risultato verificati; nessuna installazione VM. Il prossimo passo è individuare la GUI locale del 54HP dalla sua scheda Nebula. Il comando del 30HP descritto sotto resta documentazione della prova conclusa: non riusarlo per il secondo switch senza un mapping esplicito.
+
+Prossima prova richiesta dall'operatore: `powershell -NoProfile -ExecutionPolicy Bypass -File "D:/log-collector/_notes/watch-nebula-publication-final.ps1"` sulla postazione Windows. Preparare prima la pagina locale di login del 30HP, attendere l'avviso di osservazione effettivamente avviata, eseguire un solo accesso e premere Invio nello stesso terminale subito dopo il pannello del browser. Osservazione fino a dieci minuti più richiesta in corso; report e conferma privati, nessuna installazione sulla VM. Questo tentativo sostituisce come prossimo lavoro il chiarimento dell'ora precedente; non ne risolve retroattivamente l'ambiguità.
+
+Il confronto storico è versionato in `8dba118`, finestre ed estremi in `48be07b`, misurati sul campione 30HP. La prima osservazione di pubblicazione produce venti array vuoti con login locale confermato. Il wrapper privato `_notes/check-nebula-publication-followup.ps1` è già stato eseguito dall'operatore: due POST, controllo presente e candidato login alle 15:12:23, fuori dalla prima finestra. Report, mapping e token via stdin restano privati. Alla ripresa dopo il riavvio non serve ripetere il comando: resta da chiarire l'ora umana del login. Nessuna installazione o modifica al timer sulla VM. Il runbook distingue diagnosi, prima comparsa e ritardo massimo non misurato.
 
 Sulla postazione di sviluppo, `python bin/ads-render.py --parametri config/parametri.yaml --sorgente config/collettore --destinazione <cartella-privata>` genera la configurazione del collettore; la stessa utility con `--sorgente config/proxmox-host` genera quella dell'host. `bin/ads-vm-command.py` stampa il comando per creare la VM e `bin/ads-pki.sh` emette i certificati sulla postazione amministrativa. `bin/ads-bootstrap.sh --prova <albero-generato> <cartella-tls> <cartella-chiavi>` mostra le azioni previste; l'esecuzione reale e ogni intervento sugli host richiedono un passo esplicito dell'utente e sono registrati nei runbook. I controlli prima dell'attivazione sono `nft -c`, `sshd -t`, `visudo -c` e `rsyslogd -N1`. Non c'è uno script di rilascio o rollback verificato nel repository; gli aggiornamenti eseguiti finora sono descritti nel runbook corrispondente.
 
