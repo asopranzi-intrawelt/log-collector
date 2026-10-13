@@ -6,7 +6,7 @@ covers-paths:
   - bin/**
   - config/**
   - tests/**
-last-verified-commit: 48be07b
+last-verified-commit: 9710d4d
 ---
 
 # Stack applicativo
@@ -14,6 +14,10 @@ last-verified-commit: 48be07b
 > Documento di recupero più importante: tracciato, perché un collega che clona deve vederlo. Popolare leggendo il codice attuale, non inventare. Affinare `covers-paths` man mano.
 
 ## Stack e runtime
+
+Il target `--switch-model XGS2220-54HP` è eseguito realmente il 13/10 dalla postazione: due risposte, una vuota e una con login. Report ricalcolato identico dai payload e dagli orari, candidato esatto e mapping del secondo apparato confermati; ritardo apparente 14,769 secondi. Il riferimento tecnico non è stato interrogato nella diagnosi, perché l'osservazione è positiva. La prova dimostra quel login, non logout, fallimenti, clock offset o servizio installato sulla VM.
+
+`tools/watch-nebula-publication.py` aggiunge `--switch-model` per scegliere un modello univoco nello snapshot privato, senza dedurlo dal login storico del 30HP. `select_target` conserva il percorso precedente quando il parametro manca; con modello esplicito usa il riferimento più recente dello stesso apparato, anche tecnico. `--observation` verifica il target conservato accanto al report prima del client. Wrapper privato 54HP e piano preparati, nessuna nuova API; il controllo tecnico del 54HP non è una misura di copertura AdS.
 
 La prova reale `--final-attempt` del 12/10 termina dopo cinque richieste: quattro array vuoti e un login 30HP. Report ricalcolato identico dai campioni; conferma umana successiva di 4,827975 secondi al timestamp del record. Prima risposta positiva a +38,030 secondi sul timestamp dichiarato, senza misura dello scarto dell'orologio. La diagnostica di timeout non è stata invocata. Misura e limiti nel runbook, nessun cambio al poller; il target del 54HP deve essere predisposto separatamente perché il wrapper seleziona dal riferimento storico 30HP.
 

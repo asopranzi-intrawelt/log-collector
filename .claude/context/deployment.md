@@ -28,6 +28,10 @@ Un solo albero di lavoro, `D:/log-collector` su `main`; non è un ambiente di pr
 
 ## Comandi
 
+Il wrapper dedicato 54HP è eseguito il 13/10: login osservato nella seconda risposta e risultato verificato localmente dai grezzi, nessuna installazione VM. Il comando sotto descrive una prova conclusa, non un nuovo login da ripetere. Prossimo collaudo dopo la chiusura della milestone: logout del 54HP con criterio predisposto per quel tipo di evento; l'osservatore attuale seleziona soltanto login.
+
+Comando del nuovo collaudo 54HP: `powershell -NoProfile -ExecutionPolicy Bypass -File "D:/log-collector/_notes/watch-nebula-publication-54hp.ps1"` sulla postazione Windows. URL della GUI locale fornito dal proprietario e registrato soltanto nel livello privato. Preparare la pagina di login prima dell'avvio, entrare soltanto dopo «Osservazione avviata» e premere Invio appena compare il pannello. Modello esplicito nello snapshot, budget dieci minuti/41 POST più due diagnostici dopo timeout; controllo storico del medesimo 54HP, senza API dell'agente o installazione VM. Il risultato reale resta atteso.
+
 Il wrapper finale del 30HP è stato eseguito dalla postazione il 12/10: cinque richieste, un login osservato, conferma umana e risultato verificati; nessuna installazione VM. Il prossimo passo è individuare la GUI locale del 54HP dalla sua scheda Nebula. Il comando del 30HP descritto sotto resta documentazione della prova conclusa: non riusarlo per il secondo switch senza un mapping esplicito.
 
 Prossima prova richiesta dall'operatore: `powershell -NoProfile -ExecutionPolicy Bypass -File "D:/log-collector/_notes/watch-nebula-publication-final.ps1"` sulla postazione Windows. Preparare prima la pagina locale di login del 30HP, attendere l'avviso di osservazione effettivamente avviata, eseguire un solo accesso e premere Invio nello stesso terminale subito dopo il pannello del browser. Osservazione fino a dieci minuti più richiesta in corso; report e conferma privati, nessuna installazione sulla VM. Questo tentativo sostituisce come prossimo lavoro il chiarimento dell'ora precedente; non ne risolve retroattivamente l'ambiguità.

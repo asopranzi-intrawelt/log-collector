@@ -4,7 +4,7 @@ generated-from-branch: main
 generated-date: 2026-09-30
 covers-paths:
   - tests/**
-last-verified-commit: 48be07b
+last-verified-commit: 9710d4d
 ---
 
 # Test di sviluppo
@@ -12,6 +12,10 @@ last-verified-commit: 48be07b
 > Popolare leggendo la configurazione reale dei test. La checklist operativa locale dei test manuali vive invece in `_notes/TEST-CHECKLIST.md`, ignorata da git.
 
 ## Test runner e comandi
+
+Misura reale 54HP del 13/10: ricalcolati senza rete report e candidato dai due payload, con confronto esatto di metadati, modello/target, MAC del riferimento e conferma umana dopo ready. Un array vuoto prima dell'ora del login, poi un candidato; risposta positiva a +14,769 secondi dichiarati. Nessun limite inferiore ricavato dal primo vuoto, né clock offset o ritardo massimo. La verifica usa i dati reali ed è distinta dai 55 casi del verificatore già passati nel giro precedente, non rieseguiti per la sola documentazione.
+
+Il lavoro locale per il 54HP aggiunge sette casi: scelta esplicita del modello con controllo tecnico dello stesso dispositivo, modello assente o duplicato, riferimento mancante, CLI positiva o vuota e report dell'altro apparato respinto prima del client. Totale dei quattro verificatori 55/55 senza rete. Mutazione che ignora il modello e mutazione senza guardia sul report fanno cadere i casi discriminanti; backup e SHA-256 verificati, originale ripristinato dopo ciascuna, suite finale verde. Prova nativa del wrapper con chiave finta: parametro 54HP ricevuto dal figlio, ready prima della conferma, fallimento senza richiesta di login e codice 7. Ruff check/format e parser PowerShell verdi; misura reale 54HP ancora attesa.
 
 Misura reale del nuovo login 30HP del 12/10: cinque payload ricalcolati con gli orari registrati, confronto esatto del report e del candidato, mapping confermato nello snapshot e nel riferimento, conferma umana dopo ready e dopo il timestamp dell'evento. Screenshot 423 e SHA privati. Esito `observed`, risposta positiva a +38,030 secondi dichiarati; non clock offset o limite massimo. Il ricalcolo è una verifica dei grezzi reali senza rete, distinta dalle 48 prove precedenti del verificatore, che non sono ripetute per il solo aggiornamento documentale.
 

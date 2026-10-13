@@ -4,6 +4,12 @@
 
 ## Stato
 
+**Login 54HP osservato e verificato, 13/10/2026.** L'utente esegue il wrapper dedicato: due richieste, primo array vuoto e secondo con un login. Evento alle 09:08:27 locali, conferma umana alle 09:08:30,765602, risposta positiva alle 09:08:41,769102. Ritardo apparente sul timestamp del record 14,769 secondi; dopo la conferma passano circa 11,0035 secondi. Report e candidato ricalcolati identici dai grezzi senza rete, target/modello/MAC coerenti con 54HP e riferimento, account/IP coincidenti con il login 30HP. La prima query termina prima dell'ora dell'evento e non fornisce un campione negativo pertinente o un limite inferiore. È verificato un login riuscito del 54HP, insieme al precedente 30HP; logout e fallimento del secondo apparato restano da collaudare. Non ritardo massimo, scarto degli orologi o raccolta sulla VM. Passi 47-48 e SHA nel runbook, quattro pendenze e altri gate invariati.
+
+**Indirizzo 54HP fornito e osservatore dedicato pronto, 12/10/2026.** Il proprietario comunica l'URL della GUI locale; conservato soltanto in `_notes/nebula-54hp-env.json`, senza contattarlo dall'agente. Non serve un'altra schermata per ottenere quel dato. `tools/watch-nebula-publication.py` supporta ora `--switch-model XGS2220-54HP`, con modello univoco nello snapshot e riferimento dello stesso apparato; il controllo storico tecnico non prova un accesso AdS. Il wrapper privato `_notes/watch-nebula-publication-54hp.ps1` attende ready e registra Invio dopo il login. Sette casi aggiunti: 55/55 locali senza rete, due mutazioni rilevate e ripristino SHA-256 verificato; prova nativa del modello, conferma e codice 7, Ruff e parser verdi. Nuovo collaudo reale ancora atteso, nessuna API o installazione VM. Passi 43-46 nel runbook; quattro pendenze e altri gate invariati.
+
+**Milestone chiusa e ricognizione 54HP avviata, 12/10/2026.** L'utente conferma `chiudi`: HEAD e riferimento locale `origin/main` sono a `9710d4d`, albero pulito prima di questa annotazione e impronta delle 17:48 coerente. Il commit conserva osservatore, test e misura del login 30HP. Tre schede che coprono il nuovo test sono riconciliate a quel commit; design e deployment conservano l'ancora valida precedente, con aree di codice invariate. Nel progetto rete il 54HP è censito come «Switch piano 2 (rack)», nodo `sw54`; snapshot e topologia letti non danno il suo indirizzo di gestione. Prossimo passo: scheda reale del dispositivo in NCC e schermata per individuarne la GUI locale. Nessuna API nuova o credenziale del 54HP consultata; pendenze di ripresa e altri gate invariati.
+
 **Nuovo login Nebula osservato, 12/10/2026.** L'utente esegue il wrapper e conferma il login locale del 30HP con screenshot 423 e Invio. Evento alle 17:24:38 locali; conferma alle 17:24:42,827975, risposta positiva alle 17:25:16,030664. Cinque richieste, quattro array vuoti e poi un solo login; account/IP coincidono con il login noto, target e sito coincidono con snapshot e riferimento. Report ricalcolato identico dai grezzi senza rete. Ritardo apparente rispetto al timestamp del record: ultima richiesta negativa a +22,549 s, risposta positiva a +38,030 s; dopo la conferma umana trascorrono 33,202689 s. È una misura del singolo tentativo, senza scarto dell'orologio o ritardo massimo dimostrati. Il vecchio candidato delle 15:12 resta non associato. Passi 38-39 e SHA nel runbook. Prossimo lavoro: ricognizione della GUI locale del 54HP prima del suo login controllato. Nessuna installazione VM; quattro pendenze e altri gate invariati.
 
 **Nuova prova di login richiesta dall'utente, 12/10/2026.** Il proprietario preferisce un altro login controllato invece di ricostruire l'ora precedente. Pronto `_notes/watch-nebula-publication-final.ps1`: prima pagina di login locale del 30HP, poi avvio dell'osservatore, un solo accesso dopo l'avviso e Invio nel terminale subito dopo il pannello del browser. La conferma registra automaticamente un'ora successiva al login, non l'istante esatto. Osservazione di dieci minuti, massimo 41 POST e due letture diagnostiche soltanto se vuota; budget interno, non garanzia Zyxel. Recuperata anche la preparazione rimasta senza memoria prima del riavvio: una mutazione del verificatore era ancora applicata, rilevata dal test e ripristinata dal backup con SHA-256 verificato. Suite 48/48 senza rete, conferma PowerShell e codice di errore 7 provati con chiave finta. Nuova prova reale ancora attesa. Il vecchio candidato resta non associato, ma non blocca questo tentativo; quattro pendenze e altri gate invariati.
@@ -82,8 +88,8 @@
 
 ```
 Branch attivo:        main
-Commit di riferimento: 48be07b
-Data snapshot:        2026-10-12
+Commit di riferimento: 9710d4d
+Data snapshot:        2026-10-13
 Albero autorevole:    unico
 Remoto:               git@github-corp:asopranzi-intrawelt/log-collector.git (primo push di 9ee87b4 il 2026-09-30)
 Template:             E:\template-claude-developing @ ffcbdb3
@@ -93,16 +99,16 @@ Template:             E:\template-claude-developing @ ffcbdb3
 
 | Scheda | last-verified | Stato |
 |---|---|---|
-| STACK.md | 48be07b | nuovo login 30HP osservato in cinque richieste; report ricalcolato identico |
+| STACK.md | 9710d4d | target dedicato 54HP eseguito; report reale ricalcolato identico |
 | design-and-security.md | 48be07b | credenziali e grezzi privati; tempo apparente distinto dal ritardo massimo |
 | deployment.md | 48be07b | wrapper eseguito dalla postazione; nessuna installazione VM |
-| dev-testing.md | 48be07b | 48 casi verdi; mutazione rimasta applicata rilevata e ripristinata |
-| current-work.md | 48be07b | ritardo apparente misurato sul 30HP; ricognizione GUI 54HP successiva |
+| dev-testing.md | 9710d4d | 55 casi locali verdi, due mutazioni rilevate e ripristinate |
+| current-work.md | 9710d4d | login riuscito 54HP osservato; logout e fallimento ancora aperti |
 | roadmap.md | 9ee87b4 | solo struttura |
 
 ## Punto di ripresa
 
-Passo corrente: chiusura manuale della milestone Nebula in questo repository con `chiudi`, dopo i controlli completi. Messaggio pronto: «Misurata la comparsa del nuovo login Nebula nel cloud». Nel progetto rete restano anche modifiche precedenti di integrità-docs da tenere nel proprio blocco; non proporre una chiusura cumulativa da questa sessione. Dopo la chiusura del collettore, aprire la scheda del 54HP in Nebula e acquisire una schermata per individuarne la GUI locale. Il wrapper del 30HP seleziona dal riferimento storico, quindi non riusarlo senza il secondo target. Limiti, offline, notifica e D-1 restano gate prima dell'esercizio; i paragrafi successivi conservano la cronologia.
+Passo corrente: chiusura manuale della milestone 54HP con `chiudi` dopo i controlli completi dell'agente. Il login è già osservato e verificato, non ripetere il wrapper per la sola registrazione. Dopo la chiusura predisporre la prova del logout 54HP; tentativo fallito, limiti, offline, notifica e D-1 restano gate prima dell'esercizio. Non riusare l'osservatore del login per un evento di logout senza adattarne il criterio. Milestone precedente `9710d4d`; blocchi indipendenti del progetto rete conservati separatamente.
 
 Verifica preparata: l'utente esegue `_notes/check-nebula-retention.ps1` dalla postazione Windows e trasmette l'esito aggregato e il percorso della nuova cartella privata; l'agente confronta il nuovo JSON con i cinque accessi dell'08/10 e registra soltanto ciò che la misura dimostra. La raccolta di produzione resta non attivata. La propagazione documentale precedente di network-design è ancora non committata.
 

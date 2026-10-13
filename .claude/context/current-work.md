@@ -6,11 +6,27 @@ covers-paths:
   - bin/**
   - config/collettore/**
   - tests/**
-last-verified-commit: 48be07b
+last-verified-commit: 9710d4d
 stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai punti 3 e 7; eventi iLO tecnici separati con ritenzione 90 giorni attiva; catena locale provata in WSL, non installata; D7 bloccato da nomina ed elenco AdS
 ---
 
 # Lavoro in corso
+
+## Login riuscito 54HP osservato realmente, 13/10/2026
+
+Wrapper dedicato eseguito dall'operatore: due richieste, zero eventi nella prima e un login nella seconda. Evento alle 09:08:27 locali, conferma alle 09:08:30,765602 e risposta positiva alle 09:08:41,769102. Ritardo apparente 14,769 secondi sul timestamp dichiarato, circa 11,0035 secondi dalla conferma. Report e candidato ricalcolati identici senza rete; modello e target sono del 54HP, MAC coincide con il riferimento, account/IP con il login 30HP. La prima query non include l'ora dell'evento, quindi non misura un limite inferiore del ritardo. Ispezione privata e SHA, passi 47-48 nel runbook.
+
+Login riusciti dimostrati via API per entrambi gli switch. Sul 54HP logout e tentativo fallito restano non collaudati; ritardo massimo, clock offset e completezza generale non dimostrati. Nessun cambio a settle/overlap o installazione VM. Misura propagata in network-design, preservando il lavoro codeSigning degli altri progetti: sei documenti, indirizzo della GUI nel livello privato, timeline a 186 eventi e ISO-30 in_corso con tre viste HTML verificate allineate. Prossimo gesto: chiusura manuale della milestone dopo i controlli completi; poi adattare il criterio e collaudare il logout del 54HP. Quattro pendenze e altri gate conservano il loro stato.
+
+## Indirizzo 54HP ricevuto, osservatore dedicato pronto, 12/10/2026
+
+Il proprietario fornisce direttamente l'URL della pagina di login locale del XGS2220-54HP: registrato in `_notes/nebula-54hp-env.json`, non nei file pubblicabili. Superata la richiesta di screenshot per conoscere l'indirizzo; l'agente non lo contatta. Il nuovo `--switch-model` sceglie un solo apparato di quel modello nello snapshot e verifica un riferimento storico dello stesso dispositivo; sul 54HP è un evento tecnico, senza prova AdS implicita. Le riletture rifiutano un report con target diverso prima di creare il client.
+
+Pronto `_notes/watch-nebula-publication-54hp.ps1`, con trasporto del wrapper già provato, modello esplicito, ready e conferma Invio dopo il pannello. Sette casi nuovi e 55/55 locali senza rete; mutazioni della scelta del dispositivo e della guardia sul report rilevate, ripristino SHA-256 verificato. Prova nativa del parametro 54HP, conferma dopo ready e fallimento con codice 7; Ruff e parser verdi. Prossimo passo: un solo login dopo l'avviso, Invio e attesa del riepilogo. Nuova prova reale ancora attesa; nessun parametro del poller sulla VM modificato. Passi 43-46 nel runbook, quattro pendenze e altri gate invariati.
+
+## Milestone chiusa, prossimo apparato 54HP, 12/10/2026
+
+Il proprietario ha eseguito `chiudi`: `main` e riferimento locale `origin/main` a `9710d4d`, albero pulito e impronta delle 17:48 coerente prima di questo giro. Osservatore, test e misura del 30HP sono versionati. STACK, dev-testing e questa scheda sono riconciliate per contenuto e ancorate al commit; nessun nuovo test funzionale necessario per questa annotazione. Nel progetto rete il secondo switch è XGS2220-54HP, «Switch piano 2 (rack)», nodo `sw54`; topologia e snapshot letti non contengono un indirizzo di gestione utilizzabile. Prossimo gesto: scheda del dispositivo in NCC e schermata per individuarne la GUI locale. Non chiedere ancora il login e non riusare il wrapper 30HP per il secondo apparato. Quattro pendenze e altri gate invariati; nessuna chiamata reale o credenziale del 54HP consultata dall'agente.
 
 ## Nuovo login 30HP osservato realmente, 12/10/2026
 

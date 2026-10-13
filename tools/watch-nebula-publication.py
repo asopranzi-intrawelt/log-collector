@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Osserva la prima comparsa di un nuovo login locale del 30HP in Nebula.
+"""Osserva la prima comparsa di un nuovo login locale di uno switch in Nebula.
 
 Osservazione ordinaria di cinque minuti, pausa 15 secondi, budget 21 POST.
 Ultima prova opzionale: dieci minuti, massimo 41 POST e due letture diagnostiche.
@@ -27,6 +27,29 @@ INTERVAL_SECONDS = 15
 RESPONSE_GUARD = 1000
 FINAL_DURATION_SECONDS = 600
 FINAL_MAX_REQUESTS = 41
+
+
+def select_target(snapshot, baseline, switch_model=None):
+    """Sceglie il riferimento storico o un modello univoco nello snapshot."""
+    if switch_model is None:
+        device, reference = boundaries.select_reference(baseline)
+    else:
+        matches = [
+            device
+            for organization in snapshot["organizations"]
+            for site in organization["sites"]
+            for device in site["devices"]
+            if device.get("type") == "SW" and device.get("model") == switch_model
+        ]
+        if len(matches) != 1:
+            raise windows.history.EvidenceError("snapshot_model_missing_or_ambiguous")
+        device = matches[0].get("devId")
+        if not isinstance(device, str) or not device or not baseline.get(device):
+            raise windows.history.EvidenceError("target_reference_missing")
+        # Il controllo del nuovo apparato può essere tecnico: non prova un accesso.
+        reference = max(baseline[device], key=lambda event: event["timestamp"])
+    _, target = windows.resolve_targets(snapshot, {device: []})[0]
+    return target, reference
 
 
 def measure(
@@ -194,6 +217,7 @@ def main(argv=None):
     parser.add_argument("--snapshot", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--key-stdin", action="store_true", required=True)
+    parser.add_argument("--switch-model", choices=("XGS2220-30HP", "XGS2220-54HP"))
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--observation", type=Path)
     mode.add_argument("--final-attempt", action="store_true")
@@ -201,9 +225,16 @@ def main(argv=None):
     client = None
     try:
         baseline = windows.history.read_switches(args.baseline)
-        device, _ = boundaries.select_reference(baseline)
         snapshot = json.loads(args.snapshot.read_text(encoding="utf-8-sig"))
-        _, target = windows.resolve_targets(snapshot, {device: []})[0]
+        target, reference = select_target(snapshot, baseline, args.switch_model)
+        observation = None
+        if args.observation is not None:
+            recorded_target = json.loads(
+                args.observation.with_name("private-target.json").read_text(encoding="utf-8-sig")
+            )
+            if recorded_target != target:
+                raise windows.history.EvidenceError("observation_target_mismatch")
+            observation = json.loads(args.observation.read_text(encoding="utf-8-sig"))
         args.output.mkdir(parents=False, exist_ok=False)
         windows.write_private(args.output / "private-target.json", target)
         key = sys.stdin.readline(4097).rstrip("\r\n")
@@ -225,8 +256,6 @@ def main(argv=None):
                 f"apparent_delay_upper_ms={report['apparent_delay_upper_ms']}"
             )
         else:
-            observation = json.loads(args.observation.read_text(encoding="utf-8-sig"))
-            _, reference = boundaries.select_reference(baseline)
             report = recheck(client, target, reference, observation, args.output)
             detail = (
                 f"status={report['status']} requests={report['requests']} "
@@ -237,7 +266,6 @@ def main(argv=None):
         if args.final_attempt and report["status"] == "no_new_login":
             followup = args.output / "followup"
             followup.mkdir()
-            _, reference = boundaries.select_reference(baseline)
             diagnostic = recheck(client, target, reference, report, followup)
             windows.write_private(followup / "comparison.json", diagnostic)
             detail += (

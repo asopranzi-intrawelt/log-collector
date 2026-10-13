@@ -307,3 +307,168 @@ def test_final_cli_rechecks_only_timeout_and_keeps_it_inconclusive(
     else:
         assert not (output / "followup").exists()
     assert "FAKE_STDIN_KEY" not in capsys.readouterr().out
+
+
+def two_switches():
+    device54 = "<SWITCH54_ID>"
+    technical = copy.deepcopy(EVENTS[-1])
+    technical["devId"] = device54
+    technical["timestamp"] = START_MS - 100_000
+    baseline = {TARGET["device_id"]: EVENTS, device54: [technical]}
+    snapshot = {
+        "organizations": [
+            {
+                "sites": [
+                    {
+                        "siteId": TARGET["site_id"],
+                        "devices": [
+                            {
+                                "devId": TARGET["device_id"],
+                                "type": "SW",
+                                "model": "XGS2220-30HP",
+                            },
+                            {"devId": device54, "type": "SW", "model": "XGS2220-54HP"},
+                        ],
+                    }
+                ]
+            }
+        ]
+    }
+    return baseline, snapshot, {**TARGET, "device_id": device54}, technical
+
+
+def test_explicit_model_selects_54hp_with_technical_control_instead_of_30hp():
+    baseline, snapshot, target54, technical = two_switches()
+    target, reference = publication.select_target(snapshot, baseline, "XGS2220-54HP")
+    assert target == target54 and reference == technical
+    assert publication.windows.poller.outcome(reference) is None
+    legacy, legacy_reference = publication.select_target(snapshot, baseline)
+    assert legacy == TARGET
+    assert legacy_reference in EVENTS
+
+
+@pytest.mark.parametrize("matches", [0, 2])
+def test_explicit_model_rejects_missing_or_ambiguous_snapshot(matches):
+    baseline, snapshot, _, _ = two_switches()
+    devices = snapshot["organizations"][0]["sites"][0]["devices"]
+    other = devices.pop()
+    devices.extend(copy.deepcopy(other) for _ in range(matches))
+    with pytest.raises(
+        publication.windows.history.EvidenceError, match="snapshot_model_missing_or_ambiguous"
+    ):
+        publication.select_target(snapshot, baseline, "XGS2220-54HP")
+
+
+def test_explicit_model_requires_a_reference_from_the_selected_device():
+    baseline, snapshot, target54, _ = two_switches()
+    baseline[target54["device_id"]] = []
+    with pytest.raises(publication.windows.history.EvidenceError, match="target_reference_missing"):
+        publication.select_target(snapshot, baseline, "XGS2220-54HP")
+
+
+@pytest.mark.parametrize("observed", [False, True])
+def test_54hp_cli_observes_correct_target_and_rechecks_its_technical_control(
+    tmp_path, monkeypatch, observed
+):
+    baseline_data, snapshot_data, target54, technical = two_switches()
+    baseline = tmp_path / "baseline.json"
+    snapshot = tmp_path / "snapshot.json"
+    baseline.write_text(
+        json.dumps(
+            [{"DevId": device, "EventLogs": events} for device, events in baseline_data.items()]
+        )
+    )
+    snapshot.write_text(json.dumps(snapshot_data))
+    login54 = copy.deepcopy(LOGIN)
+    login54["devId"] = target54["device_id"]
+    calls = []
+
+    class SelectedClient:
+        def __init__(self, key):
+            assert key == "FAKE_STDIN_KEY"
+
+        def fetch(self, target, left, right):
+            assert target == target54
+            calls.append((left, right))
+            return [technical] if len(calls) == 1 else [login54]
+
+        def close(self):
+            pass
+
+    def observation(client, target, path, **settings):
+        assert target == target54 and settings == {"duration_seconds": 600, "max_requests": 41}
+        return {
+            "status": "observed" if observed else "no_new_login",
+            "ok": observed,
+            "eligible_start_ms": START_MS,
+            "observations": [{"query_end_ms": START_MS + 30_000}],
+            "requests": 1,
+            "candidate_logins": int(observed),
+            "apparent_delay_upper_ms": 15000 if observed else None,
+        }
+
+    monkeypatch.setattr(publication, "measure", observation)
+    monkeypatch.setattr(publication.windows.poller, "NebulaClient", SelectedClient)
+    monkeypatch.setattr(publication.sys, "stdin", io.StringIO("FAKE_STDIN_KEY\n"))
+    output = tmp_path / "output"
+    status = publication.main(
+        [
+            "--key-stdin",
+            "--final-attempt",
+            "--switch-model",
+            "XGS2220-54HP",
+            "--baseline",
+            str(baseline),
+            "--snapshot",
+            str(snapshot),
+            "--output",
+            str(output),
+        ]
+    )
+    assert status == (0 if observed else 1)
+    assert json.loads((output / "private-target.json").read_text()) == target54
+    assert len(calls) == (0 if observed else 2)
+    if not observed:
+        assert calls[0] == (technical["timestamp"] - 1000, technical["timestamp"] + 1000)
+        diagnostic = json.loads((output / "followup/comparison.json").read_text())
+        assert diagnostic["control_present"] and diagnostic["status"] == "candidates_found"
+
+
+def test_recheck_rejects_a_report_from_the_other_device_before_client_creation(
+    tmp_path, monkeypatch
+):
+    baseline_data, snapshot_data, _, _ = two_switches()
+    baseline = tmp_path / "baseline.json"
+    snapshot = tmp_path / "snapshot.json"
+    baseline.write_text(
+        json.dumps(
+            [{"DevId": device, "EventLogs": events} for device, events in baseline_data.items()]
+        )
+    )
+    snapshot.write_text(json.dumps(snapshot_data))
+    observation = tmp_path / "comparison.json"
+    observation.write_text("{}")
+    (tmp_path / "private-target.json").write_text(json.dumps(TARGET))
+
+    def no_client(key):
+        raise AssertionError("Client creato prima di verificare il target del report")
+
+    monkeypatch.setattr(publication.windows.poller, "NebulaClient", no_client)
+    monkeypatch.setattr(publication.sys, "stdin", io.StringIO("FAKE_STDIN_KEY\n"))
+    output = tmp_path / "output"
+    status = publication.main(
+        [
+            "--key-stdin",
+            "--switch-model",
+            "XGS2220-54HP",
+            "--observation",
+            str(observation),
+            "--baseline",
+            str(baseline),
+            "--snapshot",
+            str(snapshot),
+            "--output",
+            str(output),
+        ]
+    )
+    assert status == 1 and not output.exists()
