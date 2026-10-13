@@ -1,6 +1,6 @@
 # Token economy
 
-> Regola modulare. Consolida le pratiche di risparmio di contesto del sistema e indica quando valutare uno strumento esterno di ottimizzazione dei token. Si applica sempre, a ogni sessione.
+> Regola modulare. Consolida le pratiche di risparmio di contesto del sistema e indica quando valutare uno strumento esterno di ottimizzazione dei token. Si applica sempre, a ogni sessione. I casi osservati che hanno prodotto queste prescrizioni, con le misure e le date, stanno in `.claude/norme/token-economy.md`: quel file non si carica all'avvio di una sessione e non serve per applicare la regola, serve a chi deve estenderla o rimetterla in discussione.
 
 ## Principi nativi
 
@@ -14,32 +14,15 @@ Niente riletture integrali: il motore di riconciliazione confronta i commit e le
 
 Si legge un file quando serve davvero, e solo la porzione necessaria, non l'intero file se non occorre.
 
-## Più agenti insieme: quattro numeri misurati, non stimati
+## Il costo si sceglie: parallelismo, modello, delega, server
 
-Sezione ricavata da un pilota reale su un corpus di trecentosettantuno documenti, portato a termine. I numeri valgono per quella forma di lavoro, non in generale, ma i rapporti fra loro sono il dato che si trasferisce.
+Quattro leve decidono quanto costa un lavoro, e tre si scelgono prima di cominciare. Il parallelismo non riduce i token: consuma gli stessi token in metà tempo, quindi avvicina il limite invece di allontanarlo, e si usa quando serve il risultato prima, mai quando si teme di esaurire la finestra. Il modello e il livello di ragionamento valgono un fattore nove su un lavoro meccanico, a parità di mandato, e il costo per elemento cresce con la dimensione del lotto, da cui segue che molte sessioni brevi costano meno di una lunga e che un lotto unico su tutto il corpus è il modo più caro di farlo. L'ordine in cui conviene intervenire è sempre lo stesso: togliere elementi, perché la parte deterministica di una mappatura non deve vedere un modello; rendere il lavoro riprendibile, perché un lavoro che riparte da capo non si conclude mai; instradare su serbatoi indipendenti; e solo alla fine parallelizzare.
 
-**Il parallelismo non riduce i token.** Consuma gli stessi token in metà tempo: la quota si consuma proporzionalmente alla concorrenza, quindi il parallelismo **avvicina** il limite invece di allontanarlo. Si usa quando serve il risultato prima, mai quando si teme di esaurire la finestra. Un sistema multi-agente consuma più di una conversazione singola sullo stesso compito, e il consumo maggiore **è la ragione per cui funziona meglio**, non un effetto collaterale.
+Un compito che consuma molti token ma non richiede giudizio fine va al modello più economico che lo sa fare, e il modello più capace si riserva alla parte che ne ha bisogno: la scelta si fa per compito e non per sessione, e si misura su un lotto piccolo prima di estenderla. La conversazione principale non è il posto dove risparmiare, perché ogni suo passo si appoggia al precedente e un errore intermedio costa tutto ciò che vi si appoggia dopo. È meccanico il lavoro che si giudica su una regola e non su un contesto, cioè cercare dove sta qualcosa in un repository, leggere molti file per estrarne lo stesso dato, mappare o classificare molti elementi su etichette chiuse, convertire, inventariare, contare; non si delegano mai la revisione del codice, l'audit di sicurezza, la progettazione, la scelta fra due architetture e ogni passo su cui si appoggia il passo successivo. Un instradamento senza delega non instrada niente, quindi l'autorizzazione a delegare si scrive dove l'agente la legge da sé a ogni sessione, cioè in un file di istruzioni; e a fine giro l'agente dichiara quanti subagent sono partiti, perché un conto implicito non si corregge.
 
-**Il modello e il livello di ragionamento valgono un fattore nove.** Lo stesso lotto, stesso mandato: centoventiduemila token per elemento con il modello generico a ragionamento medio, **tredicimila** con il modello economico a ragionamento basso. Il tempo è sceso nella stessa proporzione, il che è una buona prova che la misura sia pulita. Per una mappatura meccanica il ragionamento non serve: si paga e non produce nulla.
+Un server MCP dichiara i propri strumenti all'apertura della sessione, e quella dichiarazione entra in contesto prima del primo messaggio sia che gli strumenti vengano usati sia che restino fermi; un comando di shell non dichiara niente e costa la riga che lo lancia più il riepilogo che risponde. Il server conviene al lavoro che torna indietro, cioè guardare, provare e correggere tenendo lo stato aperto; il comando conviene al lavoro che va avanti. Ne segue che un lavoro a passo unico non passa mai da un server, che dove il server offre un modo ridotto lo si usa, e che un server si collega per il lavoro che lo richiede e si toglie quando quel lavoro è finito, tenendo le voci spente in `disabledMcpjsonServers` invece di cancellarle. Non più di sei server restano connessi in tutto, contati sul totale e non per settore.
 
-**Il costo per elemento cresce con la dimensione del lotto.** Ventimila token per elemento su un lotto da dieci, centoventiduemila su uno da ventiquattro, a parità di modello: è il contesto che si accumula. Ne discende che **molte sessioni brevi costano meno di una lunga**, e che un lotto unico su tutto il corpus è il modo più caro di farlo, non il più economico.
-
-**Il limite è su finestra mobile, non giornaliero.** Nel pilota una radice ha consumato tredici milioni di token distribuiti su tredici lotti senza mai fermarsi, mentre un'altra si è fermata a nove milioni spesi in **una sola sessione concentrata**. Gli stessi token spesi a raffica esauriscono la finestra, spesi distribuiti no.
-
-### La conseguenza operativa, in ordine
-
-Prima **togliere elementi**: la parte deterministica di una mappatura non deve vedere un modello, e portare N da trecento a trenta vale più di qualunque ottimizzazione sui trecento. Poi **rendere il lavoro riprendibile**, perché un lavoro che riparte da capo non si conclude mai. Poi **instradare su serbatoi indipendenti**, dove esistono più flotte con quote separate. Solo alla fine **parallelizzare**, sapendo che comprime il tempo e non il costo.
-
-Il pacchetto `lavoro-a-lotti` è l'attuazione di questi quattro punti; `agenti-terminale` fornisce le flotte su cui il terzo poggia.
-
-
-### Il lavoro locale non costa token, e la sua uscita va letta per intero
-
-Conversione, OCR, impronte e indicizzazione girano con strumenti locali e non consumano token: all'agente costano il lancio e la lettura di un riepilogo di poche righe, quindi si lanciano in background e non si rifanno a mano. Il riepilogo però va letto per intero e non solo nel codice di uscita. In un caso reale un OCR su 424 scansioni è uscito con zero e ha riportato 455 documenti assenti, perché il disco esterno era stato scollegato. L'uscita di un lavoro lungo si scrive in una cartella ignorata del progetto e non nella cartella temporanea della sessione. Un'altra sessione dell'agente sulla stessa macchina, nella sua pulizia d'avvio, può cancellare la temporanea, ed è successo tre volte nella stessa giornata. Quando gli elementi da giudicare sono molti e piccoli vale la sezione sulle etichette chiuse del pacchetto `lavoro-a-lotti`.
-
-## Il modello si sceglie dal compito
-
-Lezione generale nata il 2026-10-06 in un progetto istanziato. Un compito che consuma molti token ma non richiede giudizio fine va al modello più economico che lo sa fare, e il modello più capace si riserva alla parte che ne ha bisogno. La scelta si fa per compito e non per sessione, e si misura su un lotto piccolo prima di estenderla. Nello stesso caso il costo è dipeso più dal numero di turni degli agenti che dalla lunghezza del testo letto: i numeri e la procedura stanno nel pacchetto `lavoro-a-lotti`.
+Vale infine una cautela sui flussi di verifica adversariale a più voti, come `deep-research`, che con qualche decina di affermazioni esauriscono il limite di sessione in pochi secondi: quando succede non si rilancia lo stesso flusso identico, si restringe la domanda a un angolo di ricerca più stretto, si riprende dalla cache del flusso, oppure si scende a una verifica mirata delle sole fonti primarie già trovate.
 
 ## Disclosure progressiva su documenti voluminosi
 
@@ -76,10 +59,6 @@ Prima di ogni `/clear` o di chiudere una sessione su un task non ancora concluso
 La finestra da un milione di token, disponibile su Sonnet 4.6 e Opus 4.7, e utile come assicurazione per i task lunghi ma non come obiettivo: oltre i 120-150K token utili la qualità delle risposte tende comunque a degradare per accumulo di rumore nel contesto. Chunk piccoli con handoff espliciti producono risultati migliori che riempire la finestra grande.
 
 Il principio "un task, una chat" mantiene il contesto sempre fresco: invece di una sessione fiume che accumula task diversi, si chiude e riapre per ogni unita di lavoro logica, riducendo le compattazioni multiple e il rischio di deriva del focus.
-
-## Cautela sui workflow multi-agente costosi
-
-Alcuni workflow integrati (per esempio `deep-research`) fanno verificare ogni affermazione estratta da più agenti indipendenti in parallelo: con qualche decina di affermazioni il numero di chiamate di verifica sale rapidamente a svariate decine, con un consumo di token che può esaurire il limite di sessione in pochi secondi, prima ancora che il workflow completi la sintesi finale. È il costo intrinseco della verifica adversariale a più voti, già osservato sul campo, e il workflow in quel caso funziona come previsto. Quando succede, non insistere rilanciando lo stesso workflow identico: o si restringe la domanda a un angolo di ricerca più stretto per lancio, invece di chiedere tutto insieme, o si riprende con il meccanismo di resume del workflow (che rilegge dalla cache gli stadi già completati e paga solo cio che manca), oppure si scende a una verifica manuale mirata delle sole fonti primarie già trovate nella fase di ricerca, con una singola chiamata di recupero pagina per fonte invece del panel a più voti: quest'ultima via è quasi sempre la più economica quando restano poche affermazioni da controllare.
 
 ## Strumenti esterni, a scelta
 

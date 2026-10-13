@@ -51,7 +51,9 @@ def main():
         rel = f.relative_to(cache).as_posix()
         if f.name == "_INDEX.md" or a.filtro.lower() not in rel.lower():
             continue
-        if any(s.search(rel) for s in schemi):
+        # Il percorso completo, perché gli schemi delle cartelle cercano un separatore
+        # prima del nome, che il percorso relativo di primo livello non ha.
+        if any(s.search(str(f.resolve())) for s in schemi):
             continue
         testo = f.read_text(encoding="utf-8", errors="replace")
         if len(testo.split()) >= a.minimo:

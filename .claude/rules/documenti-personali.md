@@ -1,6 +1,6 @@
 # Documenti personali: mai letti senza richiesta espressa
 
-> Regola modulare, da caricare sempre. Nasce da un'istruzione vincolante dell'utente del 2026-10-06 in un progetto istanziato, dove un'ingestione di massa del materiale di studio stava passando all'OCR anche contratti, documenti d'identità e pratiche amministrative che stavano nelle stesse cartelle.
+> Regola modulare, da caricare sempre. Nasce da un'istruzione vincolante dell'utente del 2026-10-06 in un progetto istanziato, dove un'ingestione di massa del materiale di studio stava passando all'OCR anche contratti, documenti d'identità e pratiche amministrative che stavano nelle stesse cartelle. I casi osservati che hanno prodotto queste prescrizioni, con le misure e le date, stanno in `.claude/norme/documenti-personali.md`: quel file non si carica all'avvio di una sessione e non serve per applicare la regola, serve a chi deve estenderla o rimetterla in discussione.
 
 ## Il vincolo
 
@@ -17,3 +17,9 @@ Se un documento personale è già stato letto, convertito o copiato prima che la
 ## Che cosa non è un permesso
 
 Una richiesta generica come "ingerisci tutto", "converti la cartella" o "leggi tutto ciò che è utile" non è una richiesta espressa per i documenti personali che la cartella contiene. Non lo è nemmeno il fatto che un documento stia in una cartella già autorizzata. Il permesso nomina i documenti.
+
+## Gli strumenti che la attuano
+
+`doc-ingest.py` accetta `--esclusi` con un file di schemi e `lavoro-a-lotti/tools/estratti-lotto.py` lo richiede; l'elenco di partenza è `.claude/templates/doc-ingest/esclusi-personali.esempio.txt`, che copre cartelle di acquisti, fatture, ricevute, banca, fisco e salute, documenti d'identità, pratiche universitarie e certificati medici. Gli schemi si confrontano con il percorso completo del file, e un elenco di schemi si prova sempre su una cartella di prova che contiene un caso da escludere, prima di usarlo su un corpus. L'altra metà del problema sono i dati identificanti scritti in un file pubblicabile, che `anonymization/tools/Test-Anonymization.py` riconosce validando l'IBAN con la cifra di controllo modulo 97 e il numero di una carta con Luhn. Entrambi gli strumenti hanno un `--autotest` che `chiudi` esegue a ogni commit, nel template attraverso `tools/test-documenti-personali.py`, che controlla anche che questa regola esista e si dichiari da caricare sempre.
+
+Una regola che non si carica non protegge: dopo ogni modifica a questa regola o agli strumenti che la attuano l'allineamento va eseguito su tutti i progetti istanziati.
