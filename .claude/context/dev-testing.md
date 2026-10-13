@@ -4,10 +4,18 @@ generated-from-branch: main
 generated-date: 2026-09-30
 covers-paths:
   - tests/**
-last-verified-commit: 295809f
+last-verified-commit: 928da73
 ---
 
 # Test di sviluppo
+
+## Volumi API Nebula concordanti nel campione reale, 13/10/2026
+
+La prova reale dei volumi ha restituito 18 payload: il replay locale riproduce tutti i metadati e il report senza rete. Ampie e giornaliere uguali nei sette campi, controlli positivi, cache integre, 496/711 record e zero duplicati. Verificati separatamente modello nello snapshot e tutti i cinque accessi originali 30HP. L'ispezione privata inizialmente cercava il modello nel target del client, che contiene soltanto ID; corretta per leggerlo nello snapshot, conservando il primo replay e completando quello finale. Nessuna modifica alla produzione. I 120 casi passati e uno POSIX saltato del giro precedente non sono ripetuti per sole annotazioni. Esiti e limiti del campione nei passi 77-79 del runbook.
+
+## Verifica dei volumi API preparata, milestone precedente versionata, 13/10/2026
+
+tests/test_nebula_volume.py aggiunge quindici casi: troncamento a 500 sotto la guardia locale di 1.000, perdita di un tecnico con AAA integri, controllo mancante e risposte vuote, cambiamenti fra ampie, record storici indisponibili, duplicati ai confini, risposta satura, piano invalido prima del client, due switch/18 richieste, HTTP 429 e CLI con chiave finta. Suite Nebula di sei file: 120 passate e una POSIX saltata. Due mutazioni rilevate e codice ripristinato byte/SHA; processo PowerShell nativo con token finto e codici 0/7, Ruff e parser verdi. La prova di confine inizialmente contava altri record esattamente ai bordi: campione reso isolato, senza modificare l'algoritmo. La CLI positiva inizialmente usava un periodo futuro: corrette le date sintetiche conservando il rifiuto di finestre recenti. Nessuna chiamata reale; campione disponibile per il prossimo comando dell'operatore.
 
 ## Login fallito 54HP verificato, tre casi API completati, 13/10/2026
 

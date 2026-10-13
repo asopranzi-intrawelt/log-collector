@@ -5,10 +5,14 @@ generated-date: 2026-09-30
 covers-paths:
   - bin/**
   - config/**
-last-verified-commit: 48be07b
+last-verified-commit: 928da73
 ---
 
 # Design e sicurezza applicativa
+
+## Verifica dei volumi API preparata, milestone precedente versionata, 13/10/2026
+
+Verificatore dei volumi separato dal poller: chiave solo stdin, client TLS e mapping dallo snapshot, budget massimo interno di 20 POST e piano corrente di 18. Prima di creare il client si rifiutano cache vuote, periodo oltre sette giorni o terminato meno di un'ora prima. Questo margine e la guardia di 1.000 righe sono scelte prudenziali interne, senza garanzia Zyxel. Controllo positivo e confronto ampie prima/dopo impediscono di promuovere il vuoto a prova o attribuire automaticamente a troncamento un cloud cambiato. Vecchi record assenti sono indisponibili, senza causa dedotta. Limite e retention massimi, completezza fisica e raccolta VM restano non dimostrati. Fonte API e distinzione fra documento e misura nei passi 70-71 del runbook; parser manuale riconciliato a 928da73.
 
 ## Formato manuale Nebula osservato
 

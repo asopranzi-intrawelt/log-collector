@@ -6,10 +6,18 @@ covers-paths:
   - bin/**
   - config/**
   - tests/**
-last-verified-commit: 295809f
+last-verified-commit: 928da73
 ---
 
 # Stack applicativo
+
+## Volumi API Nebula concordanti nel campione reale, 13/10/2026
+
+Il verificatore dei volumi è stato eseguito dal proprietario: 18 risposte reali, ampie prima/dopo e unione giornaliera identiche nei sette campi, 496 eventi 30HP e 711 eventi 54HP. Tutti i record della cache presenti, nessun duplicato ai confini; report ricalcolato identico senza rete. Il client e il poller non cambiano. Campione fino a 711 righe, senza limite massimo o perdite comuni escluse; nessuna installazione sulla VM. Fonte, perimetro e SHA nei passi 77-79 del runbook.
+
+## Verifica dei volumi API preparata, milestone precedente versionata, 13/10/2026
+
+tools/check-nebula-volume.py riusa lettura dello storico, mapping e client TLS del verificatore delle finestre. Due risposte ampie e sei giornaliere per switch sono confrontate per firma dei sette campi; grezzi, query e tempi sono privati. Il poller di produzione non cambia e non viene installato. Piano reale ancora da eseguire: 18 letture sul periodo 07-13/10 UTC, senza nuovi accessi locali. Ancora riconciliata a 928da73, dopo il commit manuale del parser logout e dei test.
 
 ## Login fallito 54HP verificato, tre casi API completati, 13/10/2026
 

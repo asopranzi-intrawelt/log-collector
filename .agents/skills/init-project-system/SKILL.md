@@ -6,7 +6,7 @@ description: >
   sulla macchina (setup multi-account via CLAUDE_CONFIG_DIR) e chiede conferma se ne risulta
   più di uno; poi chiede quale identità git usare per i futuri commit e a quale repository
   GitHub agganciare il remoto, configurandola a livello locale (vedi
-  rules/git-identity-and-repo.md). Infine esegue il runbook di inizializzazione passo per
+  skills/identita-git/RIFERIMENTO.md). Infine esegue il runbook di inizializzazione passo per
   passo, fermandosi a chiedere conferma dove un'azione tocca il version control o e
   difficilmente reversibile. Non esegue mai git add/commit/push: li gestisce l'utente.
 ---
