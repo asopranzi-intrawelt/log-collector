@@ -6,10 +6,22 @@ covers-paths:
   - bin/**
   - config/**
   - tests/**
-last-verified-commit: 928da73
+last-verified-commit: c756554
 ---
 
 # Stack applicativo
+
+## Tredici record locali degli offline dichiarati presenti nel cloud, 13/10/2026
+
+Confronto storico reale concluso: controllo noto presente e tredici record tecnici del buffer locale del 30HP presenti nel cloud, dieci e tre nei due intervalli offline dichiarati del 06/10. Tre POST, quattro campi locali identici, metadati/mapping e report ricalcolati senza rete. Visibilità attuale del campione; zero autenticazioni, recupero AdS non provato. Poller di produzione invariato e non installato sulla VM; passi 94-95 nel runbook.
+
+## Offline cloud osservato, confronto con buffer locale preparato, 13/10/2026
+
+Ricognizione reale connectivity 30d ricalcolata: quattro stati offline 30HP e due 54HP, nessuna prova di recupero AdS. tools/check-nebula-offline-history.py usa il client event-logs esistente e un riferimento tecnico estratto dal buffer locale del 30HP. Tre POST, confronto di timestamp/priorità/tag/testo, payload e metadati privati; controllo mancante e riferimento indisponibile restano inconcludenti. Il poller di produzione non cambia. Tredici record indipendenti, dieci e tre nelle due interruzioni del 06/10, zero autenticazioni. Prima lettura storica API ancora attesa; passi 89-92 nel runbook.
+
+## Storico cloud 30 giorni preparato, offline ancora da provare, 13/10/2026
+
+tools/check-nebula-connectivity.py estende il client TLS già usato dai verificatori, aggiungendo il solo POST connectivity alla ricognizione. Mapping dallo snapshot, controllo storico e lettura 30d per ogni switch, quattro richieste; nessuna modifica al poller di produzione. Il report separa controllo presente, online e stati da esaminare; inspected non chiude il gate offline. Payload, query e tempi privati anche sullo schema invalido. Fixture reale online, prove 134 passate e una POSIX saltata; primo comando reale ancora atteso. Ancora a c756554 riconciliata con il test volume versionato.
 
 ## Volumi API Nebula concordanti nel campione reale, 13/10/2026
 

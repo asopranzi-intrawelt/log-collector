@@ -4,10 +4,22 @@ generated-from-branch: main
 generated-date: 2026-09-30
 covers-paths:
   - tests/**
-last-verified-commit: 928da73
+last-verified-commit: c756554
 ---
 
 # Test di sviluppo
+
+## Tredici record locali degli offline dichiarati presenti nel cloud, 13/10/2026
+
+La verifica dei tre payload reali riproduce esattamente comparison.json e tutti i metadati, senza API aggiuntive. Target nello snapshot, SHA di cache/riferimento/buffer e tredici righe originali ricontrollati. Corrispondenza di timestamp/priorità/tag/testo: dieci e tre record tecnici, zero mancanti e zero autenticazioni. Controllo positivo di due righe, finestre con 63 e cinque righe totali; nessuna soglia prudenziale raggiunta. La suite precedente resta 147 passate e una POSIX saltata, non ripetuta per l'esito documentale. Questi dati provano la visibilità del campione tecnico e lasciano aperta la continuità AdS offline. Manifest privato nel replay, SHA e passi 94-95 nel runbook.
+
+## Offline cloud osservato, confronto con buffer locale preparato, 13/10/2026
+
+Replay reale di quattro letture connectivity identico nei report/metadati/mapping, raw offline ora osservato. tests/test_nebula_offline_history.py aggiunge tredici casi: quattro campi del riferimento locale, vuoto, controllo mancante, deduplica delle righe locali, riferimento invalido prima delle query, guardia locale a 1.000 e privacy CLI. Mutazioni del testo omesso dalla firma e del controllo forzato presente rilevate; ripristino byte/SHA verificato. Suite degli otto file Nebula 147 passate e una POSIX saltata. Processo nativo verifica anche il parametro reference e i tredici record nel file privato, token finto e codici 0/7. Ruff e parser verdi; preflight reale tre POST, tredici record distinti, zero autenticazioni. Il collaudo storico API è ancora atteso.
+
+## Storico cloud 30 giorni preparato, offline ancora da provare, 13/10/2026
+
+tests/test_nebula_connectivity.py aggiunge quattordici casi: fixture reale online, altri stati sintetici non classificati come offline, vuoto e controllo mancante, schema invalido, booleano come tempo, intervallo invertito, newline, due target/quattro richieste, Requests/TLS/body/percorso/302/429 e CLI con chiave finta. Le lambda invocate subito nei cicli sono sostituite con partial per legare esplicitamente i parametri dopo la segnalazione Ruff. Suite dei sette file Nebula: 134 passate, una POSIX saltata. Mutazioni del falso successo su vuoto/controllo mancante e TLS disabilitato rilevate, ripristino byte/SHA verificato. Processo nativo con token finto, codici 0/7 e parser verdi. La prova locale non misura il buffering cloud; dati reali 30d ancora attesi.
 
 ## Volumi API Nebula concordanti nel campione reale, 13/10/2026
 
