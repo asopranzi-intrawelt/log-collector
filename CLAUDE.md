@@ -14,6 +14,8 @@ Collettore centrale open source degli accessi degli amministratori di sistema (p
 - Ratio del progetto, da leggere prima di decidere chi amministra che cosa: `docs/modello-di-custodia.md` (chi è amministratore di sistema non custodisce la prova dei propri accessi; tre livelli: raccolta, prova, analisi)
 - Perché non Wazuh, e che cosa si prende dalla proposta dell'MSP: `docs/confronto-wazuh.md`
 - Copertura dell'intero inventario di rete: `docs/matrice-sorgenti-rete.md`, con classificazione verificabile in `data/copertura-rete-20261008.json` e controllo `tools/verifica-copertura-rete.py`
+- Tre archivi e censimento delle notifiche IT: `docs/progetto-log-operativi-email.md`, stessa VM per accessi AdS, tecnici e backup; frontend e correlazione come fasi successive
+- Servizi cloud, applicazioni e log operativi dei backup: `docs/ricognizione-servizi-e-backup.md`, confronto del Word storico con il progetto rete e stato separato da quello dei nodi topologici
 - Valori dell'ambiente: `config/parametri.yaml` (copia locale di `config/parametri.example.yaml`, fuori da git)
 
 I due documenti non si importano a ogni avvio, perché da soli valgono oltre 30.000 caratteri e porterebbero il progetto sopra la soglia degli instruction file (sezione 24 di `.claude/PROJECT-SYSTEM.md`). Si leggono a richiesta: prima di lavorare su un componente si leggono la sezione dell'handoff che lo descrive e le sezioni dello studio che quella richiama, e la sezione 0 dell'handoff prima di decidere se un componente è bloccato.

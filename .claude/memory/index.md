@@ -1,6 +1,24 @@
 # Snapshot di sincronizzazione
 
+## Login fallito 54HP verificato, tre casi API completati, 13/10/2026
+
+Verificata la prova con password errata: cinque richieste, quattro array vuoti e un fallimento. Evento 13:23:51 locali, conferma 13:23:54,212446, risposta positiva 13:24:46,239149. Ritardo apparente sul timestamp del record 55,239 secondi; ultima richiesta negativa pertinente a +39,635 secondi, 52,026703 secondi dalla conferma alla risposta. Report e candidato ricalcolati identici senza rete dai cinque payload; target/MAC del 54HP, account/IP del login precedente verificati, identificativi soltanto privati. Tre query negative coprono l’ora dell’evento, la prima è precedente. Nessun clock offset, istante esatto di pubblicazione o ritardo massimo dimostrato. Passi 65-67 e SHA nel runbook. Login riuscito, logout manuale e fallimento del 54HP sono ora verificati via API sul campione; raccolta VM non collaudata, poller/credenziale non installati e settle/overlap invariati. Formato già noto, codice invariato; i 105 test locali e una POSIX saltata del giro precedente non sono rieseguiti per la sola documentazione. HEAD main 295809f, 16 modificati e tre nuovi all’inizio, lavoro precedente ancora da chiudere manualmente. Prossimo gesto: chiudi nel solo collettore dopo i controlli completi. Restano AP/NCC, retention/limiti, offline, notifica, D-1, D7, censimento email IT/Seeweb e collegamento Outlook non confermato; tre archivi stessa VM conservati. Proxmox pianificato, PowerShell 7, dieci guest-agent 403 e audit fonti ADR aperti.
+
+Risultato propagato in sei documenti rete, con backup e delta privati; timeline SVG a 189 eventi e ISO-30 in_corso, tre copie HTML verificate allineate. L’aggiornamento indipendente del sistema di progetto è ora versionato in network-design a 4fb9cdb; le annotazioni del collettore restano da chiudere separatamente. Controlli completi di chiusura verdi in entrambi i progetti, diff puliti; anonimizzazione collettore su 468 candidati e rete su 533 tracciati senza blocchi, con soli avvisi noti su versioni/OID. Nessun commit, push o deploy dell’agente. Messaggio pronto per chiudi nel collettore: Collaudati accessi Nebula e censiti servizi e backup. Impronta manuale delle 09:38 preservata. Prossimo lavoro dopo la milestone: limiti/troncamenti e offline API prima del collaudo VM; quattro pendenze di ripresa e altri gate conservati, Outlook non confermato collegato.
+
+## Logout manuale 54HP verificato, fallimento preparato, 13/10/2026
+
+La prova reale termina authentication_unknown: la settima risposta contiene il nuovo logout manuale 54HP dopo sei array vuoti. Evento 11:46:19 locali, conferma 11:46:20,227647, avvio 11:46:13,831509; target/MAC e account/IP del login precedente verificati senza rete. Payload del logout verificato; comando originale rimasto errore e report finale assente. Metadati della risposta positiva non salvati: nessun ritardo preciso ricalcolato. Ultima query negativa pertinente a +73,115 secondi dichiarati, senza clock offset o massimo provati. Aggiunto il solo formato reale manuale al poller, timeout mantenuto e altri AAA rifiutati; il verificatore ora conserva i tempi anche sull’errore di classificazione, con conteggio nullo. Fixture anonimizzata, AdsLine e dedup, due mutazioni rilevate e SHA ripristinati. Prossimo collaudo pronto: --event failure e wrapper privato, un tentativo con password errata dopo ready, Invio dopo il rifiuto. Suite 105 passate, una POSIX saltata su Windows; processo nativo con token finto, tipo/modello e codice 7 verificati, Ruff verde. Passi 59-63 e SHA in docs/runbook-componente-3-nebula.md. Non ripetere il logout riuscito per la sola verifica del parser. Nessun poller/token sulla VM o parametro settle/overlap cambiato. Censimento servizi, tre archivi e posta IT conservati; Outlook Email non confermato collegato. Retention, limiti, offline, notifica, D-1, D7, Proxmox pianificato, PowerShell 7, dieci guest-agent 403 e audit fonti ADR restano aperti. HEAD main 295809f, lavoro precedente e nuovo non committati; impronta delle 09:38 preservata.
+
+Propagazione del logout eseguita: sei documenti rete, timeline SVG a 188 eventi, ISO-30 in_corso e tre copie HTML allineate. Il primo controllo globale della rete incontra dati sintetici negli auto-test di un aggiornamento indipendente del sistema di progetto; quel lavoro evolve in parallelo e resta preservato. L’ultimo chiudi -SoloControlli della rete è verde fuori sandbox, dopo PermissionError nella cartella temporanea; diff dei file pertinenti pulito. Il collettore ha chiusura completa verde, anonimizzazione su 468 candidati senza blocchi, Ruff e parser PowerShell verdi. Test 105 passati e uno POSIX saltato, due mutazioni rilevate e ripristino byte/SHA; non ripetuti dopo sole annotazioni. Proposta chiudi nel solo collettore: Aggiunti log dei servizi e collaudi manuali Nebula. Nessun commit, push o deploy dell’agente. Prossimo gesto reale: un solo login fallito 54HP con il wrapper preparato, pagina di login prima dell’avvio e conferma dopo il rifiuto. Posta IT ancora da leggere quando il collegamento Outlook sarà confermato. Le quattro pendenze di ripresa e gli altri gate conservano il loro stato.
+
+## Servizi e backup censiti, logout 54HP preparato, 13/10/2026
+
+Login 54HP versionato in 295809f, unico albero pulito all’avvio e impronta delle 09:38 coerente. Preparato --event logout e wrapper privato: sessione attiva prima dell’avvio, un Logout dopo ready, Invio quando torna la pagina di login. Otto casi nuovi, 63/63 locali senza rete; due mutazioni rilevate e byte/SHA ripristinati, prova nativa con token finto e codice 7, Ruff verde. Un formato AAA sconosciuto conserva il grezzo e causa errore; timeout non promosso a misura riuscita. Prova reale logout e fallimento 54HP ancora attesi; passi 51-56 nel runbook. L’utente conferma Seeweb principalmente per i backup e chiede tutti i log dei servizi. Ricognizione in docs/ricognizione-servizi-e-backup.md: Word storico confrontato con la rete, 7.198 blocchi e 645 titoli estratti; 2.269 immagini non tutte lette né sottoposte a OCR. Correzione Azure NAS preservata, AWS e PBX da confermare, 57 nodi invariati. Scelta della stessa VM per tre archivi logici: accessi AdS, tecnici e backup; ADR-019 e docs/progetto-log-operativi-email.md. Autorizzato censimento delle notifiche della casella IT e di due copie IT, indirizzi solo privati, con deduplicazione da verificare sui campioni. Outlook Email trovato disponibile e non installato: installazione/connessione proposta, nessuna lettura della posta ancora eseguita. Frontend LAN sysadmin confermato e correlazione tipo SIEM in fase successiva. Nessun nuovo servizio installato sulla VM. Proxmox pianificato, PowerShell 7, dieci guest-agent 403, audit fonti ADR e gate Nebula/D7 aperti.
+
 > Da leggere per primo a inizio sessione. Fotografa lo stato del progetto al commit di riferimento e mappa ogni scheda al suo stato di verifica. È la fonte di verità su cosa è fatto, non le spunte del diario. Vale per la branch dichiarata qui sotto e non per il progetto: se il progetto usa più alberi di lavoro e questa non è la branch più avanti, la memoria valida è quella dell'albero autorevole indicato (norma `.claude/skills/alberi-di-lavoro/RIFERIMENTO.md`).
+
+Propagazione rete completata: integrazione, memoria, contesto, timeline e resume aggiornati, ISO-30 in_corso, timeline a 187 eventi e tre HTML verificati allineati. Rimando al registro delle decisioni del collettore corretto dopo il rifiuto del generatore; controlli non aggirati. HEAD rete b00e94c dopo la chiusura manuale degli altri blocchi. Controlli completi di chiusura verdi in entrambi i progetti; anonimizzazione collettore su 467 candidati, zero blocchi e tre avvisi preesistenti. Diff pulito, identità/remoto locali verificati; SHA del Word riconfermato inalterato. Proposta chiudi nel collettore: Aggiunti censimento servizi e prova del logout Nebula. Commit, push e deploy restano manuali. Outlook Email non installato all’ultimo controllo, nessun lettore email disponibile; posta reale e logout ancora attesi.
 
 ## Stato
 
@@ -88,7 +106,7 @@
 
 ```
 Branch attivo:        main
-Commit di riferimento: 9710d4d
+Commit di riferimento: 295809f
 Data snapshot:        2026-10-13
 Albero autorevole:    unico
 Remoto:               git@github-corp:asopranzi-intrawelt/log-collector.git (primo push di 9ee87b4 il 2026-09-30)
@@ -99,16 +117,16 @@ Template:             E:\template-claude-developing @ ffcbdb3
 
 | Scheda | last-verified | Stato |
 |---|---|---|
-| STACK.md | 9710d4d | target dedicato 54HP eseguito; report reale ricalcolato identico |
+| STACK.md | 295809f | tre casi locali 54HP verificati via API; nessun consumer sulla VM |
 | design-and-security.md | 48be07b | credenziali e grezzi privati; tempo apparente distinto dal ritardo massimo |
 | deployment.md | 48be07b | wrapper eseguito dalla postazione; nessuna installazione VM |
-| dev-testing.md | 9710d4d | 55 casi locali verdi, due mutazioni rilevate e ripristinate |
-| current-work.md | 9710d4d | login riuscito 54HP osservato; logout e fallimento ancora aperti |
+| dev-testing.md | 295809f | 105 casi locali passati e una POSIX saltata; report reale failure ricalcolato |
+| current-work.md | 295809f | tre casi 54HP verificati; milestone da chiudere e produzione ancora da collaudare |
 | roadmap.md | 9ee87b4 | solo struttura |
 
 ## Punto di ripresa
 
-Passo corrente: chiusura manuale della milestone 54HP con `chiudi` dopo i controlli completi dell'agente. Il login è già osservato e verificato, non ripetere il wrapper per la sola registrazione. Dopo la chiusura predisporre la prova del logout 54HP; tentativo fallito, limiti, offline, notifica e D-1 restano gate prima dell'esercizio. Non riusare l'osservatore del login per un evento di logout senza adattarne il criterio. Milestone precedente `9710d4d`; blocchi indipendenti del progetto rete conservati separatamente.
+Passo corrente: chiusura manuale della milestone nel solo collettore dopo controlli completi. Tre casi locali 54HP verificati via API: successo, logout manuale e fallimento; report failure ricalcolato identico, prove da non ripetere per la registrazione. Dopo la milestone verificare limiti/troncamenti e offline dell’API prima del collaudo VM. Restano AP/NCC, notifica/D-1, posta IT, D7 e quattro pendenze.
 
 Verifica preparata: l'utente esegue `_notes/check-nebula-retention.ps1` dalla postazione Windows e trasmette l'esito aggregato e il percorso della nuova cartella privata; l'agente confronta il nuovo JSON con i cinque accessi dell'08/10 e registra soltanto ciò che la misura dimostra. La raccolta di produzione resta non attivata. La propagazione documentale precedente di network-design è ancora non committata.
 

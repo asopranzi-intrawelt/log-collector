@@ -26,6 +26,7 @@ FIELDS = ("timestamp", "category", "devId", "mac", "message", "priority", "tag")
 PATTERNS = (
     ("failure", r"HTTP\(s\) authentication failure \[username: (.+), IP address = (.+)\]"),
     ("login", r"HTTP\(s\) user (.+) login \[IP address = (.+)\]"),
+    ("logout", r"HTTP\(s\) user (.+) logout \[IP address = (.+)\]"),
     (
         "logout",
         r"HTTP\(s\) user (.+) logout due to session timeout \[IP address = (.+)\]",

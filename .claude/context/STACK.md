@@ -6,10 +6,22 @@ covers-paths:
   - bin/**
   - config/**
   - tests/**
-last-verified-commit: 9710d4d
+last-verified-commit: 295809f
 ---
 
 # Stack applicativo
+
+## Login fallito 54HP verificato, tre casi API completati, 13/10/2026
+
+Il verificatore failure 54HP è stato eseguito dall’operatore: un solo evento riconosciuto nella quinta risposta, report ricalcolato identico senza rete e stessa identità del login precedente. Sul 54HP il campione copre ora successo, logout manuale e fallimento; nessun poller installato sulla VM. Codice invariato per questo esito; tempi, SHA e limiti nei passi 65-67 del runbook.
+
+## Logout manuale 54HP verificato, fallimento preparato, 13/10/2026
+
+La prova reale termina authentication_unknown: la settima risposta contiene il nuovo logout manuale 54HP dopo sei array vuoti. Evento 11:46:19 locali, conferma 11:46:20,227647, avvio 11:46:13,831509; target/MAC e account/IP del login precedente verificati senza rete. Payload del logout verificato; comando originale rimasto errore e report finale assente. Metadati della risposta positiva non salvati: nessun ritardo preciso ricalcolato. Ultima query negativa pertinente a +73,115 secondi dichiarati, senza clock offset o massimo provati. Aggiunto il solo formato reale manuale al poller, timeout mantenuto e altri AAA rifiutati; il verificatore ora conserva i tempi anche sull’errore di classificazione, con conteggio nullo. Fixture anonimizzata, AdsLine e dedup, due mutazioni rilevate e SHA ripristinati. Prossimo collaudo pronto: --event failure e wrapper privato, un tentativo con password errata dopo ready, Invio dopo il rifiuto. Suite 105 passate, una POSIX saltata su Windows; processo nativo con token finto, tipo/modello e codice 7 verificati, Ruff verde. Passi 59-63 e SHA in docs/runbook-componente-3-nebula.md. Non ripetere il logout riuscito per la sola verifica del parser. Nessun poller/token sulla VM o parametro settle/overlap cambiato. Censimento servizi, tre archivi e posta IT conservati; Outlook Email non confermato collegato. Retention, limiti, offline, notifica, D-1, D7, Proxmox pianificato, PowerShell 7, dieci guest-agent 403 e audit fonti ADR restano aperti. HEAD main 295809f, lavoro precedente e nuovo non committati; impronta delle 09:38 preservata.
+
+## Servizi e backup censiti, logout 54HP preparato, 13/10/2026
+
+Login 54HP versionato in 295809f, unico albero pulito all’avvio e impronta delle 09:38 coerente. Preparato --event logout e wrapper privato: sessione attiva prima dell’avvio, un Logout dopo ready, Invio quando torna la pagina di login. Otto casi nuovi, 63/63 locali senza rete; due mutazioni rilevate e byte/SHA ripristinati, prova nativa con token finto e codice 7, Ruff verde. Un formato AAA sconosciuto conserva il grezzo e causa errore; timeout non promosso a misura riuscita. Prova reale logout e fallimento 54HP ancora attesi; passi 51-56 nel runbook. L’utente conferma Seeweb principalmente per i backup e chiede tutti i log dei servizi. Ricognizione in docs/ricognizione-servizi-e-backup.md: Word storico confrontato con la rete, 7.198 blocchi e 645 titoli estratti; 2.269 immagini non tutte lette né sottoposte a OCR. Correzione Azure NAS preservata, AWS e PBX da confermare, 57 nodi invariati. Scelta della stessa VM per tre archivi logici: accessi AdS, tecnici e backup; ADR-019 e docs/progetto-log-operativi-email.md. Autorizzato censimento delle notifiche della casella IT e di due copie IT, indirizzi solo privati, con deduplicazione da verificare sui campioni. Outlook Email trovato disponibile e non installato: installazione/connessione proposta, nessuna lettura della posta ancora eseguita. Frontend LAN sysadmin confermato e correlazione tipo SIEM in fase successiva. Nessun nuovo servizio installato sulla VM. Proxmox pianificato, PowerShell 7, dieci guest-agent 403, audit fonti ADR e gate Nebula/D7 aperti.
 
 > Documento di recupero più importante: tracciato, perché un collega che clona deve vederlo. Popolare leggendo il codice attuale, non inventare. Affinare `covers-paths` man mano.
 

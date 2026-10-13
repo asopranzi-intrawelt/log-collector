@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Osserva la prima comparsa di un nuovo login locale di uno switch in Nebula.
+"""Osserva un nuovo login, logout o fallimento di autenticazione in Nebula.
 
 Osservazione ordinaria di cinque minuti, pausa 15 secondi, budget 21 POST.
 Ultima prova opzionale: dieci minuti, massimo 41 POST e due letture diagnostiche.
@@ -27,6 +27,7 @@ INTERVAL_SECONDS = 15
 RESPONSE_GUARD = 1000
 FINAL_DURATION_SECONDS = 600
 FINAL_MAX_REQUESTS = 41
+EVENT_KINDS = ("login", "logout", "failure")
 
 
 def select_target(snapshot, baseline, switch_model=None):
@@ -61,7 +62,11 @@ def measure(
     sleep=None,
     duration_seconds=DURATION_SECONDS,
     max_requests=MAX_REQUESTS,
+    expected_event="login",
 ):
+    if expected_event not in EVENT_KINDS:
+        raise windows.history.EvidenceError("expected_event_invalid")
+    count_key = "candidate_logins" if expected_event == "login" else "candidate_events"
     now = now or (lambda: datetime.now(UTC))
     monotonic = monotonic or time.monotonic
     sleep = sleep or time.sleep
@@ -72,7 +77,7 @@ def measure(
     timer_start = monotonic()
     windows.write_private(output / "ready.json", {"observation_started_at": started.isoformat()})
     observations, scans, candidates = [], [], []
-    outcome = "no_new_login"
+    outcome = f"no_new_{expected_event}"
     previous_received = started_ms
     for ordinal in range(1, max_requests + 1):
         if monotonic() - timer_start > duration_seconds:
@@ -90,10 +95,6 @@ def measure(
         events = windows.poller.validate_events(response, target, query_start, end)
         if len(events) >= RESPONSE_GUARD:
             raise windows.poller.PollError("observation_response_saturated")
-        found = {}
-        for event in events:
-            if windows.poller.outcome(event) == "login" and event["timestamp"] >= eligible_start:
-                found[windows.history.digest(event)] = event
         observation = {
             "ordinal": ordinal,
             "query_start_ms": query_start,
@@ -101,8 +102,22 @@ def measure(
             "requested_at": requested.isoformat(),
             "received_at": received.isoformat(),
             "rows": len(events),
-            "candidate_logins": len(found),
+            count_key: None,
         }
+        found = {}
+        try:
+            for event in events:
+                if (
+                    windows.poller.outcome(event) == expected_event
+                    and event["timestamp"] >= eligible_start
+                ):
+                    found[windows.history.digest(event)] = event
+        except windows.poller.PollError as exc:
+            # Conservare il tempo anche quando un nuovo formato impedisce il conteggio.
+            observation["classification_error"] = str(exc)
+            windows.write_private(output / f"sample-{ordinal:03}-meta.json", observation)
+            raise
+        observation[count_key] = len(found)
         windows.write_private(output / f"sample-{ordinal:03}-meta.json", observation)
         observations.append(observation)
         scans.append((end, set(found)))
@@ -128,7 +143,7 @@ def measure(
         ]
         if negative:
             negative_start = negative[-1] - reference_ms
-    return {
+    report = {
         "started_at": started.isoformat(),
         "eligible_start_ms": eligible_start,
         "acquired_at": now().isoformat(),
@@ -137,13 +152,16 @@ def measure(
         "max_requests": max_requests,
         "status": outcome,
         "ok": outcome == "observed",
-        "candidate_logins": len(candidates),
+        count_key: len(candidates),
         "candidate_timestamp_ms": reference_ms,
         "apparent_delay_upper_ms": upper,
         "last_negative_request_start_delay_ms": negative_start,
         "observations": observations,
-        "scope": "first_api_visibility_of_one_candidate_login; clock_offset_unverified",
+        "scope": f"first_api_visibility_of_one_candidate_{expected_event}; clock_offset_unverified",
     }
+    if expected_event != "login":
+        report["expected_event"] = expected_event
+    return report
 
 
 def recheck(client, target, reference, observation, output, now=None):
@@ -151,8 +169,10 @@ def recheck(client, target, reference, observation, output, now=None):
     now = now or (lambda: datetime.now(UTC))
     eligible = observation.get("eligible_start_ms")
     samples = observation.get("observations")
+    expected_event = observation.get("expected_event", "login")
     if (
-        observation.get("status") != "no_new_login"
+        expected_event not in EVENT_KINDS
+        or observation.get("status") != f"no_new_{expected_event}"
         or observation.get("ok") is not False
         or type(eligible) is not int
         or not isinstance(samples, list)
@@ -176,23 +196,23 @@ def recheck(client, target, reference, observation, output, now=None):
     if len(control) >= RESPONSE_GUARD or len(wide) >= RESPONSE_GUARD:
         raise windows.poller.PollError("recheck_response_saturated")
     control_present = windows.history.digest(reference) in windows.signatures(control)
-    logins = {}
+    found = {}
     for event in wide:
-        if windows.poller.outcome(event) == "login":
-            logins[windows.history.digest(event)] = event
-    candidates = sorted(logins.values(), key=lambda event: event["timestamp"])
+        if windows.poller.outcome(event) == expected_event:
+            found[windows.history.digest(event)] = event
+    candidates = sorted(found.values(), key=lambda event: event["timestamp"])
     windows.write_private(output / "private-candidates.json", candidates)
-    status = "candidates_found" if candidates else "no_recent_login"
+    status = "candidates_found" if candidates else f"no_recent_{expected_event}"
     if not control_present:
         status = "control_missing"
-    return {
+    report = {
         "acquired_at": received.isoformat(),
         "requests": 2,
         "query_start_ms": start,
         "query_end_ms": end,
         "control_present": control_present,
         "wide_rows": len(wide),
-        "login_candidates": len(candidates),
+        ("login_candidates" if expected_event == "login" else "event_candidates"): len(candidates),
         "candidates": [
             {
                 "timestamp_ms": event["timestamp"],
@@ -209,6 +229,9 @@ def recheck(client, target, reference, observation, output, now=None):
         "ok": control_present and bool(candidates),
         "scope": "diagnostic_recheck; candidate_identity_and_publication_time_unverified",
     }
+    if expected_event != "login":
+        report["expected_event"] = expected_event
+    return report
 
 
 def main(argv=None):
@@ -218,6 +241,7 @@ def main(argv=None):
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--key-stdin", action="store_true", required=True)
     parser.add_argument("--switch-model", choices=("XGS2220-30HP", "XGS2220-54HP"))
+    parser.add_argument("--event", choices=EVENT_KINDS, default="login")
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--observation", type=Path)
     mode.add_argument("--final-attempt", action="store_true")
@@ -235,6 +259,8 @@ def main(argv=None):
             if recorded_target != target:
                 raise windows.history.EvidenceError("observation_target_mismatch")
             observation = json.loads(args.observation.read_text(encoding="utf-8-sig"))
+            if observation.get("expected_event", "login") != args.event:
+                raise windows.history.EvidenceError("observation_event_mismatch")
         args.output.mkdir(parents=False, exist_ok=False)
         windows.write_private(args.output / "private-target.json", target)
         key = sys.stdin.readline(4097).rstrip("\r\n")
@@ -249,29 +275,36 @@ def main(argv=None):
                     "duration_seconds": FINAL_DURATION_SECONDS,
                     "max_requests": FINAL_MAX_REQUESTS,
                 }
+            if args.event != "login":
+                settings["expected_event"] = args.event
             report = measure(client, target, args.output, **settings)
+            count_key = "candidate_logins" if args.event == "login" else "candidate_events"
             detail = (
                 f"status={report['status']} requests={report['requests']} "
-                f"candidate_logins={report['candidate_logins']} "
+                f"{count_key}={report[count_key]} "
                 f"apparent_delay_upper_ms={report['apparent_delay_upper_ms']}"
             )
         else:
             report = recheck(client, target, reference, observation, args.output)
+            count_key = "login_candidates" if args.event == "login" else "event_candidates"
             detail = (
                 f"status={report['status']} requests={report['requests']} "
                 f"control_present={report['control_present']} "
-                f"login_candidates={report['login_candidates']}"
+                f"{count_key}={report[count_key]}"
             )
         windows.write_private(args.output / "comparison.json", report)
-        if args.final_attempt and report["status"] == "no_new_login":
+        if args.final_attempt and report["status"] == f"no_new_{args.event}":
             followup = args.output / "followup"
             followup.mkdir()
             diagnostic = recheck(client, target, reference, report, followup)
+            count_key = "login_candidates" if args.event == "login" else "event_candidates"
             windows.write_private(followup / "comparison.json", diagnostic)
             detail += (
                 f" recheck_status={diagnostic['status']} recheck_requests={diagnostic['requests']}"
-                f" recheck_login_candidates={diagnostic['login_candidates']}"
+                f" recheck_{count_key}={diagnostic[count_key]}"
             )
+        if args.event != "login":
+            detail += f" expected_event={args.event}"
         status = 0 if report["ok"] else 1
     except (windows.history.EvidenceError, windows.poller.PollError) as exc:
         detail, status = f"status=error code={exc}", 1

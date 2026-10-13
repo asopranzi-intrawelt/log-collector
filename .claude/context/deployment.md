@@ -10,6 +10,14 @@ last-verified-commit: 48be07b
 
 # Deployment
 
+## Login fallito 54HP verificato, tre casi API completati, 13/10/2026
+
+La postazione ha osservato via API anche il fallimento locale del 54HP; successo, logout e fallimento sono verificati nei campioni. Questo riguarda il canale dalla sorgente a NCC/API, senza installazione del poller o token VM. Gate di produzione e parametri invariati; dettaglio nei passi 65-67 del runbook.
+
+## Logout 54HP reale, correzione ancora locale
+
+Il logout manuale è verificato nel payload API reale del 13/10 e nel parser corretto localmente, con 105 prove passate e una POSIX saltata su Windows. Non installato sulla VM. Wrapper failure 54HP preparato, prova reale attesa. Non ripetere il logout per il solo ricalcolo del parser; il report originale resta errore e i tempi positivi mancanti non sono ricostruiti. Gate di produzione invariati.
+
 > Stato riconciliato al commit `2456511`, con poller Nebula preparato nel lavoro locale del 12/10. Commit, push e interventi sugli host restano operazioni manuali dell'utente.
 
 ## Modello di separazione fra test e produzione

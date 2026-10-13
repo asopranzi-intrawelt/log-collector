@@ -8,6 +8,14 @@ last-verified-commit: 9ee87b4
 
 # Roadmap
 
+## Login fallito 54HP verificato, tre casi API completati, 13/10/2026
+
+I tre casi di accesso locale del 54HP sono verificati nei campioni API del 13/10, con ultimo fallimento osservato e report ricalcolato identico. Dopo la milestone, misurare limiti/troncamenti e offline prima del collaudo VM; la raccolta dei sei apparati e dei login NCC rimane aperta. Censimento email IT/Seeweb e tre archivi stessa VM conservati.
+
+## Log operativi, email e correlazione futura
+
+ADR-019 amplia il censimento ai servizi e ai backup, iniziando da Seeweb. L’utente conferma la VM esistente per archivi logici AdS, tecnici e backup; frontend LAN riservato al sysadmin e successiva correlazione/allarmi. Prima: censire le notifiche IT, verificare sorgenti attive, campioni, canali, deduplicazione e politiche. Outlook Email ancora da installare/collegare; nessun nuovo flusso in esercizio. Il collaudo Nebula continua. Dettaglio in docs/ricognizione-servizi-e-backup.md e docs/progetto-log-operativi-email.md.
+
 > Direzione e priorità del progetto. Tracciata. Non è il work-log: qui sta dove si va, non cosa è già stato fatto.
 
 ## Direzione

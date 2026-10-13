@@ -1,0 +1,9 @@
+{
+  "timestamp": 1791884779000,
+  "category": "AAA",
+  "devId": "<SWITCH_ID>",
+  "mac": "<SWITCH_MAC>",
+  "message": "HTTP(s) user <ACCOUNT> logout [IP address = <CLIENT_IP>]",
+  "priority": "IN",
+  "tag": "authentication"
+}

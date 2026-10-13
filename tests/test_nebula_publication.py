@@ -17,6 +17,7 @@ publication = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(publication)
 EVENTS = json.loads((FIXTURES / "nebula-switch-events.json").read_text(encoding="utf-8"))
 LOGIN = next(e for e in EVENTS if publication.windows.poller.outcome(e) == "login")
+LOGOUT = next(e for e in EVENTS if publication.windows.poller.outcome(e) == "logout")
 TARGET = {"site_id": "<SITE_ID>", "device_id": "<SWITCH_ID>"}
 START_MS = LOGIN["timestamp"] - 2000
 
@@ -43,11 +44,11 @@ class Client:
         return self.pages[min(len(self.calls) - 1, len(self.pages) - 1)]
 
 
-def measure(tmp_path, pages):
+def measure(tmp_path, pages, **settings):
     clock = Clock()
     client = Client(clock, pages)
     report = publication.measure(
-        client, TARGET, tmp_path, clock.now, lambda: clock.seconds, clock.sleep
+        client, TARGET, tmp_path, clock.now, lambda: clock.seconds, clock.sleep, **settings
     )
     return report, client
 
@@ -472,3 +473,206 @@ def test_recheck_rejects_a_report_from_the_other_device_before_client_creation(
         ]
     )
     assert status == 1 and not output.exists()
+
+
+def test_logout_ignores_login_and_old_logout_then_saves_exact_new_event(tmp_path):
+    old = copy.deepcopy(LOGOUT)
+    old["timestamp"] = START_MS - 1000
+    logout = copy.deepcopy(LOGOUT)
+    logout["timestamp"] = START_MS + 20_000
+    report, client = measure(tmp_path, [[old], [LOGIN], [logout]], expected_event="logout")
+    assert report["ok"] and report["status"] == "observed"
+    assert report["expected_event"] == "logout" and report["candidate_events"] == 1
+    assert len(client.calls) == 3 and report["candidate_timestamp_ms"] == logout["timestamp"]
+    assert report["apparent_delay_upper_ms"] == 13_000
+    assert json.loads((tmp_path / "private-candidates.json").read_text()) == [logout]
+    assert "candidate_logins" not in report
+
+
+def test_logout_watch_does_not_succeed_on_logins_alone(tmp_path):
+    report, _ = measure(tmp_path, [[], [LOGIN]], expected_event="logout")
+    assert not report["ok"] and report["status"] == "no_new_logout"
+    assert report["candidate_events"] == 0 and report["apparent_delay_upper_ms"] is None
+
+
+def test_unknown_logout_preserves_error_and_positive_response_timing(tmp_path):
+    logout = copy.deepcopy(LOGOUT)
+    logout["timestamp"] = START_MS
+    logout["message"] = logout["message"].replace("due to session timeout", "due to unknown reason")
+    with pytest.raises(publication.windows.poller.PollError, match="authentication_unknown"):
+        measure(tmp_path, [[logout]], expected_event="logout")
+    assert json.loads((tmp_path / "sample-001.json").read_text()) == [logout]
+    meta = json.loads((tmp_path / "sample-001-meta.json").read_text())
+    assert meta["classification_error"] == "authentication_unknown"
+    assert meta["requested_at"] == datetime.fromtimestamp(START_MS / 1000, UTC).isoformat()
+    assert meta["received_at"] == datetime.fromtimestamp(START_MS / 1000 + 1, UTC).isoformat()
+    assert meta["rows"] == 1 and meta["candidate_events"] is None
+    assert not (tmp_path / "comparison.json").exists()
+
+
+def test_recorded_manual_logout_is_observed_with_exact_payload(tmp_path):
+    logout = json.loads((FIXTURES / "nebula-switch-manual-logout.json").read_text())
+    clock = Clock()
+    clock.now = lambda: datetime.fromtimestamp(logout["timestamp"] / 1000 - 2 + clock.seconds, UTC)
+    client = Client(clock, [[], [logout]])
+    report = publication.measure(
+        client,
+        TARGET,
+        tmp_path,
+        clock.now,
+        lambda: clock.seconds,
+        clock.sleep,
+        expected_event="logout",
+    )
+    assert report["ok"] and report["status"] == "observed" and client.calls
+    assert report["candidate_timestamp_ms"] == logout["timestamp"]
+    assert report["candidate_events"] == 1 and report["apparent_delay_upper_ms"] == 15_000
+    assert json.loads((tmp_path / "private-candidates.json").read_text()) == [logout]
+
+
+@pytest.mark.parametrize("with_logout", [False, True])
+def test_logout_recheck_counts_only_logout_and_keeps_diagnostic_scope(tmp_path, with_logout):
+    _, reference = publication.boundaries.select_reference({TARGET["device_id"]: EVENTS})
+    logout = copy.deepcopy(LOGOUT)
+    logout["timestamp"] = START_MS + 20_000
+    original = {
+        "status": "no_new_logout",
+        "expected_event": "logout",
+        "ok": False,
+        "eligible_start_ms": START_MS,
+        "observations": [{"query_end_ms": START_MS + 30_000}],
+    }
+    report, _ = recheck(
+        tmp_path, [[reference], [LOGIN] + ([logout] if with_logout else [])], original
+    )
+    assert report["event_candidates"] == int(with_logout)
+    assert report["ok"] is with_logout
+    assert report["status"] == ("candidates_found" if with_logout else "no_recent_logout")
+    assert "publication_time_unverified" in report["scope"]
+
+
+@pytest.mark.parametrize("observed", [False, True])
+@pytest.mark.parametrize("expected_event", ["logout", "failure"])
+def test_event_cli_uses_requested_event_and_keeps_timeout_inconclusive(
+    tmp_path, monkeypatch, capsys, observed, expected_event
+):
+    baseline_data, snapshot_data, target54, technical = two_switches()
+    baseline, snapshot = tmp_path / "baseline.json", tmp_path / "snapshot.json"
+    baseline.write_text(
+        json.dumps([{"DevId": d, "EventLogs": e} for d, e in baseline_data.items()])
+    )
+    snapshot.write_text(json.dumps(snapshot_data))
+    logout = copy.deepcopy(LOGOUT if expected_event == "logout" else EVENTS[0])
+    logout.update(devId=target54["device_id"], timestamp=START_MS + 20_000)
+    calls = []
+
+    class SelectedClient:
+        def __init__(self, key):
+            assert key == "FAKE_STDIN_KEY"
+
+        def fetch(self, target, left, right):
+            assert target == target54
+            calls.append((left, right))
+            return [technical] if len(calls) == 1 else [logout]
+
+        def close(self):
+            pass
+
+    def observation(client, target, path, **settings):
+        assert target == target54
+        assert settings == {
+            "duration_seconds": 600,
+            "max_requests": 41,
+            "expected_event": expected_event,
+        }
+        return {
+            "status": "observed" if observed else f"no_new_{expected_event}",
+            "ok": observed,
+            "expected_event": expected_event,
+            "candidate_events": int(observed),
+            "eligible_start_ms": START_MS,
+            "observations": [{"query_end_ms": START_MS + 30_000}],
+            "requests": 1,
+            "apparent_delay_upper_ms": 15000 if observed else None,
+        }
+
+    monkeypatch.setattr(publication, "measure", observation)
+    monkeypatch.setattr(publication.windows.poller, "NebulaClient", SelectedClient)
+    monkeypatch.setattr(publication.sys, "stdin", io.StringIO("FAKE_STDIN_KEY\n"))
+    output = tmp_path / "output"
+    status = publication.main(
+        [
+            "--key-stdin",
+            "--final-attempt",
+            "--event",
+            expected_event,
+            "--switch-model",
+            "XGS2220-54HP",
+            "--baseline",
+            str(baseline),
+            "--snapshot",
+            str(snapshot),
+            "--output",
+            str(output),
+        ]
+    )
+    assert status == (0 if observed else 1)
+    assert len(calls) == (0 if observed else 2)
+    assert json.loads((output / "comparison.json").read_text())["ok"] is observed
+    if not observed:
+        assert (
+            json.loads((output / "followup/comparison.json").read_text())["status"]
+            == "candidates_found"
+        )
+    assert f"expected_event={expected_event}" in capsys.readouterr().out
+
+
+def test_failure_watch_ignores_successes_and_logout(tmp_path):
+    failure = copy.deepcopy(EVENTS[0])
+    failure["timestamp"] = START_MS + 20_000
+    logout = copy.deepcopy(LOGOUT)
+    logout["timestamp"] = START_MS + 1000
+    report, client = measure(tmp_path, [[], [LOGIN, logout], [failure]], expected_event="failure")
+    assert report["ok"] and report["expected_event"] == "failure"
+    assert report["requests"] == len(client.calls) == 3 and report["candidate_events"] == 1
+    assert json.loads((tmp_path / "private-candidates.json").read_text()) == [failure]
+
+
+def test_cli_rejects_wrong_event_report_before_client_creation(tmp_path, monkeypatch):
+    baseline_data, snapshot_data, target54, _ = two_switches()
+    baseline, snapshot = tmp_path / "baseline.json", tmp_path / "snapshot.json"
+    baseline.write_text(
+        json.dumps([{"DevId": d, "EventLogs": e} for d, e in baseline_data.items()])
+    )
+    snapshot.write_text(json.dumps(snapshot_data))
+    observation = tmp_path / "comparison.json"
+    observation.write_text(json.dumps({"expected_event": "login"}))
+    (tmp_path / "private-target.json").write_text(json.dumps(target54))
+
+    def no_client(key):
+        raise AssertionError("Client creato prima di verificare il tipo di evento")
+
+    monkeypatch.setattr(publication.windows.poller, "NebulaClient", no_client)
+    monkeypatch.setattr(publication.sys, "stdin", io.StringIO("FAKE_STDIN_KEY\n"))
+    output = tmp_path / "output"
+    assert (
+        publication.main(
+            [
+                "--key-stdin",
+                "--event",
+                "logout",
+                "--switch-model",
+                "XGS2220-54HP",
+                "--observation",
+                str(observation),
+                "--baseline",
+                str(baseline),
+                "--snapshot",
+                str(snapshot),
+                "--output",
+                str(output),
+            ]
+        )
+        == 1
+    )
+    assert not output.exists()

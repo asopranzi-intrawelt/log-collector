@@ -10,6 +10,10 @@ last-verified-commit: 48be07b
 
 # Design e sicurezza applicativa
 
+## Formato manuale Nebula osservato
+
+Il campione reale 54HP del 13/10 aggiunge il formato esatto del logout manuale alla lista del poller. La guardia sui formati AAA sconosciuti conserva il comportamento di errore senza cursore avanzato; il verificatore conserva tempi e conteggio non disponibile in caso di classificazione fallita. Non è un ampliamento generico basato su keyword. Campione, regressione, mutazioni e limiti nei passi 59-63 del runbook; nessun canale in esercizio o ritardo massimo nuovo dimostrato.
+
 > Stato riconciliato al commit `2456511`, con poller Nebula nel lavoro locale del 12/10. Le scelte di custodia della prova restano in `docs/modello-di-custodia.md` e ADR-010.
 
 ## Paradigmi di software design

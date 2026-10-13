@@ -94,6 +94,40 @@ def test_recorded_events_arrive_as_ads_lines_and_second_run_is_identical(tmp_pat
     assert lines(tmp_path) == first
 
 
+def test_recorded_manual_logout_arrives_as_ads_line_without_duplicate(tmp_path, config):
+    logout = json.loads((FIXTURES / "nebula-switch-manual-logout.json").read_text())
+    config["initial_start_ms"] = logout["timestamp"] - 1
+    received = datetime(2026, 10, 13, 9, 47, 48, tzinfo=UTC)
+    client = RecordedClient([logout])
+    args = (client, config, tmp_path / "state", tmp_path / "logs", logout["timestamp"] + 60_001)
+    assert nebula.poll(*args, clock=lambda: received) == 1
+    path = tmp_path / "logs/2026-10-13.log"
+    original = path.read_bytes()
+    record = original.decode().strip()
+    stamp, source, declared, system, message = record.split(" ", 4)
+    assert datetime.fromisoformat(stamp) == received
+    assert source == "nebula-test" and system == "switch-test"
+    assert declared == "2026-10-13T09:46:19.000+00:00"
+    assert message == (
+        "nebula-auth outcome=logout "
+        "event_id=fee8618984b4b1fa4db4e8e2d9d424e7810c6f2d88585cf00c794105f0f59c36 "
+        "HTTP(s) user <ACCOUNT> logout [IP address = <CLIENT_IP>]"
+    )
+    assert nebula.poll(*args, clock=lambda: received) == 0
+    assert path.read_bytes() == original and len(rows(tmp_path, "seen")) == 1
+
+
+@pytest.mark.parametrize("suffix", [" extra", " due to unknown reason", "\n"])
+def test_manual_logout_pattern_does_not_accept_other_formats(suffix):
+    logout = json.loads((FIXTURES / "nebula-switch-manual-logout.json").read_text())
+    if suffix.startswith(" due"):
+        logout["message"] = logout["message"].replace("logout [", "logout" + suffix + " [")
+    else:
+        logout["message"] += suffix
+    with pytest.raises(nebula.PollError, match="authentication_unknown"):
+        nebula.outcome(logout)
+
+
 def test_overlap_collects_late_event_without_duplicating_previous_rows(tmp_path, config):
     run(tmp_path, config)
     late = copy.deepcopy(EVENTS[3])
