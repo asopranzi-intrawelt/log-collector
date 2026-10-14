@@ -5,10 +5,16 @@ generated-date: 2026-09-30
 covers-paths:
   - tests/**
   - tools/read-seeweb-report.py
-last-verified-commit: abd1ea4
+last-verified-commit: a5fe489
 ---
 
 # Test di sviluppo
+
+## Pannelli Seeweb censiti, raccolta ancora locale, 14/10/2026
+
+Riconciliati lettore e cinque file di test/fixture versionati in a5fe489: codice invariato, SHA finale 22ed89e725ea9624cb3d07d38cadc8982467a9dd6183517066b8a0081302ec67, 24 prove Seeweb del giro precedente non ripetute per il censimento. Word SHA invariato e tre schermate realmente lette; sette URL dell'operatore, nessun endpoint autenticato o export di log testato. Verifica reale GitHub in sola lettura riuscita dopo il timeout del controllo successivo al push. Il commit è presente; impronta della precedente chiusura non registrata, guardia HEAD del vecchio script ancora corretta.
+
+Censimento sincronizzato in otto documenti pubblici della rete, compresi indice dei documenti, fornitore, nuova scheda Seeweb e timeline, e nel livello privato con inventario dei sette URL e tre schermate conservate. ISO-30 resta in_corso; timeline a 200 eventi e tre HTML allineati. La prima rigenerazione aveva registrato l'evento ma fallito sull'asset PNG mancante nella vecchia cartella Download. Logo recuperato byte identico dall'HTML precedente, SHA 4394e383124b9a708ea3bf565e110a97ab7604379c1a1b04ad1943b65e64ec1e, 282.247 byte; originale della configurazione privato conservato e nuovo riferimento al PNG trattenuto nel progetto rete. Nessun cambio del marchio o secondo evento ISO, poi rigenerazione riuscita. Controlli completi verdi nei due progetti, diff e anonimizzazione senza blocchi, schede rigorose senza difetti fra commit. Le prove del lettore rimangono le 24 precedenti, distinte dalle dieci nuove prove simulate della chiusura. Preparata la chiusura manuale dei soli dodici file del censimento, lasciando fuori i nove file del template di altra lavorazione. D:/log-collector/_notes/chiudi-seeweb-censimento.ps1 riprova la lettura remota fino a tre volte e con -Completa riprende solo verifica/impronta dopo il commit, senza ripetere add, commit o push. La ripresa confronta parent, messaggio, perimetro e remoto. Dieci casi passati con git/python/attese/conferma sostituiti, incluse prima verifica fallita, timeout definitivo, remoto diverso e ripresa positiva/rifiutata. Due mutazioni rilevate e ripristinate byte/SHA della chiusura 09de034af932f1da7cc296ba15a1c75f0b59e468bf31f838bdbe17ef5a29c1ce. Nessun git.exe, rete o impronta reali nel collaudo della chiusura; impronta del 13/10 preservata e nessun commit/push/deploy dell'agente. La memoria rete che comprendeva anche integrità-docs è stata conservata; non proporre un commit parziale dei file condivisi mentre l'altra sessione scrive.
 
 ## Report Seeweb letti e stati per unità verificati, 14/10/2026
 

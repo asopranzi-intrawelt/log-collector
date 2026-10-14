@@ -8,6 +8,10 @@ last-verified-commit: 9ee87b4
 
 # Roadmap
 
+## Pannelli Seeweb censiti, raccolta ancora locale, 14/10/2026
+
+Dopo il lettore email locale, il perimetro Seeweb comprende sette punti di accesso confermati, con appliance pubblica/privata probabilmente della stessa sorgente in base al Word storico. Verificare dashboard, identità/versione e registri esistenti prima di scegliere canali o configurare raccolta. Non assumere API di audit, protezione di tutte le VM o disponibilità di log dai soli URL. Il test AdS offline resta rimandato. La timeline della rete riporta ogni avanzamento e lacuna del collettore nello stesso giro.
+
 ## Report Seeweb letti e stati per unità verificati, 14/10/2026
 
 Primo lettore Seeweb locale verificato su due report della casella IT condivisa: sei stati per unità, due Error il 13/10, 24 prove passate. Chiudere la milestone e confrontare poi una copia già ricevuta in una casella IT personale. Prima della produzione servono dedup reale, conferma dei job e della cadenza, canale con permessi minimi, silenzio e politiche dell'archivio backup. Tre archivi sulla stessa VM, frontend sysadmin e correlazione successivi; test AdS offline rimandato per scelta dell'utente.

@@ -57,6 +57,10 @@ Primo campione: un report Seeweb originale recente, esportato in formato .eml e 
 
 Per ogni campione si conserveranno privatamente byte originali, SHA-256, ora di acquisizione e casella di provenienza, distinguendo Date e Received dall'ora del job. Si leggeranno mittente effettivo, Message-ID, oggetto, struttura MIME, corpo e allegati, senza dedurre un esito dal mittente o dall'oggetto. Il primo report può contenere più nodi, job o stati: numero di mail e numero di backup restano contatori separati. La cadenza attesa, la deduplicazione fra le copie e la corrispondenza col pannello richiedono poi ulteriori campioni. In quel giro non viene implementato un parser Seeweb né dichiarato un export supportato del prodotto; il lettore locale preparato sui campioni successivi è descritto nel runbook.
 
+## Pannelli e audit Seeweb oltre alle mail
+
+Il censimento del 14/10 comprende anche i sette punti di accesso forniti dall'operatore, descritti in docs/sorgenti-log-seeweb.md. Il lettore email è locale e versionato in a5fe489; non raccoglie login del portale backup, Cloud Center, hypervisor, appliance, area clienti o supporto. Audit del provider, eventi tecnici dei sistemi e report backup hanno canali e prove distinti. Il Word e tre schermate completano l'attribuzione; nessun accesso ai pannelli o flusso sulla VM è stato attivato. La raccolta consentita va verificata per prodotto/versione e ruolo del tenant.
+
 ## Gate prima dell'ingestione
 
 Occorrono campioni reali e confronto delle copie, canale supportato con permessi minimi, credenziale propria del servizio, parser per i formati osservati, coda persistente, deduplicazione, gestione degli errori e degli allegati, controllo dei report mancanti e limiti di volume. Mail arrivata, job completato e copia ripristinabile sono fatti diversi: il controllo del silenzio non sostituisce la prova di restore. Destinatari tecnici, retention e permessi dei due nuovi archivi restano da definire; la notifica alla Direzione continua a riguardare il flusso AdS.

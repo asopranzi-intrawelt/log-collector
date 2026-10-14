@@ -7,10 +7,14 @@ covers-paths:
   - config/**
   - tests/**
   - tools/read-seeweb-report.py
-last-verified-commit: abd1ea4
+last-verified-commit: a5fe489
 ---
 
 # Stack applicativo
+
+## Pannelli Seeweb censiti, raccolta ancora locale, 14/10/2026
+
+Il lettore locale Seeweb e le fixture sono versionati in a5fe489; nessun servizio Seeweb sulla VM. Censiti sette punti di accesso in docs/sorgenti-log-seeweb.md, con tabella di eventi/canali e inventario reale privato. Due URL firewall storicamente associati alla stessa appliance, identità corrente ancora da confrontare. Le VM Windows e i job restano sorgenti distinte dai pannelli e dall'hypervisor. Timeline comune e contesto della rete aggiornati nello stesso giro, senza cambiare la topologia per i nuovi URL.
 
 ## Report Seeweb letti e stati per unità verificati, 14/10/2026
 
