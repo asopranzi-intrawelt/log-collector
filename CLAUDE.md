@@ -14,7 +14,7 @@ Collettore centrale open source degli accessi degli amministratori di sistema (p
 - Ratio del progetto, da leggere prima di decidere chi amministra che cosa: `docs/modello-di-custodia.md` (chi è amministratore di sistema non custodisce la prova dei propri accessi; tre livelli: raccolta, prova, analisi)
 - Perché non Wazuh, e che cosa si prende dalla proposta dell'MSP: `docs/confronto-wazuh.md`
 - Copertura dell'intero inventario di rete: `docs/matrice-sorgenti-rete.md`, con classificazione verificabile in `data/copertura-rete-20261008.json` e controllo `tools/verifica-copertura-rete.py`
-- Tre archivi e censimento delle notifiche IT: `docs/progetto-log-operativi-email.md`, stessa VM per accessi AdS, tecnici e backup; frontend e correlazione come fasi successive
+- Tre archivi e censimento delle notifiche IT: `docs/progetto-log-operativi-email.md`, stessa VM per accessi AdS, tecnici e backup; frontend e correlazione come fasi successive; prove sui report e lettore locale in `docs/runbook-log-operativi-email.md`
 - Servizi cloud, applicazioni e log operativi dei backup: `docs/ricognizione-servizi-e-backup.md`, confronto del Word storico con il progetto rete e stato separato da quello dei nodi topologici
 - Valori dell'ambiente: `config/parametri.yaml` (copia locale di `config/parametri.example.yaml`, fuori da git)
 

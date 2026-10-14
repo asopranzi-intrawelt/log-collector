@@ -8,6 +8,14 @@ last-verified-commit: 9ee87b4
 
 # Roadmap
 
+## Report Seeweb letti e stati per unità verificati, 14/10/2026
+
+Primo lettore Seeweb locale verificato su due report della casella IT condivisa: sei stati per unità, due Error il 13/10, 24 prove passate. Chiudere la milestone e confrontare poi una copia già ricevuta in una casella IT personale. Prima della produzione servono dedup reale, conferma dei job e della cadenza, canale con permessi minimi, silenzio e politiche dell'archivio backup. Tre archivi sulla stessa VM, frontend sysadmin e correlazione successivi; test AdS offline rimandato per scelta dell'utente.
+
+## Milestone Nebula chiusa, offline rimandato e censimento email avviato, 13/10/2026
+
+L'utente rimanda esplicitamente il collaudo degli accessi AdS offline dopo la spiegazione dell'impatto. Il gate rimane aperto prima dell'installazione Nebula. La priorità passa al censimento delle notifiche automatiche IT e dei backup Seeweb, partendo da un originale .eml recente e poi dai formati/esiti reali e dalle copie. Outlook Email ancora disponibile e non installato al controllo delle 17:32:59, suggerimento già presente. Tre archivi nella stessa VM, frontend sysadmin e correlazione successivi conservati.
+
 ## Login fallito 54HP verificato, tre casi API completati, 13/10/2026
 
 I tre casi di accesso locale del 54HP sono verificati nei campioni API del 13/10, con ultimo fallimento osservato e report ricalcolato identico. Dopo la milestone, misurare limiti/troncamenti e offline prima del collaudo VM; la raccolta dei sei apparati e dei login NCC rimane aperta. Censimento email IT/Seeweb e tre archivi stessa VM conservati.

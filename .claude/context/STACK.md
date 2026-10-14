@@ -6,10 +6,19 @@ covers-paths:
   - bin/**
   - config/**
   - tests/**
-last-verified-commit: c756554
+  - tools/read-seeweb-report.py
+last-verified-commit: abd1ea4
 ---
 
 # Stack applicativo
+
+## Report Seeweb letti e stati per unità verificati, 14/10/2026
+
+Lettore locale standard library tools/read-seeweb-report.py: acquisizione di originali/SHA sotto _notes, parsing MIME rigoroso e due tabelle del formato reale, stati separati per consumption unit nell'archivio backup_outcomes. Date/Received non diventano tempi del job. Conteggi confrontati con le righe e schema sconosciuto rifiutato. Due report reali, sei stati; nessun collegamento alla posta, servizio o nuovo archivio sulla VM. Dedup dei soli byte identici; candidati Message-ID/contenuto conservati. Codice e fixture non committati, 24 prove locali e confronto delle nove colonne con misura indipendente. Dettaglio in docs/runbook-log-operativi-email.md; confronto delle copie reali e canale di servizio ancora aperti.
+
+## Milestone Nebula chiusa, offline rimandato e censimento email avviato, 13/10/2026
+
+Connectivity e confronto storico locale/cloud sono versionati in abd1ea4; contenuto riconciliato con i nuovi strumenti e test. Il confronto reale copre tredici tecnici del 30HP, non gli accessi AdS offline, ora rimandati dall'utente. La raccolta email diventa il lavoro corrente: originale Seeweb atteso in cartella privata; nessun parser, lettore di produzione, chiave o nuovo servizio sulla VM. Archivi logici AdS, tecnici e backup conservati.
 
 ## Tredici record locali degli offline dichiarati presenti nel cloud, 13/10/2026
 

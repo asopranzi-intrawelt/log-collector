@@ -4,10 +4,21 @@ generated-from-branch: main
 generated-date: 2026-09-30
 covers-paths:
   - tests/**
-last-verified-commit: c756554
+  - tools/read-seeweb-report.py
+last-verified-commit: abd1ea4
 ---
 
 # Test di sviluppo
+
+## Report Seeweb letti e stati per unità verificati, 14/10/2026
+
+Parser PowerShell senza errori e cinque prove della chiusura passate con git, python e conferma sostituiti: percorso positivo, stage occupato, file modificato dopo i controlli, perimetro dello stage diverso e HEAD cambiato. Nessuna chiamata a git.exe/rete o registrazione reale dell'impronta nel collaudo. Elenco di sedici file e nove esclusioni verificato in _notes/seeweb-lettore-commit-plan.json; proof privata _notes/seeweb-closure-proof-20261014.json.
+
+tests/test_seeweb_report.py passa 24 casi sul lettore locale, fixture .eml derivate dagli HTML reali e intestazioni sintetiche. Sei stati dei due originali confrontati esattamente con la misura indipendente, inclusi nove campi, Date, Received, Message-ID e SHA delle copie; tempi del job null. Mutazione che usa Date per job_execution_time: due casi rossi; guardia dei conteggi disattivata: un caso rosso. Ripristino byte/SHA 22ed89e725ea9624cb3d07d38cadc8982467a9dd6183517066b8a0081302ec67, suite finale verde e Ruff check/format passati. CLI nativa sui file reali: parsed, due report, sei stati e due Error; errore del backup distinto dall'esito del parser. Privacy verificata sul payload base64 decodificato oltre allo scanner. Dedup byte identici provata; trasporto diverso segnalato e non scartato. Warning, Pending e Ignored issue sono etichette del riepilogo reale, non esiti osservati di unità nei due campioni. Nessuna prova in produzione o di forwarding reale. La suite Nebula precedente resta 147 passate e una POSIX saltata, non rieseguita per modifiche estranee al suo codice.
+
+## Milestone Nebula chiusa, offline rimandato e censimento email avviato, 13/10/2026
+
+Ancora riconciliata ad abd1ea4 dopo la chiusura manuale dei test connectivity e offline-history e delle fixture reali. Gli otto file Nebula conservano la suite precedente di 147 passate e una POSIX saltata; report storici ricalcolati identici. Nessun test ripetuto per le sole annotazioni o per la ricognizione del collegamento email. Il campione Seeweb reale resta atteso; nessuna prova sintetica può certificarne formato, esiti o duplicati. Il collaudo AdS offline è rimandato per scelta dell'utente, senza essere dichiarato superato.
 
 ## Tredici record locali degli offline dichiarati presenti nel cloud, 13/10/2026
 

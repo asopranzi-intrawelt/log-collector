@@ -1,6 +1,6 @@
 # Raccolta dei log operativi e delle notifiche email
 
-Decisione dell'utente del 13/10/2026: usare la VM esistente per raccogliere anche log tecnici ed esiti dei backup, consultabili in seguito da un frontend riservato al sysadmin. La correlazione e gli allarmi di tipo SIEM sono una fase successiva. Questo documento registra il progetto e il censimento da eseguire; nessun servizio nuovo è installato e nessuna email è stata letta o inoltrata da questa sessione.
+Decisione dell'utente del 13/10/2026: usare la VM esistente per raccogliere anche log tecnici ed esiti dei backup, consultabili in seguito da un frontend riservato al sysadmin. La correlazione e gli allarmi di tipo SIEM sono una fase successiva. Questo documento registra progetto e stato del censimento: al 14/10 due originali Seeweb sono stati letti dalla postazione e un lettore locale è verificato; nessun nuovo servizio è installato sulla VM. Il dettaglio delle misure è in docs/runbook-log-operativi-email.md.
 
 ## Tre categorie nella stessa VM
 
@@ -8,7 +8,7 @@ Decisione dell'utente del 13/10/2026: usare la VM esistente per raccogliere anch
 |---|---|---|
 | Accessi AdS | Autenticazioni amministrative e prova della raccolta, con elenco approvato e custodia previsti dal progetto | Raccolta parziale in esercizio; D7 e catena completa ancora aperti |
 | Log tecnici e operativi | Apparati, sistemi, applicazioni e accessi ordinari NAS classificati separatamente | Flusso tecnico iLO già separato; nuove sorgenti e smistamento NAS da realizzare |
-| Esiti dei backup | Report di job, warning, errori, restore e mancata esecuzione, da registri diretti o email | Richiesto dall'utente, censimento e canali da verificare |
+| Esiti dei backup | Report di job, warning, errori, restore e mancata esecuzione, da registri diretti o email | Due report Seeweb e sei stati per unità verificati localmente; raccolta in produzione ancora da definire |
 
 Le tre categorie sono serbatoi logici; percorsi, quote, utenti di servizio e retention dei nuovi flussi si definiranno sullo stato della VM. Un report tecnico di backup non entra nella catena probatoria AdS. La stessa mail può contenere più job o eventi e non deve diventare una sola riuscita generica. Gli accessi ordinari NAS mantengono classificazione e autorizzazioni proprie anche se collocati nel secondo archivio.
 
@@ -39,7 +39,23 @@ La scoperta comprende Seeweb, NAS/HBS, Proxmox, Veeam, Cobian, esportazioni TM, 
 
 ## Accesso attuale alla posta
 
-Il 13/10 la sessione non espone strumenti di lettura Outlook. La ricerca delle integrazioni trova **Outlook Email disponibile e non installato**; proposta l'installazione/connessione, senza considerarla eseguita. Sul PC è rilevato il nuovo Outlook, non il processo Outlook classico; questo non fornisce da solo accesso ai messaggi dell'account. La lettura resta attesa finché un collegamento autorizzato o originali esportati permettono di esaminare i report. Non sono state usate credenziali del Word, lette cache di token o create regole di inoltro.
+Il 13/10 la sessione non espone strumenti di lettura Outlook. La ricerca delle integrazioni trova **Outlook Email disponibile e non installato**; proposta l'installazione/connessione, senza considerarla eseguita. Sul PC è rilevato il nuovo Outlook, non il processo Outlook classico; questo non fornisce da solo accesso ai messaggi dell'account. Il 14/10 sono invece letti due originali esportati dall'operatore: questo permette il campionamento del formato, senza un censimento completo delle caselle o una connessione di servizio. Non sono state usate credenziali del Word, lette cache di token o create regole di inoltro.
+
+## Report Seeweb acquisiti e lettore locale, 14/10/2026
+
+Due originali provenienti dalla casella IT condivisa, confermata dall'operatore: report del 12/10 con tre unità OK e del 13/10 con due Error e una OK. Una mail non equivale a un job: i sei record sono stati dichiarati per unità di consumo, con Date/Received distinti dall'acquisizione e job_execution_time null. Job, orario effettivo, causa e stato attuale del 14/10 richiedono pannello o report ulteriori. Zero allegati; HTML UTF-8/base64 e due tabelle con nove colonne per unità.
+
+Lettore locale tools/read-seeweb-report.py verificato sulle nove colonne di tutte le unità e con 24 prove automatiche, due mutazioni rilevate e ripristinate. Conserva originali/SHA e manifest privati; rifiuta schema/conteggi incoerenti. Deduplica soltanto byte identici; altre copie con lo stesso Message-ID e contenuto rimangono candidati. Prossimo campione discriminante: originale .eml della copia già ricevuta del report Error del 13/10 in una casella personale IT autorizzata, con casella dichiarata. Nessun nuovo inoltro manuale. Fonti, misure, SHA e limiti in docs/runbook-log-operativi-email.md.
+
+## Avvio del censimento Seeweb, 13/10/2026
+
+Dopo la chiusura della milestone Nebula in abd1ea4, l'utente rimanda esplicitamente il test degli accessi AdS offline e chiede di procedere con altro. Il censimento delle notifiche IT e dei backup diventa il lavoro corrente; il rinvio lascia aperto il gate offline prima dell'installazione del poller. Nessuna regola del firewall o interruzione del collegamento cloud è stata eseguita.
+
+La verifica delle integrazioni delle 17:32:59 locali riconferma Outlook Email disponibile e non installato, senza strumenti di lettura della posta. Il suggerimento delle 10:02:34 locali è già presente e non viene riproposto. Esito e cronologia in _notes/email-connector-check-20261013.json; zero messaggi letti. Questa verifica riguarda l'integrazione della sessione, non l'accessibilità delle singole caselle Microsoft né la loro configurazione.
+
+Primo campione: un report Seeweb originale recente, esportato in formato .eml e salvato in _notes/email-reports-inbox, ignorato da git. Nel nuovo Outlook il messaggio aperto si salva da Altre azioni > Salva con nome, secondo la [procedura ufficiale Microsoft](https://support.microsoft.com/it-it/outlook/mail/save-an-outlook-message-as-a-eml-file-a-pdf-file-or-as-a-draft). Il file originale conserva intestazioni, corpo e allegati utili al confronto; un PDF o una schermata non costituiscono lo stesso campione. Il salvataggio locale non configura inoltri né un nuovo flusso sul collettore.
+
+Per ogni campione si conserveranno privatamente byte originali, SHA-256, ora di acquisizione e casella di provenienza, distinguendo Date e Received dall'ora del job. Si leggeranno mittente effettivo, Message-ID, oggetto, struttura MIME, corpo e allegati, senza dedurre un esito dal mittente o dall'oggetto. Il primo report può contenere più nodi, job o stati: numero di mail e numero di backup restano contatori separati. La cadenza attesa, la deduplicazione fra le copie e la corrispondenza col pannello richiedono poi ulteriori campioni. In quel giro non viene implementato un parser Seeweb né dichiarato un export supportato del prodotto; il lettore locale preparato sui campioni successivi è descritto nel runbook.
 
 ## Gate prima dell'ingestione
 
