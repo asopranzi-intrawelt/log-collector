@@ -1,6 +1,6 @@
 {
   "fonte": "D:/network-design/data/network-topology.json",
-  "rilevata_il": "2026-10-08",
+  "rilevata_il": "2026-10-15",
   "asset_documentati_fuori_topologia": [],
   "gruppi": [
     {
@@ -13,7 +13,7 @@
     },
     {
       "stato": "interno_da_ricognire",
-      "ids": ["pc-backup", "ollama", "ht812", "suprema", "irrigazione", "inverter", "tel-1", "tel-2", "tel-3", "tel-4", "tel-5", "vm209", "vm208", "vm207", "pg209", "mfp-pt", "mfp-p1"]
+      "ids": ["pc-backup", "ollama", "ht812", "suprema", "irrigazione", "inverter", "tel-1", "tel-2", "tel-3", "tel-4", "tel-5", "vm209", "vm208", "vm207", "pg209", "mfp-pt", "mfp-p1", "ups-liebert-nic", "domotica-mh"]
     },
     {
       "stato": "fornitore_da_concordare",
