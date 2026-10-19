@@ -537,7 +537,12 @@ def invariante_frontmatter(esito, percorsi):
         esito.nota("      frontmatter delle schede: la cartella %s non esiste" % rel_schede)
         return
 
-    campi = percorsi.get('campi_firma') or ['last-verified-commit', 'last-verified']
+    # generated-from-commit e' un campo di firma come gli altri: il primo ancoraggio di
+    # sync-context (passo 0) lo riscrive insieme a last-verified-commit, e senza di lui
+    # quel commit conterebbe come modifica di contenuto, cioe' ogni scheda risulterebbe
+    # rotta subito dopo essere stata ancorata (osservato il 2026-10-16 su cinque schede).
+    campi = percorsi.get('campi_firma') or ['last-verified-commit', 'last-verified',
+                                             'generated-from-commit']
 
     # Il percorso si estrae separando sul primo spazio, non tagliando a posizione fissa:
     # il taglio a posizione fissa si rompe perché l'output viene normalizzato e lo spazio
@@ -556,13 +561,28 @@ def invariante_frontmatter(esito, percorsi):
             candidato = candidato.split(' -> ', 1)[1].strip().strip('"')
         sporche.add(candidato)
 
-    atteso = re.compile('^(?:' + '|'.join(re.escape(c) for c in campi) + r'):\s*(\S+)', re.M)
+    # I campi hanno due ruoli distinti. Tutti marcano righe di sola firma, che non contano
+    # come modifica di contenuto. Ma solo quelli di verifica dichiarano l'ancora: si prende
+    # il primo presente nell'ordine della lista, non nell'ordine del file, e mai
+    # generated-from-commit, che data la nascita della scheda e non una rilettura. Prima
+    # di questa distinzione una scheda con generated-from-commit in testa al frontmatter
+    # dichiarava il commit di nascita, e risultava rotta dopo ogni rilettura (2026-10-16).
+    dichiaranti = [c for c in campi if c != 'generated-from-commit']
+    regole = [re.compile('^' + re.escape(c) + r':\s*(\S+)', re.M) for c in dichiaranti]
+
+    def dichiarazione(testo):
+        for regola in regole:
+            m = regola.search(testo)
+            if m:
+                return m
+        return None
+
     disallineate = []
     illeggibili = []
     quante = 0
     for nome in sorted(n for n in os.listdir(cartella) if n.endswith('.md')):
         rel = rel_schede + '/' + nome
-        trovato = atteso.search(testo_di(rel))
+        trovato = dichiarazione(testo_di(rel))
         if not trovato:
             continue
         quante += 1

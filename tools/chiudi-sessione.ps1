@@ -39,6 +39,7 @@
 #   .\tools\chiudi-sessione.ps1 -Si                     senza conferma
 #   .\tools\chiudi-sessione.ps1 -SoloControlli          stato e controlli, nient'altro
 #   .\tools\chiudi-sessione.ps1 -NoWipe                 salta il wipe
+#   .\tools\chiudi-sessione.ps1 -NoPush                 committa ma non pusha; l'impronta si registra sul commit locale
 #   .\tools\chiudi-sessione.ps1 -Account account2       wipe del solo .claude-account2
 #
 # Nel template lo script vive in .claude\templates\tools\ e riconosce da solo di essere nel
@@ -49,6 +50,7 @@ param(
     [switch]$Si,
     [switch]$SoloControlli,
     [switch]$NoWipe,
+    [switch]$NoPush,
     [string]$Account = "",
     [string]$Radice = ""
 )
@@ -63,7 +65,9 @@ function Nota([string]$t) { Write-Host "   $t" -ForegroundColor DarkGray }
 
 # Radice del repository: quella indicata, altrimenti quella che contiene lo script, cosi' il
 # comando funziona da qualunque cartella sia aperto il terminale.
-if (-not $Radice) { $Radice = (& git -C $PSScriptRoot rev-parse --show-toplevel 2>$null) }
+# git scrive il percorso in UTF-8: senza questa impostazione PowerShell 5.1 lo decodifica con la
+# codifica OEM e un accento nel nome della cartella diventa un percorso inesistente (2026-10-12).
+if (-not $Radice) { $codificaPrec = [Console]::OutputEncoding; [Console]::OutputEncoding = [Text.Encoding]::UTF8; try { $Radice = (& git -C $PSScriptRoot rev-parse --show-toplevel 2>$null) } finally { [Console]::OutputEncoding = $codificaPrec } }
 if (-not $Radice) { Write-Host "Non trovo il repository: passare -Radice." -ForegroundColor Red; exit 2 }
 Set-Location $Radice
 # Il bundle si riconosce da due file insieme. PACKAGES.md da solo non basta: la procedura di
@@ -207,7 +211,8 @@ if ($cambi.Count -gt 0) {
     Write-Host "   autore: $nome <$email>"
 
     if (-not $Si) {
-        $r = Read-Host "   Committo tutto e pusho su '$ramo'? [s/N]"
+        $azione = if ($NoPush) { "Committo tutto, senza push," } else { "Committo tutto e pusho" }
+        $r = Read-Host "   $azione su '$ramo'? [s/N]"
         if ($r -notmatch '^(s|si|y|yes)$') { Write-Host "Annullato: niente e' stato committato." -ForegroundColor Yellow; exit 1 }
     }
 
@@ -220,7 +225,13 @@ if ($cambi.Count -gt 0) {
 
 # ---------------------------------------------------------------------------------------------
 Titolo "Push"
-if (-not $haOrigin) {
+# -NoPush (2026-10-16, da un progetto istanziato): quando un push ha un costo da rimandare, per
+# esempio un monte di minuti di CI quasi finito, la chiusura si faceva a mano commit per commit
+# perche' questo script pusha sempre. Il commit resta locale e l'impronta lo registra: la ripresa
+# confronta HEAD e albero di lavoro, non il remoto.
+if ($NoPush) {
+    Nota "push saltato su richiesta (-NoPush): il commit resta locale su '$ramo'"
+} elseif (-not $haOrigin) {
     Nota "nessun remoto 'origin': push saltato, il commit resta locale"
 } elseif (-not (& git rev-parse -q --verify HEAD)) {
     Nota "nessun commit sul ramo: niente da pushare"
