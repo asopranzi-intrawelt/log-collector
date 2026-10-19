@@ -1,0 +1,4 @@
+# Override per provare una prima partenza con volumi nuovi e senza uscita Internet.
+networks:
+  default:
+    internal: true

@@ -72,3 +72,7 @@ secrets/
 
 # Albero di configurazione generato da ads-render.py: contiene valori reali dell'ambiente.
 build/
+
+# Target reali del pilota metriche: indirizzi e identita' restano locali.
+pilot/monitoring-hub/targets/
+pilot/monitoring-hub/fixtures/

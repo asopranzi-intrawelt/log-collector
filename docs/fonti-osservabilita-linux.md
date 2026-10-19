@@ -1,6 +1,6 @@
 # Fonti e passi dell’osservabilità Linux
 
-Stato al 15/10/2026. Questo registro collega le fonti tecniche alla sequenza del pilota e alle nuove scelte per il Debian. Requisito permanente dell’operatore: ogni passo deve riportare motivo, fonte con URL/data/versione, destinazione, comando, criterio di riuscita, risultato ricevuto, interpretazione e limiti; evidenze identificanti nel livello privato con impronta SHA-256. Una fonte scaricata non è per questo letta; una documentazione corrente non prova la compatibilità della versione installata. Gli aggiornamenti successivi mantengono gli stati precedenti come storia, rendendo esplicito quello corrente.
+Stato al 19/10/2026. Questo registro collega le fonti tecniche alla sequenza del pilota e alle nuove scelte per il Debian. Requisito permanente dell’operatore: ogni passo deve riportare motivo, fonte con URL/data/versione, destinazione, comando, criterio di riuscita, risultato ricevuto, interpretazione e limiti; evidenze identificanti nel livello privato con impronta SHA-256. Una fonte scaricata non è per questo letta; una documentazione corrente non prova la compatibilità della versione installata. Gli aggiornamenti successivi mantengono gli stati precedenti come storia, rendendo esplicito quello corrente.
 
 ## Sequenza e provenienza
 
@@ -22,10 +22,15 @@ I comandi e le spiegazioni sono nel [runbook](runbook-monitoraggio-linux.md). Le
 | 12. Avvio reale | active/running, Result success e listener loopback | operator-first-start-excerpts.txt; non prova reboot o stabilità prolungata |
 | 13. API e stato Cloud | v2.12.1, un host; Claimed No e Online No | operator-first-start-selected.json; campi selezionati, non dump integrale o analisi del traffico |
 | 14. Metriche e memoria | Righe CPU/RAM presenti; cgroup circa 372 MiB | Estratti primo avvio; conteggio per prefissi, impatto a regime ignoto |
-| 15. GPU | Ripristino e simulazione riconciliati; query come netdata riuscita e configurazione letta | Trascrizioni e prova handoff; comando enable accettato, campioni hardware Netdata ancora attesi |
+| 15. GPU | Ripristino e simulazione riconciliati; query come netdata riuscita e configurazione letta | Trascrizioni e prova handoff; comando enable accettato, export daemon GPU/VRAM/temperatura 1/3/1 ricevuto; impatto sostenuto aperto |
 | 16. Normalizzazione e risorse | Contratto comune, retention, budget e guardie richiesti | Documento di progetto; nessuna applicazione sul Debian |
-| 17. Debian e stack centrale | Baseline, dimensionamento, parser e servizi da realizzare | Nessuna evidenza runtime ancora disponibile |
+| 17. Debian e stack centrale | Baseline del guest e archivi ricevuta; pilota PC metriche/log sintetici collaudato, stack non sul Debian | Evidenze private del pilota; nessun target Netdata reale o log di host inviato |
 | 18. Pacchetto riutilizzabile | Specifica nei tre progetti, estrazione dopo collaudo | Documento di proposta; catalogo e pacchetto non ancora completati |
+| 19. Capacità Proxmox live | Sei GET di stato, 70 medie RRD e due thin pool letti; swap quasi piena | Risposte e SHA privati; attività `si/so`, picchi e budget hub+QA aperti |
+| 20. Guard e rotazione del pilota | V0 sintetico offline: 12 prove; secondo rename/create su path fisso perso, corretto con segmenti unici | Test ed evidenza privata del 17/10; due file da 818 byte ricevuti, guasto durante scrittura/rete aperto |
+| 21. Publisher sintetico e ripresa | File staged fuori glob, segmento immutabile, ripresa dopo arresto della sessione | Prove del 17 e 19/10 nel dossier privato; intervallo di circa 38 ore senza query, retention e guasti lunghi aperti |
+| 22. Fermo Loki con riavvio Alloy | Due varianti locali: controllo e secondo evento presenti, primo evento durante fermo assente entro 90 s e al probe | Dossier privato del 19/10; WAL experimental su volume esistente non risolutivo, trasporto reale bloccato |
+| 23. Riparazione della fixture | Guard, query, push 204, query con una copia; secondo giro senza invio | Stati e SHA privati del 19/10; un evento fittizio, duplicati sotto concorrenza e automazione aperti |
 
 ## Registro dei collegamenti
 
@@ -194,6 +199,10 @@ Il processo delle fonti vive è stato richiesto come parte del percorso ISO dall
 
 Letti la segnalazione ricevuta nel collettore e sei file del produttore QA in lavorazione: configurazione log, chiamanti, client locale, fallback e registro di uso. Percorsi, HEAD, stato e SHA nella ricognizione privata qa-producer/reading-20261016.json; copie dei soli file letti, non un backup del progetto. La richiesta dell’operatore e la lettura del codice non sono test di esercizio. Catalogo e limiti in [Integrazione QA](integrazione-log-qa-verifier.md).
 
+Rilettura locale del 16/10: `D:/intrawelt-qa-verifier` è pulito su `staging` al commit `1b2d9f3`; la scheda di deployment e ADR-011 confermano due LXC pianificati e non creati. Il commit versiona protocollo, client Ollama e fallback dei passi 1-3. La fonte è autorevole sul codice e sul piano di deployment del produttore, non sulla presenza degli ospiti o sull’arrivo dei log nel collettore. Il chiarimento dell’operatore collega a questo progetto la «nuova VM» menzionata nel percorso del collettore.
+
+Seconda lettura locale nello stesso giorno: `staging` è pulito a `425d956`, commit di chiusura/memoria; i file applicativi pertinenti sono invariati rispetto al passo 3 di `1b2d9f3`. Sono stati riletti `app/local_client.py`, `app/claude_client.py`, `app/fallback.py`, `app/auth.py`, `app/main.py`, `app/logging_setup.py` e `app/usage_log.py` per i possibili contenuti dei log. La fonte prova percorsi di codice e default, non contenuti realmente emessi né comportamento della UI non ancora integrata. Il dettaglio del confine dell'indice è nel [catalogo QA](integrazione-log-qa-verifier.md) e la scelta interna è ADR-022; nessuna fonte esterna viene attribuita alla decisione di minimizzazione.
+
 | Fonte primaria letta il 16/10 | Uso e limite |
 |---|---|
 | [Download Prometheus](https://prometheus.io/download/) | Selezionata candidata 3.13.4 LTS; immagine scaricata e digest letto, non avviata |
@@ -204,3 +213,56 @@ Letti la segnalazione ricevuta nel collettore e sei file del produttore QA in la
 | [Compose services](https://docs.docker.com/reference/compose-file/services/) e [provisioning Grafana](https://grafana.com/docs/grafana/latest/administration/provisioning/) | Riferimenti per configurazioni future, non stack generato o già verificato |
 
 Le due immagini ispezionate occupano complessivamente circa 2,14 GiB secondo Docker: non dimensionano cache, database, WAL o uso del Debian. Digest e misure sono privati; nessun container creato in questa preparazione. La richiesta di chiusura ha preceduto configurazione e collaudo del pilota centrale: riprenderli nella nuova sessione, con rete locale e risorse esplicite.
+
+## Fonti del pilota locale e limite della prova, 16/10/2026
+
+Configurazione e letture sul PC sono in `pilot/monitoring-hub/` nel progetto collettore. La prova runtime osserva solo lo scrape interno e la query Grafana; i target Netdata reali sono ancora zero. L'avvio iniziale ha scaricato plugin suggeriti; il riavvio con `preinstall_disabled` non li ha riscaricati, poi una seconda prima partenza con volumi nuovi e rete Docker interna ha superato le query Prometheus e Grafana senza download plugin nei log. Il controllo host non poteva raggiungere porte non pubblicate dalla rete interna; la prova valida è stata eseguita nei container.
+
+| Fonte ufficiale consultata | Uso |
+|---|---|
+| [Netdata con Prometheus](https://learn.netdata.cloud/docs/exporting-metrics/prometheus) | Endpoint `allmetrics`, formato del singolo host e differenza per Parent |
+| [Configurazione Prometheus](https://prometheus.io/docs/prometheus/latest/configuration/configuration/) e [file discovery](https://prometheus.io/docs/guides/file-sd/) | Job e lista target privata |
+| [promtool](https://prometheus.io/docs/prometheus/latest/command-line/promtool/) e [storage](https://prometheus.io/docs/prometheus/latest/storage/) | Validazione e limiti della retention di prova |
+| [Provisioning Grafana](https://grafana.com/docs/grafana/latest/administration/provisioning/) e [API datasource](https://grafana.com/docs/grafana/latest/developer-resources/api-reference/http-api/api-legacy/data_source/) | Dashboard, datasource e query proxy verificate |
+| [Configurazione Grafana](https://grafana.com/docs/grafana/latest/setup-grafana/configure-grafana/) | `preinstall_disabled`, telemetria e controlli aggiornamenti |
+| [Servizi Docker Compose](https://docs.docker.com/reference/compose-file/services/) e [reti Compose](https://docs.docker.com/compose/how-tos/networking/) | Bind delle porte su loopback nel profilo principale e rete interna nella prova offline |
+
+## Fonti del pilota sintetico Loki/Alloy, 16/10/2026
+
+Riscontro primario: configurazioni del collettore in `pilot/monitoring-hub/`, query locali e file privato `local-logs-20261016.json` nel dossier di osservabilità. Il controllo esercita il percorso del singolo record fittizio fino a Loki e Grafana; nella risposta sono state osservate le label archive, source_family, service, filename, service_name e detected_level, senza l'identificativo evento. La prima guardia ha rilevato detected_level come label non prevista, poi il perimetro ammesso è stato corretto e riprovato. Non misura log reali né cancellazione a scadenza.
+
+| Fonte ufficiale consultata | Uso e limite |
+|---|---|
+| [Installazione Loki con Docker](https://grafana.com/docs/loki/latest/setup/install/docker/) e [configurazione locale](https://grafana.com/docs/loki/latest/configure/examples/configuration-examples/) | Immagine e schema TSDB v13/filesystem per il pilota |
+| [Retention Loki](https://grafana.com/docs/loki/latest/operations/storage/retention/) e [filesystem](https://grafana.com/docs/loki/latest/operations/storage/filesystem/) | Compactor richiesto; configurazione di 24 ore non equivale a eliminazione osservata o quota disco |
+| [API Loki](https://grafana.com/docs/loki/latest/reference/loki-http-api/) | `/ready` e query `query_range` del record sintetico |
+| [Alloy in Docker](https://grafana.com/docs/alloy/latest/set-up/install/docker/), [validate](https://grafana.com/docs/alloy/latest/reference/cli/validate/) e [raccolta dati](https://grafana.com/docs/alloy/latest/data-collection/) | Immagine, configurazione e reporting disattivato |
+| [Lettura file Alloy](https://grafana.com/docs/alloy/latest/reference/components/loki/loki.source.file/) e [scrittura Loki](https://grafana.com/docs/alloy/latest/reference/components/loki/loki.write/) | Tailing, posizioni persistenti e invio a Loki, senza promessa exactly-once |
+
+## Fonti del preflight Proxmox live, 17/10/2026
+
+Fonte primaria della misura: risposte REST GET del nodo Proxmox, salvate privatamente in `_notes/linux-observability-20261015/hub/capacity-live-20261016.json`; riepilogo offline in `capacity-live-20261016-summary.json` con SHA-256 dell'originale `ce81832d627a4c78a0369ace9c1d1227e8aa167721ef94d6e2fd8dec8b0baf91`. Sei stati puntuali e 70 medie RRD sono misure del 17/10, non un'assegnazione di risorse né una prova di `si/so`. Il token, l'indirizzo e i nomi reali dei pool restano privati. Il controllo su stato, thin e inventario è descritto nel [runbook](runbook-monitoraggio-linux.md).
+
+La pagina ufficiale [Proxmox Storage Manager](https://pve.proxmox.com/pve-docs/pvesm.1.html) è stata letta via `curl` locale il 17/10 (HTTP 200, 313007 byte, sezione «LVM thin Backend» presente, SHA-256 privato `0a8da31399eeb06722d459bd24c6c1eaf254edba4c89d8be586d420647229e5b`). Il recupero web del modello aveva restituito 403: quell'esito non viene scambiato per una lettura. Il manuale sostiene il rischio generale di riempimento di uno storage thin, non dimostra salute o futuro dei pool di questo nodo. Le soglie e la decisione di allocazione restano interne al progetto e dipendono dalle misure mancanti.
+
+## Fonti della rotazione e del guard v0, 17/10/2026
+
+La fonte primaria del difetto e della correzione è il test live nel pilota PC, documentato in `pilot/monitoring-hub/README.md` e nell'evidenza privata `_notes/linux-observability-20261015/hub/hardening-20261017.json` (SHA-256 `B8B2D5D2A0594DB635523F0A201D9732A97E53A93FB1C37CBAFE09B29FE839AD`). La seconda rotazione del path fisso non arrivava entro 75 s; dopo la modifica sono arrivati due segmenti con nomi unici da 818 byte. La guida ufficiale [loki.source.file di Alloy](https://grafana.com/docs/alloy/latest/reference/components/loki/loki.source.file/) chiarisce discovery e posizioni; non garantisce consegna senza perdita nel caso del progetto. La [guida Docker al driver `local`](https://docs.docker.com/engine/logging/drivers/local/) documenta la rotazione dei log stdout/stderr del container, distinta dalla retention dei dati Loki. Il guard v0 e le sue 12 prove sono codice locale: verificano soltanto la fixture sintetica, non un contratto QA o AdS di produzione.
+
+## Publisher sintetico e ripresa del pilota, 19/10/2026
+
+Fonte primaria: codice e controlli in `D:/log-collector/pilot/monitoring-hub/`, stati privati delle tre prove e dossier `publisher-20261019.json` con SHA-256 `dfa424aa281cbd3e6649b7647c446d5b13e920716660fa6a90d14361542a1559`. Le query negative sono sette prima della pausa il 17/10 e due dopo il riavvio il 19/10: non coprono le circa 38 ore intermedie. La [documentazione Python di os.replace](https://docs.python.org/3/library/os.html#os.replace) indica l'atomicità del rename riuscito come requisito POSIX e il possibile errore fra filesystem; la [documentazione di fsync](https://docs.python.org/3/library/os.html#os.fsync) specifica flush prima di fsync per file bufferizzati. La prova sul PC Windows/Docker misura il comportamento locale e non dimostra durabilità dopo perdita di alimentazione. La scelta di staging fuori glob e il limite della prova sono decisioni interne del pilot.
+
+## Fonti del fermo Loki e del WAL candidato, 19/10/2026
+
+Le fonti primarie sono i due stati del controllo `check-outage.py`, le query Loki e il log di Alloy riassunti nel dossier privato `outage-investigation-20261019.json` (SHA-256 `D867439A4203CFA2550624268C7F7E91D3FB65B3E7C863C380992C60E0D25D69`). La [guida ufficiale di `loki.write`](https://grafana.com/docs/alloy/latest/reference/components/loki/loki.write/) descrive retry, WAL opzionale e stato experimental; la [guida di `loki.source.file`](https://grafana.com/docs/alloy/latest/reference/components/loki/loki.source.file/) descrive i soli offset persistiti. Queste guide spiegano le possibilità del componente, non il motivo accertato del segmento WAL mancante nel test locale. La scelta di bloccare il trasporto reale è interna al progetto.
+
+## Fonti della riparazione della fixture, 19/10/2026
+
+Fonte primaria: `pilot/monitoring-hub/repair-outage.py`, query e stati privati con SHA-256 `4190910FD2ED6D6E51238D2D9ECECEA2E45E86BAE10421D776A415D8FC27982B` per il push e `EDDC122E8C9AF3C3BE002333AB0DA34A797F96B3B24256C43C5F83B94E0B9E53` per il giro senza invio. La [API HTTP ufficiale di Loki](https://grafana.com/docs/loki/latest/reference/loki-http-api/) specifica corpo JSON `streams`, timestamp nanosecondi come stringa e query_range. La risposta 204 e la copia letta sono misure del pilot, non una garanzia di exactly once; il limite di concorrenza è inferenza dalla separazione fra query e push.
+
+## Fonti della quota del pilot e della ricognizione QA, 19/10/2026
+
+Per la quota la fonte primaria è il codice locale `pilot/monitoring-hub/replay-outbox.py` con `tests/test_replay_outbox.py`: 18 prove guard+coda verdi dopo il ripristino verificato, e la prova mirata fallisce se il conteggio degli originali viene tolto. Il limite di 8 MiB è una scelta interna e si applica solo al comando del pilot, non al filesystem; nessuna fonte esterna gli attribuisce una garanzia di durabilità o concorrenza.
+
+Per il produttore QA la fonte versionata è l'ADR-023 del branch `staging` a `7472de5` del 19/10/2026, che adotta `qa-tech-v1` del collettore e dichiara assente l'emettitore. Le modifiche del passo 5 lette nello stesso repository sono non committate e mobili; la nota privata `_notes/qa-handoff-20261016/qa-source-snapshot-20261019.md` distingue stato, percorso e limiti. La scelta di separare gli eventi tecnici minimizzati da un registro di autorizzazione identificante è una decisione da definire fra progetti, non una conclusione dedotta da documentazione esterna o una prova di esercizio.

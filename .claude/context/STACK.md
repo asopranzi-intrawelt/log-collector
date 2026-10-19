@@ -12,6 +12,14 @@ last-verified-commit: a5fe489
 
 # Stack applicativo
 
+## Replay sintetico nel pilota, 19/10/2026
+
+`pilot/monitoring-hub/replay-outbox.py` pubblica segmenti fuori dal glob Alloy, valida tutti gli originali e riconcilia con Loki prima di inviare. Conserva i segmenti dopo il push; gli originali restano in `fixtures/original/`. La prova è solo sintetica e non modifica la catena AdS o QA.
+
+## Guard v0 e pilota locale dei log, 17/10/2026
+
+`bin/pilot_consultation_v0.py` è un controllo CLI offline del solo record emesso da `pilot/monitoring-hub/emit-fixture.py`. Verifica schema esatto, parser e sorgente sintetici, file originale confinato, formato dei byte, SHA-256 e label fisse. Non parsea log QA o AdS reali e non è nel percorso Alloy. Il pilota locale Prometheus/Grafana/Loki/Alloy ha corretto una perdita alla seconda rotazione del path fisso con segmenti dai nomi unici; due segmenti consecutivi da 818 byte sono arrivati a Loki. Configurazione, controlli e limiti nel README del pilota; Docker fermo, volumi conservati. Le ancore `last-verified-commit` non coprono questo lavoro ancora non committato.
+
 ## Primo avvio Netdata verificato; normalizzazione e capienza richieste, 15/10/2026
 
 Output dell’operatore ricevuto: Netdata 2.12.1 active/running, Result success, listener soltanto 127.0.0.1:19999. ACLK Claimed No e Online No; capacità Cloud compilata distinta dalla connessione. Export locale con 14 righe di prefisso CPU e 4 RAM. MemoryCurrent 389820416 byte, circa 372 MiB del cgroup, istantanea e non RSS o impatto a regime. API info precedente con charts-count e metrics-count zero: conservato il limite, nessuna copertura completa dedotta. GPU ancora da collaudare: utility assente, modulo 595.99.02. Nessun nuovo flusso al Debian o stack centrale installato. Requisiti permanenti dell’operatore: vista uniforme dei log di tutte le sorgenti con parser e provenienza verificabili, conservando gli originali; ogni passo deve riportare fonte/link, motivo, comando, risultato, limiti ed evidenza privata con SHA. Progetto in docs/normalizzazione-retention-capienza.md e registro in docs/fonti-osservabilita-linux.md. Retention e budget distinti per archivi, metriche, indici, code e temporanei; guardie su byte/inode, crescita, RAM/CPU/I/O e controllo esterno. Soglie proposte, non applicate; dimensionamento sulla baseline Debian e sul margine Proxmox, senza assumere adeguata la vecchia configurazione da 2 GiB. Specifica del pacchetto aggiornata anche nel template, ancora da realizzare e collaudare. M29, D7 e gate AdS invariati; offline Nebula rimandato e risposta Seeweb attesa. Proxmox pianificato/TLS/segreti, PowerShell 7, dieci guest-agent 403 e audit retrospettivo fonti ADR aperti. Nessuna sessione SSH dell’assistente, nessun commit/push/deploy; le vecchie chiusure Linux sono da rigenerare.
@@ -92,7 +100,7 @@ Il target `--switch-model XGS2220-54HP` è eseguito realmente il 13/10 dalla pos
 
 La prova reale `--final-attempt` del 12/10 termina dopo cinque richieste: quattro array vuoti e un login 30HP. Report ricalcolato identico dai campioni; conferma umana successiva di 4,827975 secondi al timestamp del record. Prima risposta positiva a +38,030 secondi sul timestamp dichiarato, senza misura dello scarto dell'orologio. La diagnostica di timeout non è stata invocata. Misura e limiti nel runbook, nessun cambio al poller; il target del 54HP deve essere predisposto separatamente perché il wrapper seleziona dal riferimento storico 30HP.
 
-La nuova modalità `--final-attempt` di `tools/watch-nebula-publication.py` osserva fino a dieci minuti con budget 41 POST; dopo un esito vuoto aggiunge soltanto le due letture diagnostiche già disponibili. La diagnosi non promuove il timeout a misura riuscita. Il wrapper privato `_notes/watch-nebula-publication-final.ps1` conserva il trasporto via stdin e attende ready prima del login; un Invio umano dopo il pannello registra `operator-confirmation.json`. Preparazione recuperata e provata il 12/10, misura reale ancora attesa.
+La nuova modalità `--final-attempt` di `tools/watch-nebula-publication.py` osserva fino a dieci minuti con budget 41 POST; dopo un esito vuoto aggiunge soltanto le due letture diagnostiche già disponibili. La diagnosi non promuove il timeout a misura riuscita. Il wrapper privato `_notes/archivio-sessioni/nebula-ilo/strumenti/watch-nebula-publication-final.ps1` conserva il trasporto via stdin e attende ready prima del login; un Invio umano dopo il pannello registra `operator-confirmation.json`. Preparazione recuperata e provata il 12/10, misura reale ancora attesa.
 
 La verifica dello storico è versionata in `8dba118`, finestre ed estremi in `48be07b`: cinque accessi concordanti e un riferimento su entrambi gli estremi dopo 93,356911 ore. Il 54HP resta senza accessi noti. `tools/watch-nebula-publication.py` osserva un login locale nuovo; il primo giro reale produce venti array vuoti con login confermato dall'operatore, quindi nessun ritardo misurato. La modalità `--observation` rilegge due ore precedenti l'avvio fino a ora corrente e un vecchio riferimento di controllo, con due POST. La rilettura reale delle 16:15:38 del 12/10 ritrova il controllo e 22 eventi unici, con un candidato login alle 15:12:23, fuori dalla prima finestra. Report ricalcolato identico; associazione all'ora umana ancora pendente. Candidati e grezzi privati, nessun identificativo nel riepilogo; nessuna installazione sulla VM.
 
@@ -129,3 +137,15 @@ Sul dispositivo reale iLO Advanced è stata abilitata via Remote Syslog UDP 514:
 ## Sorgenti QA catalogate e ripresa con altro account preparata, 16/10/2026
 
 Aggiunto docs/integrazione-log-qa-verifier.md: catalogo sorgenti del produttore QA e mapping al contratto comune. Campioni di codice in lavorazione e digest delle immagini candidate conservati privatamente; nessun nuovo componente runtime o flusso di raccolta installato. Retention snapshot abilitata dall’operatore dopo la milestone rete pubblicata.
+
+## Publisher sintetico e ripresa del pilota, 19/10/2026
+
+`pilot/monitoring-hub/emit-fixture.py` pubblica un record sintetico per segmento dopo staging e fsync. `check-recovery.py`, `check-partial.py` e `check-publisher.py` conservano prove private di continuità, riga incompleta e prefisso abbandonato. Il guard `bin/pilot_consultation_v0.py` rimane offline e non è nel percorso Alloy.
+
+## Fermo Loki e riavvio Alloy, 19/10/2026
+
+`pilot/monitoring-hub/check-outage.py` misura tre eventi attraverso fermo Loki e riavvio Alloy. Il profilo stabile non usa WAL; una variante experimental è stata provata e rimossa dopo lo stesso esito 2/3. ADR-023 blocca il trasporto reale finché la coda durevole non supera il test.
+
+## Riparazione di una fixture dopo il fermo, 19/10/2026
+
+`pilot/monitoring-hub/repair-outage.py` rilegge un solo evento mancante da `outage-state.json`, valida segmento e originale con il guard v0 e può inviare il JSON all'API Loki locale. È un backfill manuale della fixture, separato da Alloy e dai percorsi reali.

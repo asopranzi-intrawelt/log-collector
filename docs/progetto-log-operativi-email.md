@@ -29,7 +29,7 @@ flowchart LR
 
 ## Censimento della posta autorizzato
 
-L'utente autorizza il controllo delle notifiche automatiche ricevute dalla casella IT e delle copie recapitate a due caselle personali IT. Indirizzi reali in `_notes/mail-log-scope.json`, ignorato da git. Si ricogniscono report e log automatici pertinenti all'infrastruttura; la normale corrispondenza commerciale non è una sorgente di log da importare.
+L'utente autorizza il controllo delle notifiche automatiche ricevute dalla casella IT e delle copie recapitate a due caselle personali IT. Indirizzi reali in `_notes/archivio-sessioni/generale/materiali/mail-log-scope.json`, ignorato da git. Si ricogniscono report e log automatici pertinenti all'infrastruttura; la normale corrispondenza commerciale non è una sorgente di log da importare.
 
 Partire dal periodo recente e dagli archivi/cartelle delle notifiche, includendo report giornalieri, settimanali e mensili. Per ciascuna famiglia annotare sorgente e prodotto, mittente effettivo e intestazioni, casella/cartella, esemplari di successo e fallimento disponibili, oggetto, formato del corpo/allegato, job o nodo, tempi/fuso, esito, cadenza attesa e link al registro autorevole. Riportare anche risultati parziali e limite temporale della ricerca; assenza in una cartella o pagina non dimostra assenza del servizio.
 
@@ -51,7 +51,7 @@ Lettore locale tools/read-seeweb-report.py verificato sulle nove colonne di tutt
 
 Dopo la chiusura della milestone Nebula in abd1ea4, l'utente rimanda esplicitamente il test degli accessi AdS offline e chiede di procedere con altro. Il censimento delle notifiche IT e dei backup diventa il lavoro corrente; il rinvio lascia aperto il gate offline prima dell'installazione del poller. Nessuna regola del firewall o interruzione del collegamento cloud è stata eseguita.
 
-La verifica delle integrazioni delle 17:32:59 locali riconferma Outlook Email disponibile e non installato, senza strumenti di lettura della posta. Il suggerimento delle 10:02:34 locali è già presente e non viene riproposto. Esito e cronologia in _notes/email-connector-check-20261013.json; zero messaggi letti. Questa verifica riguarda l'integrazione della sessione, non l'accessibilità delle singole caselle Microsoft né la loro configurazione.
+La verifica delle integrazioni delle 17:32:59 locali riconferma Outlook Email disponibile e non installato, senza strumenti di lettura della posta. Il suggerimento delle 10:02:34 locali è già presente e non viene riproposto. Esito e cronologia in _notes/archivio-sessioni/seeweb-email/materiali/email-connector-check-20261013.json; zero messaggi letti. Questa verifica riguarda l'integrazione della sessione, non l'accessibilità delle singole caselle Microsoft né la loro configurazione.
 
 Primo campione: un report Seeweb originale recente, esportato in formato .eml e salvato in _notes/email-reports-inbox, ignorato da git. Nel nuovo Outlook il messaggio aperto si salva da Altre azioni > Salva con nome, secondo la [procedura ufficiale Microsoft](https://support.microsoft.com/it-it/outlook/mail/save-an-outlook-message-as-a-eml-file-a-pdf-file-or-as-a-draft). Il file originale conserva intestazioni, corpo e allegati utili al confronto; un PDF o una schermata non costituiscono lo stesso campione. Il salvataggio locale non configura inoltri né un nuovo flusso sul collettore.
 

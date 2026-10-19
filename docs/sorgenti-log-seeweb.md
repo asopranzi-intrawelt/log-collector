@@ -2,7 +2,7 @@
 
 ## Perimetro confermato il 14/10/2026
 
-L'operatore fornisce sette URL di accesso attuali e chiede di raccogliere, dove disponibili, gli accessi amministrativi e gli eventi tecnici dei servizi Seeweb. Sono sette punti di accesso, non sette nuovi server: il Word li associava storicamente e la dashboard attuale conferma il nome pubblico e la LAN privata sulla stessa OPNsense 21.1.5. SWB-02 e SWB-07 sono due ingressi della stessa sorgente. I valori reali e la provenienza stanno in _notes/seeweb-access-inventory-20261014.json; nei documenti condivisi si usano le stesse etichette nei due progetti.
+L'operatore fornisce sette URL di accesso attuali e chiede di raccogliere, dove disponibili, gli accessi amministrativi e gli eventi tecnici dei servizi Seeweb. Sono sette punti di accesso, non sette nuovi server: il Word li associava storicamente e la dashboard attuale conferma il nome pubblico e la LAN privata sulla stessa OPNsense 21.1.5. SWB-02 e SWB-07 sono due ingressi della stessa sorgente. I valori reali e la provenienza stanno in _notes/archivio-sessioni/seeweb-email/materiali/seeweb-access-inventory-20261014.json; nei documenti condivisi si usano le stesse etichette nei due progetti.
 
 La raccolta automatica Seeweb sul collettore non è attiva. Il commit a5fe489 contiene un lettore locale di originali email esportati dall'operatore, verificato su due report e sei stati per unità. Non legge autonomamente la casella, non interroga i pannelli e non raccoglie login Seeweb. Dettaglio della misura in docs/runbook-log-operativi-email.md. Un endpoint noto, una capacità documentata del prodotto e un flusso realmente ricevuto sulla VM sono stati distinti.
 

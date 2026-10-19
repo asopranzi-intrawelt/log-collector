@@ -10,6 +10,14 @@ last-verified-commit: 928da73
 
 # Design e sicurezza applicativa
 
+## Confine QA riconfermato dal produttore, 19/10/2026
+
+L'ADR-023 versionata del produttore QA su `staging` a `7472de5` adotta `qa-tech-v1` e corregge l'ipotesi che `AdsLine` fosse il formato in ingresso. Il codice letto non emette ancora il contratto: il lavoro del passo 5 è non committato, con CSV uso che conserva `filename` e `user` e fallback che nomina `T1/T2`. Il futuro evento tecnico generale resta a vocabolari chiusi, senza testo libero o identificativi in label; l'eventuale registro identificante dell'autorizzazione al backup richiede perimetro e accessi separati. Nessun adapter QA o flusso reale è abilitato dal pilot.
+
+## Perimetro del contratto sintetico e dei futuri eventi QA, 17/10/2026
+
+ADR-022 e `docs/integrazione-log-qa-verifier.md` richiedono eventi QA strutturati e minimizzati prima del Loki generale; i diagnostici originali eventualmente autorizzati restano in archivio protetto. Anche un testo di formato noto richiede whitelist e rifiuto dei campi non classificati. Il nuovo `bin/pilot_consultation_v0.py` è fail closed soltanto per la fixture sintetica, con originale confinato e hash controllato: non autentica la fonte, non prova assenza di dati sensibili nei log QA e non è collegato alla pipeline reale. La verifica del produttore con errori sensibili fittizi e UI/job sul consenso e sull'attesa di 600 s resta un gate aperto. L'ancora `last-verified-commit` non copre il codice non committato di questo checkpoint.
+
 ## Verifica dei volumi API preparata, milestone precedente versionata, 13/10/2026
 
 Verificatore dei volumi separato dal poller: chiave solo stdin, client TLS e mapping dallo snapshot, budget massimo interno di 20 POST e piano corrente di 18. Prima di creare il client si rifiutano cache vuote, periodo oltre sette giorni o terminato meno di un'ora prima. Questo margine e la guardia di 1.000 righe sono scelte prudenziali interne, senza garanzia Zyxel. Controllo positivo e confronto ampie prima/dopo impediscono di promuovere il vuoto a prova o attribuire automaticamente a troncamento un cloud cambiato. Vecchi record assenti sono indisponibili, senza causa dedotta. Limite e retention massimi, completezza fisica e raccolta VM restano non dimostrati. Fonte API e distinzione fra documento e misura nei passi 70-71 del runbook; parser manuale riconciliato a 928da73.
@@ -57,3 +65,15 @@ La catena locale preparata in `ads-nightly.sh` e `ads-verify.sh` rileva modifich
 ## Diagrammi
 
 Nessun diagramma di questi componenti è presente nel repository al commit verificato. Una tabella dei diagrammi sarà aggiunta quando esisteranno sorgente e derivato corrispondenti al codice.
+
+## Publisher sintetico e ripresa del pilota, 19/10/2026
+
+Nel pilot il glob di Alloy include solo `technical-*.jsonl`: il publisher prepara `.pending-*.tmp` fuori glob e rinomina il file completo. Questa guardia locale non prova durabilità dopo power loss, consegna esattamente una volta o sanitizzazione delle sorgenti QA reali; ADR-022 e il gate del produttore restano validi.
+
+## Fermo Loki e riavvio Alloy, 19/10/2026
+
+Il punto di perdita osservato è fra offset del lettore file e conferma di indicizzazione Loki. Segmenti completi e posizioni persistenti non sostituiscono una coda durevole con replay e limiti; nessuna sorgente reale entra nel percorso del pilot secondo ADR-023.
+
+## Riparazione di una fixture dopo il fermo, 19/10/2026
+
+Il backfill del pilot usa soltanto il contratto sintetico validato e le label fisse; rifiuta record alterati e query ambigue. Query e push separati non sono atomici, quindi il secondo giro senza invio non prova assenza di duplicati sotto concorrenza o crash.

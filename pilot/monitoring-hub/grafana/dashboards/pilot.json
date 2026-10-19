@@ -1,0 +1,22 @@
+{
+  "uid": "linux-metrics-pilot",
+  "title": "Pilota metriche Linux",
+  "tags": ["pilota", "linux"],
+  "timezone": "browser",
+  "schemaVersion": 41,
+  "version": 1,
+  "refresh": "30s",
+  "time": {"from": "now-1h", "to": "now"},
+  "panels": [
+    {
+      "id": 1,
+      "type": "timeseries",
+      "title": "Scrape delle sorgenti (1 = riuscito)",
+      "description": "Uno scrape riuscito non prova che tutte le metriche richieste siano presenti.",
+      "datasource": {"type": "prometheus", "uid": "pilot-prometheus"},
+      "targets": [{"refId": "A", "expr": "up", "legendFormat": "{{job}} / {{instance}}"}],
+      "fieldConfig": {"defaults": {"min": 0, "max": 1}},
+      "gridPos": {"h": 9, "w": 24, "x": 0, "y": 0}
+    }
+  ]
+}
