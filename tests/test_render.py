@@ -83,6 +83,45 @@ def test_filtro_ilo_rifiuta_valori_che_iniettano_configurazione(tmp_path, params
     assert "sorgenti.ilo: indirizzo IP non valido" in capsys.readouterr().err
 
 
+def test_seeweb_disattivato_senza_ip_sorgente(tmp_path):
+    code, dest = run(tmp_path, FIXTURES / "parametri-completi.yaml")
+    assert code == 0
+    nft = (dest / "etc" / "nftables.conf").read_text(encoding="utf-8")
+    conf = (dest / "etc" / "rsyslog.d" / "10-ads.conf").read_text(encoding="utf-8")
+    assert "# Sorgente Seeweb non ancora autorizzata" in nft
+    assert "ip saddr { 127.0.0.2 } udp dport 514 accept" not in nft
+    assert 'if ($fromhost-ip == "0.0.0.0" and $fromhost-ip == "::") then {' in conf
+
+
+def test_seeweb_apre_solo_udp_per_l_ip_validato_e_separa_i_log(tmp_path, params_text):
+    f = tmp_path / "p.yaml"
+    f.write_text(
+        params_text.replace("seeweb_opnsense: []", 'seeweb_opnsense: ["127.0.0.2"]'),
+        encoding="utf-8",
+    )
+    code, dest = run(tmp_path, f)
+    assert code == 0
+    nft = (dest / "etc" / "nftables.conf").read_text(encoding="utf-8")
+    conf = (dest / "etc" / "rsyslog.d" / "10-ads.conf").read_text(encoding="utf-8")
+    assert "ip saddr { 127.0.0.2 } udp dport 514 accept" in nft
+    assert "ip saddr { 127.0.0.2 } tcp dport 6514 accept" not in nft
+    assert 'if ($fromhost-ip == "127.0.0.2") then {' in conf
+    assert 'dynaFile="AdsSeewebTechnicalFile"' in conf
+    assert 'fileGroup="root" fileCreateMode="0640"' in conf
+
+
+def test_seeweb_rifiuta_ip_non_valido_senza_scrivere_output(tmp_path, params_text, capsys):
+    f = tmp_path / "p.yaml"
+    f.write_text(
+        params_text.replace("seeweb_opnsense: []", 'seeweb_opnsense: ["127.0.0.2; accept"]'),
+        encoding="utf-8",
+    )
+    code, dest = run(tmp_path, f)
+    assert code == 1
+    assert not dest.exists()
+    assert "sorgenti.seeweb_opnsense: indirizzo IPv4 non valido" in capsys.readouterr().err
+
+
 def test_un_solo_amministratore_scritto_come_scalare(tmp_path, params_text):
     f = tmp_path / "p.yaml"
     f.write_text(params_text.replace(ADMINS, 'ip_admin_non_msp: "203.0.113.10"'), encoding="utf-8")

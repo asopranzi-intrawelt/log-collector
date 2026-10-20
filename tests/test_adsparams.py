@@ -13,6 +13,7 @@ def test_legge_scalari_liste_in_linea_e_a_blocco(params_text):
     assert p["sorgenti"]["nebula_switch_ap"] == ["192.0.2.2", "192.0.2.3"]
     assert p["sorgenti"]["qnap"] == ["192.0.2.4", "192.0.2.5"]
     assert p["sorgenti"]["ilo"] == []
+    assert p["sorgenti"]["seeweb_opnsense"] == []
     assert p["rete"]["subnet_server"] == ""
 
 

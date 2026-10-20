@@ -20,6 +20,9 @@ template(name="AdsFile" type="string" string="/srv/ads/%fromhost-ip%/%$year%-%$m
 # Gli eventi iLO diversi dagli accessi espliciti vanno in un flusso separato. La destinazione
 # comprende anche eventi non ancora classificati: va ispezionata prima dell'attivazione reale.
 template(name="AdsIloOtherFile" type="string" string="/var/log/ads-ilo-other/%fromhost-ip%/%$year%-%$month%-%$day%.log")
+# I registri OPNsense restano tecnici finche' un campione nativo non dimostra quali eventi
+# siano accessi amministrativi. Non farli entrare per default nell'archivio AdS.
+template(name="AdsSeewebTechnicalFile" type="string" string="/var/log/ads-seeweb-technical/%fromhost-ip%/%$year%-%$month%-%$day%.log")
 # Il campo messaggio e' $!ads_msg, calcolato nel ruleset: tag e testo riattaccati esattamente come
 # erano nella riga RFC 3164, e separati da uno spazio nei messaggi RFC 5424, dove sono due campi
 # distinti. Una regola "spazio se manca" era sbagliata: con il firewall Zyxel, che non scrive un
@@ -39,7 +42,11 @@ ruleset(name="ads" parser=["rsyslog.rfc5424", "ads.rfc3164anno"]) {
     } else {
         set $!ads_msg = $syslogtag & $msg;
     }
-    if {{ rsyslog_ip_match(sorgenti.ilo) }} then {
+    if {{ rsyslog_ip_match(sorgenti.seeweb_opnsense) }} then {
+        action(type="omfile" dynaFile="AdsSeewebTechnicalFile" template="AdsLine"
+               fileOwner="root" fileGroup="root" fileCreateMode="0640"
+               dirOwner="root" dirGroup="root" dirCreateMode="0750")
+    } else if {{ rsyslog_ip_match(sorgenti.ilo) }} then {
         # Corrispondenze osservate sul dispositivo: Browser login, failure, logout. Le forme
         # SSH e Remote console sono documentate da HPE ma non ancora provate su questa iLO.
         if $!ads_msg startswith "iLO5 Browser login:" or

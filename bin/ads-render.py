@@ -31,6 +31,7 @@ import adsparams  # noqa: E402
 PLACEHOLDER = re.compile(r"\{\{\s*([^{}]*?)\s*\}\}")
 DOTTED = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*\.[A-Za-z_][A-Za-z0-9_]*$")
 RSYSLOG_IP_MATCH = re.compile(r"^rsyslog_ip_match\(([^()]*)\)$")
+NFT_UDP_SOURCE_RULE = re.compile(r"^nft_udp_source_rule\(([^()]*)\)$")
 SUFFIX = ".template"
 
 
@@ -43,6 +44,22 @@ def render_text(text: str, params: adsparams.Params, where: str, errors: list[st
 
     def substitute(match: re.Match[str]) -> str:
         expr = match.group(1)
+        if nft_rule := NFT_UDP_SOURCE_RULE.fullmatch(expr):
+            key = nft_rule.group(1).strip()
+            if not DOTTED.fullmatch(key):
+                errors.append(f"{where}: chiave IP non valida {{{{ {expr} }}}}")
+                return match.group(0)
+            try:
+                value = adsparams.lookup(params, key)
+                addresses = [str(ipaddress.IPv4Address(item)) for item in _values(value) if item]
+            except (adsparams.ParamsError, ValueError) as exc:
+                errors.append(f"{where}: {key}: indirizzo IPv4 non valido: {exc}")
+                return match.group(0)
+            return (
+                "ip saddr { " + ", ".join(addresses) + " } udp dport 514 accept"
+                if addresses
+                else "# Sorgente Seeweb non ancora autorizzata"
+            )
         if ip_match := RSYSLOG_IP_MATCH.fullmatch(expr):
             key = ip_match.group(1).strip()
             if not DOTTED.fullmatch(key):

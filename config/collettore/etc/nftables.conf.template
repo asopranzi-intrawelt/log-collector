@@ -16,6 +16,7 @@ table inet filter {
     ct state invalid drop
     iif lo accept
     ip saddr { {{ rete.subnet_lan + rete.subnet_server }} } udp dport 514 accept
+    {{ nft_udp_source_rule(sorgenti.seeweb_opnsense) }}
     ip saddr { {{ rete.subnet_lan + rete.subnet_server }} } tcp dport 6514 accept
     ip saddr { {{ rete.ip_admin_non_msp }} } tcp dport 22 accept
     icmp type echo-request accept

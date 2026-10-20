@@ -23,6 +23,7 @@ sorgenti:
     - "192.0.2.4"
     - "192.0.2.5"
   ilo: []
+  seeweb_opnsense: []
   proxmox_host: []
   windows_pilota: []
 ads:

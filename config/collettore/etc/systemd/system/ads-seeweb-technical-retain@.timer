@@ -1,0 +1,10 @@
+[Unit]
+Description=Controllo giornaliero della ritenzione Seeweb (%i giorni)
+
+[Timer]
+OnCalendar=*-*-* 03:10:00
+Persistent=true
+Unit=ads-seeweb-technical-retain@%i.service
+
+[Install]
+WantedBy=timers.target

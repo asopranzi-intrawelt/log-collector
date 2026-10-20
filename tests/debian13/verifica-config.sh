@@ -30,16 +30,21 @@ done
 sed 's/ilo: \[\]/ilo: ["127.0.0.1"]/' "$root/tests/fixtures/parametri-completi.yaml" >"$work/parametri-ilo.yaml"
 "$py" "$root/bin/ads-render.py" --parametri "$work/parametri-ilo.yaml" \
     --sorgente "$root/config/collettore" --destinazione "$work/ilo-tree" >/dev/null
+sed 's/seeweb_opnsense: \[\]/seeweb_opnsense: ["127.0.0.2"]/' "$root/tests/fixtures/parametri-completi.yaml" >"$work/parametri-seeweb.yaml"
+"$py" "$root/bin/ads-render.py" --parametri "$work/parametri-seeweb.yaml" \
+    --sorgente "$root/config/collettore" --destinazione "$work/seeweb-tree" >/dev/null
 
 # Su Git Bash il percorso va passato a Docker in forma Windows.
 mount_src=$work/tree
 mount_ilo=$work/ilo-tree
+mount_seeweb=$work/seeweb-tree
 if command -v cygpath >/dev/null; then
     mount_src=$(cygpath -w "$work/tree")
     mount_ilo=$(cygpath -w "$work/ilo-tree")
+    mount_seeweb=$(cygpath -w "$work/seeweb-tree")
 fi
 
-MSYS_NO_PATHCONV=1 docker run --rm --cap-add NET_ADMIN -v "$mount_src:/tree:ro" -v "$mount_ilo:/ilo-tree:ro" "$IMAGE" bash -c '
+MSYS_NO_PATHCONV=1 docker run --rm --cap-add NET_ADMIN -v "$mount_src:/tree:ro" -v "$mount_ilo:/ilo-tree:ro" -v "$mount_seeweb:/seeweb-tree:ro" "$IMAGE" bash -c '
 set -euo pipefail
 fail() { echo "FALLITO: $*"; exit 1; }
 ok() { echo "ok  $*"; }
@@ -47,10 +52,11 @@ ok() { echo "ok  $*"; }
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -qq
 apt-get install -y -qq --no-install-recommends nftables openssh-server chrony \
-    unattended-upgrades qemu-guest-agent rsyslog rsyslog-gnutls sudo openssl iproute2 >/dev/null
+    unattended-upgrades qemu-guest-agent rsyslog rsyslog-gnutls sudo openssl iproute2 python3-minimal >/dev/null
 ok "pacchetti installabili su $(. /etc/os-release && echo "$PRETTY_NAME")"
 
 nft -c -f /tree/etc/nftables.conf || fail "nft -c rifiuta il ruleset"
+nft -c -f /seeweb-tree/etc/nftables.conf || fail "nft -c rifiuta la regola Seeweb"
 ok "nftables: ruleset valido per nft $(nft --version | cut -d" " -f2)"
 
 install -m 0644 /tree/etc/ssh/sshd_config.d/10-ads.conf /etc/ssh/sshd_config.d/
@@ -185,6 +191,26 @@ grep -qF "iLO clock has been synchronized" "$f" && fail "NTP iLO entrato nel flu
 [ "$(stat -c "%U:%G %a" "$other")" = "root:root 640" ] || fail "permessi del flusso distinto"
 [ "$(stat -c "%U:%G %a" "$(dirname "$other")")" = "root:root 750" ] || fail "permessi della directory iLO tecnica"
 ok "iLO: tre accessi nel flusso AdS, tre eventi tecnici o ignoti nel file distinto, nessuna riga persa"
+
+# Il mittente Seeweb usa un IP loopback diverso: il nome host nel payload non conta per lo
+# smistamento. La prova misura realmente $fromhost-ip, non un testo che imita la sorgente.
+kill "$(cat /run/rsyslogd-ads.pid)"
+for i in 1 2 3 4 5 6 7 8 9 10; do [ ! -e /run/rsyslogd-ads.pid ] && break; sleep 0.2; done
+install -m 0644 /seeweb-tree/etc/rsyslog.d/10-ads.conf /etc/rsyslog.d/
+rsyslogd -N1 >/dev/null 2>&1 || { rsyslogd -N1; fail "rsyslogd -N1 rifiuta il filtro Seeweb"; }
+rsyslogd -i /run/rsyslogd-ads.pid
+sleep 1
+python3 -c "import socket; s=socket.socket(socket.AF_INET,socket.SOCK_DGRAM); s.bind((\"127.0.0.2\",0)); s.sendto(b\"<134>Oct 20 12:00:00 opnsense SEEWEB_TEST_EVENT\\n\",(\"127.0.0.1\",514))"
+logger -n 127.0.0.1 -P 514 -d -t prova-ads "ADS_TEST_EVENT"
+sleep 2
+tech=/var/log/ads-seeweb-technical/127.0.0.2/$(date +%Y-%m-%d).log
+[ -f "$tech" ] || fail "file tecnico Seeweb assente"
+grep -qF "SEEWEB_TEST_EVENT" "$tech" || fail "evento Seeweb assente dal flusso tecnico"
+[ ! -e "/srv/ads/127.0.0.2/$(date +%Y-%m-%d).log" ] || fail "Seeweb entrato nel flusso AdS"
+grep -qF "ADS_TEST_EVENT" "$f" || fail "sorgente AdS locale persa"
+[ "$(stat -c "%U:%G %a" "$tech")" = "root:root 640" ] || fail "permessi file Seeweb"
+[ "$(stat -c "%U:%G %a" "$(dirname "$tech")")" = "root:root 750" ] || fail "permessi cartella Seeweb"
+ok "Seeweb: sorgente UDP distinta, file tecnico root:root e zero righe nel flusso AdS"
 
 echo "tutte le verifiche superate"
 '

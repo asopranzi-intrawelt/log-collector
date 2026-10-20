@@ -21,6 +21,7 @@ sorgenti:                  # elenco atteso per il controllo di silenzio; ilo ide
   nebula_switch_ap: []
   qnap: []
   ilo: []
+  seeweb_opnsense: []      # IP sorgente effettivo, da confermare con Seeweb prima del test
   proxmox_host: []
   windows_pilota: []
   gravityzone: ""         # console GravityZone come sorgente attesa (studio, D9)
