@@ -6,10 +6,14 @@ covers-paths:
   - bin/**
   - config/**
   - pilot/monitoring-hub/**
-last-verified-commit: 84de61e
+last-verified-commit: 93c21e4
 ---
 
 # Design e sicurezza applicativa
+
+## Confine del ricevitore Seeweb, 20/10/2026
+
+La regola nftables ammette UDP 514 solo dall'IPv4 Seeweb configurato, ma l'indirizzo non autentica il mittente. Rsyslog isola tutti i messaggi di quella sorgente nell'archivio tecnico `root:root 0640/0750`, senza promuoverli ad accessi AdS prima di campioni nativi con attore. Il controllo di ritenzione richiede giorni espliciti prima di cancellare, registra i percorsi rimossi e segnala localmente archivio vuoto o uso disco almeno all'80%. Non è installato; percorso VPN, volume reale, durata, silenzio e allarme esterno restano da verificare.
 
 ## Nuovo builder QA e confine degli archivi, 20/10/2026
 
@@ -21,7 +25,7 @@ Nel pilot `os.link` crea il nome definitivo dallo staged nella stessa directory 
 
 ## Confine della coda sintetica, 19/10/2026
 
-Il pilot rifiuta figli inattesi della directory della coda e un nome di segmento già presente prima di scrivere l'originale. Queste guardie proteggono soltanto il comando cooperante: il lock non è condiviso dagli altri writer, la verifica del nome precede una rinomina che potrebbe sovrascrivere un file creato nel frattempo e gli originali sono in una cartella condivisa. La quota di 8 MiB è logica, non imposta dal filesystem. Nessun evento reale QA o AdS deve entrare in questo percorso finché isolamento, pubblicazione senza sovrascrittura, quota fisica e prove di guasto non siano verificati.
+Il pilot rifiuta figli inattesi della directory della coda e un nome di segmento già presente prima di scrivere l'originale. Il lock resta locale al comando cooperante; `os.link` rifiuta la collisione tardiva, ma non impedisce modifiche successive da altri writer, e gli originali sono in una cartella condivisa. La quota di 8 MiB è logica, non imposta dal filesystem. Nessun evento reale QA o AdS deve entrare in questo percorso finché isolamento degli originali, quota fisica e prove di guasto non siano verificati.
 
 ## Confine QA riconfermato dal produttore, 19/10/2026
 
@@ -29,7 +33,7 @@ L'ADR-023 versionata del produttore QA su `staging` a `7472de5` adotta `qa-tech-
 
 ## Perimetro del contratto sintetico e dei futuri eventi QA, 17/10/2026
 
-ADR-022 e `docs/integrazione-log-qa-verifier.md` richiedono eventi QA strutturati e minimizzati prima del Loki generale; i diagnostici originali eventualmente autorizzati restano in archivio protetto. Anche un testo di formato noto richiede whitelist e rifiuto dei campi non classificati. `bin/pilot_consultation_v0.py` è fail closed soltanto per la fixture sintetica, con originale confinato e hash controllato: non autentica la fonte, non prova assenza di dati sensibili nei log QA e non è collegato alla pipeline reale. La verifica del produttore con errori sensibili fittizi e UI/job sul consenso e sull'attesa di 600 s resta un gate aperto. Le modifiche non committate di questo giro non sono certificate dalla sola ancora a HEAD.
+ADR-022 e `docs/integrazione-log-qa-verifier.md` richiedono eventi QA strutturati e minimizzati prima del Loki generale; i diagnostici originali eventualmente autorizzati restano in archivio protetto. Anche un testo di formato noto richiede whitelist e rifiuto dei campi non classificati. `bin/pilot_consultation_v0.py` è fail closed soltanto per la fixture sintetica, con originale confinato e hash controllato: non autentica la fonte, non prova assenza di dati sensibili nei log QA e non è collegato alla pipeline reale. La verifica del produttore con errori sensibili fittizi e UI/job sul consenso e sull'attesa di 600 s resta un gate aperto.
 
 ## Verifica dei volumi API preparata, milestone precedente versionata, 13/10/2026
 

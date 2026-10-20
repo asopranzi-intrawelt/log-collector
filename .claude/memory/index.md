@@ -372,11 +372,11 @@ Template:             E:\template-claude-developing @ ffcbdb3
 
 | Scheda | last-verified | Stato |
 |---|---|---|
-| STACK.md | 84de61e | pilot sintetico e guard della coda documentati; writer esterni ancora aperti |
-| design-and-security.md | 84de61e | confine QA e rischi della coda sintetica aggiornati; flussi reali bloccati |
-| deployment.md | 48be07b | wrapper eseguito dalla postazione; nessuna installazione VM |
-| dev-testing.md | 84de61e | collisione mutata e guard+coda 20/20; nessuna nuova prova live |
-| current-work.md | 84de61e | note private 13 voci; pilot e gate QA ancora aperti |
+| STACK.md | 93c21e4 | ingresso Seeweb opzionale e pubblicazione del pilot riconciliati |
+| design-and-security.md | 93c21e4 | archivio tecnico Seeweb isolato; limiti del pilot e QA distinti |
+| deployment.md | 93c21e4 | candidata Seeweb provata in container, non installata sulla VM |
+| dev-testing.md | 93c21e4 | prove Seeweb e ritenzione fittizia, nessuna misura reale |
+| current-work.md | 93c21e4 | candidato Seeweb e gate di attivazione aggiornati |
 | roadmap.md | 9ee87b4 | solo struttura |
 
 ## Punto di ripresa

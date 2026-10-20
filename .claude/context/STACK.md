@@ -8,18 +8,22 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 84de61e
+last-verified-commit: 93c21e4
 ---
 
 # Stack applicativo
 
+## Ingresso tecnico Seeweb preparato, 20/10/2026
+
+`sorgenti.seeweb_opnsense` è vuoto per default. Con l'IPv4 confermato, `bin/ads-render.py` genera la regola nftables UDP 514 per quel mittente e rsyslog salva ogni suo evento sotto `/var/log/ads-seeweb-technical/`, fuori da `/srv/ads/`. `bin/ads-seeweb-technical-retain.sh` misura volume e spazio; la cancellazione richiede `--days N`. Le unità systemd sono candidate non installate, senza giorni di conservazione approvati né eventi reali.
+
 ## Replay sintetico nel pilota, 19/10/2026
 
-`pilot/monitoring-hub/replay-outbox.py` pubblica segmenti fuori dal glob Alloy, valida tutti gli originali e riconcilia con Loki prima di inviare. Conserva i segmenti dopo il push; gli originali restano in `fixtures/original/`. Il pilot blocca un nome di segmento già presente prima di scrivere l'originale, ma la pubblicazione con rename resta vulnerabile a un writer esterno che crei quel nome dopo il controllo. La prova è solo sintetica e non modifica la catena AdS o QA.
+`pilot/monitoring-hub/replay-outbox.py` pubblica segmenti fuori dal glob Alloy, valida tutti gli originali e riconcilia con Loki prima di inviare. Conserva i segmenti dopo il push; gli originali restano in `fixtures/original/`. Il pilot blocca un nome già presente prima di scrivere l'originale e usa `os.link` per rifiutare anche una collisione tardiva. Un writer esterno può ancora modificare un file già pubblicato. La prova è solo sintetica e non modifica la catena AdS o QA.
 
 ## Guard v0 e pilota locale dei log, 17/10/2026
 
-`bin/pilot_consultation_v0.py` è un controllo CLI offline del solo record emesso da `pilot/monitoring-hub/emit-fixture.py`. Verifica schema esatto, parser e sorgente sintetici, file originale confinato, formato dei byte, SHA-256 e label fisse. Non parsea log QA o AdS reali e non è nel percorso Alloy. Il pilota locale Prometheus/Grafana/Loki/Alloy ha corretto una perdita alla seconda rotazione del path fisso con segmenti dai nomi unici; due segmenti consecutivi da 818 byte sono arrivati a Loki. Configurazione, controlli e limiti nel README del pilota; Docker fermo, volumi conservati. Le modifiche al pilot di questo giro restano nel working tree e non sono certificate dalla sola ancora a HEAD.
+`bin/pilot_consultation_v0.py` è un controllo CLI offline del solo record emesso da `pilot/monitoring-hub/emit-fixture.py`. Verifica schema esatto, parser e sorgente sintetici, file originale confinato, formato dei byte, SHA-256 e label fisse. Non parsea log QA o AdS reali e non è nel percorso Alloy. Il pilota locale Prometheus/Grafana/Loki/Alloy ha corretto una perdita alla seconda rotazione del path fisso con segmenti dai nomi unici; due segmenti consecutivi da 818 byte sono arrivati a Loki. Configurazione, controlli e limiti nel README del pilota; Docker fermo, volumi conservati. La pubblicazione con `os.link` è versionata in `d8a9879`.
 
 ## Primo avvio Netdata verificato; normalizzazione e capienza richieste, 15/10/2026
 

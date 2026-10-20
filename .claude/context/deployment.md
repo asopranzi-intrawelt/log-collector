@@ -5,10 +5,14 @@ generated-date: 2026-09-30
 covers-paths:
   - config/**
   - docs/handoff-sviluppo-collettore.md
-last-verified-commit: 48be07b
+last-verified-commit: 93c21e4
 ---
 
 # Deployment
+
+## Candidata Seeweb ancora fuori dalla VM, 20/10/2026
+
+Il render dell'ingresso Seeweb e le unità `ads-seeweb-technical-retain@` sono nel repository, ma non installati sul collettore. La prova `tests/debian13/verifica-config.sh` ha validato nftables, rsyslog e isolamento dell'archivio con una sorgente loopback distinta; il test Linux della ritenzione usa file fittizi. Prima dell'installazione servono l'IPv4 reale, il percorso VPN verificato, campioni e categorie concordati con Seeweb, una durata di conservazione fondata sul volume e la prova del namespace systemd con archivio assente. Nessun evento Seeweb reale è stato raccolto.
 
 ## Login fallito 54HP verificato, tre casi API completati, 13/10/2026
 

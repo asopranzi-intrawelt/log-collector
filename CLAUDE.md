@@ -10,7 +10,7 @@ Collettore centrale open source degli accessi degli amministratori di sistema (p
 
 - Cosa e perché: `docs/studio-collettore-ads.md`
 - Come e in che ordine: `docs/handoff-sviluppo-collettore.md`
-- Che cosa è stato fatto davvero, passo per passo con l'esito: `docs/runbook-componente-1.md`, `docs/runbook-componente-2.md`, `docs/runbook-componente-3-proxmox.md`, `docs/runbook-componente-3-firewall.md`, `docs/runbook-componente-3-nas.md`, `docs/runbook-componente-3-nebula.md`, `docs/runbook-componente-4-ilo.md` e `docs/runbook-componente-5-catena.md`, uno per componente o sorgente, da aggiornare a ogni passo eseguito su un host. Il runbook iLO registra il collaudo Remote Syslog sul dispositivo; quello Nebula registra la ricognizione della GUI e quello della catena descrive per ora il codice e le sole prove locali. Sono scritti per essere letti da chi non ha partecipato e sono la fonte da cui `D:/compilatore-documenti` può ricavare un documento per un cliente (richiesta dell'utente del 2026-10-02); i valori reali non vi compaiono e stanno in `config/parametri.yaml`
+- Esecuzione e prove: `docs/runbook-componente-1.md`, `docs/runbook-componente-2.md`, `docs/runbook-componente-3-proxmox.md`, `docs/runbook-componente-3-firewall.md`, `docs/runbook-componente-3-nas.md`, `docs/runbook-componente-3-nebula.md`, `docs/runbook-componente-4-ilo.md` e `docs/runbook-componente-5-catena.md`. Aggiornarli dopo ogni passo su host; distinguono collaudi reali (iLO), ricognizioni (Nebula) e prove locali (catena). Sono leggibili senza la sessione e utilizzabili da `D:/compilatore-documenti` per documenti cliente; i valori reali stanno in `config/parametri.yaml`.
 - Ratio del progetto, da leggere prima di decidere chi amministra che cosa: `docs/modello-di-custodia.md` (chi è amministratore di sistema non custodisce la prova dei propri accessi; tre livelli: raccolta, prova, analisi)
 - Perché non Wazuh, e che cosa si prende dalla proposta dell'MSP: `docs/confronto-wazuh.md`
 - Copertura dell'intero inventario di rete: `docs/matrice-sorgenti-rete.md`, con classificazione verificabile in `data/copertura-rete-20261008.json` e controllo `tools/verifica-copertura-rete.py`
@@ -18,7 +18,7 @@ Collettore centrale open source degli accessi degli amministratori di sistema (p
 - Servizi cloud, applicazioni e log operativi dei backup: `docs/ricognizione-servizi-e-backup.md`, confronto del Word storico con il progetto rete e stato separato da quello dei nodi topologici; ingressi Seeweb, canali e lacune in `docs/sorgenti-log-seeweb.md`; configurazione osservata del firewall e piano in `docs/firewall-seeweb-opnsense.md`
 - Valori dell'ambiente: `config/parametri.yaml` (copia locale di `config/parametri.example.yaml`, fuori da git)
 
-I due documenti non si importano a ogni avvio, perché da soli valgono oltre 30.000 caratteri e porterebbero il progetto sopra la soglia degli instruction file (sezione 24 di `.claude/PROJECT-SYSTEM.md`). Si leggono a richiesta: prima di lavorare su un componente si leggono la sezione dell'handoff che lo descrive e le sezioni dello studio che quella richiama, e la sezione 0 dell'handoff prima di decidere se un componente è bloccato.
+Handoff e studio superano insieme 30.000 caratteri: non caricarli a ogni avvio (budget nella sezione 24 di `.claude/PROJECT-SYSTEM.md`). Per un componente, leggere la sezione pertinente dell'handoff e i suoi rimandi allo studio; prima di sbloccarlo, leggere la sezione 0 dell'handoff.
 
 ## Regole di progetto
 
@@ -72,7 +72,7 @@ Schede tecniche, sotto `.claude/context/`, con frontmatter di riconciliazione.
 
 Regole sempre attive, sotto `.claude/rules/`, e skill canoniche richiamabili, sotto `.claude/skills/`. La distinzione fra i due livelli non è di forma ma di costo, e va conosciuta prima di aggiungere una regola: ogni file `.md` sotto `.claude/rules/` senza frontmatter `paths:` entra in contesto a ogni sessione e concorre al budget degli instruction file, mentre una skill si carica quando serve. Una norma che vale solo in certe situazioni vive come `RIFERIMENTO.md` dentro la propria skill oppure usa `paths:` se riguarda file specifici; l'indice qui sotto dice quando richiamarla per le operazioni che non toccano quei file. Lo strumento `tools/misura-istruzioni.py` misura il carico e fallisce oltre la soglia. Codex scopre le skill attraverso adapter sottili sotto `.agents/skills/`, che rimandano alla fonte canonica senza duplicarla. Lo standard di sistema completo è in `.claude/PROJECT-SYSTEM.md`.
 
-Norme caricate su richiesta, una riga per situazione con le parole con cui si presenta, così che il caricamento non dipenda dal ricordare che la norma esista.
+Norme su richiesta: una riga per situazione, con parole che rendono riconoscibile quando caricarle.
 
 - Prima di configurare l'identità Git, collegare o modificare un remoto, usare GitHub CLI o preparare comandi di bootstrap Git, leggere `.claude/skills/identita-git/RIFERIMENTO.md`; la regola si applica anche ai file `.git/**` e `.githooks/**` tramite `paths:`.
 - Si scrive o si valuta una prova automatica, si chiude un difetto, una verifica manuale smentisce una suite verde, si sta per dichiarare completo un intervento il cui scopo era un effetto misurabile: skill `prove-che-misurano`.

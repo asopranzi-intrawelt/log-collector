@@ -6,10 +6,14 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 84de61e
+last-verified-commit: 93c21e4
 ---
 
 # Test di sviluppo
+
+## Ingresso e ritenzione Seeweb, 20/10/2026
+
+Il commit `93c21e4` include 32 prove dei parametri/render e la verifica Debian 13: nftables e rsyslog validi, evento UDP della sorgente fittizia nel solo archivio tecnico, AdS locale ancora ricevuto. `tests/test_seeweb_technical_retain.sh` in WSL copre confine della durata, file vuoto, cancellazione completa, link simbolici, soglia disco e isolamento dall'AdS; togliendo la guardia ai link nella copia del codice la prova fallisce. Non sono misurati volume Seeweb reale, consegna, silenzio o timer sulla VM.
 
 ## Collisione tardiva durante la pubblicazione, 20/10/2026
 
@@ -29,7 +33,7 @@ La prova usa un conteggio indipendente dei byte esistenti e lascia spazio per il
 
 ## Guard sintetico e ripresa Alloy, 17/10/2026
 
-`tests/test_consultation_v0.py` importa il vero produttore fittizio in una directory temporanea isolata: 12 prove passano. I casi negativi alterano provenienza, archivio, parser, percorso, messaggio/attributi con sentinella, originale con hash ricalcolato, chiavi duplicate e lotto con errore dopo un record valido; il CLI non emette risultati parziali. La prima esecuzione in sandbox è stata bloccata dai permessi della directory temporanea, la ripetizione autorizzata passa 12/12. `py_compile` passa; `ruff` non è installato. Il test live del pilota ha riprodotto la perdita sulla seconda rotazione dello stesso path e verificato due segmenti unici da 818 byte dopo il riavvio di Alloy; interruzione durante la scrittura/rete, duplicati sotto guasto e retention effettiva restano non misurati. Le ancore per commit non attestano ancora i file non committati.
+`tests/test_consultation_v0.py` importa il vero produttore fittizio in una directory temporanea isolata: 12 prove passano. I casi negativi alterano provenienza, archivio, parser, percorso, messaggio/attributi con sentinella, originale con hash ricalcolato, chiavi duplicate e lotto con errore dopo un record valido; il CLI non emette risultati parziali. La prima esecuzione in sandbox è stata bloccata dai permessi della directory temporanea, la ripetizione autorizzata passa 12/12. `py_compile` passa; `ruff` non è installato. Il test live del pilota ha riprodotto la perdita sulla seconda rotazione dello stesso path e verificato due segmenti unici da 818 byte dopo il riavvio di Alloy; interruzione durante la scrittura/rete, duplicati sotto guasto e retention effettiva restano non misurati.
 
 ## GPU leggibile da Netdata; campioni hardware da verificare, 15/10/2026
 
