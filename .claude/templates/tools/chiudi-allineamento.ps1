@@ -121,13 +121,42 @@ function Sporchi([string]$prj) {
   return $out
 }
 
+# Le corse che hanno scritto in questo progetto dopo il suo ultimo commit, non solo l'ultima.
+# Una corsa finita incompleta lascia file scritti e non committati; la corsa successiva li trova
+# gia' a posto e non li elenca, e il commit li lasciava fuori: misurato il 2026-10-20, quindici
+# file per progetto. Una corsa ha scritto se accanto al suo rapporto c'e' <slug>.dopo.json.
+function Percorsi-Corse([string]$prj, [string]$rapporto) {
+  # Un insieme nuovo: quello restituito da Percorsi-Rapporto esce dalla funzione come array di
+  # dimensione fissa, e un Add su quello fallisce senza fermare niente.
+  $tutti = New-Object System.Collections.Generic.HashSet[string]
+  foreach ($f in (Percorsi-Rapporto $rapporto)) { [void]$tutti.Add($f) }
+  $cartella = Split-Path (Split-Path $rapporto -Parent) -Parent
+  $slug = [System.IO.Path]::GetFileNameWithoutExtension($rapporto)
+  # L'ultimo commit dell'allineamento, cioe' quello che ha toccato il marcatore, e non l'ultimo
+  # commit del progetto: un'altra sessione che committa il proprio lavoro dopo una corsa non
+  # rende committato cio' che la corsa aveva scritto.
+  $dataHead = @(Invoca-Git $prj log -1 --format=%cd --date=format:%Y%m%d-%H%M%S -- .claude/allineamento-template.json) | Select-Object -First 1
+  if (-not $dataHead -or -not (Test-Path -LiteralPath $cartella)) { return , $tutti }
+  foreach ($c in (Get-ChildItem -LiteralPath $cartella -Directory -ErrorAction SilentlyContinue)) {
+    if ($c.Name -le $dataHead) { continue }
+    if (-not (Test-Path -LiteralPath (Join-Path $c.FullName "$slug.dopo.json"))) { continue }
+    $r = Join-Path $c.FullName "$slug.json"
+    if (Test-Path -LiteralPath $r) { foreach ($f in (Percorsi-Rapporto $r)) { [void]$tutti.Add($f) } }
+  }
+  return , $tutti
+}
+
 function Smista([string]$prj, [string]$rapporto) {
-  $attesi = Percorsi-Rapporto $rapporto
+  $attesi = Percorsi-Corse $prj $rapporto
   $miei = @(); $altrui = @()
+  # Gli adattatori Codex sono generati dalla passata con sync-codex-skills, non scritti dal
+  # rapporto: senza questa regola restavano fuori dal commit e la chiusura del progetto si fermava.
+  # Ma sono della passata solo dove il progetto li aveva gia' tracciati, perche' la passata li
+  # aggiorna e non li crea: il 2026-10-20 una sessione aperta su un progetto ha creato da se'
+  # .agents/, e il commit dell'allineamento l'avrebbe preso per suo.
+  $adattatoriTracciati = @(Invoca-Git $prj ls-files -- .agents).Count -gt 0
   foreach ($f in (Sporchi $prj)) {
-    # Gli adattatori Codex sono generati dalla passata con sync-codex-skills, non scritti dal
-    # rapporto: senza questa riga restavano fuori dal commit e la chiusura del progetto si fermava.
-    if ($attesi.Contains($f) -or $f -like '.agents/skills/*') { $miei += $f } else { $altrui += $f }
+    if ($attesi.Contains($f) -or ($adattatoriTracciati -and $f -like '.agents/skills/*')) { $miei += $f } else { $altrui += $f }
   }
   return [pscustomobject]@{ miei = $miei; altrui = $altrui }
 }
@@ -302,11 +331,40 @@ function Esegui-Autotest {
 
     # 3c. l'adattatore Codex generato dalla passata entra nel commit
     $k = Nuovo-Repo 'adattatori'
-    Scrivi $k 'mio.md' "prima`n"
+    Scrivi $k 'mio.md' "prima`n"; Scrivi $k '.agents/skills/vecchia/SKILL.md' "adattatore`n"
     & git -C $k add -A | Out-Null; & git -C $k commit -q -m 'base' | Out-Null
     Scrivi $k '.agents/skills/nuova/SKILL.md' "adattatore`n"
     $null = Chiudi-Progetto $k $rapA $MSG $true 1 $false $true $null
     Prova "l'adattatore Codex generato dalla passata entra nel commit" ((@(& git -C $k show --name-only --pretty=format: HEAD) -contains '.agents/skills/nuova/SKILL.md'))
+    # 3d. una cartella .agents creata da un'altra sessione, dove il progetto non ne tracciava, resta fuori
+    $q = Nuovo-Repo 'agentialtrui'
+    Scrivi $q 'mio.md' "prima`n"
+    & git -C $q add -A | Out-Null; & git -C $q commit -q -m 'base' | Out-Null
+    Scrivi $q 'mio.md' "aggiornato`n"; Scrivi $q '.agents/skills/sua/SKILL.md' "di un'altra sessione`n"
+    $rQ = Chiudi-Progetto $q $rapA $MSG $true 1 $false $true $null
+    Prova ".agents creata da un'altra sessione resta fuori dal commit" (-not (@(& git -C $q show --name-only --pretty=format: HEAD) -contains '.agents/skills/sua/SKILL.md') -and $rQ.lasciati -eq 1)
+
+    # 3e. il commit prende i file di tutte le corse che hanno scritto dopo l'ultimo allineamento
+    $u = Nuovo-Repo 'corse'
+    Scrivi $u 'a.md' "prima`n"; Scrivi $u 'b.md' "prima`n"; Scrivi $u 'c.md' "prima`n"; Scrivi $u 'd.md' "prima`n"
+    Scrivi $u '.claude/allineamento-template.json' "{}`n"
+    & git -C $u add -A | Out-Null; & git -C $u commit -q -m 'allineamento precedente' | Out-Null
+    $corse = Join-Path $radice 'registro-corse'
+    function Corsa([string]$nome, [string]$file, [bool]$scritta) {
+      $d = Join-Path $corse $nome; New-Item -ItemType Directory -Force -Path $d | Out-Null
+      [System.IO.File]::WriteAllText((Join-Path $d 'prj.json'), (ConvertTo-Json @(@{ file = $file; template = $file; esito = 'VECCHIO' })), $utf8)
+      if ($scritta) { [System.IO.File]::WriteAllText((Join-Path $d 'prj.dopo.json'), '[]', $utf8) }
+      return (Join-Path $d 'prj.json')
+    }
+    $null = Corsa '20000101-000000' 'c.md' $true
+    $null = Corsa '29991230-000000' 'a.md' $true
+    $null = Corsa '29991230-120000' 'd.md' $false
+    $ultimaCorsa = Corsa '29991231-000000' 'b.md' $true
+    foreach ($n in 'a.md', 'b.md', 'c.md', 'd.md') { Scrivi $u $n "aggiornato`n" }
+    $rU = Chiudi-Progetto $u $ultimaCorsa $MSG $true 1 $false $true $null
+    $dentroU = @(& git -C $u show --name-only --pretty=format: HEAD | Where-Object { $_ })
+    Prova "una corsa precedente che ha scritto dopo l'ultimo allineamento entra nel commit" ($dentroU -contains 'a.md' -and $dentroU -contains 'b.md')
+    Prova "una corsa anteriore all'ultimo allineamento, o che ha solo misurato, resta fuori" (-not ($dentroU -contains 'c.md') -and -not ($dentroU -contains 'd.md') -and $rU.lasciati -eq 2)
 
     # 4. un albero senza niente da committare non produce un commit vuoto
     $b = Nuovo-Repo 'pulito'
@@ -478,7 +536,7 @@ Write-Host ("modo: {0}   {1}   messaggio: {2}" -f $modo, $cosa, $msg)
 # comunque nostro. L'eta' della corsa e' quindi parte della misura, e si dichiara.
 $misure = @($voci | ForEach-Object { $_.misurato } | Where-Object { $_ } | Sort-Object)
 if ($misure) {
-  $ultima = [datetime]::Parse($misure[-1])
+  $ultima = [datetime]::Parse($misure[-1], [Globalization.CultureInfo]::InvariantCulture)
   $ore = [Math]::Round(((Get-Date) - $ultima).TotalHours, 1)
   Write-Host ("corsa misurata il {0}, {1} ore fa" -f $ultima.ToString('yyyy-MM-dd HH:mm'), $ore)
   if ($ore -gt 6) {

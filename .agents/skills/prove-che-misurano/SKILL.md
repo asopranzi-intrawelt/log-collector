@@ -8,7 +8,8 @@ description: >
   strumento, quando si scrive una sequenza di verifica manuale, e quando si sta per dichiarare
   completo un intervento il cui scopo era un effetto misurabile. Copre anche il caso in cui
   una decisione dipenda da una proprietà dei dati reali, che nessuna prova su dati costruiti
-  può vedere. Non prescrive framework né linguaggi.
+  può vedere, e il controllo in esercizio di un servizio il cui valore è un tasso, che una
+  sonda di disponibilità non misura. Non prescrive framework né linguaggi.
 ---
 
 <!-- generato da sync-codex-skills.py; non modificare -->

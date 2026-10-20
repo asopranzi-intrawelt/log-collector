@@ -540,6 +540,33 @@ class SkillPromossa(BaseDelMerge):
         self.assertEqual(locale.read_text(encoding="utf-8"), nuova)
 
 
+class InnescoDellaSkillNuova(BaseDelMerge):
+    """La riga d'innesco di una skill di sistema che arriva nella stessa passata si propone
+    subito, non alla passata dopo: il 2026-10-20 37 progetti su 37 risultavano incompleti."""
+
+    def test_innesco_nella_stessa_passata(self):
+        modello = self.tpl / ".claude/templates/CLAUDE.md"
+        modello.parent.mkdir(parents=True)
+        modello.write_text("# <nome>\n\nNorme caricate su richiesta, una riga per situazione.\n\n"
+                           "- Va prodotto un documento: skill `craft-apps`, che verifica in locale.\n\n"
+                           "## Vincoli di team\n", encoding="utf-8", newline="\n")
+        skill = self.tpl / ".claude/skills/craft-apps/SKILL.md"
+        skill.parent.mkdir(parents=True)
+        skill.write_text("---\nname: craft-apps\n---\ncorpo\n", encoding="utf-8", newline="\n")
+        self.git("add", "-A")
+        self.git("commit", "-q", "-m", "skill di sistema nuova")
+        (self.prj / "CLAUDE.md").write_text("# P\n\nNorme caricate su richiesta, una riga per situazione.\n\n"
+                                            "## Vincoli di team\n", encoding="utf-8", newline="\n")
+        rapporto = self.base / "rapporto.json"
+        r = subprocess.run([sys.executable, str(STRUMENTO), "--template", str(self.tpl), "--progetto", str(self.prj),
+                            "--json", str(rapporto), "--innesco"], capture_output=True, text=True)
+        self.assertIn(r.returncode, (0, 1), r.stderr)
+        esiti = json.loads(rapporto.read_text(encoding="utf-8"))
+        self.assertIn("NUOVO", [e["esito"] for e in esiti if e["file"] == ".claude/skills/craft-apps/SKILL.md"])
+        innesco = [e for e in esiti if e["esito"] == "INNESCO"]
+        self.assertTrue(innesco and "craft-apps" in innesco[0].get("skill", []), r.stdout)
+
+
 class Somiglianza(unittest.TestCase):
     """La scorciatoia della somiglianza decide come la ratio piena, a ogni soglia.
 

@@ -14,6 +14,27 @@
     "dove": "templates/tools/lezioni-template.py: il corpo della lezione si conserva com'e', --testo-file, prova sulla struttura"
   },
   {
+    "progetto": "home-lab-cybersec-networking",
+    "id": "L-003",
+    "commit": "",
+    "data": "2026-10-20",
+    "dove": "marcatore ref-assente sulla riga di skills/craft-apps che nomina il file di stile opzionale, entrato in 953e506"
+  },
+  {
+    "progetto": "home-lab-cybersec-networking",
+    "id": "L-004",
+    "commit": "",
+    "data": "2026-10-20",
+    "dove": "skills/prove-che-misurano/RIFERIMENTO.md, sezione Una fixture che fallisce prima di misurare il codice"
+  },
+  {
+    "progetto": "home-lab-cybersec-networking",
+    "id": "L-005",
+    "commit": "",
+    "data": "2026-10-20",
+    "dove": "templates/tools/chiudi-sessione.ps1: @( ) attorno all'if degli argomenti delle lezioni, lo splat di un solo argomento non perde l'array"
+  },
+  {
     "progetto": "intrawelt-qa-verifier",
     "id": "L-001",
     "commit": "",
@@ -28,6 +49,41 @@
     "dove": "marcatore ref-assente sulle righe che nominano file creati al bisogno: skills/craft-apps, rules/chat-non-e-memoria, PROJECT-SYSTEM sez.16"
   },
   {
+    "progetto": "intrawelt-qa-verifier",
+    "id": "L-003",
+    "commit": "",
+    "data": "2026-10-20",
+    "dove": "templates/tools/chiudi-sessione.ps1: @( ) attorno all'if degli argomenti delle lezioni, lo splat di un solo argomento non perde l'array"
+  },
+  {
+    "progetto": "intrawelt-qa-verifier",
+    "id": "L-004",
+    "commit": "",
+    "data": "2026-10-20",
+    "dove": "fix-typography/tools/fix-accents.py: rifiuta un sorgente passato per nome salvo --anche-sorgenti, e nella modalita' codice non tocca le citazioni fra apici singoli; prove in test-tipografia e nell'autotest"
+  },
+  {
+    "progetto": "intrawelt-qa-verifier",
+    "id": "L-005",
+    "commit": "",
+    "data": "2026-10-20",
+    "dove": "templates/tools/lint-doc-references.py: categoria propagato, i documenti scritti dall'allineamento non fermano la chiusura di un progetto"
+  },
+  {
+    "progetto": "local-audio-transcriptor",
+    "id": "L-001",
+    "commit": "",
+    "data": "2026-10-20",
+    "dove": "templates/tools/lint-cultura.py, lanciato da chiudi-sessione: blocca nel template, avvisa nei progetti"
+  },
+  {
+    "progetto": "log-collector",
+    "id": "L-001",
+    "commit": "",
+    "data": "2026-10-20",
+    "dove": "templates/tools/chiudi-sessione.ps1: @( ) attorno all'if degli argomenti delle lezioni, lo splat di un solo argomento non perde l'array"
+  },
+  {
     "progetto": "my-wedding-day",
     "id": "L-001",
     "commit": "",
@@ -40,5 +96,26 @@
     "commit": "",
     "data": "2026-10-20",
     "dove": ".claude/templates/fix-typography/README.md, esclusioni per percorso"
+  },
+  {
+    "progetto": "my-wedding-day",
+    "id": "L-003",
+    "commit": "",
+    "data": "2026-10-20",
+    "dove": "chiudi-sessione.ps1 e .sh: sync-codex-skills --check solo dove esiste .agents/skills, come la passata; stessa condizione in skills/riprendi"
+  },
+  {
+    "progetto": "my-wedding-day",
+    "id": "L-004",
+    "commit": "",
+    "data": "2026-10-20",
+    "dove": "templates/tools/chiudi-sessione.ps1: @( ) attorno all'if degli argomenti delle lezioni, lo splat di un solo argomento non perde l'array"
+  },
+  {
+    "progetto": "network-design",
+    "id": "L-001",
+    "commit": "",
+    "data": "2026-10-20",
+    "dove": ".claude/skills/prove-che-misurano/RIFERIMENTO.md"
   }
 ]
