@@ -168,3 +168,40 @@ def test_duplicate_event_id_blocks_whole_replay(outbox, monkeypatch):
     with pytest.raises(RuntimeError, match="ripetuto"):
         outbox.reconcile(True)
     assert network_calls == []
+
+
+def test_segment_name_collision_preserves_existing_record_and_originals(outbox, monkeypatch):
+    outbox.emit()
+    existing = outbox.segments()[0]
+    saved = existing.read_bytes()
+    originals = outbox.ROOT / "fixtures" / "original"
+    before = sorted(path.name for path in originals.iterdir())
+    marker = existing.stem.removeprefix("technical-")
+    monkeypatch.setattr(outbox, "uuid4", lambda: type("Id", (), {"hex": marker})())
+
+    with pytest.raises(RuntimeError, match="destinazione già presente"):
+        outbox.emit()
+
+    assert existing.read_bytes() == saved
+    assert sorted(path.name for path in originals.iterdir()) == before
+    assert not (outbox.OUTBOX / ".lock").exists()
+
+
+def test_external_writer_between_guard_and_publish_cannot_be_overwritten(outbox, monkeypatch):
+    marker = "f" * 32
+    segment = outbox.OUTBOX / f"technical-{marker}.jsonl"
+    staged = outbox.OUTBOX / f".pending-{marker}.tmp"
+    monkeypatch.setattr(outbox, "uuid4", lambda: type("Id", (), {"hex": marker})())
+    write_original = outbox.fixture.write_original
+
+    def external_writer(event_id, raw):
+        write_original(event_id, raw)
+        segment.write_bytes(b"segmento scritto da un altro processo\n")
+
+    monkeypatch.setattr(outbox.fixture, "write_original", external_writer)
+    with pytest.raises(RuntimeError, match="comparso durante la pubblicazione"):
+        outbox.emit()
+
+    assert segment.read_bytes() == b"segmento scritto da un altro processo\n"
+    assert staged.exists()
+    assert not (outbox.OUTBOX / ".lock").exists()

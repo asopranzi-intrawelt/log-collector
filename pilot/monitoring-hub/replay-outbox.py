@@ -102,16 +102,22 @@ def emit() -> str:
                 len(payload) > guard.MAX_JSONL_BYTES or
                 used + len(raw) + len(payload) > MAX_BYTES):
             raise RuntimeError("Coda piena: nessun nuovo originale creato")
-        fixture.write_original(event_id, raw)
-        guard.check_jsonl(payload, ROOT)
         marker = uuid4().hex
         staged = OUTBOX / f".pending-{marker}.tmp"
         segment = OUTBOX / f"technical-{marker}.jsonl"
+        if segment.exists() or segment.is_symlink():
+            raise RuntimeError("Segmento di destinazione già presente nella coda")
+        fixture.write_original(event_id, raw)
+        guard.check_jsonl(payload, ROOT)
         with staged.open("xb") as output:
             output.write(payload)
             output.flush()
             os.fsync(output.fileno())
-        staged.replace(segment)
+        try:
+            os.link(staged, segment)
+        except FileExistsError as exc:
+            raise RuntimeError("Segmento di destinazione comparso durante la pubblicazione") from exc
+        staged.unlink()
         return event_id
 
 

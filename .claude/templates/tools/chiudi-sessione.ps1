@@ -187,6 +187,20 @@ if (-not $python) {
     }
 }
 
+# Le lezioni verso il template, dal 2026-10-19: avvisano e non fermano il commit, perche' una
+# lezione non ancora risalita non lo rende sbagliato. Nel progetto si vede che cosa il progetto
+# deve al template; nel template, il debito di tutti i progetti, prima della prossima funzionalita'.
+$lezioni = ".claude\templates\tools\lezioni-template.py"
+if ($python -and (Test-Path $lezioni)) {
+    # Nel template solo i progetti locali: la raccolta completa, VM comprese, si fa all'apertura
+    # della sessione. Il 2026-10-20 la lettura via SSH ha tenuto ferma una chiusura.
+    $argLez = if ($bundle) { @("raccogli", "--solo-locali") } else { @("controlla") }
+    $uscitaLez = & $python $lezioni @argLez 2>&1
+    $righe = @($uscitaLez | Where-Object { "$_".Trim() })
+    if ($bundle) { $righe = @($righe | Select-Object -Last 3) }
+    if ($righe.Count -gt 0) { Titolo "Lezioni per il template"; $righe | ForEach-Object { Write-Host "   $_" } }
+}
+
 if ($falliti.Count -gt 0) {
     Write-Host ""
     Write-Host "Controlli falliti: $($falliti -join ', '). Mi fermo prima del commit." -ForegroundColor Red

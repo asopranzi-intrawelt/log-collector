@@ -5,10 +5,23 @@ generated-date: 2026-09-30
 covers-paths:
   - bin/**
   - config/**
-last-verified-commit: 928da73
+  - pilot/monitoring-hub/**
+last-verified-commit: 84de61e
 ---
 
 # Design e sicurezza applicativa
+
+## Nuovo builder QA e confine degli archivi, 20/10/2026
+
+Su `staging` a `71a3892` il produttore QA ha versionato `app/events.py`: crea due famiglie di eventi `qa-tech-v1`, ma non le invia né è collegato ai chiamanti applicativi. `authorisation_event()` include identità e nome file; il contratto del collettore riserva questi dati a un registro dell'autorizzazione con accessi distinti dalla vista tecnica generale. `validate()` da sola controlla le chiavi ma non tutti i valori e le combinazioni. Prima di costruire il ricevente servono separazione dei due archivi, schema con allowlist completo e prove negative sui dati prodotti dall'applicazione. I due LXC QA non esistono ancora e nessuna sorgente è collegata.
+
+## Pubblicazione del pilot e limiti residui, 20/10/2026
+
+Nel pilot `os.link` crea il nome definitivo dallo staged nella stessa directory dopo `fsync` del file; se il nome è stato occupato nel frattempo, l'emissione fallisce e non sovrascrive il segmento esterno. Su questo PC la prova della collisione tardiva conferma i byte invariati e lo staged residuo. La specifica POSIX di [`link()`](https://pubs.opengroup.org/onlinepubs/9699919799/functions/link.html) descrive creazione atomica ed errore `EEXIST`; [Python `os.link`](https://docs.python.org/3/library/os.html#os.link) espone l'operazione anche su Windows, dove l'esito qui è una prova locale e non una garanzia generale dedotta dalla specifica POSIX. La directory non è sincronizzata dopo la pubblicazione; un altro writer può modificare il file in seguito e gli originali restano condivisi. Quota fisica, isolamento, concorrenza di replay, carico e guasti prolungati restano gate prima di sorgenti reali.
+
+## Confine della coda sintetica, 19/10/2026
+
+Il pilot rifiuta figli inattesi della directory della coda e un nome di segmento già presente prima di scrivere l'originale. Queste guardie proteggono soltanto il comando cooperante: il lock non è condiviso dagli altri writer, la verifica del nome precede una rinomina che potrebbe sovrascrivere un file creato nel frattempo e gli originali sono in una cartella condivisa. La quota di 8 MiB è logica, non imposta dal filesystem. Nessun evento reale QA o AdS deve entrare in questo percorso finché isolamento, pubblicazione senza sovrascrittura, quota fisica e prove di guasto non siano verificati.
 
 ## Confine QA riconfermato dal produttore, 19/10/2026
 
@@ -16,7 +29,7 @@ L'ADR-023 versionata del produttore QA su `staging` a `7472de5` adotta `qa-tech-
 
 ## Perimetro del contratto sintetico e dei futuri eventi QA, 17/10/2026
 
-ADR-022 e `docs/integrazione-log-qa-verifier.md` richiedono eventi QA strutturati e minimizzati prima del Loki generale; i diagnostici originali eventualmente autorizzati restano in archivio protetto. Anche un testo di formato noto richiede whitelist e rifiuto dei campi non classificati. Il nuovo `bin/pilot_consultation_v0.py` è fail closed soltanto per la fixture sintetica, con originale confinato e hash controllato: non autentica la fonte, non prova assenza di dati sensibili nei log QA e non è collegato alla pipeline reale. La verifica del produttore con errori sensibili fittizi e UI/job sul consenso e sull'attesa di 600 s resta un gate aperto. L'ancora `last-verified-commit` non copre il codice non committato di questo checkpoint.
+ADR-022 e `docs/integrazione-log-qa-verifier.md` richiedono eventi QA strutturati e minimizzati prima del Loki generale; i diagnostici originali eventualmente autorizzati restano in archivio protetto. Anche un testo di formato noto richiede whitelist e rifiuto dei campi non classificati. `bin/pilot_consultation_v0.py` è fail closed soltanto per la fixture sintetica, con originale confinato e hash controllato: non autentica la fonte, non prova assenza di dati sensibili nei log QA e non è collegato alla pipeline reale. La verifica del produttore con errori sensibili fittizi e UI/job sul consenso e sull'attesa di 600 s resta un gate aperto. Le modifiche non committate di questo giro non sono certificate dalla sola ancora a HEAD.
 
 ## Verifica dei volumi API preparata, milestone precedente versionata, 13/10/2026
 

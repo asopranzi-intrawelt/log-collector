@@ -1,5 +1,9 @@
 # Sorgenti Seeweb e stato della raccolta
 
+## Ticket sull'appliance: risposta parziale, 20/10/2026
+
+Il supporto Seeweb indica i menu dei file di log di sistema e firewall e il confronto delle configurazioni precedenti nel menu Backup. Chiede se la GUI debba essere limitata a IP determinati e propone di studiare l'aggiornamento dell'OPNsense 21.1.5 attraverso undici passaggi fra serie principali, con possibile ripristino. Il ticket appare chiuso nella schermata ricevuta. Non sono stati forniti audit dei login o delle modifiche con attore, retention, export/Syslog, prova di ricezione, matrice dei servizi raggiungibili dalla WAN, piano di aggiornamento o soluzione del certificato indicato scaduto. SWB-02 e SWB-07 restano una sola sorgente censita e nessun flusso automatico è stato attivato. Dettaglio e limiti nel [dossier firewall](firewall-seeweb-opnsense.md); copia della schermata e bozza di seguito nel livello privato.
+
 ## Perimetro confermato il 14/10/2026
 
 L'operatore fornisce sette URL di accesso attuali e chiede di raccogliere, dove disponibili, gli accessi amministrativi e gli eventi tecnici dei servizi Seeweb. Sono sette punti di accesso, non sette nuovi server: il Word li associava storicamente e la dashboard attuale conferma il nome pubblico e la LAN privata sulla stessa OPNsense 21.1.5. SWB-02 e SWB-07 sono due ingressi della stessa sorgente. I valori reali e la provenienza stanno in _notes/archivio-sessioni/seeweb-email/materiali/seeweb-access-inventory-20261014.json; nei documenti condivisi si usano le stesse etichette nei due progetti.

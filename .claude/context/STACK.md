@@ -6,19 +6,20 @@ covers-paths:
   - bin/**
   - config/**
   - tests/**
+  - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: a5fe489
+last-verified-commit: 84de61e
 ---
 
 # Stack applicativo
 
 ## Replay sintetico nel pilota, 19/10/2026
 
-`pilot/monitoring-hub/replay-outbox.py` pubblica segmenti fuori dal glob Alloy, valida tutti gli originali e riconcilia con Loki prima di inviare. Conserva i segmenti dopo il push; gli originali restano in `fixtures/original/`. La prova è solo sintetica e non modifica la catena AdS o QA.
+`pilot/monitoring-hub/replay-outbox.py` pubblica segmenti fuori dal glob Alloy, valida tutti gli originali e riconcilia con Loki prima di inviare. Conserva i segmenti dopo il push; gli originali restano in `fixtures/original/`. Il pilot blocca un nome di segmento già presente prima di scrivere l'originale, ma la pubblicazione con rename resta vulnerabile a un writer esterno che crei quel nome dopo il controllo. La prova è solo sintetica e non modifica la catena AdS o QA.
 
 ## Guard v0 e pilota locale dei log, 17/10/2026
 
-`bin/pilot_consultation_v0.py` è un controllo CLI offline del solo record emesso da `pilot/monitoring-hub/emit-fixture.py`. Verifica schema esatto, parser e sorgente sintetici, file originale confinato, formato dei byte, SHA-256 e label fisse. Non parsea log QA o AdS reali e non è nel percorso Alloy. Il pilota locale Prometheus/Grafana/Loki/Alloy ha corretto una perdita alla seconda rotazione del path fisso con segmenti dai nomi unici; due segmenti consecutivi da 818 byte sono arrivati a Loki. Configurazione, controlli e limiti nel README del pilota; Docker fermo, volumi conservati. Le ancore `last-verified-commit` non coprono questo lavoro ancora non committato.
+`bin/pilot_consultation_v0.py` è un controllo CLI offline del solo record emesso da `pilot/monitoring-hub/emit-fixture.py`. Verifica schema esatto, parser e sorgente sintetici, file originale confinato, formato dei byte, SHA-256 e label fisse. Non parsea log QA o AdS reali e non è nel percorso Alloy. Il pilota locale Prometheus/Grafana/Loki/Alloy ha corretto una perdita alla seconda rotazione del path fisso con segmenti dai nomi unici; due segmenti consecutivi da 818 byte sono arrivati a Loki. Configurazione, controlli e limiti nel README del pilota; Docker fermo, volumi conservati. Le modifiche al pilot di questo giro restano nel working tree e non sono certificate dalla sola ancora a HEAD.
 
 ## Primo avvio Netdata verificato; normalizzazione e capienza richieste, 15/10/2026
 

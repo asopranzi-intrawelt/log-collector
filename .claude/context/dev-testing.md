@@ -4,11 +4,20 @@ generated-from-branch: main
 generated-date: 2026-09-30
 covers-paths:
   - tests/**
+  - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: a5fe489
+last-verified-commit: 84de61e
 ---
 
 # Test di sviluppo
+
+## Collisione tardiva durante la pubblicazione, 20/10/2026
+
+`tests/test_replay_outbox.py` inserisce un segmento di un writer esterno durante `write_original`, dopo la guardia iniziale e prima della pubblicazione. Verifica che la collisione fallisca, che i byte esterni restino intatti, che lo staged sopravviva per esame e che il lock sia rilasciato. Sostituendo temporaneamente `os.link`/`unlink` con `replace()`, il test fallisce con `DID NOT RAISE`; la sorgente è stata ripristinata. La collisione sequenziale misura separatamente che non venga creato un nuovo originale. Guard e coda passano 21/21 prove isolate su Windows. Nessuna prova live di Loki, quota fisica o guasto lungo in questo giro.
+
+## Collisione del segmento e riferimenti privati, 19/10/2026
+
+La nuova prova di `tests/test_replay_outbox.py` crea un segmento, forza il riuso del suo nome e verifica che il segmento e gli originali rimangano invariati. Togliendo la guardia in una copia isolata, il test fallisce con `DID NOT RAISE`; ripristinata la sorgente, la suite guard+coda passa 20/20. La prova misura la collisione sequenziale e non la gara con writer esterni tra controllo e rename. Dopo la migrazione di `_notes`, il linter dei riferimenti vivi del collettore segnala zero percorsi rotti; i tre wrapper Nebula spostati hanno zero errori nel parser PowerShell. Nessuna API Nebula e nessun Loki reale sono stati contattati in questo giro.
 
 ## Quota degli originali: prova di non vacuità, 19/10/2026
 
@@ -110,7 +119,7 @@ Il lavoro locale per il 54HP aggiunge sette casi: scelta esplicita del modello c
 
 Misura reale del nuovo login 30HP del 12/10: cinque payload ricalcolati con gli orari registrati, confronto esatto del report e del candidato, mapping confermato nello snapshot e nel riferimento, conferma umana dopo ready e dopo il timestamp dell'evento. Screenshot 423 e SHA privati. Esito `observed`, risposta positiva a +38,030 secondi dichiarati; non clock offset o limite massimo. Il ricalcolo è una verifica dei grezzi reali senza rete, distinta dalle 48 prove precedenti del verificatore, che non sono ripetute per il solo aggiornamento documentale.
 
-Lint finale della prova lunga: ritrovato `_notes/nebula-tooling/bin/ruff.exe`, `check` sui due file dell'osservatore e dei test verde senza installazioni. Il precedente avvio come modulo mancante resta un tentativo non eseguito, distinto da questo risultato.
+Lint finale della prova lunga: ritrovato `_notes/strumenti-locali/nebula-tooling/bin/ruff.exe`, `check` sui due file dell'osservatore e dei test verde senza installazioni. Il precedente avvio come modulo mancante resta un tentativo non eseguito, distinto da questo risultato.
 
 Il 12/10, dopo la richiesta di un nuovo login, sono rieseguiti i quattro verificatori Nebula: 48/48 casi passati senza rete, inclusi tre casi della modalità `--final-attempt` già preparati prima del riavvio. Il test della diagnosi positiva dopo timeout rileva una mutazione rimasta applicata: un caso rosso e uno verde; backup verificato, riga mutata unica, ripristino SHA-256 e suite finale verde. Il primo tentativo pytest nella sandbox non esercita il difetto perché la cartella temporanea è negata; i risultati validi sono le esecuzioni successive fuori dalla sandbox. Prova nativa del wrapper finale con token finto: Invio acquisito dopo ready, assenza della richiesta di login quando il figlio fallisce e codice 7 conservato; parser PowerShell verde. Nessuna nuova API reale o misura di ritardo. Dettaglio nei passi 35-37 del runbook.
 

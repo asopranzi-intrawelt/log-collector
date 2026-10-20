@@ -1,5 +1,13 @@
 # Integrazione dei log del servizio QA
 
+## Modulo eventi del produttore riletto, 20/10/2026
+
+Il produttore QA su `staging` a `71a3892` ha ora versionato `app/events.py` nel commit `7189dfe` insieme alla sua suite di test. Il modulo costruisce `qa-tech-v1` con `event_id`, ora con offset, `source_id` e ambiente obbligatori; non apre un trasporto e non è chiamato dagli altri moduli applicativi letti. Il builder traduce `T1/T2` in `T1_T2`, mentre il fallback conserva il nome locale. L'albero del produttore ha altri lavori non committati, ma sorgente e test del builder sono puliti alla lettura; la suite riportata dal produttore non è stata rieseguita qui. L'esistenza del builder non attesta invio, ricezione centrale o LXC creati.
+
+La riconciliazione del contratto è ancora aperta. `authorisation_event()` include `who`, `file`, `model` e `text_version`: identità e nome file richiedono il registro riservato previsto per l'autorizzazione e non possono entrare automaticamente nella vista tecnica generale descritta sotto. Inoltre `validate()` controlla la presenza delle chiavi e rifiuta chiavi extra, ma se chiamato direttamente non convalida valori di enum, combinazioni evento/campi, tipo dei campi o formato di `event_time_original`. Prima dell'adattatore occorrono schema e destinazioni separati per evento tecnico minimizzato e prova dell'autorizzazione, validazione completa al confine, campioni sintetici prodotti dall'applicazione e verifica della redazione al punto di indice. Nessun flusso reale QA è abilitato da questo modulo.
+
+## Fotografia storica del 17/10/2026
+
 Stato al 17/10/2026: requisiti dell’operatore, segnalazione del progetto produttore e lettura del codice. Il produttore è pulito su `staging` a `425d956`, commit di chiusura documentale successivo a `1b2d9f3`; il codice applicativo letto resta quello del passo 3 versionato a `1b2d9f3`, con protocollo del backend, client Ollama e catena di backup con consenso e attesa. La presenza del codice e delle sue prove nel repository non attesta un ambiente QA o un flusso verso il collettore in esercizio. La segnalazione locale è conservata nel progetto collettore come `docs/segnalazione-produttore-qa.md`; riferimenti reali e impronte dei file letti stanno nel livello privato. Questo documento è condiviso con il progetto rete, dove la segnalazione originale resta un riferimento del progetto collettore.
 
 ## Ricognizione del produttore del 19/10/2026
