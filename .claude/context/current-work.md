@@ -14,9 +14,13 @@ stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai p
 
 # Lavoro in corso
 
-## Gate QA candidato, 21/10/2026
+## QA: evento tecnico locale candidato, 21/10/2026
 
-Il produttore QA su `staging` ha chiuso manualmente il checkpoint `2ab7e5a`. Nel candidato successivo, ancora non versionato, `app/authorisation_store.py` committa su SQLite privata fuori dal clone la ricevuta con ora UTC e testo esatto dell'avviso prima di avviare il worker; il runner la rilegge prima di costruire il backend. Una scrittura SQLite fallita ferma il job prima del thread. La CLI rifiuta la modalità server prima di costruire il client esterno. Verifica locale: 458 prove con filtro CI, 6 con dati reali deselezionati, Ruff e Mypy verdi. È un gate applicativo locale: non dimostra custodia indipendente, ACL/retention/restore a dodici mesi, emissione durevole di `backup_selected`, trasporto o indicizzazione. Il fallback esterno resta spento per default; due LXC QA non create, M32e e ISO-30 in corso senza avanzamento da questa modifica.
+QA `staging` è stato chiuso manualmente a `a473d92`, allineato al remoto. Nel candidato successivo `FallbackBackend` scrive un file tecnico `qa-tech-v1` completo e sincronizzato prima della chiamata al backup; il file resta anche se il backend fallisce. La scrittura o l'identità sorgente mancante fermano la chiamata. Quattro prove red/green, suite CI 462 verdi e 6 dati reali esclusi, Ruff e Mypy verdi. È emissione locale: trasporto, ricevuta centrale, replay, quota e indicizzazione non sono attivi; due LXC assenti e M32e/ISO-30 restano in corso. Il clone `D:/network-design` è tornato allineato al remoto a `677f1d3`, con sei file documentali ancora modificati. Dopo il `chiudi` QA, aggiornare il dossier di rete con il commit dell'outbox, verificare i sei file e poi eseguire i controlli della rete.
+
+## Gate QA a checkpoint, 21/10/2026
+
+Il produttore QA su `staging` ha chiuso manualmente il gate locale a `a473d92`. `app/authorisation_store.py` committa su SQLite privata fuori dal clone la ricevuta con ora UTC e testo esatto dell'avviso prima di avviare il worker; il runner la rilegge prima di costruire il backend. Una scrittura SQLite fallita ferma il job prima del thread. La CLI rifiuta la modalità server prima di costruire il client esterno. Verifica al checkpoint: 458 prove con filtro CI, 6 con dati reali deselezionati, Ruff e Mypy verdi. È un gate applicativo locale: non dimostra custodia indipendente, ACL/retention/restore a dodici mesi, trasporto o indicizzazione. L'emissione locale di `backup_selected` è il candidato distinto nella sezione precedente. Il fallback esterno resta spento per default; due LXC QA non create, M32e e ISO-30 in corso.
 
 ## Produttore QA: percorso locale senza chiave esterna, 21/10/2026
 

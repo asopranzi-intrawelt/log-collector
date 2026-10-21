@@ -1,5 +1,23 @@
 # Work-log
 
+## 2026-10-21 - Rete di nuovo allineata al remoto
+
+Area: integrazione QA. Dopo la ricognizione che trovava storie Git divergenti, `D:/network-design` mostra `main` e `origin/main` entrambi a `677f1d3` e un merge-base valido. I sei file documentali modificati in precedenza restano nell'albero; non sono stati riscritti. Il punto di allineamento è dopo il commit manuale QA dell'outbox: rileggere quei file, aggiungere il nuovo stato nel dossier, mantenere ISO-30 in corso e verificare prima di proporre `chiudi` sulla rete. Ratio: un commit QA immutabile consente alla rete di citare una prova verificabile senza chiamare rilasciato un candidato ancora in albero.
+
+**Didattica:** nessuna.
+
+**Template:** nessuna.
+
+## 2026-10-21 - Outbox QA candidato e divergenza del repository rete
+
+Area: integrazione QA. QA `staging` è stato chiuso manualmente a `a473d92`, allineato al remoto. Nel candidato successivo `FallbackBackend` scrive un file tecnico `qa-tech-v1` completo e sincronizzato prima della chiamata al backup; il file resta anche se il backend fallisce. La scrittura o l'identità sorgente mancante fermano la chiamata. Quattro prove red/green, suite CI 462 verdi e 6 dati reali esclusi, Ruff e Mypy verdi. È emissione locale: trasporto, ricevuta centrale, replay, quota e indicizzazione non sono attivi; due LXC assenti e M32e/ISO-30 restano in corso. La rete non è pronta per `chiudi`: il clone `D:/network-design` ha sei file modificati e `main`/`origin/main` non hanno un merge-base; le due storie risalgono a commit iniziali diversi. Prima si deve riconciliare quel repository nel suo filone di version control, poi aggiornare il dossier con il commit QA e rieseguire i controlli. L'agente non esegue merge, reset o push. Ratio: il dossier distingue un file prodotto dal QA da un evento ricevuto; una storia Git senza antenato comune non si chiude con un push ordinario.
+
+Prova incrociata: il writer QA ha prodotto un evento sintetico `backup_selected`; il confine offline reale del collettore lo ha accettato e minimizzato (1/1), senza pubblicare il dettaglio sintetico. Il probe non ha aperto un socket né scritto nell'archivio centrale.
+
+**Didattica:** nessuna.
+
+**Template:** nessuna.
+
 ## 2026-10-21 - Gate QA locale registrato nei confini del collettore
 
 Area: integrazione QA. Il produttore QA su `staging` ha chiuso manualmente il checkpoint `2ab7e5a`. Nel candidato successivo, ancora non versionato, `app/authorisation_store.py` committa su SQLite privata fuori dal clone la ricevuta con ora UTC e testo esatto dell'avviso prima di avviare il worker; il runner la rilegge prima di costruire il backend. Una scrittura SQLite fallita ferma il job prima del thread. La CLI rifiuta la modalità server prima di costruire il client esterno. Verifica locale: 458 prove con filtro CI, 6 con dati reali deselezionati, Ruff e Mypy verdi. È un gate applicativo locale: non dimostra custodia indipendente, ACL/retention/restore a dodici mesi, emissione durevole di `backup_selected`, trasporto o indicizzazione. Il fallback esterno resta spento per default; due LXC QA non create, M32e e ISO-30 in corso senza avanzamento da questa modifica. Ratio: aggiornare la lettura del produttore senza trattare il database locale come evento raccolto o controllo ISO chiuso.
