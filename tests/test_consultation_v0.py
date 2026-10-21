@@ -112,6 +112,22 @@ def test_duplicate_key_is_rejected(sample):
     assert result.stdout == ""
 
 
+def test_replay_original_needs_explicit_guard_mode(sample):
+    root, event_id, record = sample
+    guard = load(SCRIPT, "replay_guard_test")
+    raw = (root / record["original_ref"]).read_bytes()
+    replay = root / "fixtures" / "replay-original"
+    replay.mkdir()
+    (replay / f"{event_id}.log").write_bytes(raw)
+    new_record = {**record, "original_ref": f"fixtures/replay-original/{event_id}.log"}
+    payload = (json.dumps(new_record, ensure_ascii=False) + "\n").encode("utf-8")
+
+    with pytest.raises(guard.Rejected, match="original_ref"):
+        guard.check_jsonl(payload, root)
+    assert guard.check_jsonl(payload, root, allow_replay_original=True)[0]["record"] == new_record
+    assert run_cli(root, write_jsonl(root, new_record)).returncode == 1
+
+
 def test_late_bad_record_does_not_release_earlier_good_record(sample):
     root, _, record = sample
     result = run_cli(root, write_jsonl(root, record, {**record, "source_id": "unknown"}))

@@ -5,10 +5,14 @@ generated-date: 2026-09-30
 covers-paths:
   - config/**
   - docs/handoff-sviluppo-collettore.md
-last-verified-commit: 93c21e4
+last-verified-commit: 99db226
 ---
 
 # Deployment
+
+## Percorso del pilot ancora locale, 21/10/2026
+
+L'isolamento degli originali riguarda solo il codice e i test del pilot sul PC. Nessun file è stato distribuito alla VM e nessuna nuova porta o sorgente è stata abilitata. La stima di completamento aggiunta nell'handoff non cambia i gate di installazione.
 
 ## Candidata Seeweb ancora fuori dalla VM, 20/10/2026
 

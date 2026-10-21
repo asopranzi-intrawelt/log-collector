@@ -21,6 +21,7 @@ def outbox(tmp_path, monkeypatch):
     (root / "fixtures").mkdir()
     monkeypatch.setattr(module, "ROOT", root)
     monkeypatch.setattr(module, "OUTBOX", root / "fixtures" / "replay-outbox")
+    monkeypatch.setattr(module, "REPLAY_ORIGINALS", root / "fixtures" / "replay-original")
     monkeypatch.setattr(module.fixture, "FIXTURES", root / "fixtures")
     return module
 
@@ -95,10 +96,10 @@ def test_staged_segment_left_by_crash_blocks_new_emission(outbox):
     outbox.emit()
     staged = outbox.OUTBOX / (".pending-" + "0" * 32 + ".tmp")
     staged.write_bytes(b"incompleto")
-    before = len(list((outbox.ROOT / "fixtures" / "original").glob("*.log")))
+    before = len(list(outbox.REPLAY_ORIGINALS.glob("*.log")))
     with pytest.raises(RuntimeError, match="temporaneo residuo"):
         outbox.emit()
-    after = len(list((outbox.ROOT / "fixtures" / "original").glob("*.log")))
+    after = len(list(outbox.REPLAY_ORIGINALS.glob("*.log")))
     assert after == before
 
 
@@ -106,7 +107,7 @@ def test_unexpected_file_blocks_emission_and_replay(outbox, monkeypatch):
     outbox.emit()
     rogue = outbox.OUTBOX / "non-classificato.bin"
     rogue.write_bytes(b"x" * 64)
-    originals = outbox.ROOT / "fixtures" / "original"
+    originals = outbox.REPLAY_ORIGINALS
     before = sorted(path.name for path in originals.iterdir())
     network_calls = []
     monkeypatch.setattr(outbox, "query", lambda _record: network_calls.append("query"))
@@ -143,18 +144,60 @@ def test_query_uses_event_window_and_rechecks_age(outbox, monkeypatch):
 
 def test_total_quota_counts_originals_before_creating_another(outbox, monkeypatch):
     outbox.emit()
-    originals = outbox.ROOT / "fixtures" / "original"
+    originals = outbox.REPLAY_ORIGINALS
     before = sorted(path.name for path in originals.glob("*.log"))
-    candidate = outbox.fixture.build_record()
+    candidate = outbox.fixture.build_record(original_dir="replay-original")
     next_payload = outbox.fixture.serialized_line(candidate[2]).encode("utf-8")
     used = sum(path.stat().st_size for path in outbox.segments())
     used += sum(path.stat().st_size for path in originals.iterdir())
-    monkeypatch.setattr(outbox.fixture, "build_record", lambda: candidate)
+    monkeypatch.setattr(outbox.fixture, "build_record", lambda **_kwargs: candidate)
     monkeypatch.setattr(outbox, "MAX_BYTES", used + len(next_payload))
     with pytest.raises(RuntimeError, match="Coda piena"):
         outbox.emit()
     assert sorted(path.name for path in originals.glob("*.log")) == before
     assert len(outbox.segments()) == 1
+
+
+def test_new_originals_are_isolated_from_other_fixture_writers(outbox):
+    first = outbox.emit()
+    record = outbox.load_pending()[0]["record"]
+    assert record["event_id"] == first
+    assert record["original_ref"] == f"fixtures/replay-original/{first}.log"
+    assert (outbox.REPLAY_ORIGINALS / f"{first}.log").is_file()
+
+    shared = outbox.ROOT / "fixtures" / "original"
+    shared.mkdir()
+    (shared / "unrelated.log").write_bytes(b"x" * (outbox.MAX_BYTES + 1))
+    used = outbox.capacity(outbox.segments())
+    assert used < outbox.MAX_BYTES
+    assert outbox.emit() != first
+    assert outbox.capacity(outbox.segments()) < outbox.MAX_BYTES
+
+
+def test_historical_segment_keeps_its_original_and_counts_only_that_file(outbox):
+    event_id, raw, record = outbox.fixture.build_record()
+    outbox.fixture.write_original(event_id, raw)
+    outbox.OUTBOX.mkdir()
+    old = outbox.OUTBOX / ("technical-" + "a" * 32 + ".jsonl")
+    old.write_text(outbox.fixture.serialized_line(record), encoding="utf-8")
+    shared = outbox.ROOT / "fixtures" / "original"
+    (shared / "unrelated.log").write_bytes(b"x" * (outbox.MAX_BYTES + 1))
+
+    assert outbox.capacity(outbox.segments()) == len(raw) + old.stat().st_size
+    assert outbox.load_pending()[0]["record"] == record
+    assert outbox.emit() != event_id
+    assert (shared / f"{event_id}.log").read_bytes() == raw
+    assert (outbox.REPLAY_ORIGINALS / f"{event_id}.log").exists() is False
+
+
+def test_unexpected_replay_original_blocks_emission(outbox):
+    outbox.emit()
+    before = sorted(path.name for path in outbox.REPLAY_ORIGINALS.iterdir())
+    (outbox.REPLAY_ORIGINALS / "unclassified.bin").write_bytes(b"x")
+    with pytest.raises(RuntimeError, match="Originale non regolare"):
+        outbox.emit()
+    after = sorted(path.name for path in outbox.REPLAY_ORIGINALS.iterdir())
+    assert after == sorted(before + ["unclassified.bin"])
 
 
 def test_duplicate_event_id_blocks_whole_replay(outbox, monkeypatch):
@@ -174,7 +217,7 @@ def test_segment_name_collision_preserves_existing_record_and_originals(outbox, 
     outbox.emit()
     existing = outbox.segments()[0]
     saved = existing.read_bytes()
-    originals = outbox.ROOT / "fixtures" / "original"
+    originals = outbox.REPLAY_ORIGINALS
     before = sorted(path.name for path in originals.iterdir())
     marker = existing.stem.removeprefix("technical-")
     monkeypatch.setattr(outbox, "uuid4", lambda: type("Id", (), {"hex": marker})())
@@ -194,8 +237,8 @@ def test_external_writer_between_guard_and_publish_cannot_be_overwritten(outbox,
     monkeypatch.setattr(outbox, "uuid4", lambda: type("Id", (), {"hex": marker})())
     write_original = outbox.fixture.write_original
 
-    def external_writer(event_id, raw):
-        write_original(event_id, raw)
+    def external_writer(event_id, raw, original_dir):
+        write_original(event_id, raw, original_dir=original_dir)
         segment.write_bytes(b"segmento scritto da un altro processo\n")
 
     monkeypatch.setattr(outbox.fixture, "write_original", external_writer)

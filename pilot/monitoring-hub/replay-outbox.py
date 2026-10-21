@@ -22,6 +22,7 @@ from uuid import uuid4
 
 ROOT = Path(__file__).resolve().parent
 OUTBOX = ROOT / "fixtures" / "replay-outbox"
+REPLAY_ORIGINALS = ROOT / "fixtures" / "replay-original"
 PROJECT = ROOT.parents[1]
 LOKI = "http://127.0.0.1:13100"
 SEGMENT_NAME = re.compile(r"technical-[0-9a-f]{32}\.jsonl\Z")
@@ -45,8 +46,11 @@ logs = load_script(ROOT / "check-logs.py", "outbox_logs")
 
 @contextmanager
 def exclusive():
+    fixtures = ROOT / "fixtures"
+    if fixtures.is_symlink() or fixtures.is_junction():
+        raise RuntimeError("Radice delle fixture collegata altrove")
     OUTBOX.mkdir(parents=True, exist_ok=True)
-    if OUTBOX.is_symlink():
+    if OUTBOX.is_symlink() or OUTBOX.is_junction():
         raise RuntimeError("Cartella della coda collegata altrove")
     lock = OUTBOX / ".lock"
     try:
@@ -78,13 +82,23 @@ def segments() -> list[Path]:
 def capacity(paths: list[Path]) -> int:
     if len(paths) > MAX_SEGMENTS:
         raise RuntimeError("Quota del numero di segmenti superata")
-    originals = ROOT / "fixtures" / "original"
-    if originals.is_symlink():
+    if REPLAY_ORIGINALS.is_symlink() or REPLAY_ORIGINALS.is_junction():
         raise RuntimeError("Cartella degli originali collegata altrove")
-    original_paths = list(originals.iterdir()) if originals.exists() else []
-    if any(not path.is_file() or path.is_symlink() for path in original_paths):
-        raise RuntimeError("Originale non regolare nella cartella condivisa")
-    total = sum(path.stat().st_size for path in paths + original_paths)
+    original_paths = list(REPLAY_ORIGINALS.iterdir()) if REPLAY_ORIGINALS.exists() else []
+    if any(not guard.EVENT_ID.fullmatch(path.stem) or path.suffix != ".log" or
+           not path.is_file() or path.is_symlink() for path in original_paths):
+        raise RuntimeError("Originale non regolare nella coda isolata")
+    # I due segmenti storici conservano il riferimento alla cartella condivisa.
+    # Contiamo solo gli originali cui fanno riferimento, non i file di altri produttori.
+    legacy = set()
+    for path in paths:
+        checked = guard.check_jsonl(path.read_bytes(), ROOT, allow_replay_original=True)
+        if len(checked) != 1:
+            raise RuntimeError("Il segmento della coda deve contenere un solo record")
+        original_ref = checked[0]["record"]["original_ref"]
+        if original_ref.startswith("fixtures/original/"):
+            legacy.add(ROOT / original_ref)
+    total = sum(path.stat().st_size for path in paths + original_paths + sorted(legacy))
     if total > MAX_BYTES:
         raise RuntimeError("Quota byte di segmenti e originali superata")
     return total
@@ -96,7 +110,7 @@ def emit() -> str:
         used = capacity(paths)
         if len(paths) >= MAX_SEGMENTS:
             raise RuntimeError("Coda piena: nessun nuovo originale creato")
-        event_id, raw, record = fixture.build_record()
+        event_id, raw, record = fixture.build_record(original_dir="replay-original")
         payload = fixture.serialized_line(record).encode("utf-8")
         if (len(raw) > guard.MAX_ORIGINAL_BYTES or
                 len(payload) > guard.MAX_JSONL_BYTES or
@@ -107,8 +121,8 @@ def emit() -> str:
         segment = OUTBOX / f"technical-{marker}.jsonl"
         if segment.exists() or segment.is_symlink():
             raise RuntimeError("Segmento di destinazione già presente nella coda")
-        fixture.write_original(event_id, raw)
-        guard.check_jsonl(payload, ROOT)
+        fixture.write_original(event_id, raw, original_dir="replay-original")
+        guard.check_jsonl(payload, ROOT, allow_replay_original=True)
         with staged.open("xb") as output:
             output.write(payload)
             output.flush()
@@ -136,7 +150,7 @@ def load_pending() -> list[dict]:
     ids = set()
     for path in paths:
         raw = path.read_bytes()
-        checked = guard.check_jsonl(raw, ROOT)
+        checked = guard.check_jsonl(raw, ROOT, allow_replay_original=True)
         if len(checked) != 1:
             raise RuntimeError("Il segmento della coda deve contenere un solo record")
         item = checked[0]

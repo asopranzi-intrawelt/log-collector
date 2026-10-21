@@ -6,10 +6,14 @@ covers-paths:
   - bin/**
   - config/**
   - pilot/monitoring-hub/**
-last-verified-commit: 93c21e4
+last-verified-commit: 99db226
 ---
 
 # Design e sicurezza applicativa
+
+## Confine degli originali nel replay, 21/10/2026
+
+Il guard ammette `fixtures/replay-original/<id>.log` solo su richiesta esplicita della coda; la CLI normale accetta soltanto il percorso precedente. I record storici non vengono riscritti e i loro originali condivisi restano soggetti a verifica dei byte. Le nuove emissioni evitano la contesa di quota con gli altri generatori, ma la separazione è logica: non impone limite al filesystem, non impedisce modifiche da processi esterni e non abilita dati reali. I due segmenti storici sono oltre la finestra di replay automatico.
 
 ## Confine del ricevitore Seeweb, 20/10/2026
 

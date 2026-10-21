@@ -8,11 +8,15 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 93c21e4
+last-verified-commit: 99db226
 stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai punti 3 e 7; eventi iLO tecnici separati con ritenzione 90 giorni attiva; catena locale provata in WSL, non installata; D7 bloccato da nomina ed elenco AdS
 ---
 
 # Lavoro in corso
+
+## Originali del replay separati e prossimo gate, 21/10/2026
+
+Le nuove emissioni sintetiche della coda usano `fixtures/replay-original/`; il guard le ammette solo in modalità replay. La quota logica conta segmenti, nuovi originali e i soli originali condivisi citati dai due segmenti storici. Entrambi i segmenti privati del 19/10 sono stati validati e lasciati intatti; sono oltre la finestra di 55 minuti e il loro replay automatico resta bloccato. La suite mirata passa 25/25 e la mutazione del percorso verso la vecchia cartella fa fallire il test dell'isolamento. Nessun test live Loki o nuova emissione nei file privati. Seguono quota fisica e allarme, concorrenza, carico, guasti lunghi e misure di capacità prima di qualunque flusso reale. La stima dei due perimetri di consegna e i gate esterni sono nella roadmap.
 
 ## Seeweb: contratto e ricevitore preparatorio, 20/10/2026
 

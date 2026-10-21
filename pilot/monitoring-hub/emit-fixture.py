@@ -21,7 +21,9 @@ def active_log() -> Path:
     return FIXTURES / name
 
 
-def build_record() -> tuple[str, bytes, dict]:
+def build_record(original_dir: str = "original") -> tuple[str, bytes, dict]:
+    if original_dir not in {"original", "replay-original"}:
+        raise ValueError("Cartella degli originali sintetici non ammessa")
     now = datetime.now(timezone.utc).isoformat(timespec="seconds")
     event_id = "pilot-" + uuid4().hex
     raw = f"{now} servizio=fixture esito=ok id={event_id}\n".encode("utf-8")
@@ -49,16 +51,22 @@ def build_record() -> tuple[str, bytes, dict]:
         "parser_version": "0",
         "parse_status": "ok",
         "errors": [],
-        "original_ref": f"fixtures/original/{event_id}.log",
+        "original_ref": f"fixtures/{original_dir}/{event_id}.log",
         "original_sha256": sha256(raw).hexdigest(),
         "record_locator": "line:1",
     }
     return event_id, raw, record
 
 
-def write_original(event_id: str, raw: bytes) -> None:
-    original = FIXTURES / "original" / f"{event_id}.log"
+def write_original(event_id: str, raw: bytes, original_dir: str = "original") -> None:
+    if original_dir not in {"original", "replay-original"}:
+        raise ValueError("Cartella degli originali sintetici non ammessa")
+    if FIXTURES.is_symlink() or FIXTURES.is_junction():
+        raise RuntimeError("Radice delle fixture collegata altrove")
+    original = FIXTURES / original_dir / f"{event_id}.log"
     original.parent.mkdir(parents=True, exist_ok=True)
+    if original.parent.is_symlink() or original.parent.is_junction():
+        raise RuntimeError("Cartella degli originali collegata altrove")
     with original.open("xb") as output:
         output.write(raw)
         output.flush()

@@ -8,10 +8,14 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 93c21e4
+last-verified-commit: 99db226
 ---
 
 # Stack applicativo
+
+## Originali della coda sintetica, 21/10/2026
+
+`replay-outbox.py` passa `replay-original` al produttore e attiva esplicitamente la variante del guard; `emit-fixture.py` e la CLI ordinaria mantengono il contratto precedente. La quota legge tutti i file della directory dedicata e solo gli originali della cartella condivisa referenziati dai segmenti storici, che restano immutati. Questo cambia solo il pilot sintetico locale, senza collegare sorgenti reali.
 
 ## Ingresso tecnico Seeweb preparato, 20/10/2026
 

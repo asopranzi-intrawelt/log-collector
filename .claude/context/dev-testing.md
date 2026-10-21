@@ -6,10 +6,14 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 93c21e4
+last-verified-commit: 99db226
 ---
 
 # Test di sviluppo
+
+## Isolamento degli originali della coda, 21/10/2026
+
+La suite guard+coda passa 25/25: nuovo percorso e modalità esplicita, file grande di un altro produttore nella cartella condivisa senza effetto sulla quota, segmento storico ancora valido, file inatteso nella cartella dedicata respinto. I due segmenti privati reali del pilot sono stati riletti con il guard, senza modificarli. Sostituendo temporaneamente il riferimento del nuovo record con quello della vecchia cartella, il test dell'isolamento fallisce; la sorgente è stata ripristinata e la suite è tornata verde. Nessun test live Loki, guasto di alimentazione o quota fisica in questo giro.
 
 ## Ingresso e ritenzione Seeweb, 20/10/2026
 

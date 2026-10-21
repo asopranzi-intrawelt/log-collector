@@ -36,7 +36,7 @@ def _unique_object(pairs: list[tuple[str, object]]) -> dict:
     return result
 
 
-def validate(record: object, root: Path) -> dict[str, str]:
+def validate(record: object, root: Path, allow_replay_original: bool = False) -> dict[str, str]:
     """Verifica record, byte conservati e provenienza; restituisce label fisse."""
     if not isinstance(record, dict):
         raise Rejected("record_type")
@@ -44,11 +44,20 @@ def validate(record: object, root: Path) -> dict[str, str]:
     if not isinstance(event_id, str) or not EVENT_ID.fullmatch(event_id):
         raise Rejected("event_id")
 
-    original_ref = f"fixtures/original/{event_id}.log"
-    if record.get("original_ref") != original_ref:
+    allowed_refs = {f"fixtures/original/{event_id}.log"}
+    if allow_replay_original:
+        allowed_refs.add(f"fixtures/replay-original/{event_id}.log")
+    original_ref = record.get("original_ref")
+    if not isinstance(original_ref, str) or original_ref not in allowed_refs:
         raise Rejected("original_ref")
     resolved_root = root.resolve(strict=True)
-    original = (resolved_root / original_ref).resolve(strict=True)
+    expected_original = resolved_root / original_ref
+    if any(
+        path.is_symlink() or path.is_junction()
+        for path in (expected_original.parent.parent, expected_original.parent, expected_original)
+    ):
+        raise Rejected("original_location")
+    original = expected_original.resolve(strict=True)
     if not original.is_relative_to(resolved_root) or not original.is_file():
         raise Rejected("original_location")
     if original.stat().st_size > MAX_ORIGINAL_BYTES:
@@ -101,7 +110,7 @@ def validate(record: object, root: Path) -> dict[str, str]:
     return LABELS.copy()
 
 
-def check_jsonl(payload: bytes, root: Path) -> list[dict]:
+def check_jsonl(payload: bytes, root: Path, allow_replay_original: bool = False) -> list[dict]:
     """Rifiuta l'intero lotto prima di produrre un singolo risultato."""
     if not payload or len(payload) > MAX_JSONL_BYTES:
         raise Rejected("jsonl_size")
@@ -119,7 +128,7 @@ def check_jsonl(payload: bytes, root: Path) -> list[dict]:
             record = json.loads(line, object_pairs_hook=_unique_object)
         except (ValueError, json.JSONDecodeError) as exc:
             raise Rejected("jsonl_format") from exc
-        labels = validate(record, root)
+        labels = validate(record, root, allow_replay_original=allow_replay_original)
         results.append({"labels": labels, "record": record})
     return results
 

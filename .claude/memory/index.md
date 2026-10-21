@@ -1,5 +1,9 @@
 # Snapshot di sincronizzazione
 
+## Replay sintetico e stima residua, 21/10/2026
+
+Il collettore e il template sono stati chiusi manualmente dall'utente ai commit `99db226` e `5a5e8dd`, con remoti allineati. Le nuove emissioni della coda sintetica usano originali dedicati; i due segmenti privati storici sono stati validati e conservati senza riscrittura. Guard+coda 25/25, mutazione del vecchio percorso rilevata. Restano quota fisica, replay concorrente, guasti lunghi, capacità e sorgenti reali; ADR-023 continua a bloccarle. La roadmap distingue primo esercizio AdS (25-40 giorni persona residui condizionati) e perimetro completo (60-100 giorni persona, stima inferita, escluse attese esterne). Nessun deploy. Dettagli nel README del pilot e in `.claude/context/roadmap.md`.
+
 ## Seeweb: avanzamento documentale e candidato isolato, 20/10/2026
 
 Letti screenshot_111 e contratto generale Seeweb del 2014: proposta di aggiornamento non accettata, responsabilità specifica delle patch OPNsense da chiarire con scheda del servizio e accordi successivi. Network-design ha aggiornato dossier, gap, timeline e ISO-27/30 senza chiudere controlli. Nel collettore il render opzionale per sorgente IPv4 OPNsense e UDP 514 lascia per default tutto spento e salva i messaggi Seeweb solo nel tecnico `root:root`; test Debian 13 e 32 unit test superati. Nessun deploy o flusso reale. Mancano conferma della sorgente, selezione eventi, retention, capienza, rilevamento silenzio e classificazione degli accessi su campioni nativi; vedere `docs/runbook-componente-2.md` e `docs/firewall-seeweb-opnsense.md`.
@@ -372,11 +376,11 @@ Template:             E:\template-claude-developing @ ffcbdb3
 
 | Scheda | last-verified | Stato |
 |---|---|---|
-| STACK.md | 93c21e4 | ingresso Seeweb opzionale e pubblicazione del pilot riconciliati |
-| design-and-security.md | 93c21e4 | archivio tecnico Seeweb isolato; limiti del pilot e QA distinti |
-| deployment.md | 93c21e4 | candidata Seeweb provata in container, non installata sulla VM |
-| dev-testing.md | 93c21e4 | prove Seeweb e ritenzione fittizia, nessuna misura reale |
-| current-work.md | 93c21e4 | candidato Seeweb e gate di attivazione aggiornati |
+| STACK.md | 99db226 | nuovo percorso degli originali nel pilot; ingresso Seeweb invariato |
+| design-and-security.md | 99db226 | confine esplicito del replay e limiti dei flussi reali |
+| deployment.md | 99db226 | isolamento solo locale; candidata Seeweb non installata |
+| dev-testing.md | 99db226 | prove della coda 25/25 e mutazione del percorso rilevata |
+| current-work.md | 99db226 | nuovi originali isolati e gate successivi esplicitati |
 | roadmap.md | 9ee87b4 | solo struttura |
 
 ## Punto di ripresa
