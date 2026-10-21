@@ -8,11 +8,15 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 56a1e12
+last-verified-commit: 2a51dbb
 stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai punti 3 e 7; eventi iLO tecnici separati con ritenzione 90 giorni attiva; catena locale provata in WSL, non installata; D7 bloccato da nomina ed elenco AdS
 ---
 
 # Lavoro in corso
+
+## Esito incerto del replay e fermo lungo, 21/10/2026
+
+L'utente ha chiuso manualmente il checkpoint precedente a `2a51dbb`; `main` e `origin/main` coincidono. Il diff attuale registra e sincronizza un marker con digest prima della POST, riserva spazio per i marker, ne verifica integrità e rifiuta il retry automatico se il record è ancora assente dall'indice. La query in sola lettura può esaminare un record vecchio; `--apply` blocca l'intero lotto se manca un record vecchio, futuro o con invio incerto. Un segmento vecchio già presente non impedisce l'invio di quello fresco. La prova con due processi, il timeout prima dell'indicizzazione e la modifica del segmento fra le query sono verdi: 38/38 guard+coda, ruff verde. La mutazione che omette il marker ha fatto fallire il test pertinente, con SHA del sorgente ripristinato. Non sono provati fsync su Linux, power loss, mount fisico, notifiche o flussi reali. Pendenze cliente in `docs/handoff-sviluppo-collettore.md` §0, nessun nuovo riscontro Seeweb.
 
 ## Gate di mount della coda e pendenze cliente, 21/10/2026
 

@@ -6,10 +6,14 @@ covers-paths:
   - bin/**
   - config/**
   - pilot/monitoring-hub/**
-last-verified-commit: 56a1e12
+last-verified-commit: 2a51dbb
 ---
 
 # Design e sicurezza applicativa
+
+## Risposta ambigua dopo la POST, 21/10/2026
+
+Un marker di tentativo scritto e sincronizzato prima dell'invio separa un record ancora mai tentato da uno che potrebbe essere stato accettato senza risposta. Il riavvio può verificare l'indice, ma non ripete la POST di un record assente con marker; un marker senza segmento o con digest diverso blocca il lotto. Il digest del segmento viene ricontrollato anche dopo la seconda query e prima del marker. La directory è sincronizzata solo su POSIX; su Windows il pilot prova il flusso logico, non la durabilità dopo perdita di alimentazione. Il lock riguarda i writer che usano questa coda; writer esterni e Loki non condividono una transazione, quindi nessuna garanzia *exactly once*.
 
 ## Confine fisico proposto per il replay sintetico, 21/10/2026
 

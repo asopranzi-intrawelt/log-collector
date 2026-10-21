@@ -1,15 +1,16 @@
 """Prove della coda sintetica con arresto e risposta persa del backend."""
 
-from datetime import timedelta
 import importlib.util
+import subprocess
+import sys
+import time
+from datetime import UTC, datetime, timedelta
 from io import BytesIO
 from pathlib import Path
-import sys
 from types import SimpleNamespace
 from urllib.parse import parse_qs, urlsplit
 
 import pytest
-
 
 SCRIPT = Path(__file__).resolve().parents[1] / "pilot" / "monitoring-hub" / "replay-outbox.py"
 
@@ -123,7 +124,7 @@ def test_unexpected_file_blocks_emission_and_replay(outbox, monkeypatch):
     assert network_calls == []
 
 
-def test_query_uses_event_window_and_rechecks_age(outbox, monkeypatch):
+def test_old_record_can_be_queried_but_cannot_be_pushed(outbox, monkeypatch):
     outbox.emit()
     record = outbox.load_pending()[0]["record"]
     urls = []
@@ -140,9 +141,185 @@ def test_query_uses_event_window_and_rechecks_age(outbox, monkeypatch):
     assert (int(params["end"][0]) - int(params["start"][0])) == 4_000_000_000
 
     monkeypatch.setattr(outbox, "MAX_AGE", -timedelta(seconds=1))
+    assert outbox.query(record) == []
+    assert len(urls) == 2
+    item = outbox.load_pending()[0]
     with pytest.raises(RuntimeError, match="fuori dalla finestra"):
-        outbox.query(record)
-    assert len(urls) == 1
+        outbox.push(item)
+    assert len(urls) == 2
+
+
+def test_delayed_index_after_lost_reply_never_retries_push(outbox, monkeypatch):
+    event_id = outbox.emit()
+    item = outbox.load_pending()[0]
+    indexed = {}
+    sent = []
+    monkeypatch.setattr(outbox, "query", lambda record: indexed.get(record["event_id"], []))
+
+    def accepted_but_unconfirmed(payload):
+        marker = outbox.OUTBOX / (
+            ".attempt-" + payload["segment"].stem.removeprefix("technical-") + ".sha256"
+        )
+        assert marker.read_bytes() == payload["sha256"].encode("ascii") + b"\n"
+        sent.append(payload["record"]["event_id"])
+        raise TimeoutError("Risposta persa prima dell'indicizzazione")
+
+    monkeypatch.setattr(outbox, "push", accepted_but_unconfirmed)
+    with pytest.raises(TimeoutError, match="Risposta persa"):
+        outbox.reconcile(True)
+    assert sent == [event_id]
+    assert outbox.spool_status()["attempt_markers"] == 1
+    assert outbox.reconcile(False)["uncertain_missing"] == 1
+    with pytest.raises(RuntimeError, match="invio incerto"):
+        outbox.reconcile(True)
+    assert sent == [event_id]
+    indexed[event_id] = [item["record"]]
+    assert outbox.reconcile(True)["pushed"] == 0
+    assert sent == [event_id]
+
+
+def test_changed_attempt_marker_blocks_before_query(outbox, monkeypatch):
+    outbox.emit()
+    monkeypatch.setattr(outbox, "query", lambda _record: [])
+    monkeypatch.setattr(outbox, "push", lambda _item: (_ for _ in ()).throw(TimeoutError()))
+    with pytest.raises(TimeoutError):
+        outbox.reconcile(True)
+    marker = next(outbox.OUTBOX.glob(".attempt-*.sha256"))
+    marker.write_bytes(b"0" * 64 + b"\n")
+    calls = []
+    monkeypatch.setattr(outbox, "query", lambda _record: calls.append("query"))
+    with pytest.raises(RuntimeError, match="diverso dal segmento"):
+        outbox.reconcile(True)
+    assert calls == []
+
+
+def test_segment_changed_between_queries_blocks_before_marker_or_push(outbox, monkeypatch):
+    outbox.emit()
+    segment = outbox.segments()[0]
+    queries = []
+
+    def query_and_change(_record):
+        queries.append("query")
+        if len(queries) == 2:
+            segment.write_bytes(segment.read_bytes().removesuffix(b"\n") + b" \n")
+        return []
+
+    monkeypatch.setattr(outbox, "query", query_and_change)
+    monkeypatch.setattr(
+        outbox, "push", lambda _item: (_ for _ in ()).throw(AssertionError("POST inattesa"))
+    )
+    with pytest.raises(RuntimeError, match="Segmento cambiato prima dell'invio"):
+        outbox.reconcile(True)
+    assert queries == ["query", "query"]
+    assert list(outbox.OUTBOX.glob(".attempt-*.sha256")) == []
+
+
+def test_failed_directory_sync_keeps_marker_and_prevents_push(outbox, monkeypatch):
+    outbox.emit()
+    monkeypatch.setattr(outbox, "query", lambda _record: [])
+    sent = []
+    monkeypatch.setattr(outbox, "push", lambda item: sent.append(item))
+
+    def failed_sync():
+        raise OSError(5, "Errore fsync della directory")
+
+    monkeypatch.setattr(outbox, "sync_outbox_directory", failed_sync)
+    with pytest.raises(OSError, match="fsync"):
+        outbox.reconcile(True)
+    assert sent == []
+    assert outbox.spool_status()["attempt_markers"] == 1
+    with pytest.raises(RuntimeError, match="invio incerto"):
+        outbox.reconcile(True)
+    assert sent == []
+
+
+def test_stale_segment_blocks_lot_before_fresh_push(outbox, monkeypatch):
+    old_now = datetime.now(UTC) - timedelta(hours=1)
+    original_datetime = outbox.fixture.datetime
+
+    class OldClock:
+        @staticmethod
+        def now(_timezone):
+            return old_now
+
+    monkeypatch.setattr(outbox.fixture, "datetime", OldClock)
+    old_event = outbox.emit()
+    monkeypatch.setattr(outbox.fixture, "datetime", original_datetime)
+    fresh_event = outbox.emit()
+    assert old_event != fresh_event
+    queried = []
+    pushed = []
+    monkeypatch.setattr(outbox, "query", lambda record: queried.append(record["event_id"]) or [])
+    monkeypatch.setattr(outbox, "push", lambda item: pushed.append(item["record"]["event_id"]))
+    report = outbox.reconcile(False)
+    assert report["stale_missing"] == 1
+    assert report["requires_review"] == 1
+    assert set(queried) == {old_event, fresh_event}
+    assert outbox.spool_status()["stale_segments"] == 1
+    with pytest.raises(RuntimeError, match="segmento vecchio"):
+        outbox.reconcile(True)
+    assert pushed == []
+
+    old_record = next(
+        item["record"] for item in outbox.load_pending()
+        if item["record"]["event_id"] == old_event
+    )
+    indexed = {old_event: [old_record]}
+
+    def indexed_query(record):
+        return indexed.get(record["event_id"], [])
+
+    def indexed_push(item):
+        record = item["record"]
+        pushed.append(record["event_id"])
+        indexed[record["event_id"]] = [record]
+
+    monkeypatch.setattr(outbox, "query", indexed_query)
+    monkeypatch.setattr(outbox, "push", indexed_push)
+    assert outbox.reconcile(True)["pushed"] == 1
+    assert pushed == [fresh_event]
+
+
+def test_second_process_cannot_reconcile_while_first_holds_lock(outbox, tmp_path, monkeypatch):
+    ready = tmp_path / "child-ready"
+    child_code = """
+import importlib.util
+from pathlib import Path
+import sys
+
+script, root, ready = map(Path, sys.argv[1:])
+spec = importlib.util.spec_from_file_location("replay_lock_child", script)
+module = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(module)
+module.ROOT = root
+module.OUTBOX = root / "fixtures" / "replay-outbox"
+module.REPLAY_ORIGINALS = root / "fixtures" / "replay-original"
+module.LOCAL_PILOT = True
+with module.exclusive():
+    ready.write_text("locked", encoding="ascii")
+    sys.stdin.readline()
+"""
+    child = subprocess.Popen(
+        [sys.executable, "-c", child_code, str(SCRIPT), str(outbox.ROOT), str(ready)],
+        stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
+    )
+    try:
+        deadline = time.monotonic() + 10
+        while not ready.exists() and child.poll() is None and time.monotonic() < deadline:
+            time.sleep(0.02)
+        assert ready.read_text(encoding="ascii") == "locked"
+        calls = []
+        monkeypatch.setattr(outbox, "query", lambda _record: calls.append("query"))
+        with pytest.raises(RuntimeError, match="Coda occupata"):
+            outbox.reconcile(True)
+        assert calls == []
+    finally:
+        try:
+            _stdout, stderr = child.communicate(input="\n", timeout=10)
+        except subprocess.TimeoutExpired:
+            child.kill()
+            _stdout, stderr = child.communicate(timeout=10)
+        assert child.returncode == 0, stderr
 
 
 def test_total_quota_counts_originals_before_creating_another(outbox, monkeypatch):
@@ -158,6 +335,19 @@ def test_total_quota_counts_originals_before_creating_another(outbox, monkeypatc
     with pytest.raises(RuntimeError, match="Coda piena"):
         outbox.emit()
     assert sorted(path.name for path in originals.glob("*.log")) == before
+    assert len(outbox.segments()) == 1
+
+
+def test_emission_reserves_attempt_marker_for_every_unattempted_segment(outbox, monkeypatch):
+    outbox.emit()
+    used = outbox.capacity(outbox.segments())
+    candidate = outbox.fixture.build_record(original_dir="replay-original")
+    raw = candidate[1]
+    payload = outbox.fixture.serialized_line(candidate[2]).encode("utf-8")
+    monkeypatch.setattr(outbox.fixture, "build_record", lambda **_kwargs: candidate)
+    outbox.MAX_BYTES = used + len(raw) + len(payload) + outbox.ATTEMPT_BYTES
+    with pytest.raises(RuntimeError, match="Coda piena"):
+        outbox.emit()
     assert len(outbox.segments()) == 1
 
 

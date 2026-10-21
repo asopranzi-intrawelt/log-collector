@@ -5,20 +5,19 @@ L'indice Loki e la fonte di conferma; un risultato ambiguo blocca il replay.
 """
 
 import argparse
+import json
+import os
+import re
+import time
 from contextlib import contextmanager
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from hashlib import sha256
 from importlib.machinery import SourceFileLoader
 from importlib.util import module_from_spec, spec_from_loader
-import json
-import os
 from pathlib import Path
-import re
-import time
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 from uuid import uuid4
-
 
 ROOT = Path(__file__).resolve().parent
 OUTBOX = ROOT / "fixtures" / "replay-outbox"
@@ -26,10 +25,12 @@ REPLAY_ORIGINALS = ROOT / "fixtures" / "replay-original"
 PROJECT = ROOT.parents[1]
 LOKI = "http://127.0.0.1:13100"
 SEGMENT_NAME = re.compile(r"technical-[0-9a-f]{32}\.jsonl\Z")
+ATTEMPT_NAME = re.compile(r"\.attempt-[0-9a-f]{32}\.sha256\Z")
 MAX_BYTES = 8 * 1024 * 1024
 MAX_SEGMENTS = 256
 MAX_AGE = timedelta(minutes=55)
 MAX_BOUNDED_FILESYSTEM_BYTES = 64 * 1024 * 1024
+ATTEMPT_BYTES = 65
 LOCAL_PILOT = False
 
 
@@ -104,10 +105,54 @@ def segments() -> list[Path]:
             continue
         if path.name.startswith(".pending-"):
             raise RuntimeError("Segmento temporaneo residuo: verificare prima di proseguire")
+        if ATTEMPT_NAME.fullmatch(path.name):
+            if path.is_symlink() or path.is_junction() or not path.is_file():
+                raise RuntimeError("Tentativo di invio non regolare nella coda")
+            continue
         if not SEGMENT_NAME.fullmatch(path.name) or path.is_symlink() or not path.is_file():
             raise RuntimeError("File o collegamento inatteso nella coda")
         paths.append(path)
     return sorted(paths)
+
+
+def attempts(paths: list[Path]) -> dict[Path, Path]:
+    """Associa ogni intento durevole al segmento esatto e al suo digest."""
+    known = {path.stem.removeprefix("technical-"): path for path in paths}
+    result = {}
+    for marker in OUTBOX.iterdir():
+        if not ATTEMPT_NAME.fullmatch(marker.name):
+            continue
+        if marker.is_symlink() or marker.is_junction() or not marker.is_file():
+            raise RuntimeError("Tentativo di invio non regolare nella coda")
+        key = marker.name.removeprefix(".attempt-").removesuffix(".sha256")
+        segment = known.get(key)
+        if segment is None:
+            raise RuntimeError("Tentativo di invio senza segmento nella coda")
+        expected = sha256(segment.read_bytes()).hexdigest().encode("ascii") + b"\n"
+        if marker.read_bytes() != expected:
+            raise RuntimeError("Tentativo di invio diverso dal segmento conservato")
+        result[segment] = marker
+    return result
+
+
+def sync_outbox_directory() -> None:
+    """Sul Linux forza anche la directory prima di una POST irrevocabile."""
+    if os.name != "posix":
+        return  # Il pilot PC non dichiara durabilitÃ  dopo perdita di alimentazione.
+    directory_fd = os.open(OUTBOX, os.O_RDONLY | os.O_DIRECTORY)
+    try:
+        os.fsync(directory_fd)
+    finally:
+        os.close(directory_fd)
+
+
+def record_attempt(item: dict) -> None:
+    marker = OUTBOX / (".attempt-" + item["segment"].stem.removeprefix("technical-") + ".sha256")
+    with marker.open("xb") as output:
+        output.write(item["sha256"].encode("ascii") + b"\n")
+        output.flush()
+        os.fsync(output.fileno())
+    sync_outbox_directory()
 
 
 def capacity(paths: list[Path]) -> int:
@@ -142,7 +187,9 @@ def capacity(paths: list[Path]) -> int:
         raise RuntimeError("Segmento storico fuori dal filesystem limitato: trattare manualmente")
     if set(original_paths) != referenced_new:
         raise RuntimeError("Originale senza segmento o segmento senza originale nella coda")
-    total = sum(path.stat().st_size for path in paths + original_paths + sorted(legacy))
+    marker_paths = list(attempts(paths).values())
+    counted_paths = paths + original_paths + sorted(legacy) + marker_paths
+    total = sum(path.stat().st_size for path in counted_paths)
     if total > MAX_BYTES:
         raise RuntimeError("Quota byte di segmenti e originali superata")
     return total
@@ -152,13 +199,15 @@ def emit() -> str:
     with exclusive():
         paths = segments()
         used = capacity(paths)
+        unattempted = len(paths) - len(attempts(paths))
         if len(paths) >= MAX_SEGMENTS:
             raise RuntimeError("Coda piena: nessun nuovo originale creato")
         event_id, raw, record = fixture.build_record(original_dir="replay-original")
         payload = fixture.serialized_line(record).encode("utf-8")
         if (len(raw) > guard.MAX_ORIGINAL_BYTES or
                 len(payload) > guard.MAX_JSONL_BYTES or
-                used + len(raw) + len(payload) > MAX_BYTES):
+                used + len(raw) + len(payload) + ATTEMPT_BYTES * (unattempted + 1)
+                > MAX_BYTES):
             raise RuntimeError("Coda piena: nessun nuovo originale creato")
         marker = uuid4().hex
         staged = OUTBOX / f".pending-{marker}.tmp"
@@ -174,22 +223,34 @@ def emit() -> str:
         try:
             os.link(staged, segment)
         except FileExistsError as exc:
-            raise RuntimeError("Segmento di destinazione comparso durante la pubblicazione") from exc
+            raise RuntimeError(
+                "Segmento di destinazione comparso durante la pubblicazione"
+            ) from exc
         staged.unlink()
         return event_id
 
 
 def recent_instant(record: dict) -> datetime:
     instant = datetime.fromisoformat(record["event_at"])
-    age = datetime.now(timezone.utc) - instant
+    age = datetime.now(UTC) - instant
     if age > MAX_AGE or age < -timedelta(seconds=5):
         raise RuntimeError("Evento fuori dalla finestra di replay: intervento manuale richiesto")
     return instant
 
 
+def replay_age(record: dict) -> str:
+    age = datetime.now(UTC) - datetime.fromisoformat(record["event_at"])
+    if age < -timedelta(seconds=5):
+        return "future"
+    if age > MAX_AGE:
+        return "stale"
+    return "fresh"
+
+
 def load_pending() -> list[dict]:
     paths = segments()
     capacity(paths)
+    markers = attempts(paths)
     result = []
     ids = set()
     for path in paths:
@@ -203,8 +264,11 @@ def load_pending() -> list[dict]:
         if event_id in ids:
             raise RuntimeError("Identificativo evento ripetuto nella coda")
         ids.add(event_id)
-        recent_instant(record)
-        result.append({"record": record, "labels": item["labels"], "sha256": sha256(raw).hexdigest()})
+        result.append({
+            "record": record, "labels": item["labels"],
+            "sha256": sha256(raw).hexdigest(), "segment": path,
+            "attempted": path in markers,
+        })
     return result
 
 
@@ -213,16 +277,25 @@ def spool_status() -> dict:
     with exclusive():
         paths = segments()
         used = capacity(paths)
+        items = load_pending()
+        age_states = [replay_age(item["record"]) for item in items]
         reasons = []
         if used * 100 >= MAX_BYTES * 80:
             reasons.append("logical_bytes_80_percent")
         if len(paths) * 100 >= MAX_SEGMENTS * 80:
             reasons.append("segments_80_percent")
+        if "stale" in age_states:
+            reasons.append("stale_segments")
+        if "future" in age_states:
+            reasons.append("future_segments")
         result = {
             "bounded_mount_verified": not LOCAL_PILOT,
             "segments": len(paths),
             "logical_bytes": used,
             "logical_limit_bytes": MAX_BYTES,
+            "attempt_markers": sum(item["attempted"] for item in items),
+            "stale_segments": age_states.count("stale"),
+            "future_segments": age_states.count("future"),
             "filesystem_bytes_available": None,
             "filesystem_inodes_available": None,
             "warning_reasons": reasons,
@@ -241,11 +314,16 @@ def spool_status() -> dict:
 
 
 def query(record: dict) -> list[dict]:
-    instant = recent_instant(record)
-    expression = '{archive="technical",source_family="pilot",service="fixture"} |= "' + record["event_id"] + '"'
+    instant = datetime.fromisoformat(record["event_at"])
+    expression = (
+        '{archive="technical",source_family="pilot",service="fixture"} |= "'
+        + record["event_id"] + '"'
+    )
     start_ns = int((instant - timedelta(seconds=2)).timestamp() * 1_000_000_000)
     end_ns = int((instant + timedelta(seconds=2)).timestamp() * 1_000_000_000)
-    url = LOKI + "/loki/api/v1/query_range?" + urlencode({"query": expression, "start": str(start_ns), "end": str(end_ns), "limit": "20"})
+    url = LOKI + "/loki/api/v1/query_range?" + urlencode({
+        "query": expression, "start": str(start_ns), "end": str(end_ns), "limit": "20",
+    })
     with urlopen(Request(url), timeout=15) as response:
         payload = json.load(response)
     return logs.check_labels(logs.entries(payload), record)
@@ -257,8 +335,14 @@ def push(item: dict) -> None:
     seconds = int(instant.timestamp())
     timestamp_ns = str(seconds * 1_000_000_000 + instant.microsecond * 1_000)
     line = json.dumps(record, ensure_ascii=False, separators=(",", ":"))
-    body = json.dumps({"streams": [{"stream": item["labels"], "values": [[timestamp_ns, line]]}]}, ensure_ascii=False).encode("utf-8")
-    request = Request(LOKI + "/loki/api/v1/push", data=body, headers={"Content-Type": "application/json"}, method="POST")
+    body = json.dumps(
+        {"streams": [{"stream": item["labels"], "values": [[timestamp_ns, line]]}]},
+        ensure_ascii=False,
+    ).encode("utf-8")
+    request = Request(
+        LOKI + "/loki/api/v1/push", data=body,
+        headers={"Content-Type": "application/json"}, method="POST",
+    )
     with urlopen(request, timeout=10) as response:
         if response.status != 204:
             raise RuntimeError("Loki non ha confermato il push")
@@ -268,9 +352,21 @@ def reconcile(apply: bool) -> dict:
     with exclusive():
         items = load_pending()  # Valida l'intero lotto prima della prima query o scrittura.
         before = [query(item["record"]) for item in items]
-        if any(found not in ([], [item["record"]]) for item, found in zip(items, before)):
+        if any(
+            found not in ([], [item["record"]])
+            for item, found in zip(items, before, strict=True)
+        ):
             raise RuntimeError("Indice ambiguo o record diverso: nessun invio")
-        missing = [item for item, found in zip(items, before) if not found]
+        missing = [item for item, found in zip(items, before, strict=True) if not found]
+        stale = [item for item in missing if replay_age(item["record"]) == "stale"]
+        future = [item for item in missing if replay_age(item["record"]) == "future"]
+        uncertain = [item for item in missing if item["attempted"]]
+        needs_review = {item["segment"] for item in stale + future + uncertain}
+        if apply and needs_review:
+            raise RuntimeError(
+                "Replay sospeso: segmento vecchio, futuro o con invio incerto; "
+                "esame manuale richiesto"
+            )
         pushed = 0
         if apply:
             for item in missing:
@@ -280,6 +376,12 @@ def reconcile(apply: bool) -> dict:
                     continue
                 if found:
                     raise RuntimeError("Indice ambiguo prima del push")
+                recent_instant(item["record"])
+                if capacity(segments()) + ATTEMPT_BYTES > MAX_BYTES:
+                    raise RuntimeError("Quota insufficiente per registrare il tentativo di invio")
+                if sha256(item["segment"].read_bytes()).hexdigest() != item["sha256"]:
+                    raise RuntimeError("Segmento cambiato prima dell'invio")
+                record_attempt(item)
                 push(item)
                 pushed += 1
                 deadline = time.monotonic() + 75
@@ -291,8 +393,15 @@ def reconcile(apply: bool) -> dict:
                         raise RuntimeError("Record diverso o duplicato dopo il push")
                     time.sleep(2)
                 else:
-                    raise RuntimeError("Push confermato ma record assente dall'indice entro 75 secondi")
-        return {"segments": len(items), "present_before": len(items) - len(missing), "missing_before": len(missing), "pushed": pushed}
+                    raise RuntimeError(
+                        "Push confermato ma record assente dall'indice entro 75 secondi"
+                    )
+        return {
+            "segments": len(items), "present_before": len(items) - len(missing),
+            "missing_before": len(missing), "stale_missing": len(stale),
+            "future_missing": len(future), "uncertain_missing": len(uncertain),
+            "requires_review": len(needs_review), "pushed": pushed,
+        }
 
 
 def main() -> None:

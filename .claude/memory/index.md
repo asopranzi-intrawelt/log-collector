@@ -1,5 +1,9 @@
 # Snapshot di sincronizzazione
 
+## Replay incerto e record scaduti, 21/10/2026
+
+L'utente ha chiuso manualmente il collettore a `2a51dbb`, con `main` allineato a `origin/main`. Il nuovo diff del pilot salva nello spool un marker con digest prima della POST, impedisce il retry automatico dopo un esito incerto e consente query in sola lettura dei segmenti vecchi. `--apply` ferma tutto il lotto se un record assente è vecchio, futuro o già tentato; `status` ne mostra i conteggi locali. Un segmento vecchio già indicizzato non ferma l'invio di un fresco. Guard+coda 38/38, ruff sui due file verde; prova con due processi e mutazione del marker sensibili. Nessun deploy, flusso reale, nuova risposta Seeweb o aggiornamento di rete. Restano prova Linux di mount/fsync/power loss, carico, allarme esterno e budget hub+due LXC QA. Dettaglio in `pilot/monitoring-hub/README.md` e nelle schede di contesto.
+
 ## Gate spool e dipendenze cliente, 21/10/2026
 
 Dopo il `chiudi` manuale il collettore è a `56a1e12`; il nuovo diff del replay sintetico richiede per default due mount Linux dello stesso filesystem fino a 64 MiB, con bypass esplicito `--local-pilot` per il PC. Originali parziali e segmenti storici fuori spool bloccano la modalità vincolata; `status` espone saturazione locale senza inviare avvisi. Guard+coda 31/31 su fixture; mancano prova Linux fisica, allarme consegnato, concorrenza e carico. `docs/handoff-sviluppo-collettore.md` §0 è il registro per il cliente delle attese da Direzione/privacy/Seeweb/QA e del gate interno di capacità; il seguito Seeweb è riferito inviato dall'utente, senza riscontro provider nel progetto. Nessun deploy, modifica a network-design o operazione Git dell'agente.

@@ -8,10 +8,14 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 56a1e12
+last-verified-commit: 2a51dbb
 ---
 
 # Stack applicativo
+
+## Tentativi di replay e triage, 21/10/2026
+
+La coda conserva nello spool un `.attempt-<id>.sha256` prima della POST e ne verifica il legame con il segmento ai giri successivi. `reconcile` può cercare in Loki anche un record oltre 55 minuti, ma applica il limite soltanto all'invio; un record assente e vecchio, futuro o con marker blocca l'intero lotto con `--apply`. `status` mostra conteggi di marker e segmenti fuori finestra. Il marker resta dopo un invio confermato e non ha una pulizia automatica. Il codice è ancora un pilot sintetico.
 
 ## Gate dello spool sintetico, 21/10/2026
 

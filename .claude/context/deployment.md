@@ -5,10 +5,14 @@ generated-date: 2026-09-30
 covers-paths:
   - config/**
   - docs/handoff-sviluppo-collettore.md
-last-verified-commit: 56a1e12
+last-verified-commit: 2a51dbb
 ---
 
 # Deployment
+
+## Replay incerto ancora solo nel pilot, 21/10/2026
+
+Il marker di tentativo vive nella stessa directory dei segmenti e richiede spazio riservato. Nessun servizio o timer del Debian è stato modificato; lo stato di invio incerto richiede esame umano e il codice non elimina marker o originali. Prima dell'esercizio servono prova Linux di mount limitato, fsync directory e arresto improvviso, budget di capacità, destinatario degli allarmi e procedura approvata di triage. Nessun cambiamento di rete o sorgente reale.
 
 ## Candidato spool vincolato, 21/10/2026
 

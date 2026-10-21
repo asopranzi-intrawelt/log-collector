@@ -6,10 +6,14 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 56a1e12
+last-verified-commit: 2a51dbb
 ---
 
 # Test di sviluppo
+
+## Retry incerto, fermo lungo e concorrenza, 21/10/2026
+
+Guard+coda 38/38 su fixture e ruff verde per sorgente/test. Il test del timeout lascia il marker prima della POST, simula indice ancora vuoto e verifica nessun secondo invio; il test della sincronizzazione fallita lascia il marker senza chiamare `push`. Un processo figlio tiene il lock mentre il processo principale tenta la riconciliazione: nessuna query parte. Un segmento oltre 55 minuti è cercato in sola lettura, blocca il lotto se assente e non blocca un evento fresco se già presente. Una modifica JSON valida dei byte del segmento fra le due query ha prodotto prima una POST inattesa, poi è stata fermata dal controllo del digest. La mutazione che omette `record_attempt` fa cadere la prova del marker prima della POST; il sorgente è stato ripristinato con SHA verificato. La prima esecuzione mutazionale non era valida per permessi temporanei del sandbox Windows e non è stata conteggiata. Manca la prova di durabilità su Linux reale e di concorrenza con writer che ignorano il lock.
 
 ## Guardie spool e stato locale, 21/10/2026
 
