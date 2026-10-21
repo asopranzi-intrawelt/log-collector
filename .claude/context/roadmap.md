@@ -8,6 +8,10 @@ last-verified-commit: 9ee87b4
 
 # Roadmap
 
+## Confine QA offline, 21/10/2026
+
+Pronto il controllo locale del solo evento `backup_selected`, con 20 prove e rifiuto della prova di autorizzazione nella vista tecnica. Il prossimo gate QA è un evento emesso da un job vero e verificato fino al punto di indice, con archivio riservato separato; restano aperti trasporto, i due LXC e budget hub+QA. Questa tappa non modifica la stima residua né abilita sorgenti reali.
+
 ## Stima residua e criteri di chiusura, 21/10/2026
 
 Avanzamento del gate trasporto: preflight dei mount, blocco degli originali parziali e stato di saturazione locale sono pronti per il pilot sintetico; la quota fisica non è ancora dimostrata su Linux e manca la consegna dell'allarme. I blocchi esterni, con evidenza disponibile e riscontro richiesto, sono nella sezione 0 di `docs/handoff-sviluppo-collettore.md`. Le stime sotto escludono i tempi di risposta di Direzione, consulente, Seeweb e produttore QA. Nessun flusso reale va collegato prima dei gate.

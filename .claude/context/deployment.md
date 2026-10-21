@@ -5,10 +5,14 @@ generated-date: 2026-09-30
 covers-paths:
   - config/**
   - docs/handoff-sviluppo-collettore.md
-last-verified-commit: 2a51dbb
+last-verified-commit: 5c19167
 ---
 
 # Deployment
+
+## Confine QA ancora offline, 21/10/2026
+
+Il controllo locale non è installato sul Debian e non apre un trasporto. Il produttore non chiama ancora il builder `qa-tech-v1`; i due LXC e l'archivio riservato non esistono. Prima del collegamento servono identità censite, canale autenticato, redazione provata all'indice, retention/budget e prova di recupero sotto guasto. M32e e ISO-30 restano in corso.
 
 ## Replay incerto ancora solo nel pilot, 21/10/2026
 

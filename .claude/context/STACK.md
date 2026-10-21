@@ -8,10 +8,14 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 2a51dbb
+last-verified-commit: 5c19167
 ---
 
 # Stack applicativo
+
+## Confine QA offline, 21/10/2026
+
+`bin/qa_technical_boundary.py` accetta JSONL locale del solo `backup_selected` prodotto dal builder `qa-tech-v1`, vincola source_id e environment forniti dal chiamante, verifica l'intero lotto e prepara record minimizzati con label fisse. `job_ref` viene validato ma omesso dall'output. Eventi di autorizzazione sono respinti: nessun trasporto, archivio o sorgente reale è collegato.
 
 ## Tentativi di replay e triage, 21/10/2026
 

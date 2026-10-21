@@ -1,5 +1,9 @@
 # Snapshot di sincronizzazione
 
+## Confine tecnico QA offline, 21/10/2026
+
+Il collettore accetta e minimizza offline solo `backup_selected` del contratto `qa-tech-v1`; `authorisation_granted` va a un futuro registro riservato e il confine tecnico lo rifiuta. Sorgente/ambiente vincolati, lotto senza output parziale, 20 prove verdi e mutazione del correlatore rilevata. Produttore `staging` a `2bb9381`: builder senza chiamanti applicativi o trasporto. Due LXC non creati, nessun ingresso reale. Dettaglio in `docs/integrazione-log-qa-verifier.md`.
+
 ## Replay incerto e record scaduti, 21/10/2026
 
 L'utente ha chiuso manualmente il collettore a `2a51dbb`, con `main` allineato a `origin/main`. Il nuovo diff del pilot salva nello spool un marker con digest prima della POST, impedisce il retry automatico dopo un esito incerto e consente query in sola lettura dei segmenti vecchi. `--apply` ferma tutto il lotto se un record assente è vecchio, futuro o già tentato; `status` ne mostra i conteggi locali. Un segmento vecchio già indicizzato non ferma l'invio di un fresco. Guard+coda 38/38, ruff sui due file verde; prova con due processi e mutazione del marker sensibili. Nessun deploy, flusso reale, nuova risposta Seeweb o aggiornamento di rete. Restano prova Linux di mount/fsync/power loss, carico, allarme esterno e budget hub+due LXC QA. Dettaglio in `pilot/monitoring-hub/README.md` e nelle schede di contesto.

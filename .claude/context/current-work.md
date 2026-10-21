@@ -8,11 +8,15 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 2a51dbb
+last-verified-commit: 5c19167
 stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai punti 3 e 7; eventi iLO tecnici separati con ritenzione 90 giorni attiva; catena locale provata in WSL, non installata; D7 bloccato da nomina ed elenco AdS
 ---
 
 # Lavoro in corso
+
+## Confine tecnico QA, 21/10/2026
+
+Dopo il `chiudi` manuale a `5c19167`, ramo e remoto puliti. Il produttore QA `staging` è a `2bb9381`, con `app/events.py` versionato ma senza chiamanti applicativi o trasporto. Il nuovo `bin/qa_technical_boundary.py` valida offline `backup_selected` contro identità/ambiente attesi, contratto esatto e ora con offset; emette solo campi e label ammessi, omettendo `job_ref`. Eventi di autorizzazione con identità/file sono rifiutati prima della vista generale. Lotto intero validato prima dell'output, 20/20 prove verdi; mutazione che rimette `job_ref` fa fallire due prove, SHA del sorgente ripristinato. Nessun archivio riservato, sorgente reale, deploy o LXC; integrazione e prove negative sul produttore ancora necessarie. La rete ha un diff indipendente su quattro file: preservarlo nel riallineamento del dossier QA.
 
 ## Esito incerto del replay e fermo lungo, 21/10/2026
 

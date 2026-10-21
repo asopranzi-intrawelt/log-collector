@@ -6,10 +6,14 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 2a51dbb
+last-verified-commit: 5c19167
 ---
 
 # Test di sviluppo
+
+## Confine QA offline, 21/10/2026
+
+`tests/test_qa_technical_boundary.py`: 20/20 prove, compresi autorizzazione identificante rifiutata, chiavi/valori fuori contratto, sorgente inattesa, chiave JSON duplicata, output CLI senza dati sensibili e lotto invalido senza output parziale. Una mutazione che rimette `job_ref` nell'output rende rosse due prove; dopo il ripristino il sorgente ha SHA-256 `366C14D3737F0434EEC8959FC5608678257AEC4B375F05CF3816AD52989C096C`. Prima prova finale in sandbox invalidata da permessi della cartella temporanea Windows, ripetuta fuori sandbox con 20/20 e ruff verde. Un probe privato con il builder versionato QA accetta `backup_selected_event()` e rifiuta `authorisation_event()`. Serve ancora una prova con eventi di un job QA reale e col punto di indice.
 
 ## Retry incerto, fermo lungo e concorrenza, 21/10/2026
 

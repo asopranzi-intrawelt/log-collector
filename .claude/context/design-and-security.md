@@ -6,10 +6,14 @@ covers-paths:
   - bin/**
   - config/**
   - pilot/monitoring-hub/**
-last-verified-commit: 2a51dbb
+last-verified-commit: 5c19167
 ---
 
 # Design e sicurezza applicativa
+
+## Confine QA: autorizzazione fuori dalla vista tecnica, 21/10/2026
+
+Il nuovo controllo offline rifiuta `authorisation_granted` prima di produrre una vista tecnica. Chiavi esatte, enum, origine attesa, timestamp con offset, chiavi JSON duplicate e intero lotto sono verificati; l'output è costruito esplicitamente senza `job_ref`. La prova del builder è su dati costruiti secondo il codice sorgente, non su un job reale o su Loki. Il registro riservato dell'autorizzazione e la sua conservazione devono essere progettati separatamente prima di collegare il produttore.
 
 ## Risposta ambigua dopo la POST, 21/10/2026
 
