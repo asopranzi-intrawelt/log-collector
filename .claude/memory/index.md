@@ -1,5 +1,13 @@
 # Snapshot di sincronizzazione
 
+## Produttore QA: gate locale candidato, 21/10/2026
+
+Il produttore QA su `staging` ha chiuso manualmente il checkpoint `2ab7e5a`. Nel candidato successivo, ancora non versionato, `app/authorisation_store.py` committa su SQLite privata fuori dal clone la ricevuta con ora UTC e testo esatto dell'avviso prima di avviare il worker; il runner la rilegge prima di costruire il backend. Una scrittura SQLite fallita ferma il job prima del thread. La CLI rifiuta la modalità server prima di costruire il client esterno. Verifica locale: 458 prove con filtro CI, 6 con dati reali deselezionati, Ruff e Mypy verdi. È un gate applicativo locale: non dimostra custodia indipendente, ACL/retention/restore a dodici mesi, emissione durevole di `backup_selected`, trasporto o indicizzazione. Il fallback esterno resta spento per default; due LXC QA non create, M32e e ISO-30 in corso senza avanzamento da questa modifica.
+
+## Correzione del runner QA in albero, 21/10/2026
+
+Collettore `main` a `e6a9456` dopo `chiudi` manuale, remoto allineato. Nel produttore QA `staging` a `083aae0`, la prova del job locale senza chiave Anthropic era rossa prima della correzione e verde dopo; il job esterno senza chiave fallisce chiuso. Modifica QA non ancora committata: 449 prove con filtro CI e 6 dati reali deselezionati, Ruff e Mypy verdi. Il dossier condiviso è aggiornato; prova durevole dell'autorizzazione, emissione, trasporto e LXC non sono risolti. Nessuna modifica topologica o avanzamento ISO in rete da questa correzione.
+
 ## Spool Linux limitato e gate QA, 21/10/2026
 
 Dopo il commit manuale `288e022`, la coda sintetica è stata provata su due bind mount dello stesso tmpfs WSL da 16 MiB: preflight, stato sotto il 20% ed ENOSPC osservati. La prima prova a zero blocchi ha lasciato `.lock`; correzione e ripetizione verdi, con 41 prove guard+coda. Directory dei nuovi originali e segmenti sincronizzate su Linux; power loss, carico e allarme esterno aperti. Audit QA del produttore a `2bb9381`: prova di autorizzazione solo in RAM e CLI esterna da governare prima di collegare o abilitare il backup. Dossier in `pilot/monitoring-hub/README.md` e `docs/integrazione-log-qa-verifier.md`.

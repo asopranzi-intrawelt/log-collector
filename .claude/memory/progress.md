@@ -1,5 +1,19 @@
 # Work-log
 
+## 2026-10-21 - Gate QA locale registrato nei confini del collettore
+
+Area: integrazione QA. Il produttore QA su `staging` ha chiuso manualmente il checkpoint `2ab7e5a`. Nel candidato successivo, ancora non versionato, `app/authorisation_store.py` committa su SQLite privata fuori dal clone la ricevuta con ora UTC e testo esatto dell'avviso prima di avviare il worker; il runner la rilegge prima di costruire il backend. Una scrittura SQLite fallita ferma il job prima del thread. La CLI rifiuta la modalità server prima di costruire il client esterno. Verifica locale: 458 prove con filtro CI, 6 con dati reali deselezionati, Ruff e Mypy verdi. È un gate applicativo locale: non dimostra custodia indipendente, ACL/retention/restore a dodici mesi, emissione durevole di `backup_selected`, trasporto o indicizzazione. Il fallback esterno resta spento per default; due LXC QA non create, M32e e ISO-30 in corso senza avanzamento da questa modifica. Ratio: aggiornare la lettura del produttore senza trattare il database locale come evento raccolto o controllo ISO chiuso.
+
+**Didattica:** nessuna.
+
+**Template:** nessuna.
+
+## 2026-10-21 - Corretto il difetto della chiave nel produttore QA
+
+Dopo il `chiudi` manuale il collettore è a `e6a9456`, pulito e allineato al remoto. Nel verificatore QA il runner chiedeva la chiave Anthropic anche per i job solo locali: riprodotto con prova rossa, poi corretto nel suo albero non ancora committato. La scelta del backend precede la risoluzione della chiave; una rotta esterna senza chiave fallisce chiusa. Suite QA 449 eseguite, 6 con dati reali deselezionati, Ruff e Mypy verdi. Aggiornati qui dossier, contesto e memoria, lasciando espliciti registro riservato, evento tecnico, CLI, trasporto e LXC ancora aperti. La rete aveva già queste pendenze; nessuna nuova misura o topologia ne cambia ISO-30. File scritti: `docs/integrazione-log-qa-verifier.md`, `.claude/context/current-work.md`, `.claude/memory/index.md`, `.claude/memory/progress.md`, `_notes/RESUME-PROMPT.md`, `_notes/COMMIT-MSG.txt`. Ratio: un difetto riprodotto nel produttore va registrato nel dossier di integrazione con lo stato del commit, altrimenti il collettore potrebbe interpretare una correzione in albero come capacità già rilasciata.
+
+**Template:** nessuna.
+
 ## 2026-10-21 - ENOSPC reale nel tmpfs e lock orfano corretto
 
 Dopo `chiudi` manuale a `288e022`, provato il replay sintetico in un namespace mount privato Ubuntu WSL con tmpfs da 16 MiB e due bind mount. La prima corsa ha confermato mount, emissione e avviso di spazio, ma a zero blocchi ha lasciato `.lock` dopo un errore sincrono nella sua scrittura. Separata la creazione esclusiva del lock dalla scrittura e rimossa solo la propria creazione fallita; la stessa prova passa, primo record invariato e nessun lock residuo. Aggiunti fsync delle directory dopo originale e segmento: due test simulano errori, 41/41 guard+coda e ruff verdi. Limiti: nessun taglio di corrente, carico o allarme consegnato. Audit parallelo di sola lettura sul QA a `2bb9381`: autorizzazione solo in RAM, evento di backup interno prima della chiamata ma non pubblicato, CLI con uscita esterna diretta; nessuna modifica al produttore. File scritti: `pilot/monitoring-hub/{replay-outbox.py,README.md}`, `tests/{test_replay_outbox.py,linux/probe-spool-mount.sh}`, `docs/{normalizzazione-retention-capienza,handoff-sviluppo-collettore,integrazione-log-qa-verifier}.md`, `.claude/context/{current-work,STACK,design-and-security,dev-testing,deployment,roadmap}.md`, `.claude/memory/{index,progress}.md`, dossier privato spool. Nella rete aggiornati dossier QA, integrazione, roadmap, pendenze, memoria ed evento ISO-30; le copie derivate della roadmap sono allineate, stato ancora in corso.
