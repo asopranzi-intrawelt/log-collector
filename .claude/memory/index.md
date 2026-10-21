@@ -1,5 +1,9 @@
 # Snapshot di sincronizzazione
 
+## Gate spool e dipendenze cliente, 21/10/2026
+
+Dopo il `chiudi` manuale il collettore è a `56a1e12`; il nuovo diff del replay sintetico richiede per default due mount Linux dello stesso filesystem fino a 64 MiB, con bypass esplicito `--local-pilot` per il PC. Originali parziali e segmenti storici fuori spool bloccano la modalità vincolata; `status` espone saturazione locale senza inviare avvisi. Guard+coda 31/31 su fixture; mancano prova Linux fisica, allarme consegnato, concorrenza e carico. `docs/handoff-sviluppo-collettore.md` §0 è il registro per il cliente delle attese da Direzione/privacy/Seeweb/QA e del gate interno di capacità; il seguito Seeweb è riferito inviato dall'utente, senza riscontro provider nel progetto. Nessun deploy, modifica a network-design o operazione Git dell'agente.
+
 ## Replay sintetico e stima residua, 21/10/2026
 
 Il collettore e il template sono stati chiusi manualmente dall'utente ai commit `99db226` e `5a5e8dd`, con remoti allineati. Le nuove emissioni della coda sintetica usano originali dedicati; i due segmenti privati storici sono stati validati e conservati senza riscrittura. Guard+coda 25/25, mutazione del vecchio percorso rilevata. Restano quota fisica, replay concorrente, guasti lunghi, capacità e sorgenti reali; ADR-023 continua a bloccarle. La roadmap distingue primo esercizio AdS (25-40 giorni persona residui condizionati) e perimetro completo (60-100 giorni persona, stima inferita, escluse attese esterne). Nessun deploy. Dettagli nel README del pilot e in `.claude/context/roadmap.md`.

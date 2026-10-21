@@ -29,6 +29,8 @@ SEGMENT_NAME = re.compile(r"technical-[0-9a-f]{32}\.jsonl\Z")
 MAX_BYTES = 8 * 1024 * 1024
 MAX_SEGMENTS = 256
 MAX_AGE = timedelta(minutes=55)
+MAX_BOUNDED_FILESYSTEM_BYTES = 64 * 1024 * 1024
+LOCAL_PILOT = False
 
 
 def load_script(path: Path, name: str):
@@ -49,6 +51,7 @@ def exclusive():
     fixtures = ROOT / "fixtures"
     if fixtures.is_symlink() or fixtures.is_junction():
         raise RuntimeError("Radice delle fixture collegata altrove")
+    check_spool_mount()
     OUTBOX.mkdir(parents=True, exist_ok=True)
     if OUTBOX.is_symlink() or OUTBOX.is_junction():
         raise RuntimeError("Cartella della coda collegata altrove")
@@ -64,6 +67,34 @@ def exclusive():
         yield
     finally:
         lock.unlink()
+
+
+def check_spool_mount() -> None:
+    """In modalità vincolata rifiuta il fallback sul filesystem padre."""
+    if LOCAL_PILOT:
+        return
+    if os.name != "posix":
+        raise RuntimeError(
+            "La coda vincolata richiede un mount Linux; usare --local-pilot solo per le fixture"
+        )
+    mounts = Path("/proc/self/mountinfo").read_text(encoding="utf-8").splitlines()
+    mounted_paths = {line.split(" - ", 1)[0].split()[4] for line in mounts}
+    validate_spool_mounts(mounted_paths)
+
+
+def validate_spool_mounts(mounted_paths: set[str]) -> None:
+    """Controlla i due percorsi e il loro filesystem, senza creare directory."""
+    for path in (OUTBOX, REPLAY_ORIGINALS):
+        if not path.is_dir() or path.is_symlink() or str(path) not in mounted_paths:
+            raise RuntimeError(
+                "Mount dedicato della coda assente o non valido"
+            )
+    if OUTBOX.stat().st_dev != REPLAY_ORIGINALS.stat().st_dev:
+        raise RuntimeError("Segmenti e originali non condividono il filesystem limitato")
+    filesystems = [os.statvfs(path) for path in (OUTBOX, REPLAY_ORIGINALS)]
+    sizes = [fs.f_blocks * fs.f_frsize for fs in filesystems]
+    if sizes[0] != sizes[1] or not 0 < sizes[0] <= MAX_BOUNDED_FILESYSTEM_BYTES:
+        raise RuntimeError("Filesystem della coda non limitato alla dimensione del pilot")
 
 
 def segments() -> list[Path]:
@@ -85,12 +116,19 @@ def capacity(paths: list[Path]) -> int:
     if REPLAY_ORIGINALS.is_symlink() or REPLAY_ORIGINALS.is_junction():
         raise RuntimeError("Cartella degli originali collegata altrove")
     original_paths = list(REPLAY_ORIGINALS.iterdir()) if REPLAY_ORIGINALS.exists() else []
-    if any(not guard.EVENT_ID.fullmatch(path.stem) or path.suffix != ".log" or
-           not path.is_file() or path.is_symlink() for path in original_paths):
+    if any(
+        not guard.EVENT_ID.fullmatch(path.stem)
+        or path.suffix != ".log"
+        or not path.is_file()
+        or path.is_symlink()
+        or path.is_junction()
+        for path in original_paths
+    ):
         raise RuntimeError("Originale non regolare nella coda isolata")
     # I due segmenti storici conservano il riferimento alla cartella condivisa.
     # Contiamo solo gli originali cui fanno riferimento, non i file di altri produttori.
     legacy = set()
+    referenced_new = set()
     for path in paths:
         checked = guard.check_jsonl(path.read_bytes(), ROOT, allow_replay_original=True)
         if len(checked) != 1:
@@ -98,6 +136,12 @@ def capacity(paths: list[Path]) -> int:
         original_ref = checked[0]["record"]["original_ref"]
         if original_ref.startswith("fixtures/original/"):
             legacy.add(ROOT / original_ref)
+        else:
+            referenced_new.add(ROOT / original_ref)
+    if legacy and not LOCAL_PILOT:
+        raise RuntimeError("Segmento storico fuori dal filesystem limitato: trattare manualmente")
+    if set(original_paths) != referenced_new:
+        raise RuntimeError("Originale senza segmento o segmento senza originale nella coda")
     total = sum(path.stat().st_size for path in paths + original_paths + sorted(legacy))
     if total > MAX_BYTES:
         raise RuntimeError("Quota byte di segmenti e originali superata")
@@ -164,6 +208,38 @@ def load_pending() -> list[dict]:
     return result
 
 
+def spool_status() -> dict:
+    """Espone saturazione e modalità senza attribuire al pilot una quota fisica locale."""
+    with exclusive():
+        paths = segments()
+        used = capacity(paths)
+        reasons = []
+        if used * 100 >= MAX_BYTES * 80:
+            reasons.append("logical_bytes_80_percent")
+        if len(paths) * 100 >= MAX_SEGMENTS * 80:
+            reasons.append("segments_80_percent")
+        result = {
+            "bounded_mount_verified": not LOCAL_PILOT,
+            "segments": len(paths),
+            "logical_bytes": used,
+            "logical_limit_bytes": MAX_BYTES,
+            "filesystem_bytes_available": None,
+            "filesystem_inodes_available": None,
+            "warning_reasons": reasons,
+        }
+        if not LOCAL_PILOT:
+            fs = os.statvfs(OUTBOX)
+            total = fs.f_blocks * fs.f_frsize
+            available = fs.f_bavail * fs.f_frsize
+            result["filesystem_bytes_available"] = available
+            result["filesystem_inodes_available"] = fs.f_favail
+            if available * 100 <= total * 20:
+                reasons.append("filesystem_bytes_available_20_percent")
+            if fs.f_files and fs.f_favail * 100 <= fs.f_files * 20:
+                reasons.append("filesystem_inodes_available_20_percent")
+        return result
+
+
 def query(record: dict) -> list[dict]:
     instant = recent_instant(record)
     expression = '{archive="technical",source_family="pilot",service="fixture"} |= "' + record["event_id"] + '"'
@@ -220,16 +296,35 @@ def reconcile(apply: bool) -> dict:
 
 
 def main() -> None:
+    global LOCAL_PILOT
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
-    commands.add_parser("emit", help="Crea un solo evento fittizio nella coda locale")
+    emission = commands.add_parser("emit", help="Crea un solo evento fittizio nella coda locale")
+    emission.add_argument(
+        "--local-pilot", action="store_true", help="Usa directory locali senza mount limitato"
+    )
     replay = commands.add_parser("reconcile", help="Confronta la coda con l'indice Loki")
     replay.add_argument("--apply", action="store_true", help="Invia solo gli eventi assenti")
+    replay.add_argument(
+        "--local-pilot", action="store_true", help="Usa directory locali senza mount limitato"
+    )
+    status = commands.add_parser(
+        "status", help="Misura la saturazione della coda senza contattare Loki"
+    )
+    status.add_argument(
+        "--local-pilot", action="store_true", help="Usa directory locali senza mount limitato"
+    )
     args = parser.parse_args()
+    LOCAL_PILOT = args.local_pilot
     if args.command == "emit":
         print(emit())
-    else:
+    elif args.command == "reconcile":
         print(json.dumps(reconcile(args.apply), sort_keys=True))
+    else:
+        report = spool_status()
+        print(json.dumps(report, sort_keys=True))
+        if report["warning_reasons"]:
+            raise SystemExit(2)
 
 
 if __name__ == "__main__":

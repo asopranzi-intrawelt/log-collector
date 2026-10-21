@@ -4,6 +4,8 @@ from datetime import timedelta
 import importlib.util
 from io import BytesIO
 from pathlib import Path
+import sys
+from types import SimpleNamespace
 from urllib.parse import parse_qs, urlsplit
 
 import pytest
@@ -22,6 +24,7 @@ def outbox(tmp_path, monkeypatch):
     monkeypatch.setattr(module, "ROOT", root)
     monkeypatch.setattr(module, "OUTBOX", root / "fixtures" / "replay-outbox")
     monkeypatch.setattr(module, "REPLAY_ORIGINALS", root / "fixtures" / "replay-original")
+    monkeypatch.setattr(module, "LOCAL_PILOT", True)
     monkeypatch.setattr(module.fixture, "FIXTURES", root / "fixtures")
     return module
 
@@ -190,6 +193,17 @@ def test_historical_segment_keeps_its_original_and_counts_only_that_file(outbox)
     assert (outbox.REPLAY_ORIGINALS / f"{event_id}.log").exists() is False
 
 
+def test_bounded_mode_rejects_historical_original_outside_spool(outbox):
+    event_id, raw, record = outbox.fixture.build_record()
+    outbox.fixture.write_original(event_id, raw)
+    outbox.OUTBOX.mkdir()
+    old = outbox.OUTBOX / ("technical-" + "a" * 32 + ".jsonl")
+    old.write_text(outbox.fixture.serialized_line(record), encoding="utf-8")
+    outbox.LOCAL_PILOT = False
+    with pytest.raises(RuntimeError, match="Segmento storico fuori dal filesystem limitato"):
+        outbox.capacity(outbox.segments())
+
+
 def test_unexpected_replay_original_blocks_emission(outbox):
     outbox.emit()
     before = sorted(path.name for path in outbox.REPLAY_ORIGINALS.iterdir())
@@ -198,6 +212,81 @@ def test_unexpected_replay_original_blocks_emission(outbox):
         outbox.emit()
     after = sorted(path.name for path in outbox.REPLAY_ORIGINALS.iterdir())
     assert after == sorted(before + ["unclassified.bin"])
+
+
+def test_bounded_mode_rejects_missing_mount_before_any_write_or_query(outbox, monkeypatch):
+    outbox.LOCAL_PILOT = False
+    calls = []
+    monkeypatch.setattr(outbox, "query", lambda _record: calls.append("query"))
+    with pytest.raises(RuntimeError, match="mount Linux|Mount dedicato"):
+        outbox.emit()
+    with pytest.raises(RuntimeError, match="mount Linux|Mount dedicato"):
+        outbox.reconcile(True)
+    assert not outbox.OUTBOX.exists()
+    assert not outbox.REPLAY_ORIGINALS.exists()
+    assert calls == []
+
+
+def test_mount_validation_requires_both_paths_and_small_filesystem(outbox, monkeypatch):
+    outbox.OUTBOX.mkdir()
+    outbox.REPLAY_ORIGINALS.mkdir()
+    both = {str(outbox.OUTBOX), str(outbox.REPLAY_ORIGINALS)}
+    with pytest.raises(RuntimeError, match="Mount dedicato"):
+        outbox.validate_spool_mounts({str(outbox.OUTBOX)})
+
+    blocks = [128]
+    monkeypatch.setattr(
+        outbox.os, "statvfs",
+        lambda _path: SimpleNamespace(f_blocks=blocks[0], f_frsize=1024 * 1024),
+        raising=False,
+    )
+    with pytest.raises(RuntimeError, match="Filesystem della coda non limitato"):
+        outbox.validate_spool_mounts(both)
+    blocks[0] = 32
+    outbox.validate_spool_mounts(both)
+
+
+def test_partial_original_after_full_disk_blocks_further_emission(outbox, monkeypatch):
+    write_original = outbox.fixture.write_original
+
+    def full_disk(event_id, raw, original_dir):
+        write_original(event_id, raw[:16], original_dir=original_dir)
+        raise OSError(28, "Spazio esaurito")
+
+    monkeypatch.setattr(outbox.fixture, "write_original", full_disk)
+    with pytest.raises(OSError, match="Spazio esaurito"):
+        outbox.emit()
+    assert outbox.segments() == []
+    assert len(list(outbox.REPLAY_ORIGINALS.iterdir())) == 1
+    monkeypatch.setattr(outbox.fixture, "write_original", write_original)
+    with pytest.raises(RuntimeError, match="Originale senza segmento"):
+        outbox.emit()
+    assert outbox.segments() == []
+
+
+def test_local_status_reports_logical_warning_without_claiming_mount(outbox):
+    outbox.emit()
+    normal = outbox.spool_status()
+    assert normal["bounded_mount_verified"] is False
+    assert normal["filesystem_bytes_available"] is None
+    assert normal["filesystem_inodes_available"] is None
+    assert normal["warning_reasons"] == []
+    outbox.MAX_BYTES = normal["logical_bytes"]
+    warning = outbox.spool_status()
+    assert warning["warning_reasons"] == ["logical_bytes_80_percent"]
+    assert not (outbox.OUTBOX / ".lock").exists()
+
+
+def test_status_cli_exits_two_at_warning_threshold(outbox, monkeypatch, capsys):
+    outbox.emit()
+    outbox.MAX_BYTES = outbox.capacity(outbox.segments())
+    monkeypatch.setattr(sys, "argv", ["replay-outbox.py", "status", "--local-pilot"])
+    with pytest.raises(SystemExit) as stopped:
+        outbox.main()
+    assert stopped.value.code == 2
+    report = outbox.json.loads(capsys.readouterr().out)
+    assert report["warning_reasons"] == ["logical_bytes_80_percent"]
+    assert report["bounded_mount_verified"] is False
 
 
 def test_duplicate_event_id_blocks_whole_replay(outbox, monkeypatch):

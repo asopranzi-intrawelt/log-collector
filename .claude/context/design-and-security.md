@@ -6,10 +6,14 @@ covers-paths:
   - bin/**
   - config/**
   - pilot/monitoring-hub/**
-last-verified-commit: 99db226
+last-verified-commit: 56a1e12
 ---
 
 # Design e sicurezza applicativa
+
+## Confine fisico proposto per il replay sintetico, 21/10/2026
+
+Prima di creare la coda o contattare Loki, la modalità vincolata richiede due mount Linux esatti sullo stesso filesystem di massimo 64 MiB. La directory degli originali deve corrispondere esattamente ai riferimenti dei segmenti: un file parziale/orfano blocca emissione e replay, evitando di scambiare un ENOSPC per un invio riuscito. I riferimenti storici a `fixtures/original/` sono consentiti soltanto nel pilot PC. Questa guardia non sostituisce la prova su mount reale né impedisce modifiche di writer esterni ai file pubblicati; nessun flusso reale autorizzato.
 
 ## Confine degli originali nel replay, 21/10/2026
 

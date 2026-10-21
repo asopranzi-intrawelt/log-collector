@@ -6,10 +6,14 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 99db226
+last-verified-commit: 56a1e12
 ---
 
 # Test di sviluppo
+
+## Guardie spool e stato locale, 21/10/2026
+
+Guard+coda 31/31 su fixture: assenza di mount senza scrittura/query, uno dei due mount mancante, filesystem troppo grande, segmento storico fuori spool, originale parziale dopo ENOSPC e soglia logica di `status`. La prova del mount usa dati di filesystem simulati; non misura un filesystem Linux reale, il comportamento di ENOSPC sotto carico, la ricezione di avvisi o un guasto di alimentazione. Il codice non è distribuito.
 
 ## Isolamento degli originali della coda, 21/10/2026
 

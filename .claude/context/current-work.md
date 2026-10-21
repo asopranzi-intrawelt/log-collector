@@ -8,11 +8,15 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 99db226
+last-verified-commit: 56a1e12
 stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai punti 3 e 7; eventi iLO tecnici separati con ritenzione 90 giorni attiva; catena locale provata in WSL, non installata; D7 bloccato da nomina ed elenco AdS
 ---
 
 # Lavoro in corso
+
+## Gate di mount della coda e pendenze cliente, 21/10/2026
+
+Dopo il `chiudi` manuale dell'utente il collettore è pulito a `56a1e12`. Il nuovo diff rende il mount Linux limitato la modalità predefinita della coda sintetica; la prova PC richiede `--local-pilot`. Il preflight rifiuta mount assente o filesystem oltre 64 MiB prima di scrivere/interrogare Loki; i segmenti storici con originali fuori spool sono esclusi dalla modalità vincolata. Un originale parziale blocca nuove emissioni; `status` segnala localmente la soglia logica dell'80% e, solo con mount, spazio e inode. La suite mirata passa 31/31. Nessun mount reale, allarme esterno, deploy o sorgente reale è stato provato. `docs/handoff-sviluppo-collettore.md` §0 registra le pendenze distinguendo Direzione/privacy, Seeweb, QA e capacità interna; il seguito Seeweb è riferito inviato dall'utente, ma non c'è una risposta successiva in evidenza. WORM richiede custodia indipendente dagli AdS, non il solo NAS-HERO amministrato dagli stessi soggetti.
 
 ## Originali del replay separati e prossimo gate, 21/10/2026
 

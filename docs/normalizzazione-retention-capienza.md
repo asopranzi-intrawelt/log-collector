@@ -1,5 +1,9 @@
 # Normalizzazione, retention e capienza del collettore
 
+## Gate attuale della coda sintetica, 21/10/2026
+
+Il replay fittizio verifica prima di ogni operazione che `replay-outbox` e `replay-original` siano mountpoint Linux sullo stesso filesystem, con dimensione totale fino a 64 MiB; senza mount si ferma prima di creare file o interrogare Loki. Il controllo usa `/proc/self/mountinfo` anche per riconoscere bind mount dello stesso filesystem. La modalità `--local-pilot` consente le sole prove su PC senza dichiarare una quota fisica. La quota logica resta 8 MiB/256 segmenti; un originale parziale o senza segmento blocca la coda dopo un errore di spazio, e i segmenti storici con originali fuori dallo spool sono esclusi dalla modalità vincolata. `status` espone saturazione e codice di uscita 2 al raggiungimento dell'80%, ma non invia alcuna notifica. Restano da dimostrare su Linux il mount reale, l'esaurimento fisico, la consegna e il silenzio degli allarmi, il recupero dopo guasto e il carico rappresentativo. Il [runbook del pilota](../pilot/monitoring-hub/README.md) contiene i comandi locali; la coda non trasporta dati reali.
+
 Stato al 17/10/2026: requisiti confermati dall’operatore, pilota PC con soli dati sintetici e preflight live Proxmox acquisito; nessuna politica di capienza generale o distribuzione dell’hub in esercizio. Il primo Agent Netdata risponde localmente sul fisico pilota; il Debian non riceve ancora queste metriche e non ospita lo stack. Le risorse del nodo restano da decidere dopo attività swap e carico rappresentativo, includendo i due LXC QA previsti. [Studio Linux](osservabilita-linux-netdata.md), [runbook del pilota](runbook-monitoraggio-linux.md), [tre archivi logici](progetto-log-operativi-email.md) e [fonti e passi](fonti-osservabilita-linux.md) formano lo stesso percorso anche nel progetto rete.
 
 ## Lettura uniforme, provenienza conservata

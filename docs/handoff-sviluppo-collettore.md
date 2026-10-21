@@ -12,7 +12,21 @@ Riferimento funzionale: `studio-collettore-ads.md`. Questo file dice **come e in
 | Sorgenti firewall, NAS, Proxmox | Estensione Windows oltre il pilota → **parere del consulente privacy** |
 | iLO Remote Syslog; lettore Redfish alternativo | Passo 3 della catena notturna → **scelta della TSA** |
 | Struttura dei job notturni (senza marca) | Mail alla Direzione → **relay SMTP da usare** |
-| | Copia WORM → **cartella WORM Compliance creata su NAS-HERO** e credenziale di scrittura |
+| | Copia immutabile → **custode/supporto indipendente dagli AdS, politica e credenziali approvati**; il NAS-HERO amministrato dagli stessi AdS non è da solo prova indipendente |
+
+### Pendenze con evidenza, 21/10/2026
+
+Queste righe distinguono lavoro interno e attese esterne. Per dichiarare chiusa una pendenza servono un artefatto ricevuto e una prova di integrazione, non soltanto il testo di una proposta. Il dossier tecnico di ciascuna sorgente conserva il dettaglio; questa è la vista di consegna al cliente.
+
+| Pendenza | Evidenza disponibile | Riscontro necessario | Effetto finché manca |
+|---|---|---|---|
+| Direzione: nomina ed elenco AdS | Perimetro AdS nello studio; approvazione non acquisita | Atto di nomina ed elenco approvato con data/versione | Filtri Windows, QNAP e M365 e D7 non finalizzabili |
+| Consulente privacy: estensione Windows | Pilota tecnico distinto dall'estensione | Parere sul perimetro e sui dati da conservare | Estensione Windows sospesa |
+| Direzione/fornitori: TSA, relay e custodia indipendente | Catena e opzioni progettate, non installate | Scelta TSA, relay SMTP e custode/supporto immutabile con titolarità e accessi | Marca temporale, avvisi alla Direzione e copia indipendente non collaudabili |
+| Seeweb: log e percorso di rete | Screenshot del ticket del 20/10; seguito riferito inviato dall'utente, senza ricevuta o successiva risposta disponibile nel progetto | Categorie e campioni minimizzati GUI/SSH/cambi e PF/IPsec, sorgente IPv4, selettori IPsec, NAT, volume, retention e comportamento al fermo VPN | Nessun flusso Seeweb reale o classificazione AdS degli accessi |
+| Seeweb: aggiornamento OPNsense | Proposta economica non accettata; contratto generale 2014 letto, scheda del servizio non disponibile | Responsabilità contrattuale, release e percorso supportati, backup ripristinabile, console, finestra, rollback e verifica del certificato | Aggiornamento non pianificabile né attestabile |
+| Produttore QA e infrastruttura | Builder `qa-tech-v1` versionato, senza trasporto; due LXC previsti | Contratto finale minimizzato e test negativo sui campi, trasporto autenticato, autorizzazione separata, LXC e campioni verificati | QA non collegabile alla raccolta reale |
+| Team interno: capacità hub e spool | Guardie della coda sintetica e preflight di mount nel codice; nessuna prova su mount Linux limitato o allarme esterno | Budget Proxmox con hub e due LXC QA; prova mount/ENOSPC, carico, recupero e consegna dell'allarme | Pilot locale soltanto; nessuna dichiarazione di quota fisica o prontezza operativa |
 
 ---
 
@@ -86,7 +100,7 @@ Resta vero (studio, sezione 6) che l'amministratore dell'hypervisor può acceder
      }
    }
    ```
-   Uscita libera verso: NTP INRIM, iLO:443, TSA, relay SMTP, NAS-HERO (SMB), API Microsoft e NinjaOne.
+   Uscita libera verso: NTP INRIM, iLO:443, TSA, relay SMTP, custode immutabile approvato, API Microsoft e NinjaOne.
 7. **Accessi al collettore stesso**: anche il login SSH al collettore è un accesso AdS. Instradare `sshd`, `sudo` e `su` locali nel ruleset `ads` verso `/srv/ads/127.0.0.1/`.
 
 ---

@@ -5,10 +5,14 @@ generated-date: 2026-09-30
 covers-paths:
   - config/**
   - docs/handoff-sviluppo-collettore.md
-last-verified-commit: 99db226
+last-verified-commit: 56a1e12
 ---
 
 # Deployment
+
+## Candidato spool vincolato, 21/10/2026
+
+Nessun mount è stato creato e nessun file è stato installato sul Debian. Per passare dal pilot PC al percorso vincolato servono un filesystem piccolo dedicato con i due mountpoint verificati, dipendenze del servizio dal mount, prova di saturazione fisica e osservatore esterno degli allarmi. I due segmenti storici rimangono privati e non sono compatibili con la modalità vincolata senza trattamento manuale. Nessuna modifica a rete, apparati o VM in questo giro.
 
 ## Percorso del pilot ancora locale, 21/10/2026
 

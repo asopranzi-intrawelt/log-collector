@@ -10,6 +10,8 @@ last-verified-commit: 9ee87b4
 
 ## Stima residua e criteri di chiusura, 21/10/2026
 
+Avanzamento del gate trasporto: codice di preflight dei mount, blocco degli originali parziali e stato di saturazione locale sono pronti per il pilot sintetico; la quota fisica non è ancora dimostrata su Linux e manca la consegna dell'allarme. I blocchi esterni, con evidenza disponibile e riscontro richiesto, sono nella sezione 0 di `docs/handoff-sviluppo-collettore.md`. Le stime sotto escludono i tempi di risposta di Direzione, consulente, Seeweb e produttore QA. Il prossimo sviluppo autonomo è la prova della concorrenza e del recupero del pilot, seguita dal budget hub più due LXC QA; nessun flusso reale va collegato prima dei gate.
+
 «Finito» ha due perimetri. Il primo esercizio AdS comprende custodia della prova, sorgenti prioritarie, catena giornaliera installata e collaudo sul Debian; la stima residua è 25-40 giorni persona se arrivano nomina, elenco AdS e decisioni su WORM/TSA. Il perimetro completo oggi richiesto comprende inoltre 59 nodi censiti con esito verificato per ciascuna sorgente applicabile, tre archivi, QA, Seeweb, cloud, monitoraggio, hardening e consultazione LAN: la stima residua è 60-100 giorni persona. Sono stime di pianificazione del 21/10, non tempi misurati né impegni di fornitura; comprendono sviluppo, test e integrazione, ma escludono l'attesa di autorizzazioni, fornitori, campioni e finestre di intervento. La vecchia stima di 8,5-11,5 giorni persona e la scadenza 13/11 dello studio riguardano il foglio iniziale e non sono una previsione per questo perimetro.
 
 | Fase residua | Giorni persona | Uscita verificabile |

@@ -8,10 +8,14 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 99db226
+last-verified-commit: 56a1e12
 ---
 
 # Stack applicativo
+
+## Gate dello spool sintetico, 21/10/2026
+
+`replay-outbox.py` richiede per default due mountpoint Linux sullo stesso filesystem fino a 64 MiB; `--local-pilot` abilita esplicitamente la prova PC senza quota fisica. Il limite logico è 8 MiB/256 segmenti. `status` pubblica JSON di saturazione con uscita 2 al superamento della soglia; non spedisce notifiche. La modalità vincolata rifiuta i record storici con originali fuori dal filesystem dedicato. Il codice è candidato non distribuito.
 
 ## Originali della coda sintetica, 21/10/2026
 

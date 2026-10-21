@@ -8,6 +8,8 @@ Questo riscontro localizza menu e apre una discussione, ma non identifica righe 
 
 ## Seguito tecnico e avanzamento da concordare, 20/10/2026
 
+Stato aggiornato al 21/10: l'utente riferisce di aver inviato il seguito descritto qui. La frase precedente sulla bozza non inviata fotografa solo il momento iniziale; nel progetto non sono disponibili ricevuta, numero del nuovo ticket o risposta successiva. L'invio riferito dall'utente non costituisce conferma tecnica del provider.
+
 L'utente prepara un seguito al ticket chiuso: chiede a Seeweb l'inoltro Syslog remoto verso l'IP privato del collettore Debian, porta UDP 514, soltanto nel tunnel IPsec sede-cloud e senza apertura Internet. Prima dell'attivazione il provider deve confermare IP sorgente effettivo dell'appliance, selettori e regole IPsec nei due versi, assenza di NAT, categorie disponibili, esempi minimizzati di accesso GUI/SSH, retention locale e comportamento durante fermo VPN. Il collettore deve prima ammettere solo la sorgente verificata e separare i log tecnici OPNsense dall'archivio AdS; il target non è configurato e nessun test di ricezione Seeweb è avvenuto. L'IP di destinazione reale resta nel livello privato del collettore.
 
 L'utente intende concordare con Seeweb un avanzamento della piattaforma OPNsense 21.1.5 e della sicurezza della GUI. Sono ancora da definire release bersaglio supportata, percorso di aggiornamento o sostituzione, backup ripristinabile, console alternativa, finestra, test, rollback, certificato e matrice degli IP amministrativi ammessi. La proposta del provider non è un piano approvato e non autorizza modifiche all'appliance; M31 e SWB-001/002/005 restano aperti.
