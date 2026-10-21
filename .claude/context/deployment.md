@@ -5,10 +5,14 @@ generated-date: 2026-09-30
 covers-paths:
   - config/**
   - docs/handoff-sviluppo-collettore.md
-last-verified-commit: 5c19167
+last-verified-commit: 288e022
 ---
 
 # Deployment
+
+## Mount Linux collaudati solo nel namespace locale, 21/10/2026
+
+Due bind mount sullo stesso tmpfs di 16 MiB sono stati provati nella Ubuntu WSL locale, senza modificare il namespace principale o la VM Debian. Questo non decide dimensione e posizione del filesystem operativo: dipendenze systemd dal mount, ritenzione, allarme esterno, budget Proxmox e prova di carico restano da definire. Nessun deploy o cambio di rete.
 
 ## Confine QA ancora offline, 21/10/2026
 

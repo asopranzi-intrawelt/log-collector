@@ -417,6 +417,42 @@ def test_bounded_mode_rejects_missing_mount_before_any_write_or_query(outbox, mo
     assert calls == []
 
 
+def test_full_disk_during_lock_write_does_not_leave_false_lock(outbox, monkeypatch):
+    def no_space(_fd):
+        raise OSError(28, "No space left on device")
+
+    monkeypatch.setattr(outbox.os, "fsync", no_space)
+    with pytest.raises(OSError, match="No space left on device"):
+        outbox.emit()
+    assert not (outbox.OUTBOX / ".lock").exists()
+    assert not outbox.REPLAY_ORIGINALS.exists()
+
+
+def test_original_directory_sync_failure_stops_before_segment_publication(outbox, monkeypatch):
+    def failed_sync(path):
+        assert path == outbox.REPLAY_ORIGINALS
+        raise OSError(5, "directory sync failed")
+
+    monkeypatch.setattr(outbox, "sync_directory", failed_sync)
+    with pytest.raises(OSError, match="directory sync failed"):
+        outbox.emit()
+    assert outbox.segments() == []
+    assert len(list(outbox.REPLAY_ORIGINALS.iterdir())) == 1
+    assert not (outbox.OUTBOX / ".lock").exists()
+
+
+def test_segment_directory_sync_failure_keeps_segment_for_triage(outbox, monkeypatch):
+    def failed_sync():
+        raise OSError(5, "directory sync failed")
+
+    monkeypatch.setattr(outbox, "sync_outbox_directory", failed_sync)
+    with pytest.raises(OSError, match="directory sync failed"):
+        outbox.emit()
+    assert len(outbox.segments()) == 1
+    assert outbox.capacity(outbox.segments()) > 0
+    assert not (outbox.OUTBOX / ".lock").exists()
+
+
 def test_mount_validation_requires_both_paths_and_small_filesystem(outbox, monkeypatch):
     outbox.OUTBOX.mkdir()
     outbox.REPLAY_ORIGINALS.mkdir()

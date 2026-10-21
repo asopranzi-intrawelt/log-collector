@@ -8,10 +8,14 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 5c19167
+last-verified-commit: 288e022
 ---
 
 # Stack applicativo
+
+## Spool Linux provato su tmpfs, 21/10/2026
+
+Il test `tests/linux/probe-spool-mount.sh` crea un tmpfs isolato da 16 MiB e due bind mount, poi usa il vero `replay-outbox.py`. La CLI rileva i mount e misura spazio/inode; `emit` ora forza file e directory degli originali e del segmento prima del successo. Un fallimento sincrono mentre scrive il proprio `.lock` lo rimuove; un lock di altro processo resta intoccato. La prova è locale e usa solo eventi sintetici.
 
 ## Confine QA offline, 21/10/2026
 

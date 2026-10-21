@@ -6,10 +6,14 @@ covers-paths:
   - bin/**
   - config/**
   - pilot/monitoring-hub/**
-last-verified-commit: 5c19167
+last-verified-commit: 288e022
 ---
 
 # Design e sicurezza applicativa
+
+## Errore fisico dello spool e prova di autorizzazione QA, 21/10/2026
+
+Nel tmpfs Linux a zero blocchi, `lock.open('x')` poteva creare `.lock` e fallire durante la scrittura: prima della correzione quel file restava e impediva anche il triage con `status`. Ora si elimina solo il lock creato dal processo dopo un errore sincrono di scrittura/fsync; i lock preesistenti continuano a bloccare. La prova non simula un kill o un taglio di corrente. Nel produttore QA l'autorizzazione è ancora solo in RAM e la CLI raggiunge il client esterno senza il gate web: nessun backup esterno è da abilitare finché il registro riservato non è durevole e tutte le vie d'uscita sono governate.
 
 ## Confine QA: autorizzazione fuori dalla vista tecnica, 21/10/2026
 

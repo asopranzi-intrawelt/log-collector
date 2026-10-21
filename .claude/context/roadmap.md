@@ -8,15 +8,19 @@ last-verified-commit: 9ee87b4
 
 # Roadmap
 
+## Prova fisica dello spool e gate successivo, 21/10/2026
+
+Il mount limitato e l'ENOSPC sono verificati in Ubuntu WSL locale su tmpfs sintetico, con il lock residuo corretto. Restano power loss, carico, recupero dei guasti lunghi, consegna dell'allarme e budget hub+due LXC QA. L'audit QA indica inoltre un gate prioritario del produttore: autorizzazione riservata durevole prima del backup esterno, emissione tecnica sul percorso del job anche se fallisce e copertura della CLI. Le stime residue restano condizionate.
+
 ## Confine QA offline, 21/10/2026
 
 Pronto il controllo locale del solo evento `backup_selected`, con 20 prove e rifiuto della prova di autorizzazione nella vista tecnica. Il prossimo gate QA è un evento emesso da un job vero e verificato fino al punto di indice, con archivio riservato separato; restano aperti trasporto, i due LXC e budget hub+QA. Questa tappa non modifica la stima residua né abilita sorgenti reali.
 
 ## Stima residua e criteri di chiusura, 21/10/2026
 
-Avanzamento del gate trasporto: preflight dei mount, blocco degli originali parziali e stato di saturazione locale sono pronti per il pilot sintetico; la quota fisica non è ancora dimostrata su Linux e manca la consegna dell'allarme. I blocchi esterni, con evidenza disponibile e riscontro richiesto, sono nella sezione 0 di `docs/handoff-sviluppo-collettore.md`. Le stime sotto escludono i tempi di risposta di Direzione, consulente, Seeweb e produttore QA. Nessun flusso reale va collegato prima dei gate.
+Avanzamento del gate trasporto: due bind mount su tmpfs Linux da 16 MiB, soglia disco e ENOSPC sono stati provati nel WSL locale isolato; un lock rimasto dopo ENOSPC è stato corretto. Il risultato non copre perdita di alimentazione, carico o consegna degli allarmi. I blocchi esterni, con evidenza disponibile e riscontro richiesto, sono nella sezione 0 di `docs/handoff-sviluppo-collettore.md`. Le stime sotto escludono i tempi di risposta di Direzione, consulente, Seeweb e produttore QA. Nessun flusso reale va collegato prima dei gate.
 
-Il replay sintetico ora registra il tentativo prima della POST, non ripete automaticamente un invio incerto e segnala i record scaduti. La concorrenza di due processi che rispettano il lock è provata sul PC; rimangono durabilità e mount Linux, carico e alert esterno prima di chiudere questa fase. Il passo autonomo successivo è il budget misurato dell'hub con i due LXC QA, oltre alla prova fisica dello spool quando sarà disponibile un ambiente Linux dedicato.
+Il replay sintetico registra il tentativo prima della POST, non ripete automaticamente un invio incerto e segnala i record scaduti. La concorrenza di due processi che rispettano il lock è provata sul PC; la prova Linux copre mount ed ENOSPC ma non un taglio di alimentazione. Restano carico e alert esterno prima di chiudere questa fase. Il passo autonomo successivo è il budget misurato dell'hub con i due LXC QA.
 
 «Finito» ha due perimetri. Il primo esercizio AdS comprende custodia della prova, sorgenti prioritarie, catena giornaliera installata e collaudo sul Debian; la stima residua è 25-40 giorni persona se arrivano nomina, elenco AdS e decisioni su WORM/TSA. Il perimetro completo oggi richiesto comprende inoltre 59 nodi censiti con esito verificato per ciascuna sorgente applicabile, tre archivi, QA, Seeweb, cloud, monitoraggio, hardening e consultazione LAN: la stima residua è 60-100 giorni persona. Sono stime di pianificazione del 21/10, non tempi misurati né impegni di fornitura; comprendono sviluppo, test e integrazione, ma escludono l'attesa di autorizzazioni, fornitori, campioni e finestre di intervento. La vecchia stima di 8,5-11,5 giorni persona e la scadenza 13/11 dello studio riguardano il foglio iniziale e non sono una previsione per questo perimetro.
 

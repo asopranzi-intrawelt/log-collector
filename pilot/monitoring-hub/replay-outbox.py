@@ -58,12 +58,19 @@ def exclusive():
         raise RuntimeError("Cartella della coda collegata altrove")
     lock = OUTBOX / ".lock"
     try:
-        with lock.open("x", encoding="ascii") as handle:
+        handle = lock.open("x", encoding="ascii")
+    except FileExistsError as exc:
+        raise RuntimeError("Coda occupata o lock residuo: verificare prima di sbloccare") from exc
+    try:
+        with handle:
             handle.write(f"pid={os.getpid()}\n")
             handle.flush()
             os.fsync(handle.fileno())
-    except FileExistsError as exc:
-        raise RuntimeError("Coda occupata o lock residuo: verificare prima di sbloccare") from exc
+    except BaseException:
+        # L'apertura esclusiva riuscita ha creato questo lock.
+        # Un errore sincrono di scrittura non deve lasciarlo come falso residuo.
+        lock.unlink()
+        raise
     try:
         yield
     finally:
@@ -135,15 +142,20 @@ def attempts(paths: list[Path]) -> dict[Path, Path]:
     return result
 
 
-def sync_outbox_directory() -> None:
-    """Sul Linux forza anche la directory prima di una POST irrevocabile."""
+def sync_directory(path: Path) -> None:
+    """Sincronizza la directory su Linux prima di confermare la scrittura."""
     if os.name != "posix":
-        return  # Il pilot PC non dichiara durabilitÃ  dopo perdita di alimentazione.
-    directory_fd = os.open(OUTBOX, os.O_RDONLY | os.O_DIRECTORY)
+        return  # Il pilot PC non prova la persistenza dopo perdita di alimentazione.
+    directory_fd = os.open(path, os.O_RDONLY | os.O_DIRECTORY)
     try:
         os.fsync(directory_fd)
     finally:
         os.close(directory_fd)
+
+
+def sync_outbox_directory() -> None:
+    """Sincronizza i marker prima di una POST potenzialmente irreversibile."""
+    sync_directory(OUTBOX)
 
 
 def record_attempt(item: dict) -> None:
@@ -215,6 +227,7 @@ def emit() -> str:
         if segment.exists() or segment.is_symlink():
             raise RuntimeError("Segmento di destinazione già presente nella coda")
         fixture.write_original(event_id, raw, original_dir="replay-original")
+        sync_directory(REPLAY_ORIGINALS)
         guard.check_jsonl(payload, ROOT, allow_replay_original=True)
         with staged.open("xb") as output:
             output.write(payload)
@@ -227,6 +240,7 @@ def emit() -> str:
                 "Segmento di destinazione comparso durante la pubblicazione"
             ) from exc
         staged.unlink()
+        sync_outbox_directory()
         return event_id
 
 

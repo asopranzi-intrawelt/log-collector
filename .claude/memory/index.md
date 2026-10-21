@@ -1,5 +1,9 @@
 # Snapshot di sincronizzazione
 
+## Spool Linux limitato e gate QA, 21/10/2026
+
+Dopo il commit manuale `288e022`, la coda sintetica è stata provata su due bind mount dello stesso tmpfs WSL da 16 MiB: preflight, stato sotto il 20% ed ENOSPC osservati. La prima prova a zero blocchi ha lasciato `.lock`; correzione e ripetizione verdi, con 41 prove guard+coda. Directory dei nuovi originali e segmenti sincronizzate su Linux; power loss, carico e allarme esterno aperti. Audit QA del produttore a `2bb9381`: prova di autorizzazione solo in RAM e CLI esterna da governare prima di collegare o abilitare il backup. Dossier in `pilot/monitoring-hub/README.md` e `docs/integrazione-log-qa-verifier.md`.
+
 ## Confine tecnico QA offline, 21/10/2026
 
 Il collettore accetta e minimizza offline solo `backup_selected` del contratto `qa-tech-v1`; `authorisation_granted` va a un futuro registro riservato e il confine tecnico lo rifiuta. Sorgente/ambiente vincolati, lotto senza output parziale, 20 prove verdi e mutazione del correlatore rilevata. Produttore `staging` a `2bb9381`: builder senza chiamanti applicativi o trasporto. Due LXC non creati, nessun ingresso reale. Dettaglio in `docs/integrazione-log-qa-verifier.md`.

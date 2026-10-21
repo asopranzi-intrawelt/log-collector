@@ -8,11 +8,15 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 5c19167
+last-verified-commit: 288e022
 stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai punti 3 e 7; eventi iLO tecnici separati con ritenzione 90 giorni attiva; catena locale provata in WSL, non installata; D7 bloccato da nomina ed elenco AdS
 ---
 
 # Lavoro in corso
+
+## Spool fisico Linux e audit del produttore QA, 21/10/2026
+
+Dopo il `chiudi` manuale a `288e022`, il collettore era pulito e allineato al remoto. La prova WSL in namespace mount privato usa tmpfs da 16 MiB e due bind mount: preflight, emissione, soglia del 20% e ENOSPC verificati su file reali fittizi. A zero blocchi la prima versione lasciava `.lock`; corretta la pulizia dopo errore sincrono del proprio lock, prova rossa/verde. `emit` sincronizza ora le directory di originali e segmenti su Linux; 41 prove guard+coda verdi, inclusi errori simulati di fsync, e ruff verde. Nessuna prova di power loss, carico o allarme consegnato; nessun host di produzione toccato. L'audit QA sul produttore `staging` a `2bb9381` trova l'autorizzazione solo in RAM, builder senza chiamanti, backup rilevato prima della chiamata esterna ma aggregato solo nel risultato completato, e CLI con client esterno diretto. Il registro riservato durevole deve precedere ogni backup esterno; i due LXC non esistono. Dossier e pendenze aggiornati; la rete ha ricevuto dossier QA, integrazione, pendenze, roadmap ed evento ISO-30, che resta in corso. Le copie derivate della roadmap ISO sono allineate.
 
 ## Confine tecnico QA, 21/10/2026
 
