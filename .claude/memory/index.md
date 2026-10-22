@@ -1,5 +1,9 @@
 # Snapshot di sincronizzazione
 
+## QA dopo le chiusure e riserva del ricevitore, 22/10/2026
+
+QA `d994af0` e collettore `5e46478` sono versionati e pubblicati. `D:/network-design` ha aggiornato dossier, M32e e fonte ISO-30, ancora in corso; i suoi file VPS paralleli sono stati conservati. Nel candidato del collettore il ricevitore richiede anche una riserva positiva di byte disponibili: 36/36 prove, mutazione della guardia sensibile. È un preflight, non quota fisica. Restano trasporto autenticato, ricevuta/replay, allarme, retention/restore riservati, indice e due LXC. Versionamento e deploy restano manuali.
+
 ## QA: archivio tecnico offline candidato, 22/10/2026
 
 Collettore `main` a `cf4ffd8`: ricevitore QA offline versionato; nuovo candidato con budget logico obbligatorio, lock POSIX, conteggio di definitivi e temporanei, rifiuto per capacità e retry identico anche a budget pieno. Confine e ricevitore 34/34, mutazione del limite rilevata, concorrenza a due processi provata in WSL. QA `staging` a `25d4f97` conserva l'outbox candidata non versionata ma i controlli di chiusura sono verdi; l'utente è stato avvisato di eseguire `chiudi` lì. Dopo lo SHA QA, aggiornare rete e ISO-30 ancora in corso. Mancano trasporto autenticato, quota fisica/allarme, indice, due LXC e prova sul mount destinato. Git di scrittura e deploy manuali.

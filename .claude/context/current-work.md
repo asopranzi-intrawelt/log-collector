@@ -14,6 +14,12 @@ stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai p
 
 # Lavoro in corso
 
+## QA: riserva di spazio e rete allineata, 22/10/2026
+
+L'utente ha chiuso QA `staging` a `d994af0` e collettore `main` a `5e46478`, entrambi allineati al remoto. Il dossier, la riga M32e e la fonte ISO-30 di `D:/network-design` registrano i due checkpoint; ISO-30 resta in corso. Nella rete è attiva un'altra sessione che modifica i file VPS: i suoi file non sono stati riscritti e il `chiudi` della rete non va proposto insieme a questa milestone.
+
+Il ricevitore QA corrente richiede anche `--min-free-bytes` positivo: prima di scrivere deve esserci spazio per la voce e la riserva. La suite ricevitore/confine passa 36/36; la prova della soglia cade se si elimina la guardia e il sorgente è stato ripristinato con SHA-256 verificato. La verifica usa spazio disponibile controllato nella suite Windows, non un volume Linux pieno. Mancano quota fisica, soglia misurata, allarme, trasporto autenticato, replay/ricevuta, indice e LXC. Nessun deploy o flusso reale.
+
 ## QA: ricevitore offline candidato, 22/10/2026
 
 Su `main` il ricevitore QA offline è versionato a `cf4ffd8`. Il nuovo candidato obbliga a indicare un budget in byte, conta voci definitive e temporanei residui sotto lock POSIX, rifiuta capacità esaurita o voci inattese e lascia riconoscere un retry identico anche a budget pieno. La CLI opera solo su POSIX; il limite è logico, non una quota fisica. Confine e ricevitore: 34/34 prove; la mutazione che elimina il controllo della quota rende rosse le prove mirate, poi il sorgente è stato ripristinato. In WSL `/tmp`, due processi simultanei con spazio per uno hanno prodotto una ricevuta e un rifiuto. Mancano trasporto autenticato, quota fisica/allarme, indice, mount Linux destinato e due LXC. QA `staging` a `25d4f97` ha l'outbox non committata ma i controlli di chiusura verdi; l'utente è stato avvisato di eseguire `chiudi` lì. Dopo quel commit, allineare la rete citandone lo SHA e lasciare ISO-30 in corso. Nessun deploy o Git di scrittura dell'agente.

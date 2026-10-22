@@ -2,7 +2,7 @@
 
 ## Limite logico del ricevitore QA, 22/10/2026
 
-Il ricevitore QA offline del collettore richiede un budget in byte per le voci dell'archivio privato. Su POSIX serializza i writer cooperativi con un lock sulla directory, conta anche i temporanei residui e rifiuta una nuova voce oltre il budget; un retry identico resta riconoscibile. In WSL due processi simultanei con capienza per un solo evento hanno dato una ricevuta e un rifiuto. Questo limite non è la quota del filesystem, non protegge da altri writer e non invia allarmi: montaggio, spazio e inode, retention e soglie effettive restano da misurare e collaudare prima di ricevere QA reale. Dettaglio nel [dossier QA](integrazione-log-qa-verifier.md).
+Il ricevitore QA offline del collettore richiede un budget in byte per le voci dell'archivio privato e una riserva minima di byte liberi del filesystem. Su POSIX serializza i writer cooperativi con un lock sulla directory, conta anche i temporanei residui e rifiuta una nuova voce oltre il budget o quando il preflight non lascerebbe la riserva; un retry identico resta riconoscibile. La prova con spazio disponibile controllato verifica il byte al confine e cade se si toglie la guardia. In WSL due processi simultanei con budget logico per un solo evento hanno dato una ricevuta e un rifiuto. Questi controlli non sono una quota del filesystem, non riservano blocchi, non proteggono da altri writer e non inviano allarmi: montaggio, spazio e inode, retention e soglie effettive restano da misurare e collaudare prima di ricevere QA reale. Dettaglio nel [dossier QA](integrazione-log-qa-verifier.md).
 
 ## Gate attuale della coda sintetica, 21/10/2026
 

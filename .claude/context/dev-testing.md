@@ -11,6 +11,10 @@ last-verified-commit: 288e022
 
 # Test di sviluppo
 
+## Riserva di spazio del ricevitore QA, 22/10/2026
+
+Ricevitore e confine: 36/36 prove verdi. La prova della riserva imposta il byte disponibile appena sotto e appena sopra la soglia richiesta: sotto non compare un nuovo file, al confine la ricevuta è prodotta, e un retry identico resta riconosciuto. Togliendo temporaneamente la condizione della guardia, la prova è fallita con `DID NOT RAISE`; il sorgente è stato ripristinato e confrontato con il backup SHA-256. Un primo tentativo di controllo mutazionale è stato invalido: pytest si è fermato per permessi del suo temporaneo, prima dell'asserzione. È stato scartato e ripetuto con pytest avviato direttamente. Il test usa disponibilità del filesystem simulata; non dimostra una quota fisica o il comportamento sul mount di esercizio.
+
 ## Ricevitore QA offline, 22/10/2026
 
 `tests/test_qa_technical_archive.py` e la suite del confine passano 34/34 casi. Oltre a originale e vista minimizzata, retry, collisione, link, autorizzazione e `fsync`, misurano il rifiuto prima di scrivere quando il budget è insufficiente, il retry a budget pieno, la voce inattesa e il fallimento del secondo `fsync` senza ricevuta. Le mutazioni che reinserivano `job_ref` nella vista o eliminavano il limite hanno reso rosse le prove mirate, con sorgente ripristinato. Un probe col writer QA corrente ha prodotto un file accettato e un retry duplicato. In WSL `/tmp` sono stati verificati file `0600`, vista minimizzata, retry, rifiuto di directory `0755` e due processi concorrenti con spazio per una sola voce: una ricevuta e un rifiuto. Le prove Windows sono state eseguite fuori sandbox per i permessi delle cartelle temporanee. Non sono prove di durabilità sotto spegnimento sul volume destinato, quota fisica, trasporto o indice.

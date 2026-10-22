@@ -8,6 +8,7 @@ import argparse
 import json
 import os
 import re
+import shutil
 import stat
 import sys
 from contextlib import contextmanager
@@ -137,11 +138,14 @@ def _existing(path: Path, digest: str, original: dict, technical: dict) -> dict:
 
 
 def receive(
-    source: Path, archive: Path, source_id: str, environment: str, *, max_archive_bytes: int,
+    source: Path, archive: Path, source_id: str, environment: str, *,
+    max_archive_bytes: int, min_free_bytes: int,
 ) -> dict:
     """Validate, publish atomically, then acknowledge the exact source bytes."""
     if type(max_archive_bytes) is not int or max_archive_bytes <= 0:
         raise Rejected("archive_limit")
+    if type(min_free_bytes) is not int or min_free_bytes <= 0:
+        raise Rejected("free_space_limit")
     archive = _archive_directory(archive)
     raw = _source_bytes(source)
     try:
@@ -173,6 +177,8 @@ def receive(
         ).encode("utf-8")
         if used + len(payload) > max_archive_bytes:
             raise Rejected("archive_capacity")
+        if shutil.disk_usage(archive).free < len(payload) + min_free_bytes:
+            raise Rejected("free_space_reserve")
         pending = archive / f".pending-{uuid4().hex}.json"
         flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_NOFOLLOW", 0)
         try:
@@ -201,13 +207,17 @@ def main() -> int:
         "--max-archive-bytes", required=True, type=int,
         help="Logical byte limit for private archive entries",
     )
+    parser.add_argument(
+        "--min-free-bytes", required=True, type=int,
+        help="Minimum available filesystem bytes after admitting one entry",
+    )
     args = parser.parse_args()
     try:
         if os.name != "posix":
             raise Rejected("posix_required")
         receipt = receive(
             args.event_file, args.archive_dir, args.source_id, args.environment,
-            max_archive_bytes=args.max_archive_bytes,
+            max_archive_bytes=args.max_archive_bytes, min_free_bytes=args.min_free_bytes,
         )
     except (Rejected, OSError) as exc:
         code = str(exc) if isinstance(exc, Rejected) else "io_error"

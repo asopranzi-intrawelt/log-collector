@@ -1,5 +1,17 @@
 # Work-log
 
+## 2026-10-22 - Chiusure QA, allineamento rete e riserva del ricevitore
+
+Area: integrazione QA. L'utente ha eseguito `chiudi` su QA `staging` (`d994af0`) e collettore `main` (`5e46478`), con remoto uguale a HEAD. Nella rete sono stati aggiornati dossier QA/collettore, contesto, M32e, memoria e fonte ISO-30; il generatore ha allineato roadmap Markdown e copie HTML private, `check --desktop` e `chiudi -SoloControlli` verdi. Il lavoro VPS della sessione parallela è rimasto intatto; la sua presenza impedisce di proporre un `chiudi` unico della rete ora.
+
+Nel collettore `qa_technical_archive.py` richiede ora una riserva positiva di byte liberi oltre al budget logico. La guardia controlla lo spazio disponibile prima di pubblicare la nuova voce; il retry esatto è verificato prima della guardia. Ricevitore/confine 36/36 verdi, Ruff e `chiudi -SoloControlli` verdi senza avvisi del template. La prima mutazione è stata invalidata da un errore sui temporanei di pytest e non è stata contata; nella ripetizione diretta, eliminare la guardia ha fatto fallire la prova con mancato rifiuto. Ripristino del sorgente verificato con SHA-256. La prova controlla la disponibilità simulata, non un volume Linux saturo. Restano quota fisica, riserva misurata, allarme, trasporto autenticato, replay/ricevuta, indice, retention/restore e due LXC.
+
+**Didattica:** nessuna.
+
+**Template:** nessuna.
+
+File scritti e riletti: `bin/qa_technical_archive.py`, `tests/test_qa_technical_archive.py`, `docs/integrazione-log-qa-verifier.md`, `docs/normalizzazione-retention-capienza.md`, `docs/handoff-sviluppo-collettore.md`, `.claude/context/current-work.md`, `.claude/context/dev-testing.md`, `.claude/memory/index.md`, questo work-log, `_notes/RESUME-PROMPT.md`, `_notes/COMMIT-MSG.txt`; nel progetto rete i file elencati nel suo work-log.
+
 ## 2026-10-22 - Ricezione QA offline prima del trasporto
 
 Area: integrazione QA. Il ricevitore offline è stato chiuso manualmente dal proprietario a `cf4ffd8`, remoto allineato. Nel candidato successivo il comando richiede un budget logico in byte, serializza i writer cooperativi su POSIX, conta file definitivi e temporanei residui, blocca una voce nuova se manca spazio logico e conserva il retry identico. La CLI rifiuta Windows perché lì il lock e il `fsync` della directory non offrono le stesse garanzie. Confine e ricevitore 34/34 verdi; la mutazione senza guardia di quota ha fatto fallire la prova, poi il sorgente è stato ripristinato. In WSL `/tmp`, due processi simultanei con capienza per uno hanno prodotto una ricevuta e un rifiuto. Nessuna quota fisica, allarme, trasporto, indice, due LXC o prova di alimentazione sul volume destinato. QA `staging` a `25d4f97` ha l'outbox non committata, ma `chiudi -SoloControlli` è verde: l'utente è stato informato del passo manuale. La rete si allinea dopo lo SHA QA, lasciando ISO-30 in corso. File scritti: `bin/qa_technical_archive.py`, `tests/test_qa_technical_archive.py`, `docs/integrazione-log-qa-verifier.md`, `docs/handoff-sviluppo-collettore.md`, `docs/normalizzazione-retention-capienza.md`, `.claude/context/current-work.md`, `.claude/context/dev-testing.md`, `.claude/memory/index.md`, `.claude/memory/progress.md`, `_notes/RESUME-PROMPT.md`, `_notes/COMMIT-MSG.txt`. Ratio: un limite logico applicato al momento della ricevuta impedisce che un writer cooperativo saturi senza un rifiuto esplicito, ma richiede ancora quota fisica e allarme prima dell'esercizio.

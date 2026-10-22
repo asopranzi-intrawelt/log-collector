@@ -6,6 +6,7 @@ import os
 import subprocess
 import sys
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -55,7 +56,8 @@ def source_file(tmp_path, data):
 
 def receive(receiver, source, archive):
     return receiver.receive(
-        source, archive, "qa-test-source", "staging", max_archive_bytes=4096,
+        source, archive, "qa-test-source", "staging",
+        max_archive_bytes=4096, min_free_bytes=1,
     )
 
 
@@ -197,14 +199,21 @@ def test_archive_cannot_live_inside_repository(tmp_path, receiver):
 def test_archive_budget_blocks_new_event_but_allows_exact_retry(tmp_path, receiver):
     archive = private_directory(tmp_path)
     first = source_file(tmp_path, event())
-    receiver.receive(first, archive, "qa-test-source", "staging", max_archive_bytes=4096)
+    receiver.receive(
+        first, archive, "qa-test-source", "staging",
+        max_archive_bytes=4096, min_free_bytes=1,
+    )
     first_size = (archive / first.name).stat().st_size
     second = source_file(tmp_path, event(event_id="b" * 32))
     with pytest.raises(receiver.Rejected, match="archive_capacity"):
-        receiver.receive(second, archive, "qa-test-source", "staging", max_archive_bytes=first_size)
+        receiver.receive(
+            second, archive, "qa-test-source", "staging",
+            max_archive_bytes=first_size, min_free_bytes=1,
+        )
     assert not (archive / second.name).exists()
     assert receiver.receive(
-        first, archive, "qa-test-source", "staging", max_archive_bytes=first_size,
+        first, archive, "qa-test-source", "staging",
+        max_archive_bytes=first_size, min_free_bytes=1,
     )["status"] == "duplicate"
 
 
@@ -212,7 +221,53 @@ def test_archive_budget_rejects_first_event_without_pending_file(tmp_path, recei
     archive = private_directory(tmp_path)
     source = source_file(tmp_path, event())
     with pytest.raises(receiver.Rejected, match="archive_capacity"):
-        receiver.receive(source, archive, "qa-test-source", "staging", max_archive_bytes=1)
+        receiver.receive(
+            source, archive, "qa-test-source", "staging",
+            max_archive_bytes=1, min_free_bytes=1,
+        )
+    assert list(archive.iterdir()) == []
+
+
+def test_free_space_reserve_rejects_new_file_but_preserves_exact_retry(
+    tmp_path, receiver, monkeypatch,
+):
+    archive = private_directory(tmp_path)
+    first = source_file(tmp_path, event())
+    receive(receiver, first, archive)
+    entry_bytes = (archive / first.name).stat().st_size
+    reserve = 100
+    second = source_file(tmp_path, event(event_id="b" * 32))
+
+    monkeypatch.setattr(
+        receiver.shutil, "disk_usage",
+        lambda _path: SimpleNamespace(free=entry_bytes + reserve - 1),
+    )
+    with pytest.raises(receiver.Rejected, match="free_space_reserve"):
+        receiver.receive(
+            second, archive, "qa-test-source", "staging",
+            max_archive_bytes=4096, min_free_bytes=reserve,
+        )
+    assert not (archive / second.name).exists()
+    assert receive(receiver, first, archive)["status"] == "duplicate"
+
+    monkeypatch.setattr(
+        receiver.shutil, "disk_usage",
+        lambda _path: SimpleNamespace(free=entry_bytes + reserve),
+    )
+    assert receiver.receive(
+        second, archive, "qa-test-source", "staging",
+        max_archive_bytes=4096, min_free_bytes=reserve,
+    )["status"] == "stored"
+
+
+def test_free_space_reserve_must_be_positive(tmp_path, receiver):
+    archive = private_directory(tmp_path)
+    source = source_file(tmp_path, event())
+    with pytest.raises(receiver.Rejected, match="free_space_limit"):
+        receiver.receive(
+            source, archive, "qa-test-source", "staging",
+            max_archive_bytes=4096, min_free_bytes=0,
+        )
     assert list(archive.iterdir()) == []
 
 
@@ -221,7 +276,10 @@ def test_unexpected_archive_entry_blocks_receipt(tmp_path, receiver):
     (archive / "unexpected.txt").write_text("unclassified", encoding="utf-8")
     source = source_file(tmp_path, event())
     with pytest.raises(receiver.Rejected, match="archive_entry"):
-        receiver.receive(source, archive, "qa-test-source", "staging", max_archive_bytes=4096)
+        receiver.receive(
+            source, archive, "qa-test-source", "staging",
+            max_archive_bytes=4096, min_free_bytes=1,
+        )
     assert not (archive / source.name).exists()
 
 
@@ -232,7 +290,8 @@ def test_cli_rejects_windows_before_archive_write(tmp_path):
     completed = subprocess.run(
         [sys.executable, str(SCRIPT), "--event-file", str(source),
          "--archive-dir", str(archive), "--source-id", "qa-test-source",
-         "--environment", "staging", "--max-archive-bytes", "4096"],
+         "--environment", "staging", "--max-archive-bytes", "4096",
+         "--min-free-bytes", "1"],
         capture_output=True, text=True, check=False,
     )
     assert completed.returncode == 1
