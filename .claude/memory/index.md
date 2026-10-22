@@ -1,5 +1,9 @@
 # Snapshot di sincronizzazione
 
+## QA: archivio tecnico offline candidato, 22/10/2026
+
+Collettore `main` a `036eda9` dopo il commit separato del template: ricevitore QA offline in albero, un evento per file, validazione tramite confine esistente, archivio privato fuori repo con originale e vista tecnica minimizzata, ricevuta dopo `fsync` su POSIX, retry identico e collisione distinti. Suite mirata 29/29, mutazione di `job_ref` rilevata e probe del writer QA e POSIX riusciti. QA `staging` a `25d4f97` conserva l'outbox candidata non versionata; rete `main` a `c1d1e68` conserva modifiche documentali. Dopo il commit manuale QA aggiornare il dossier di rete con SHA, mantenendo ISO-30 in corso. Mancano trasporto autenticato, quota/allarme, indice, due LXC e prova Linux destinata. Git di scrittura e deploy manuali.
+
 ## QA e allineamento rete da completare, 21/10/2026
 
 QA `staging` è stato chiuso manualmente a `a473d92`, allineato al remoto. Nel candidato successivo `FallbackBackend` scrive un file tecnico `qa-tech-v1` completo e sincronizzato prima della chiamata al backup; il file resta anche se il backend fallisce. La scrittura o l'identità sorgente mancante fermano la chiamata. Quattro prove red/green, suite CI 462 verdi e 6 dati reali esclusi, Ruff e Mypy verdi. È emissione locale: trasporto, ricevuta centrale, replay, quota e indicizzazione non sono attivi; due LXC assenti e M32e/ISO-30 restano in corso. Il 21/10 il clone `D:/network-design` è tornato allineato al remoto a `677f1d3`, ma contiene sei file documentali modificati da un lavoro precedente. Dopo il `chiudi` QA, aggiornare il dossier di rete con il commit immutabile dell'outbox e verificare quei sei file prima di proporre la chiusura manuale della rete.

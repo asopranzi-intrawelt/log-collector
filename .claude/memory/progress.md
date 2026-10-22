@@ -1,5 +1,13 @@
 # Work-log
 
+## 2026-10-22 - Ricezione QA offline prima del trasporto
+
+Area: integrazione QA. Nel collettore, ora a `036eda9` dopo il commit separato del template, è stato preparato il ricevitore di un file locale `qa-tech-v1` alla volta. Valida con il confine esistente, conserva originale e vista minimizzata in un archivio privato esterno al repository e dà ricevuta dopo la pubblicazione e il `fsync` della directory su POSIX. Retry degli stessi byte: `duplicate`; collisione di ID o voce alterata: rifiuto. 29 prove fra ricevitore e confine passate fuori sandbox; mutazione che passava `job_ref` nella vista tecnica rilevata e ripristinata. Un file sintetico del writer QA è stato accettato e ritentato; WSL `/tmp` ha verificato mode `0600`, vista e rifiuto di directory `0755`. Non ci sono trasporto autenticato, quota/allarme, indice, due LXC o prova di spegnimento Linux. QA outbox ancora in albero su `staging` a `25d4f97`; rete a `c1d1e68` con documenti modificati da lavori precedenti, da aggiornare dopo il commit manuale QA. File scritti: `bin/qa_technical_archive.py`, `tests/test_qa_technical_archive.py`, `docs/integrazione-log-qa-verifier.md`, `docs/handoff-sviluppo-collettore.md`, `.claude/context/current-work.md`, `.claude/context/dev-testing.md`, `.claude/memory/index.md`, `.claude/memory/progress.md`, `_notes/RESUME-PROMPT.md`, `_notes/COMMIT-MSG.txt`. Ratio: preparare una ricevuta locale verificabile senza chiamarla consegna centrale o integrazione già in esercizio.
+
+**Didattica:** nessuna.
+
+**Template:** nessuna.
+
 ## 2026-10-21 - Rete di nuovo allineata al remoto
 
 Area: integrazione QA. Dopo la ricognizione che trovava storie Git divergenti, `D:/network-design` mostra `main` e `origin/main` entrambi a `677f1d3` e un merge-base valido. I sei file documentali modificati in precedenza restano nell'albero; non sono stati riscritti. Il punto di allineamento è dopo il commit manuale QA dell'outbox: rileggere quei file, aggiungere il nuovo stato nel dossier, mantenere ISO-30 in corso e verificare prima di proporre `chiudi` sulla rete. Ratio: un commit QA immutabile consente alla rete di citare una prova verificabile senza chiamare rilasciato un candidato ancora in albero.

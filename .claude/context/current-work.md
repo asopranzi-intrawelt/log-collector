@@ -14,6 +14,10 @@ stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai p
 
 # Lavoro in corso
 
+## QA: ricevitore offline candidato, 22/10/2026
+
+Su `main` a `036eda9` dopo il commit separato del template, `bin/qa_technical_archive.py` e la sua prova sono ancora in albero. Un file outbox QA validato viene archiviato fuori repository con originale privato e proiezione tecnica minimizzata; `job_ref` resta solo nell'originale. Su POSIX sono richiesti directory 0700 e file 0600, con `fsync` prima della ricevuta e pubblicazione senza sovrascrittura. Retry identico è duplicato, collisione o voce alterata viene rifiutata. Confine e ricevitore: 29/29 prove; mutazione che reinserisce `job_ref` nella vista fallita e ripristinata. Probe col writer QA corrente e su WSL `/tmp` riusciti. Sono assenti trasporto autenticato, quota/allarme, indice generale, test su mount Linux destinato e due LXC. QA `staging` è a `25d4f97` dopo il commit del template, con outbox non committata; rete `main` a `c1d1e68` con documenti modificati da lavori precedenti. Allineare la rete dopo il commit manuale QA, citando lo SHA e lasciando ISO-30 in corso. Nessun deploy o Git di scrittura dell'agente.
+
 ## QA: evento tecnico locale candidato, 21/10/2026
 
 QA `staging` è stato chiuso manualmente a `a473d92`, allineato al remoto. Nel candidato successivo `FallbackBackend` scrive un file tecnico `qa-tech-v1` completo e sincronizzato prima della chiamata al backup; il file resta anche se il backend fallisce. La scrittura o l'identità sorgente mancante fermano la chiamata. Quattro prove red/green, suite CI 462 verdi e 6 dati reali esclusi, Ruff e Mypy verdi. È emissione locale: trasporto, ricevuta centrale, replay, quota e indicizzazione non sono attivi; due LXC assenti e M32e/ISO-30 restano in corso. Il clone `D:/network-design` è tornato allineato al remoto a `677f1d3`, con sei file documentali ancora modificati. Dopo il `chiudi` QA, aggiornare il dossier di rete con il commit dell'outbox, verificare i sei file e poi eseguire i controlli della rete.

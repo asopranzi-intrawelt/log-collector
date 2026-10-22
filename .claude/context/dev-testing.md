@@ -11,6 +11,10 @@ last-verified-commit: 288e022
 
 # Test di sviluppo
 
+## Ricevitore QA offline, 22/10/2026
+
+`tests/test_qa_technical_archive.py` e la suite del confine passano 29/29 casi: originale e vista minimizzata, retry identico, collisione di ID, voce alterata, link simbolico, autorizzazione rifiutata, permessi della directory, errore di `fsync` senza ricevuta, nome del file e archivio dentro il repository. Una mutazione che metteva `job_ref` nella vista tecnica ha fatto fallire la prova mirata, poi il sorgente è stato ripristinato. Un probe col writer QA corrente ha prodotto un file accettato e un retry duplicato. In WSL `/tmp` sono stati verificati file `0600`, vista minimizzata, retry e rifiuto della directory `0755`. La prima esecuzione in sandbox Windows non poteva aprire la directory temporanea di pytest; la ripetizione autorizzata fuori sandbox è verde. Non è una prova di durabilità sotto spegnimento su Linux, né di trasporto, ACL Windows o indice.
+
 ## Mount ed ENOSPC fisici sul Linux locale, 21/10/2026
 
 Il probe WSL esige un namespace mount privato, altrimenti esce prima di montare. Su tmpfs da 16 MiB con due bind mount ha rifiutato il mount assente, emesso un evento, riportato codice 2 sotto il 20% libero e fermato un'emissione con ENOSPC conservando il primo record. Il caso con zero blocchi liberi ha fatto fallire la prima versione per `.lock` residuo e passa dopo la correzione. La suite guard+coda passa 41/41; due prove distinguono errori di fsync delle directory degli originali e dei segmenti. Nessuna prova di alimentazione, indice Loki o carico in questo giro. Evidenza privata nel README del pilot.

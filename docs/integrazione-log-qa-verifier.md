@@ -1,5 +1,17 @@
 # Integrazione dei log del servizio QA
 
+## Ricezione offline candidata, 22/10/2026
+
+`bin/qa_technical_archive.py` riceve **un file locale alla volta** dall'outbox QA. Riusa il confine `qa_technical_boundary.py`: accetta solo `backup_selected` con `source_id` e ambiente attesi dal chiamante, rifiuta l'autorizzazione e richiede che il nome del file coincida con l'`event_id` validato. L'archivio deve essere una directory assoluta già esistente, esterna al repository, di proprietà del processo e con permessi `0700` su POSIX. Ogni voce viene creata con `0600`, sincronizzata e pubblicata senza sovrascrivere un nome esistente; la ricevuta JSON esce solo dopo la sincronizzazione della directory. Un retry degli stessi byte riceve `duplicate`; stesso ID con byte diversi o voce alterata viene rifiutato. I codici di errore non includono il contenuto dell'evento.
+
+La voce privata contiene l'originale e una proiezione `technical` minimizzata; **solo `technical` potrà alimentare un indice generale**. L'originale può contenere `job_ref` e richiede ACL, ritenzione e accessi propri dell'archivio privato. Questo comando non autentica il mittente: `--source-id` e `--environment` dovranno arrivare da un futuro trasporto autenticato, non dal JSON stesso. Non apre socket, non legge automaticamente l'outbox QA e non invia a Loki. Il `fsync` della directory è implementato su POSIX; le prove Windows misurano la logica locale, non la durabilità Linux o il fermo elettrico. Esempio di invocazione dopo aver predisposto un'area privata:
+
+```text
+python bin/qa_technical_archive.py --event-file <FILE_OUTBOX> --archive-dir <ARCHIVIO_PRIVATO_ASSOLUTO> --source-id <ID_QA_REGISTRATO> --environment staging
+```
+
+Prove locali: 29/29 fra ricevitore e confine; una mutazione che copiava `job_ref` nella vista tecnica ha fatto fallire il test mirato, poi il sorgente è stato ripristinato. Un probe sintetico con il writer QA corrente ha prodotto un file, archiviato una volta e riconosciuto il retry come duplicato. In WSL su `/tmp` il percorso POSIX ha verificato file `0600`, vista minimizzata, retry e rifiuto della directory `0755`. Mancano consegna autenticata, quota e allarme di saturazione, replay dal produttore alla ricevuta, prova sul mount Linux destinato, indice minimizzato e verifica delle due LXC. M32e e ISO-30 restano in corso.
+
 ## Emissione locale del backup, 21/10/2026
 
 QA `staging` è stato chiuso manualmente a `a473d92`, allineato al remoto. Nel candidato successivo `FallbackBackend` scrive un file tecnico `qa-tech-v1` completo e sincronizzato prima della chiamata al backup; il file resta anche se il backend fallisce. La scrittura o l'identità sorgente mancante fermano la chiamata; il costruttore rifiuta una catena autorizzata senza callback tecnico. Quattro prove red/green, suite CI 462 verdi e 6 dati reali esclusi, Ruff e Mypy verdi. È emissione locale: trasporto, ricevuta centrale, replay, quota e indicizzazione non sono attivi; due LXC assenti e M32e/ISO-30 restano in corso. Il file pronto non contiene utente, nome file, `job_ref` o testo cliente; la ricevuta di autorizzazione resta in un archivio locale distinto e riservato. Un probe offline sul file prodotto dal writer QA è stato accettato dal confine reale del collettore (1/1) e la vista non contiene il dettaglio sintetico della selezione; resta da provare il percorso dall'applicazione al trasporto e al punto d'indice.
