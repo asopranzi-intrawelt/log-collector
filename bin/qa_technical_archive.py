@@ -7,8 +7,10 @@ from a future authenticated transport, not from the event's own claim.
 import argparse
 import json
 import os
+import re
 import stat
 import sys
+from contextlib import contextmanager
 from datetime import UTC, datetime
 from hashlib import sha256
 from pathlib import Path
@@ -18,6 +20,8 @@ import qa_technical_boundary as boundary
 
 PROJECT = Path(__file__).resolve().parent.parent
 MAX_FILE_BYTES = boundary.MAX_BATCH_BYTES
+MAX_ARCHIVE_ENTRY_BYTES = 2 * MAX_FILE_BYTES
+PENDING_NAME = re.compile(r"\.pending-[0-9a-f]{32}\.json\Z")
 
 
 class Rejected(ValueError):
@@ -61,6 +65,50 @@ def _sync_directory(path: Path) -> None:
         os.close(descriptor)
 
 
+@contextmanager
+def _archive_lock(path: Path):
+    if os.name != "posix":
+        yield
+        return
+    import fcntl
+
+    flags = os.O_RDONLY | os.O_DIRECTORY | getattr(os, "O_NOFOLLOW", 0)
+    descriptor = os.open(path, flags)
+    try:
+        fcntl.flock(descriptor, fcntl.LOCK_EX)
+        locked = os.fstat(descriptor)
+        current = path.stat()
+        if (locked.st_dev, locked.st_ino) != (current.st_dev, current.st_ino):
+            raise Rejected("archive_directory")
+        if locked.st_uid != os.geteuid() or stat.S_IMODE(locked.st_mode) & 0o077:
+            raise Rejected("archive_permissions")
+        yield
+    finally:
+        os.close(descriptor)
+
+
+def _archive_usage(path: Path) -> int:
+    """Count published and abandoned pending bytes; reject unknown entries."""
+    total = 0
+    with os.scandir(path) as entries:
+        for entry in entries:
+            name = entry.name
+            if not (
+                name.endswith(".json") and boundary.EVENT_ID.fullmatch(name[:-5])
+                or PENDING_NAME.fullmatch(name)
+            ):
+                raise Rejected("archive_entry")
+            info = entry.stat(follow_symlinks=False)
+            if not stat.S_ISREG(info.st_mode) or info.st_size > MAX_ARCHIVE_ENTRY_BYTES:
+                raise Rejected("archive_entry")
+            if os.name == "posix" and (
+                info.st_uid != os.geteuid() or stat.S_IMODE(info.st_mode) & 0o077
+            ):
+                raise Rejected("archive_entry")
+            total += info.st_size
+    return total
+
+
 def _existing(path: Path, digest: str, original: dict, technical: dict) -> dict:
     if path.is_symlink() or path.is_junction():
         raise Rejected("archive_entry")
@@ -68,14 +116,14 @@ def _existing(path: Path, digest: str, original: dict, technical: dict) -> dict:
         flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0)
         with os.fdopen(os.open(path, flags), "rb") as entry:
             info = os.fstat(entry.fileno())
-            if not stat.S_ISREG(info.st_mode) or info.st_size > 2 * MAX_FILE_BYTES:
+            if not stat.S_ISREG(info.st_mode) or info.st_size > MAX_ARCHIVE_ENTRY_BYTES:
                 raise Rejected("archive_entry")
             if os.name == "posix" and (
                 info.st_uid != os.geteuid() or stat.S_IMODE(info.st_mode) & 0o077
             ):
                 raise Rejected("archive_entry")
-            data = entry.read(2 * MAX_FILE_BYTES + 1)
-        if len(data) > 2 * MAX_FILE_BYTES:
+            data = entry.read(MAX_ARCHIVE_ENTRY_BYTES + 1)
+        if len(data) > MAX_ARCHIVE_ENTRY_BYTES:
             raise Rejected("archive_entry")
         stored = json.loads(data)
     except (OSError, ValueError) as exc:
@@ -88,8 +136,12 @@ def _existing(path: Path, digest: str, original: dict, technical: dict) -> dict:
     return {"status": "duplicate", "event_id": path.stem, "sha256": digest}
 
 
-def receive(source: Path, archive: Path, source_id: str, environment: str) -> dict:
+def receive(
+    source: Path, archive: Path, source_id: str, environment: str, *, max_archive_bytes: int,
+) -> dict:
     """Validate, publish atomically, then acknowledge the exact source bytes."""
+    if type(max_archive_bytes) is not int or max_archive_bytes <= 0:
+        raise Rejected("archive_limit")
     archive = _archive_directory(archive)
     raw = _source_bytes(source)
     try:
@@ -105,33 +157,38 @@ def receive(source: Path, archive: Path, source_id: str, environment: str) -> di
     digest = sha256(raw).hexdigest()
     original = json.loads(raw)
     technical = checked[0]
-    if destination.exists() or destination.is_symlink():
-        return _existing(destination, digest, original, technical)
-    envelope = {
-        "received_at": datetime.now(UTC).isoformat(timespec="seconds"),
-        "sha256": digest,
-        "original": original,
-        "technical": technical,
-    }
-    payload = (
-        json.dumps(envelope, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
-        + "\n"
-    ).encode("utf-8")
-    pending = archive / f".pending-{uuid4().hex}.json"
-    flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_NOFOLLOW", 0)
-    try:
-        with os.fdopen(os.open(pending, flags, 0o600), "wb") as output:
-            output.write(payload)
-            output.flush()
-            os.fsync(output.fileno())
-        try:
-            os.link(pending, destination)
-        except FileExistsError:
+    with _archive_lock(archive):
+        used = _archive_usage(archive)
+        if destination.exists() or destination.is_symlink():
             return _existing(destination, digest, original, technical)
-        _sync_directory(archive)
-        return {"status": "stored", "event_id": event_id, "sha256": digest}
-    finally:
-        pending.unlink(missing_ok=True)
+        envelope = {
+            "received_at": datetime.now(UTC).isoformat(timespec="seconds"),
+            "sha256": digest,
+            "original": original,
+            "technical": technical,
+        }
+        payload = (
+            json.dumps(envelope, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+            + "\n"
+        ).encode("utf-8")
+        if used + len(payload) > max_archive_bytes:
+            raise Rejected("archive_capacity")
+        pending = archive / f".pending-{uuid4().hex}.json"
+        flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_NOFOLLOW", 0)
+        try:
+            with os.fdopen(os.open(pending, flags, 0o600), "wb") as output:
+                output.write(payload)
+                output.flush()
+                os.fsync(output.fileno())
+            try:
+                os.link(pending, destination)
+            except FileExistsError:
+                return _existing(destination, digest, original, technical)
+            _sync_directory(archive)
+            return {"status": "stored", "event_id": event_id, "sha256": digest}
+        finally:
+            pending.unlink(missing_ok=True)
+            _sync_directory(archive)
 
 
 def main() -> int:
@@ -140,9 +197,18 @@ def main() -> int:
     parser.add_argument("--archive-dir", required=True, type=Path)
     parser.add_argument("--source-id", required=True)
     parser.add_argument("--environment", required=True, choices=("staging", "production"))
+    parser.add_argument(
+        "--max-archive-bytes", required=True, type=int,
+        help="Logical byte limit for private archive entries",
+    )
     args = parser.parse_args()
     try:
-        receipt = receive(args.event_file, args.archive_dir, args.source_id, args.environment)
+        if os.name != "posix":
+            raise Rejected("posix_required")
+        receipt = receive(
+            args.event_file, args.archive_dir, args.source_id, args.environment,
+            max_archive_bytes=args.max_archive_bytes,
+        )
     except (Rejected, OSError) as exc:
         code = str(exc) if isinstance(exc, Rejected) else "io_error"
         print(f"rejected:{code}", file=sys.stderr)
