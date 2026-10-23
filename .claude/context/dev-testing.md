@@ -11,6 +11,10 @@ last-verified-commit: 3fb0ab08037199efc9367233c8bfe8f6d3a79cd4
 
 # Test di sviluppo
 
+## Guardia mount del ricevitore QA, 23/10/2026
+
+Ricevitore e confine 39/39, Ruff verde. Il nuovo caso usa mountinfo controllato: senza il punto di mount rifiuta prima di scrivere, con il punto dichiarato pubblica il file. Eliminando temporaneamente la chiamata alla guardia, la prova è fallita per `DID NOT RAISE Rejected`; sorgente ripristinato e SHA-256 confrontato con la copia precedente. Due tentativi nel sandbox erano invalidi per permessi della directory temporanea di pytest e non sono conteggiati come prova del difetto; la ripetizione fuori sandbox è arrivata all'asserzione. Resta da esercitare il comando su un bind mount Linux reale e poi sul volume di destinazione con quota, allarme e restore.
+
 ## Ingresso QA via stdin e replay fra repository, 23/10/2026
 
 Ricevitore e confine: 38/38 prove, inclusi comando SSH errato, limite di lettura, origine diversa, hash e retry. Nel produttore QA 12/12 prove mirate e suite CI 470/470 con sei dati reali esclusi; Ruff e Mypy verdi. Un probe locale con writer QA e ricevitore reale ha perso la prima risposta dopo la pubblicazione e ottenuto `duplicate` al secondo giro; la CLI POSIX in WSL ha prodotto `stored`/`duplicate`, respinto il comando diverso e scritto `0600`. Un probe POSIX separato del mittente ha verificato lock, spostamento, file `0600`, directory `0700` e argomenti SSH con risposta simulata. Non è stato provato un canale SSH fra host, né il volume del Debian o il punto d'indice.

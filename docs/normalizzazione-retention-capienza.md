@@ -80,6 +80,8 @@ Calcolo da compilare con le misure: spazio dati richiesto = somma dei byte/giorn
 
 I volumi o quote separati servono a impedire che indice e metriche consumino la riserva degli originali e del sistema. Una directory diversa sullo stesso filesystem non isola la capienza. Il progetto deve prevedere directory di mount dedicate e verifica del mount prima di scrivere, così un disco assente non riversa i dati sulla root. Backup, snapshot, ricostruzione degli indici e compressione possono tenere contemporaneamente due copie: includerle nel picco, non solo nella media giornaliera.
 
+Il ricevitore QA via SSH verifica ora che la propria directory di archivio sia un punto di mount visibile nel namespace Linux del processo; un mount mancante blocca la scrittura. La prova automatica usa mountinfo controllato e non valida il volume reale. Per l'esercizio servono ancora quota fisica configurata e misurata, spazio e inode liberi, soglie con avviso consegnato e restore dell'originale; il limite logico `--max-archive-bytes` e la riserva `--min-free-bytes` non sostituiscono questi controlli.
+
 ## Guardie proposte, non applicate
 
 Le seguenti soglie sono valori iniziali di progetto da ricalibrare con la baseline e la finestra di intervento concordata. Sono condizioni alternative: un filesystem grande può avere percentuale buona e autonomia insufficiente; gli inode possono terminare prima dei byte.

@@ -23,6 +23,7 @@ PROJECT = Path(__file__).resolve().parent.parent
 MAX_FILE_BYTES = boundary.MAX_BATCH_BYTES
 MAX_ARCHIVE_ENTRY_BYTES = 2 * MAX_FILE_BYTES
 PENDING_NAME = re.compile(r"\.pending-[0-9a-f]{32}\.json\Z")
+MOUNTINFO = Path("/proc/self/mountinfo")
 
 
 class Rejected(ValueError):
@@ -110,6 +111,27 @@ def _archive_usage(path: Path) -> int:
     return total
 
 
+def _require_archive_mount(path: Path) -> None:
+    """Reject an SSH archive that fell back to its parent filesystem."""
+    if not sys.platform.startswith("linux"):
+        raise Rejected("linux_mount_required")
+    try:
+        mounts = MOUNTINFO.read_text(encoding="utf-8").splitlines()
+    except OSError as exc:
+        raise Rejected("mount_info") from exc
+    target = str(path.resolve(strict=True))
+    for line in mounts:
+        fields = line.split(" - ", 1)[0].split()
+        if len(fields) < 5:
+            raise Rejected("mount_info")
+        mounted = re.sub(
+            r"\\([0-7]{3})", lambda match: chr(int(match.group(1), 8)), fields[4],
+        )
+        if mounted == target:
+            return
+    raise Rejected("archive_mount_missing")
+
+
 def _existing(path: Path, digest: str, original: dict, technical: dict) -> dict:
     if path.is_symlink() or path.is_junction():
         raise Rejected("archive_entry")
@@ -154,6 +176,7 @@ def receive(
 def receive_bytes(
     raw: bytes, archive: Path, source_id: str, environment: str, *,
     max_archive_bytes: int, min_free_bytes: int, source_name: str | None = None,
+    require_mount: bool = False,
 ) -> dict:
     """Validate, publish atomically, then acknowledge the exact source bytes."""
     if type(max_archive_bytes) is not int or max_archive_bytes <= 0:
@@ -177,6 +200,8 @@ def receive_bytes(
     original = json.loads(raw)
     technical = checked[0]
     with _archive_lock(archive):
+        if require_mount:
+            _require_archive_mount(archive)
         used = _archive_usage(archive)
         if destination.exists() or destination.is_symlink():
             return _existing(destination, digest, original, technical)
@@ -247,6 +272,7 @@ def main() -> int:
             receipt = receive_bytes(
                 raw, args.archive_dir, args.source_id, args.environment,
                 max_archive_bytes=args.max_archive_bytes, min_free_bytes=args.min_free_bytes,
+                require_mount=True,
             )
         else:
             receipt = receive(

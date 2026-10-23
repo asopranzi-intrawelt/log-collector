@@ -310,6 +310,33 @@ def test_free_space_reserve_must_be_positive(tmp_path, receiver):
     assert list(archive.iterdir()) == []
 
 
+def test_ssh_archive_rejects_missing_mount_before_writing(tmp_path, receiver, monkeypatch):
+    archive = private_directory(tmp_path)
+    raw = (json.dumps(event()) + "\n").encode()
+    mountinfo = tmp_path / "mountinfo"
+    mountinfo.write_text("1 0 0:1 / / rw - ext4 /dev/test rw\n", encoding="utf-8")
+    monkeypatch.setattr(receiver, "MOUNTINFO", mountinfo)
+    monkeypatch.setattr(receiver, "sys", SimpleNamespace(platform="linux"))
+
+    with pytest.raises(receiver.Rejected, match="archive_mount_missing"):
+        receiver.receive_bytes(
+            raw, archive, "qa-test-source", "staging",
+            max_archive_bytes=4096, min_free_bytes=1, require_mount=True,
+        )
+    assert list(archive.iterdir()) == []
+
+    mount_path = str(archive.resolve()).replace(" ", r"\040")
+    mountinfo.write_text(
+        f"2 1 0:2 / {mount_path} rw - ext4 /dev/test rw\n", encoding="utf-8",
+    )
+    receipt = receiver.receive_bytes(
+        raw, archive, "qa-test-source", "staging",
+        max_archive_bytes=4096, min_free_bytes=1, require_mount=True,
+    )
+    assert receipt["status"] == "stored"
+    assert (archive / ("a" * 32 + ".json")).exists()
+
+
 def test_unexpected_archive_entry_blocks_receipt(tmp_path, receiver):
     archive = private_directory(tmp_path)
     (archive / "unexpected.txt").write_text("unclassified", encoding="utf-8")

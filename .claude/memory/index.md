@@ -1,5 +1,13 @@
 # Snapshot di sincronizzazione
 
+## Chiarimento Seeweb inviato e rete allineata, 23/10/2026
+
+L'utente riferisce di aver inviato a Seeweb il chiarimento sul percorso dei log: tunnel IPsec terminato sui firewall, VM Debian destinataria Syslog nella LAN. Testo inviato e ricevuta non sono disponibili qui; si attende la conferma del provider su IP sorgente, selettori, NAT e categorie. Nessun flusso Seeweb attivo. `D:/network-design` era pulito a `be1b365` prima dell'allineamento documentale corrente, che registra anche QA `02f1e40` e collettore `b29612c`. ISO-30 resta in corso.
+
+## Scadenza e mount QA, 23/10/2026
+
+I `chiudi` manuali hanno allineato collettore `main` a `b29612c` e QA `staging` a `02f1e40` con i rispettivi remoti. L'obiettivo prioritario entro il 20/12 è il questionario cliente di 19 requisiti, non il collettore esteso da 60-100 giorni persona: questo repository contribuisce alle righe 89 e 90. Il piano interno di settembre stimava 36,5-56 giorni persona per i 19, ma i progressi successivi vanno riconciliati; l'utente è l'unica persona tecnica e ha 40 feriali nominali fino al 18/12. L'Annex consegnato indica `12/2026` anche per le due righe che il piano interno vorrebbe parziali; conferma del differimento non trovata nella cartella esaminata. Nel nuovo diff il ricevitore SSH QA richiede che l'archivio sia un mount visibile in `/proc/self/mountinfo`; prova locale 39/39 ricevitore/confine, nessun volume QA live provato. `D:/network-design` aveva tre file VPS modificati da un'altra sessione: attendere un albero disponibile per registrare i due SHA e ISO-30 senza alterare quel lavoro. Quota fisica, allarme, due LXC e prova fra host restano aperti.
+
 ## QA: trasporto candidato, 23/10/2026
 
 Collettore `3fb0ab0` e QA `d994af0` sono i checkpoint manuali allineati ai rispettivi remoti. Nel nuovo albero di lavoro la ricezione via comando SSH forzato e il mittente con ricevuta esatta/replay sono candidati locali: 38 prove del collettore e 12 del produttore mirate, probe fra i repository e CLI POSIX in WSL superati; nessun host o LXC collegato. La roadmap mantiene 25-40 giorni persona al primo AdS e 60-100 al perimetro completo perché i gate operativi non sono chiusi. Durante il 23/10 `D:/network-design` è risultato pulito su `main` a `064eedd` e poi a `97987ee`; il suo HEAD va riverificato prima della scrittura: riconciliare QA e ISO-30 dopo i due nuovi `chiudi`. Dettaglio in `docs/integrazione-log-qa-verifier.md`, `.claude/context/roadmap.md` e nell'handoff.
