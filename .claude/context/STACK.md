@@ -8,10 +8,14 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 288e022
+last-verified-commit: 3fb0ab08037199efc9367233c8bfe8f6d3a79cd4
 ---
 
 # Stack applicativo
+
+## Ricezione QA via comando SSH forzato, 23/10/2026
+
+`bin/qa_technical_archive.py` conserva la modalità file e aggiunge `--ssh-stdin` per un singolo evento; il confine e il writer privato sono gli stessi. Il comando originale deve essere `qa-tech-v1`, mentre `--source-id` e `--environment` sono argomenti fissati sul Debian nella riga `authorized_keys` della chiave dedicata. La ricevuta JSON contiene stato, ID e SHA-256 dei byte accettati. Il mittente vive nel repository QA; nessun account SSH, LXC o servizio è stato installato.
 
 ## Spool Linux provato su tmpfs, 21/10/2026
 

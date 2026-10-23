@@ -5,10 +5,14 @@ generated-date: 2026-09-30
 covers-paths:
   - config/**
   - docs/handoff-sviluppo-collettore.md
-last-verified-commit: 288e022
+last-verified-commit: 3fb0ab08037199efc9367233c8bfe8f6d3a79cd4
 ---
 
 # Deployment
+
+## Consegna QA ancora fuori dalla VM, 23/10/2026
+
+Il candidato `--ssh-stdin` e il mittente QA sono nei due repository, non sul Debian e non nelle due LXC ancora da creare. Prima di qualsiasi invio reale: budget Proxmox e quota dell'archivio, account e chiave distinti per ambiente con comando forzato e `restrict`, fingerprint host verificata, valori di riserva misurati, ACL e retention dell'originale, allarme di saturazione e prova di restore. Il percorso operativo e i comandi segnaposto sono in `docs/integrazione-log-qa-verifier.md`; la promozione nella vista generale riguarda soltanto il record minimizzato.
 
 ## Mount Linux collaudati solo nel namespace locale, 21/10/2026
 

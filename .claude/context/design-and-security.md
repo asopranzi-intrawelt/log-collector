@@ -6,10 +6,14 @@ covers-paths:
   - bin/**
   - config/**
   - pilot/monitoring-hub/**
-last-verified-commit: 288e022
+last-verified-commit: 3fb0ab08037199efc9367233c8bfe8f6d3a79cd4
 ---
 
 # Design e sicurezza applicativa
+
+## Identità e ricevuta del flusso QA, 23/10/2026
+
+La riga SSH forzata proposta associa una chiave per ambiente a `source_id` e archivio privato fissati sul server; il payload non può cambiare l'origine attesa. `--ssh-stdin` rifiuta un comando originale diverso e legge un solo evento entro 1 MiB. Il mittente riconosce solo una ricevuta con ID e SHA-256 identici ai byte inviati e conserva il file pronto quando la risposta manca o non coincide. Il retry riceve `duplicate` se l'archivio centrale ha già pubblicato gli stessi byte. Il protocollo è candidato locale: autenticazione fra host, host key, ACL, limite fisico, allarme e durabilità sul volume destinato richiedono prova operativa.
 
 ## Errore fisico dello spool e prova di autorizzazione QA, 21/10/2026
 

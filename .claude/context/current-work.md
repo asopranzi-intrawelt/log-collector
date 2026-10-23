@@ -8,11 +8,15 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 288e022
+last-verified-commit: 3fb0ab08037199efc9367233c8bfe8f6d3a79cd4
 stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai punti 3 e 7; eventi iLO tecnici separati con ritenzione 90 giorni attiva; catena locale provata in WSL, non installata; D7 bloccato da nomina ed elenco AdS
 ---
 
 # Lavoro in corso
+
+## QA: ricevuta SSH candidata e replay locale, 23/10/2026
+
+Dopo il `chiudi` dell'utente, il collettore è pulito e allineato al remoto a `3fb0ab0`, QA a `d994af0`. Nel nuovo diff il ricevitore accetta `--ssh-stdin` solo con il comando originale `qa-tech-v1` e identità sorgente fissata sul server; il mittente QA usa OpenSSH con host key vincolata e sposta il file soltanto dopo ricevuta con ID e hash esatti. Ricevitore/confine 38/38, mittente/outbox 12/12, Ruff e Mypy verdi. Probe locale fra writer QA e ricevitore: perdita della prima ricevuta, file pronto conservato, secondo tentativo `duplicate`; CLI POSIX in WSL: `stored`, `duplicate`, comando errato rifiutato e archivio `0600`. Nessun SSH fra host, LXC o deploy: servono quota fisica e allarme, valori di budget misurati, fingerprint host confermata, indice minimizzato, ACL/retention/restore e campione dal job. Durante il 23/10 `D:/network-design` è risultato pulito su `main` a `064eedd` e poi a `97987ee`, mentre la sessione VPS avanzava; verificare di nuovo HEAD prima di scriverci; il suo dossier QA va riconciliato con i due nuovi commit **dopo** le chiusure manuali.
 
 ## QA: riserva di spazio e rete allineata, 22/10/2026
 

@@ -1,10 +1,12 @@
 """The offline receiver must persist one validated QA event before acknowledging it."""
 
 import importlib.util
+import io
 import json
 import os
 import subprocess
 import sys
+from hashlib import sha256
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -184,6 +186,43 @@ def test_file_name_must_match_validated_event_id(tmp_path, receiver):
     source.rename(renamed)
     with pytest.raises(receiver.Rejected, match="source_name"):
         receive(receiver, renamed, archive)
+    assert list(archive.iterdir()) == []
+
+
+def test_ssh_stdin_requires_exact_forced_command_and_bounded_input(
+    tmp_path, receiver, monkeypatch,
+):
+    archive = private_directory(tmp_path)
+    raw = (json.dumps(event()) + "\n").encode()
+    monkeypatch.setenv("SSH_CONNECTION", "test connection")
+    monkeypatch.setenv("SSH_ORIGINAL_COMMAND", "other-command")
+    with pytest.raises(receiver.Rejected, match="ssh_command"):
+        receiver._read_ssh_stdin(io.BytesIO(raw))
+    assert list(archive.iterdir()) == []
+    monkeypatch.setenv("SSH_ORIGINAL_COMMAND", "qa-tech-v1")
+    with pytest.raises(receiver.Rejected, match="source_file"):
+        receiver._read_ssh_stdin(io.BytesIO(b"x" * (receiver.MAX_FILE_BYTES + 1)))
+    accepted = receiver._read_ssh_stdin(io.BytesIO(raw))
+    receipt = receiver.receive_bytes(
+        accepted, archive, "qa-test-source", "staging",
+        max_archive_bytes=4096, min_free_bytes=1,
+    )
+    assert receipt["sha256"] == sha256(raw).hexdigest()
+    assert receipt["status"] == "stored"
+    assert receiver.receive_bytes(
+        accepted, archive, "qa-test-source", "staging",
+        max_archive_bytes=4096, min_free_bytes=1,
+    )["status"] == "duplicate"
+
+
+def test_ssh_stdin_rejects_claim_from_other_source(tmp_path, receiver):
+    archive = private_directory(tmp_path)
+    raw = (json.dumps(event(source_id="qa-other-source")) + "\n").encode()
+    with pytest.raises(receiver.Rejected, match="source_id"):
+        receiver.receive_bytes(
+            raw, archive, "qa-test-source", "staging",
+            max_archive_bytes=4096, min_free_bytes=1,
+        )
     assert list(archive.iterdir()) == []
 
 

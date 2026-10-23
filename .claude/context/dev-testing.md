@@ -6,10 +6,14 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 288e022
+last-verified-commit: 3fb0ab08037199efc9367233c8bfe8f6d3a79cd4
 ---
 
 # Test di sviluppo
+
+## Ingresso QA via stdin e replay fra repository, 23/10/2026
+
+Ricevitore e confine: 38/38 prove, inclusi comando SSH errato, limite di lettura, origine diversa, hash e retry. Nel produttore QA 12/12 prove mirate e suite CI 470/470 con sei dati reali esclusi; Ruff e Mypy verdi. Un probe locale con writer QA e ricevitore reale ha perso la prima risposta dopo la pubblicazione e ottenuto `duplicate` al secondo giro; la CLI POSIX in WSL ha prodotto `stored`/`duplicate`, respinto il comando diverso e scritto `0600`. Un probe POSIX separato del mittente ha verificato lock, spostamento, file `0600`, directory `0700` e argomenti SSH con risposta simulata. Non è stato provato un canale SSH fra host, né il volume del Debian o il punto d'indice.
 
 ## Riserva di spazio del ricevitore QA, 22/10/2026
 

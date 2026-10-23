@@ -1,5 +1,9 @@
 # Snapshot di sincronizzazione
 
+## QA: trasporto candidato, 23/10/2026
+
+Collettore `3fb0ab0` e QA `d994af0` sono i checkpoint manuali allineati ai rispettivi remoti. Nel nuovo albero di lavoro la ricezione via comando SSH forzato e il mittente con ricevuta esatta/replay sono candidati locali: 38 prove del collettore e 12 del produttore mirate, probe fra i repository e CLI POSIX in WSL superati; nessun host o LXC collegato. La roadmap mantiene 25-40 giorni persona al primo AdS e 60-100 al perimetro completo perché i gate operativi non sono chiusi. Durante il 23/10 `D:/network-design` è risultato pulito su `main` a `064eedd` e poi a `97987ee`; il suo HEAD va riverificato prima della scrittura: riconciliare QA e ISO-30 dopo i due nuovi `chiudi`. Dettaglio in `docs/integrazione-log-qa-verifier.md`, `.claude/context/roadmap.md` e nell'handoff.
+
 ## QA dopo le chiusure e riserva del ricevitore, 22/10/2026
 
 QA `d994af0` e collettore `5e46478` sono versionati e pubblicati. `D:/network-design` ha aggiornato dossier, M32e e fonte ISO-30, ancora in corso; i suoi file VPS paralleli sono stati conservati. Nel candidato del collettore il ricevitore richiede anche una riserva positiva di byte disponibili: 36/36 prove, mutazione della guardia sensibile. È un preflight, non quota fisica. Restano trasporto autenticato, ricevuta/replay, allarme, retention/restore riservati, indice e due LXC. Versionamento e deploy restano manuali.

@@ -8,6 +8,12 @@ last-verified-commit: 9ee87b4
 
 # Roadmap
 
+## Stato misurato e prossimo gate, 23/10/2026
+
+Checkpoint chiusi dall'utente: collettore `3fb0ab0` su `main` e QA `d994af0` su `staging`. Nel nuovo diff, la catena QA passa dal file locale del produttore a un ricevitore invocabile come comando SSH forzato, con ricevuta SHA-256 verificata dal mittente e spostamento privato del file confermato. Il probe locale fra i due repository ha esercitato la perdita di ricevuta dopo la scrittura centrale e il retry `duplicate`; WSL ha esercitato la CLI del ricevitore su POSIX. Non esiste ancora un collegamento fra host o una LXC QA in esercizio. Il prossimo gate misurabile è: creare i due LXC e il budget Proxmox approvato, configurare per ambiente chiave e host key verificate, provare un evento vero dal job fino all'archivio e alla vista tecnica, con quota fisica, allarme consegnato e ripristino. Solo allora la riga QA potrà passare da candidato a flusso operativo.
+
+Le stime di pianificazione residue del 21/10 sotto restano **25-40 giorni persona** per il primo esercizio AdS e **60-100 giorni persona** per il perimetro completo: il candidato QA riduce un'incertezza del trasporto, ma non chiude nessuna uscita operativa della tabella e non fornisce una misura sufficiente per sottrarre giorni dal totale. Somma dei cinque intervalli del perimetro completo: minimo `6+8+14+22+10=60`, massimo `10+14+22+38+16=100`. Con quattro giorni persona disponibili a settimana sono 15-25 settimane di lavoro; con tre, 20-33,3 settimane; con cinque, 12-20 settimane. Le attese esterne e le finestre di cambio si aggiungono a questi tempi, perciò non c'è una data di completamento affidabile finché i gate documentati nell'handoff non sono risolti. Il censimento 59/59 è la copertura dell'inventario, non la quota di flussi attivi.
+
 ## Prova fisica dello spool e gate successivo, 21/10/2026
 
 Il mount limitato e l'ENOSPC sono verificati in Ubuntu WSL locale su tmpfs sintetico, con il lock residuo corretto. Restano power loss, carico, recupero dei guasti lunghi, consegna dell'allarme e budget hub+due LXC QA. L'audit QA indica inoltre un gate prioritario del produttore: autorizzazione riservata durevole prima del backup esterno, emissione tecnica sul percorso del job anche se fallisce e copertura della CLI. Le stime residue restano condizionate.
@@ -148,7 +154,7 @@ Raccogliere e verificare gli accessi amministrativi di tutte le sorgenti applica
 
 ## Priorità
 
-1. Completare le sorgenti del componente 3 secondo `docs/matrice-sorgenti-rete.md`: il poller HTTPS Nebula è preparato e provato localmente su cinque accessi reali anonimizzati; misurare retention, limiti e offline cloud, collegare notifica esterna e coordinamento D-1, quindi collaudare con credenziale dedicata sulla VM; proseguire con 54HP, AP e gli altri nodi applicabili. La matrice include 57 nodi, ma la maggior parte non è ancora una sorgente collaudata.
+1. Completare le sorgenti del componente 3 secondo `docs/matrice-sorgenti-rete.md`: il poller HTTPS Nebula è preparato e provato localmente su cinque accessi reali anonimizzati; misurare retention, limiti e offline cloud, collegare notifica esterna e coordinamento D-1, quindi collaudare con credenziale dedicata sulla VM; proseguire con 54HP, AP e gli altri nodi applicabili. La matrice include 59 nodi, ma la maggior parte non è ancora una sorgente collaudata.
 2. Chiudere la separazione NAS D7 quando esisteranno nomina ed elenco AdS approvato, poi collaudare il componente 5 sul collettore e completare custodia e ancoraggio della prova.
 3. Eseguire un intervento di hardening della VM con baseline, controlli negativi e verifica di accessi, aggiornamenti, backup e monitoraggio; requisiti precisi da definire sullo stato reale prima dei cambi.
 4. Progettare e collaudare una GUI web minima, raggiungibile solo dalla LAN e autenticata per l'unico sysadmin autorizzato, con tracciamento della consultazione e permessi di sola lettura sui log. Il nome dell'account e la forma di autenticazione sono ancora da decidere.

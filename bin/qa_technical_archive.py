@@ -1,7 +1,7 @@
-"""Receive one QA outbox file into a restricted offline archive.
+"""Receive one QA event into a restricted archive from a file or forced SSH command.
 
-This command has no network listener. The expected source identity must come
-from a future authenticated transport, not from the event's own claim.
+This command has no network listener. For SSH, the server fixes the source
+identity in its forced command; the event's own claim never selects it.
 """
 
 import argparse
@@ -141,13 +141,28 @@ def receive(
     source: Path, archive: Path, source_id: str, environment: str, *,
     max_archive_bytes: int, min_free_bytes: int,
 ) -> dict:
+    """Receive an offline file whose name matches the validated event ID."""
+    archive = _archive_directory(archive)
+    raw = _source_bytes(source)
+    return receive_bytes(
+        raw, archive, source_id, environment,
+        max_archive_bytes=max_archive_bytes, min_free_bytes=min_free_bytes,
+        source_name=source.name,
+    )
+
+
+def receive_bytes(
+    raw: bytes, archive: Path, source_id: str, environment: str, *,
+    max_archive_bytes: int, min_free_bytes: int, source_name: str | None = None,
+) -> dict:
     """Validate, publish atomically, then acknowledge the exact source bytes."""
     if type(max_archive_bytes) is not int or max_archive_bytes <= 0:
         raise Rejected("archive_limit")
     if type(min_free_bytes) is not int or min_free_bytes <= 0:
         raise Rejected("free_space_limit")
+    if type(raw) is not bytes or not raw or len(raw) > MAX_FILE_BYTES:
+        raise Rejected("source_file")
     archive = _archive_directory(archive)
-    raw = _source_bytes(source)
     try:
         checked = boundary.check_jsonl(raw, source_id, environment)
     except boundary.Rejected as exc:
@@ -155,7 +170,7 @@ def receive(
     if len(checked) != 1:
         raise Rejected("single_event_required")
     event_id = checked[0]["record"]["event_id"]
-    if source.name != f"{event_id}.json":
+    if source_name is not None and source_name != f"{event_id}.json":
         raise Rejected("source_name")
     destination = archive / f"{event_id}.json"
     digest = sha256(raw).hexdigest()
@@ -197,9 +212,21 @@ def receive(
             _sync_directory(archive)
 
 
+def _read_ssh_stdin(stream) -> bytes:
+    if (os.environ.get("SSH_ORIGINAL_COMMAND") != "qa-tech-v1"
+            or not os.environ.get("SSH_CONNECTION")):
+        raise Rejected("ssh_command")
+    raw = stream.read(MAX_FILE_BYTES + 1)
+    if not raw or len(raw) > MAX_FILE_BYTES:
+        raise Rejected("source_file")
+    return raw
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--event-file", required=True, type=Path)
+    source = parser.add_mutually_exclusive_group(required=True)
+    source.add_argument("--event-file", type=Path)
+    source.add_argument("--ssh-stdin", action="store_true")
     parser.add_argument("--archive-dir", required=True, type=Path)
     parser.add_argument("--source-id", required=True)
     parser.add_argument("--environment", required=True, choices=("staging", "production"))
@@ -215,10 +242,17 @@ def main() -> int:
     try:
         if os.name != "posix":
             raise Rejected("posix_required")
-        receipt = receive(
-            args.event_file, args.archive_dir, args.source_id, args.environment,
-            max_archive_bytes=args.max_archive_bytes, min_free_bytes=args.min_free_bytes,
-        )
+        if args.ssh_stdin:
+            raw = _read_ssh_stdin(sys.stdin.buffer)
+            receipt = receive_bytes(
+                raw, args.archive_dir, args.source_id, args.environment,
+                max_archive_bytes=args.max_archive_bytes, min_free_bytes=args.min_free_bytes,
+            )
+        else:
+            receipt = receive(
+                args.event_file, args.archive_dir, args.source_id, args.environment,
+                max_archive_bytes=args.max_archive_bytes, min_free_bytes=args.min_free_bytes,
+            )
     except (Rejected, OSError) as exc:
         code = str(exc) if isinstance(exc, Rejected) else "io_error"
         print(f"rejected:{code}", file=sys.stderr)
