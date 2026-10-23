@@ -1,5 +1,21 @@
 # Work-log
 
+## 2026-10-23 - Controllo D6 con segnali espliciti
+
+Dopo il commit manuale rete `b29d82b` (12 file esclusivi, remoto allineato), cercato nel catalogo del template un presidio di silenzio per log/heartbeat: nessun pacchetto adatto, sviluppato quindi il controllo specifico del collettore. `bin/ads-silence.py` rifiuta policy mancante/vuota/duplicata e ID non sicuri, legge una lista privata per sorgente e produce JSON con stato distinto per evento giornaliero e heartbeat. Se manca un file di eventi emette `no_events` senza dedurre un guasto; l'assenza del file heartbeat previsto emette `heartbeat_missing`. Uscita 0 solo con segnali osservati, 2 per allarme e 3 per policy errata. Otto prove funzionali passano e Ruff è verde; nessuna sorgente reale o mail è stata provata. Modello solo con indirizzi di documentazione in `config/silence-policy.example.json`. Aggiornati studio, handoff, runbook componente 5, contesto e memoria. D6, ISO-30 e WindTre 89/90 restano aperti fino a politica approvata, heartbeat reale, timer, relay e verifica della consegna. Nessun deploy o Git di scrittura dell'agente.
+
+La mutazione che segnava `observed` per heartbeat mancante ha fatto fallire il caso mirato; ripristino del file e SHA-256 verificati, suite completa nuovamente verde.
+
+**Template:** nessuna.
+
+## 2026-10-23 - Mount QA provato su tmpfs WSL2
+
+L'utente ha chiuso e pubblicato il collettore a `738b6a9`. Per ridurre il rischio fra test con mountinfo finto e volume reale, probe isolato su Ubuntu WSL2 come root soltanto per montare un tmpfs da 16 MiB; prima del mount il ricevitore ha rifiutato `archive_mount_missing` senza scrivere, dopo il mount ha archiviato `backup_selected` con `0700` e ottenuto `stored`, poi `duplicate` sugli stessi byte. Hash della ricevuta e originale dell'envelope verificati; smontaggio e pulizia conclusi. Il probe temporaneo era in Temp ed è stato eliminato, nessun file di prova aggiunto al progetto. Aggiornati dossier QA, schede di contesto, memoria e ripresa privata; nessun deploy o Git di scrittura. ISO-30 resta in corso perché il volume destinato, quota fisica, allarme, due LXC, SSH fra host e retention/restore non sono provati.
+
+Proseguita con una lettura SSH della VM Debian, senza sudo né scritture: `id -u` ha dato `1000`; `findmnt -T /srv/ads` ha mostrato ext4 `rw,nosuid,nodev,noexec,relatime`; `systemctl` ha dato `active` per rsyslog e `not-found/inactive` per entrambi i timer `ads-nightly` e `ads-silence`. `test -f` sullo script notturno e `test -d` sui manifest sono negativi per quell'account; non si deduce l'assenza assoluta da una verifica priva di elevazione. Il blocco operativo per WindTre 89/90 è confermato, nessun servizio installato o riavviato. Aggiornato anche `docs/handoff-sviluppo-collettore.md`.
+
+**Template:** nessuna.
+
 ## 2026-10-23 - Ticket Seeweb inviato e allineamento rete
 
 L'utente comunica di aver inviato la risposta al supporto dopo screenshot_103. Il testo effettivo e la ricevuta non sono presenti: si registra il fatto riferito, senza promuovere a configurato l'inoltro Syslog o a confermato il percorso IPsec. Aggiornati il dossier Seeweb del collettore e le schede di `D:/network-design` con i checkpoint QA `02f1e40` e collettore `b29612c`, il perimetro WindTre di dicembre e lo stato ISO-30/M32e ancora in corso. La rete era pulita a `be1b365` prima del nuovo diff; le modifiche simultanee della sessione VPS sono conservate. File scritti in questo giro: schede Seeweb, integrazione e timeline della rete, contesto e memoria dei due progetti, ripresa privata del collettore. Nessun invio dell'agente, deploy o Git di scrittura.

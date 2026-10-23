@@ -1,5 +1,11 @@
 # Componente 5 - Catena locale dei log giornalieri
 
+## Controllo di silenzio candidato, 23/10/2026
+
+`bin/ads-silence.py` legge una politica JSON privata con `version=1` e una voce `id`/`signal` per sorgente. I segnali ammessi sono `daily_event`, che cerca un file non vuoto `/srv/ads/<id>/<D-1>.log`, e `daily_heartbeat`, che cerca `/var/lib/ads/heartbeats/<id>/<D-1>.heartbeat`. Il [modello senza indirizzi reali](../config/silence-policy.example.json) mostra il formato; non è una lista di sorgenti approvate e non va installato come configurazione di esercizio. Una politica mancante, vuota, duplicata o con ID non sicuro fa fallire il controllo. Il report JSON distingue `observed`, `no_events`, `heartbeat_missing`, `read_error` e `unsafe_path`; l'uscita è 0 solo con tutti i segnali osservati, 2 per allarme e 3 per politica invalida.
+
+`no_events` significa che non è stato osservato un evento nel giorno scelto, non che la sorgente sia guasta: iLO, firewall e altre sorgenti attivate dagli eventi possono restare legittimamente quiete. Una politica `daily_heartbeat` è significativa solo dopo aver installato e collaudato un produttore indipendente dagli accessi; oggi il pilota Windows non lo fornisce. La verifica di presenza del file non prova integrità, provenienza o completezza. Otto prove locali esercitano segnali distinti, giornate vuote e politiche invalide; nessun timer o mail è configurato. Prima dell'esercizio servono elenco delle sorgenti attese riconciliato con `parametri.yaml`, segnale valido per ciascuna, heartbeat del produttore, relay SMTP e prova di consegna dell'allarme.
+
 ## Stato e perimetro
 
 Al 07/10/2026 `bin/ads-nightly.sh`, `bin/ads-verify.sh` e le unità `ads-nightly.service` e `ads-nightly.timer` sono preparati nel repository, ma **non installati né attivati** sul collettore. Il primo stadio comprime i file del giorno D-1 e crea manifest concatenati con SHA-256. Marca temporale RFC 3161, copia WORM e invio dell'impronta alla Direzione sono stadi successivi, bloccati dalle scelte e credenziali indicate nell'handoff. Una catena che vive soltanto sulla stessa VM segnala alterazioni accidentali o non coordinate, ma non fornisce da sola una prova indipendente contro chi controlla VM, file e manifest.

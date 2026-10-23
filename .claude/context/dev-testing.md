@@ -11,6 +11,14 @@ last-verified-commit: 3fb0ab08037199efc9367233c8bfe8f6d3a79cd4
 
 # Test di sviluppo
 
+## Controllo di silenzio D6, 23/10/2026
+
+`tests/test_ads_silence.py`: 8/8 prove su due segnali indipendenti, giornata senza eventi, heartbeat mancante, file vuoto, politica vuota/duplicata/traversal/invalida e data errata; Ruff verde. Mutazione temporanea che segnava `observed` per heartbeat mancante: il caso mirato è caduto; sorgente ripristinata con SHA-256 identico alla copia verificata e suite tornata verde. La prova usa filesystem temporaneo e non un produttore reale. Prima di chiamarlo presidio servono heartbeat prodotto, timer, relay e verifica della mail ricevuta.
+
+## Mount Linux reale del ricevitore QA, 23/10/2026
+
+Probe WSL2 senza pytest, su tmpfs temporaneo da 16 MiB: mount assente rifiutato prima della scrittura; mount presente `0700` ammesso; `stored` e retry `duplicate` con hash e originale verificati. Smontaggio e rimozione riusciti. Prova locale del controllo configurativo, non del volume o della quota fisica di esercizio; nessuna VM o LXC modificata.
+
 ## Guardia mount del ricevitore QA, 23/10/2026
 
 Ricevitore e confine 39/39, Ruff verde. Il nuovo caso usa mountinfo controllato: senza il punto di mount rifiuta prima di scrivere, con il punto dichiarato pubblica il file. Eliminando temporaneamente la chiamata alla guardia, la prova è fallita per `DID NOT RAISE Rejected`; sorgente ripristinato e SHA-256 confrontato con la copia precedente. Due tentativi nel sandbox erano invalidi per permessi della directory temporanea di pytest e non sono conteggiati come prova del difetto; la ripetizione fuori sandbox è arrivata all'asserzione. Resta da esercitare il comando su un bind mount Linux reale e poi sul volume di destinazione con quota, allarme e restore.

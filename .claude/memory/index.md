@@ -1,5 +1,15 @@
 # Snapshot di sincronizzazione
 
+## D6 candidato dopo la prova mount, 23/10/2026
+
+`ads-silence.py` legge una politica privata per sorgente e distingue `no_events` da `heartbeat_missing`, con otto prove e Ruff verdi. Una giornata quieta non diventa prova di guasto. Nessun heartbeat o timer/mail installati; non attribuire copertura WindTre 89/90 a questo candidato. Rete `b29d82b` pubblicata dall'utente per i dodici file isolati; memoria e gap condivisi restano fuori da quel commit.
+
+## QA: mount locale reale provato, 23/10/2026
+
+Collettore `738b6a9` pubblicato dall'utente. Il controllo mount del ricevitore QA è stato provato su tmpfs WSL2 reale da 16 MiB: directory senza mount rifiutata, con mount evento archiviato, retry duplicato riconosciuto, hash e originale verificati. Nessun volume destinato, quota fisica, allarme, LXC o collegamento SSH fra host; ISO-30/M32e in corso. Comandi manuali per isolare il filone di rete comunicati, nessun Git di scrittura dell'agente.
+
+Sulla VM Debian, lettura del 23/10: mount AdS ext4 e `rsyslog` attivo; `ads-nightly.timer` e `ads-silence.timer` assenti dall'elenco unità. Lo script notturno e i manifest non sono visibili all'account di verifica, causa non dedotta. Nessun deploy eseguito; le righe WindTre 89/90 restano aperte.
+
 ## Chiarimento Seeweb inviato e rete allineata, 23/10/2026
 
 L'utente riferisce di aver inviato a Seeweb il chiarimento sul percorso dei log: tunnel IPsec terminato sui firewall, VM Debian destinataria Syslog nella LAN. Testo inviato e ricevuta non sono disponibili qui; si attende la conferma del provider su IP sorgente, selettori, NAT e categorie. Nessun flusso Seeweb attivo. `D:/network-design` era pulito a `be1b365` prima dell'allineamento documentale corrente, che registra anche QA `02f1e40` e collettore `b29612c`. ISO-30 resta in corso.

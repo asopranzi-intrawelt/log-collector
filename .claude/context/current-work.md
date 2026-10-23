@@ -14,6 +14,16 @@ stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai p
 
 # Lavoro in corso
 
+## D6: segnale di silenzio candidato, 23/10/2026
+
+`bin/ads-silence.py` e la politica di esempio separano `daily_event` da `daily_heartbeat` per ogni sorgente. Una giornata senza file è `no_events`, non un guasto attribuito; un heartbeat atteso mancante è `heartbeat_missing`. Politica vuota, duplicata o con ID non sicuri viene rifiutata. Otto prove sintetiche e Ruff verdi. Nessun timer, heartbeat Windows o mail installati; lista attesa, segnale per sorgente, relay e consegna dell'allarme restano gate D6. Dettagli nel runbook del componente 5. La rete `b29d82b` è pubblicata dall'utente per i 12 file esclusivi; memoria e gap della sessione concorrente restano nel suo albero.
+
+## Mount QA esercitato su Linux locale, 23/10/2026
+
+Dopo il `chiudi` manuale del collettore `738b6a9` (HEAD e `origin/main` coincidenti), il ricevitore QA con `require_mount=True` ha superato un probe WSL2 su tmpfs reale da 16 MiB: senza mount rifiuto senza file, con mount `stored`, retry `duplicate`, hash e originale corrispondenti. Il volume di destinazione, quota fisica e allarme restano non provati; nessun collegamento fra host, LXC o deploy. Il ticket Seeweb è in attesa. In `D:/network-design` l'utente ha pubblicato a `b29d82b` il filone QA/Seeweb/ISO con i soli file esclusivi; memoria e gap condivisi con la sessione del sito restano fuori.
+
+Misura read-only della VM del collettore il 23/10: `/srv/ads` è montato ext4 con `rw,nosuid,nodev,noexec` e `rsyslog` è attivo; i timer `ads-nightly` e `ads-silence` non sono registrati. La cartella manifest non è visibile all'account usato, senza attribuirne la causa. La catena AdS 89/90 non è ancora in esercizio; non installare il timer prima dei gate D7, custodia e sorgenti.
+
 ## Scadenza 20/12 e mount dell'archivio QA, 23/10/2026
 
 I due `chiudi` sono conclusi: collettore `b29612c` e QA `02f1e40`, con i rispettivi remoti allineati. L'utente ha precisato che la priorità entro il 20/12 è il questionario cliente di 19 requisiti, non l'intero collettore esteso: questo progetto copre direttamente le righe 89 e 90. Il piano interno di settembre stimava 36,5-56 giorni persona per tutte le 19 righe, ma va aggiornato sul lavoro svolto; il solo operatore ha 40 feriali nominali fino a venerdì 18/12. L'Annex consegnato riporta `12/2026` anche per le due righe che un piano interno propone parziali: nessuna accettazione del differimento è stata trovata nella cartella esaminata. La roadmap documenta i gate e i progetti collegati. Il ricevitore SSH candidato rifiuta ora l'archivio se la directory indicata non è un mount visibile in `/proc/self/mountinfo`, prima di scrivere. La prova locale su mountinfo controllato esercita rifiuto e ammissione; non dimostra il mount reale, la quota fisica o la consegna dell'allarme. Seguono prova su volume Linux e collegamento fra host con LXC. `D:/network-design` era pulito a `be1b365` prima di questo allineamento; nel nuovo diff sono registrati QA, scadenza e domanda Seeweb. L'utente riferisce di aver inviato la risposta al ticket il 23/10; risposta del provider ancora attesa, nessun flusso attivo.

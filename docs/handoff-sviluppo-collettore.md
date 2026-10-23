@@ -16,6 +16,8 @@ Riferimento funzionale: `studio-collettore-ads.md`. Questo file dice **come e in
 
 ### Pendenze con evidenza, 23/10/2026
 
+Verifica in sola lettura sulla VM del collettore il 23/10, con SSH a chiave, `BatchMode=yes` e host key obbligatoria: `/srv/ads` risulta un mount ext4 `rw,nosuid,nodev,noexec` e `rsyslog` è `active`. `ads-nightly.timer` e `ads-silence.timer` restituiscono `not-found` e `inactive`; lo script notturno e la cartella manifest non sono visibili all'account interrogato. Quest'ultima osservazione non distingue assenza da permessi insufficienti. La catena locale provata in WSL non è installata come servizio: le righe WindTre 89/90 richiedono ancora prova sulla VM, custodia indipendente e conservazione verificabile. Nessuna configurazione è stata modificata.
+
 Queste righe distinguono lavoro interno e attese esterne. Per dichiarare chiusa una pendenza servono un artefatto ricevuto e una prova di integrazione, non soltanto il testo di una proposta. Il dossier tecnico di ciascuna sorgente conserva il dettaglio; questa è la vista di consegna al cliente.
 
 Scadenza indicata dall'utente: 20/12/2026 per le evidenze del questionario cliente, con accettazione interna entro venerdì 18/12. Questo collettore contribuisce direttamente alle righe 89 e 90; il programma esteso delle 59 sorgenti non coincide automaticamente con il perimetro del questionario. L'Annex consegnato indica `12/2026` anche per la riga 90; la proposta interna di completarla solo in parte entro dicembre attende conferma scritta del cliente. Date, capacità e criteri dei gate sono nella [roadmap](../.claude/context/roadmap.md); il mancato arrivo di una decisione o di un campione resta una pendenza con evidenza, non una verifica superata.
@@ -132,7 +134,7 @@ Resta vero (studio, sezione 6) che l'amministratore dell'hypervisor può acceder
 | `ads-ninja.py` | Python | ogni giorno 00:05 | `/v2/activities` → `/srv/ads/ninjaone/` |
 | `ads-gravityzone.py` | Python | ogni ora **[Non verificato]** cadenza | accessi alla console via API pubblica → `/srv/ads/gravityzone/` (studio, D9) |
 | `ads-nightly.sh` | Bash | ogni giorno 00:15 | gzip, manifest a catena, marca TSA, copia WORM, mail (studio sez. 5) |
-| `ads-silence.sh` | Bash | ogni giorno 00:45 | sorgenti attese senza file/heartbeat → mail |
+| `ads-silence.py` | Python | ogni giorno 00:45, non installato | report locale e uscita non zero per assenza del segnale atteso; mail dopo scelta del relay |
 | `ads-verify.sh` | Bash | manuale, mensile | ricalcolo catena + `openssl ts -verify` → verbale |
 
 Regole comuni:
@@ -177,7 +179,7 @@ if $programname == ["pvedaemon","pveproxy","sshd","sudo","su","login","pveproxy-
 3. Per ogni sorgente: un login riuscito e uno fallito di un AdS compaiono nel file del giorno con **i 5 campi** (o con la lacuna documentata nella matrice dello studio).
 4. Collettore fermo per 1 ora: al riavvio arrivano gli eventi di Windows (bookmark + buffer) e di Proxmox (coda su disco). Gli eventi UDP di firewall e Nebula del periodo sono persi (rischio noto).
 5. `ads-nightly.sh`: modificare un byte di un file di D-1 già catenato → `ads-verify.sh` **segnala la rottura**.
-6. Una sorgente attesa senza file o senza heartbeat → mail di `ads-silence.sh`.
+6. Una sorgente attesa senza file o senza heartbeat → report di `ads-silence.py`; mail ancora da integrare e collaudare.
 7. Offset NTP di tutte le sorgenti < 1 s rispetto al collettore (`chronyc tracking` sul collettore; confronto degli orari di un evento noto).
 
 ---
@@ -189,7 +191,7 @@ if $programname == ["pvedaemon","pveproxy","sshd","sudo","su","login","pveproxy-
 3. Firewall, NAS, Proxmox host → collaudo punti 2-3
 4. iLO Remote Syslog → collaudo punti 3 e 7; `ads-ilo.py` resta alternativo se serve
 5. `ads-nightly.sh` senza marca e senza WORM, poi aggiunta WORM, poi TSA quando scelta
-6. `ads-silence.sh`
+6. `ads-silence.py`
 7. Pilota Windows (2 postazioni + 1 server) con Fluent Bit → misura volumi → ridimensionamento `scsi1` e WORM
 8. `ads-m365.py`, `ads-ninja.py`, `ads-gravityzone.py` (studio, D9)
 9. Collaudo completo sezione 6 → estensione Windows dopo il parere privacy

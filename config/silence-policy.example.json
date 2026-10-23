@@ -1,0 +1,7 @@
+{
+  "version": 1,
+  "sources": [
+    {"id": "192.0.2.1", "signal": "daily_event"},
+    {"id": "win-pilot", "signal": "daily_heartbeat"}
+  ]
+}
