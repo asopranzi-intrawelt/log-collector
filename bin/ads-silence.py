@@ -82,8 +82,11 @@ def _signal_file(path: Path) -> str:
 
 def check_day(
     sources: list[dict[str, str]], day: str, log_root: Path, heartbeat_root: Path,
+    require_log_mount: bool = False,
 ) -> dict[str, object]:
     _directory(log_root)
+    if require_log_mount and not log_root.is_mount():
+        raise PolicyError("log_mount_missing")
     # The heartbeat path may not exist until the first heartbeat arrives.
     if heartbeat_root.exists():
         _directory(heartbeat_root)
@@ -112,6 +115,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--policy", type=Path, default=DEFAULT_POLICY)
     parser.add_argument("--log-root", type=Path, default=DEFAULT_LOG_ROOT)
     parser.add_argument("--heartbeat-root", type=Path, default=DEFAULT_HEARTBEAT_ROOT)
+    parser.add_argument("--require-log-mount", action="store_true")
     parser.add_argument("--day", help="Day to check, YYYY-MM-DD; default is yesterday in Rome")
     args = parser.parse_args(argv)
     if args.day is None:
@@ -128,6 +132,7 @@ def main(argv: list[str] | None = None) -> int:
     try:
         report = check_day(
             load_policy(args.policy), day.isoformat(), args.log_root, args.heartbeat_root,
+            require_log_mount=args.require_log_mount,
         )
     except PolicyError as exc:
         print(f"ads-silence: {exc}", file=sys.stderr)

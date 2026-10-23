@@ -16,7 +16,7 @@ Riferimento funzionale: `studio-collettore-ads.md`. Questo file dice **come e in
 
 ### Pendenze con evidenza, 23/10/2026
 
-Verifica in sola lettura sulla VM del collettore il 23/10, con SSH a chiave, `BatchMode=yes` e host key obbligatoria: `/srv/ads` risulta un mount ext4 `rw,nosuid,nodev,noexec` e `rsyslog` è `active`. `ads-nightly.timer` e `ads-silence.timer` restituiscono `not-found` e `inactive`; lo script notturno e la cartella manifest non sono visibili all'account interrogato. Quest'ultima osservazione non distingue assenza da permessi insufficienti. La catena locale provata in WSL non è installata come servizio: le righe WindTre 89/90 richiedono ancora prova sulla VM, custodia indipendente e conservazione verificabile. Nessuna configurazione è stata modificata.
+Verifica in sola lettura sulla VM del collettore il 23/10, con SSH a chiave, `BatchMode=yes` e host key obbligatoria: `/srv/ads` risulta un mount ext4 `rw,nosuid,nodev,noexec` e `rsyslog` è `active`. `ads-nightly.timer` e `ads-silence.timer` restituiscono `not-found` e `inactive`; lo script notturno e la cartella manifest non sono visibili all'account interrogato. Quest'ultima osservazione non distingue assenza da permessi insufficienti. La catena locale provata in WSL non è installata come servizio: le righe WindTre 89/90 richiedono ancora prova sulla VM, custodia indipendente e conservazione verificabile. Le nuove unità D6 sono solo nel repository; il test su WSL e la verifica sintattica systemd non sostituiscono installazione, heartbeat o allarme consegnato. Nessuna configurazione è stata modificata.
 
 Queste righe distinguono lavoro interno e attese esterne. Per dichiarare chiusa una pendenza servono un artefatto ricevuto e una prova di integrazione, non soltanto il testo di una proposta. Il dossier tecnico di ciascuna sorgente conserva il dettaglio; questa è la vista di consegna al cliente.
 
@@ -134,7 +134,7 @@ Resta vero (studio, sezione 6) che l'amministratore dell'hypervisor può acceder
 | `ads-ninja.py` | Python | ogni giorno 00:05 | `/v2/activities` → `/srv/ads/ninjaone/` |
 | `ads-gravityzone.py` | Python | ogni ora **[Non verificato]** cadenza | accessi alla console via API pubblica → `/srv/ads/gravityzone/` (studio, D9) |
 | `ads-nightly.sh` | Bash | ogni giorno 00:15 | gzip, manifest a catena, marca TSA, copia WORM, mail (studio sez. 5) |
-| `ads-silence.py` | Python | ogni giorno 00:45, non installato | report locale e uscita non zero per assenza del segnale atteso; mail dopo scelta del relay |
+| `ads-silence.py` | Python | timer candidato alle 00:45, non installato | report nel journal e uscita non zero per assenza del segnale atteso; mail dopo scelta del relay |
 | `ads-verify.sh` | Bash | manuale, mensile | ricalcolo catena + `openssl ts -verify` → verbale |
 
 Regole comuni:

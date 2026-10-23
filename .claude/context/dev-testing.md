@@ -6,14 +6,14 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 3fb0ab08037199efc9367233c8bfe8f6d3a79cd4
+last-verified-commit: b70504de38b575ae958034db8ea5eea10be6ea88
 ---
 
 # Test di sviluppo
 
 ## Controllo di silenzio D6, 23/10/2026
 
-`tests/test_ads_silence.py`: 8/8 prove su due segnali indipendenti, giornata senza eventi, heartbeat mancante, file vuoto, politica vuota/duplicata/traversal/invalida e data errata; Ruff verde. Mutazione temporanea che segnava `observed` per heartbeat mancante: il caso mirato è caduto; sorgente ripristinata con SHA-256 identico alla copia verificata e suite tornata verde. La prova usa filesystem temporaneo e non un produttore reale. Prima di chiamarlo presidio servono heartbeat prodotto, timer, relay e verifica della mail ricevuta.
+`tests/test_ads_silence.py`: 9/9 prove su due segnali indipendenti, giornata senza eventi, heartbeat mancante, file vuoto, politica vuota/duplicata/traversal/invalida, data errata e mount assente; Ruff verde. Due mutazioni mirate sono state rilevate: heartbeat mancante marcato `observed` e guardia mount rimossa, che avrebbe restituito un semplice `no_events`; in entrambi i casi test rosso e ripristino SHA-256 verificato. Su WSL `/dev/shm` è riconosciuto come mount e il report dà `alert`, non `log_mount_missing`; `systemd-analyze verify` accetta le due unità, con soli avvisi sui permessi virtuali di DrvFs. Nessuna unità installata o prova del produttore reale; prima dell'esercizio servono heartbeat, relay e verifica della mail ricevuta.
 
 ## Mount Linux reale del ricevitore QA, 23/10/2026
 

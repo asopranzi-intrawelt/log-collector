@@ -5,10 +5,14 @@ generated-date: 2026-09-30
 covers-paths:
   - config/**
   - docs/handoff-sviluppo-collettore.md
-last-verified-commit: 3fb0ab08037199efc9367233c8bfe8f6d3a79cd4
+last-verified-commit: b70504de38b575ae958034db8ea5eea10be6ea88
 ---
 
 # Deployment
+
+## Timer D6 candidato, 23/10/2026
+
+`ads-silence.service` e `.timer` sono nel repository, non sulla VM: esecuzione alle 00:45 come `ads`, politica privata `/etc/ads/silence-policy.json`, report nel journal e uscita non zero in caso di assenza o errore. Il servizio verifica il mount `/srv/ads` e non apre rete. Per l'esercizio mancano policy approvata, produttore heartbeat e allarme esterno; `Persistent=true` non ripercorre da solo tutti i giorni saltati. Il ricevitore QA su mount reale è stato provato solo nel namespace WSL, non sul volume di destinazione.
 
 ## Consegna QA ancora fuori dalla VM, 23/10/2026
 

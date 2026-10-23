@@ -6,10 +6,14 @@ covers-paths:
   - bin/**
   - config/**
   - pilot/monitoring-hub/**
-last-verified-commit: 3fb0ab08037199efc9367233c8bfe8f6d3a79cd4
+last-verified-commit: b70504de38b575ae958034db8ea5eea10be6ea88
 ---
 
 # Design e sicurezza applicativa
+
+## Limiti del segnale D6 e del mount QA, 23/10/2026
+
+Un evento giornaliero assente indica `no_events`, non una sorgente guasta; un heartbeat mancante è `heartbeat_missing` solo se il produttore è stato collaudato. Il servizio D6 rifiuta una politica mancante e un `/srv/ads` non montato, opera come `ads` senza rete e non può leggere `/etc/ads/secrets`. Il giornale locale e il codice di uscita non sostituiscono un allarme esterno. Il controllo mount del ricevitore QA è passato su tmpfs WSL, ma la custodia e la quota del volume di destinazione restano da provare.
 
 ## Identità e ricevuta del flusso QA, 23/10/2026
 

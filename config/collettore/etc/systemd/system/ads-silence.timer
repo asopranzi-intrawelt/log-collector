@@ -1,0 +1,10 @@
+[Unit]
+Description=Controllo del segnale AdS alle 00:45
+
+[Timer]
+OnCalendar=*-*-* 00:45:00
+Persistent=true
+Unit=ads-silence.service
+
+[Install]
+WantedBy=timers.target

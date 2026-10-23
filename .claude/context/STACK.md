@@ -8,10 +8,14 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 3fb0ab08037199efc9367233c8bfe8f6d3a79cd4
+last-verified-commit: b70504de38b575ae958034db8ea5eea10be6ea88
 ---
 
 # Stack applicativo
+
+## Segnale per sorgente D6, 23/10/2026
+
+`ads-silence.py` legge una politica privata con sorgenti e segnale `daily_event` oppure `daily_heartbeat`; nessun heartbeat è ancora prodotto. Le unità candidate `ads-silence.service` e `.timer` avviano il controllo di D-1 alle 00:45, senza installazione. Il ricevitore QA richiede invece un mount dedicato prima di archiviare i byte; la sua prova su tmpfs WSL non equivale al volume di destinazione.
 
 ## Ricezione QA via comando SSH forzato, 23/10/2026
 

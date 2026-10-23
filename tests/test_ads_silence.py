@@ -94,3 +94,18 @@ def test_cli_reports_silence_without_claiming_source_failure(tmp_path, silence, 
 def test_cli_rejects_invalid_day_before_reading_policy(tmp_path, silence, capsys):
     assert silence.main(["--policy", str(tmp_path / "missing"), "--day", "2026-02-30"]) == 3
     assert "invalid_day" in capsys.readouterr().err
+
+
+def test_cli_rejects_unmounted_log_root(tmp_path, silence, capsys):
+    logs = tmp_path / "logs"
+    logs.mkdir()
+    policy = policy_file(tmp_path, [{"id": "source-a", "signal": "daily_event"}])
+    code = silence.main([
+        "--policy", str(policy), "--log-root", str(logs),
+        "--heartbeat-root", str(tmp_path / "beats"), "--day", "2026-10-22",
+        "--require-log-mount",
+    ])
+    assert code == 3
+    captured = capsys.readouterr()
+    assert "log_mount_missing" in captured.err
+    assert not captured.out

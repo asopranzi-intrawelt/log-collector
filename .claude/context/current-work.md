@@ -8,7 +8,7 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 3fb0ab08037199efc9367233c8bfe8f6d3a79cd4
+last-verified-commit: b70504de38b575ae958034db8ea5eea10be6ea88
 stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai punti 3 e 7; eventi iLO tecnici separati con ritenzione 90 giorni attiva; catena locale provata in WSL, non installata; D7 bloccato da nomina ed elenco AdS
 ---
 
@@ -16,7 +16,7 @@ stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai p
 
 ## D6: segnale di silenzio candidato, 23/10/2026
 
-`bin/ads-silence.py` e la politica di esempio separano `daily_event` da `daily_heartbeat` per ogni sorgente. Una giornata senza file è `no_events`, non un guasto attribuito; un heartbeat atteso mancante è `heartbeat_missing`. Politica vuota, duplicata o con ID non sicuri viene rifiutata. Otto prove sintetiche e Ruff verdi. Nessun timer, heartbeat Windows o mail installati; lista attesa, segnale per sorgente, relay e consegna dell'allarme restano gate D6. Dettagli nel runbook del componente 5. La rete `b29d82b` è pubblicata dall'utente per i 12 file esclusivi; memoria e gap della sessione concorrente restano nel suo albero.
+Il commit manuale `b70504d` contiene `ads-silence.py` e la politica di esempio. Nel nuovo diff le unità candidate schedulano D-1 alle 00:45; il servizio richiede `/srv/ads` montato, opera come `ads` senza rete e lascia report o errore nel journal. Nove prove sintetiche e Ruff verdi; su WSL la guardia riconosce un mount reale e `systemd-analyze verify` accetta le unità. Nessun timer, heartbeat Windows o mail installati; lista attesa, segnale per sorgente, relay e consegna dell'allarme restano gate D6. `Persistent=true` non ricostruisce tutti i giorni saltati. Dettagli nel runbook del componente 5. La rete `b29d82b` è pubblicata dall'utente per i 12 file esclusivi; memoria e gap della sessione concorrente restano nel suo albero.
 
 ## Mount QA esercitato su Linux locale, 23/10/2026
 

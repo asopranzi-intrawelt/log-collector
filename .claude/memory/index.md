@@ -1,5 +1,9 @@
 # Snapshot di sincronizzazione
 
+## D6 schedulabile soltanto come candidato, 23/10/2026
+
+Collettore `b70504d` pubblicato dall'utente. Nel nuovo diff, unità systemd D6 alle 00:45 e guardia sul mount `/srv/ads`; nove prove verdi, Ruff verde, `systemd-analyze verify` accetta le unità con avvisi DrvFs, e una lettura WSL su `/dev/shm` produce `alert` anziché errore di mount. Nessun timer installato, nessun heartbeat prodotto e nessun allarme esterno; `Persistent=true` riavvia una sola esecuzione e non verifica tutti i giorni saltati. WindTre 89/90 e ISO-30 restano in corso. Le cinque schede tecniche sono state riconciliate per contenuto con HEAD `b70504d`; il diff corrente non è coperto da quell'ancora.
+
 ## D6 candidato dopo la prova mount, 23/10/2026
 
 `ads-silence.py` legge una politica privata per sorgente e distingue `no_events` da `heartbeat_missing`, con otto prove e Ruff verdi. Una giornata quieta non diventa prova di guasto. Nessun heartbeat o timer/mail installati; non attribuire copertura WindTre 89/90 a questo candidato. Rete `b29d82b` pubblicata dall'utente per i dodici file isolati; memoria e gap condivisi restano fuori da quel commit.
@@ -423,8 +427,8 @@ Propagazione rete completata: integrazione, memoria, contesto, timeline e resume
 
 ```
 Branch attivo:        main
-Commit di riferimento: a5fe489
-Data snapshot:        2026-10-14
+Commit di riferimento: b70504d
+Data snapshot:        2026-10-23
 Albero autorevole:    unico
 Remoto:               git@github-corp:asopranzi-intrawelt/log-collector.git (primo push di 9ee87b4 il 2026-09-30)
 Template:             E:\template-claude-developing @ ffcbdb3
@@ -434,16 +438,16 @@ Template:             E:\template-claude-developing @ ffcbdb3
 
 | Scheda | last-verified | Stato |
 |---|---|---|
-| STACK.md | 99db226 | nuovo percorso degli originali nel pilot; ingresso Seeweb invariato |
-| design-and-security.md | 99db226 | confine esplicito del replay e limiti dei flussi reali |
-| deployment.md | 99db226 | isolamento solo locale; candidata Seeweb non installata |
-| dev-testing.md | 99db226 | prove della coda 25/25 e mutazione del percorso rilevata |
-| current-work.md | 99db226 | nuovi originali isolati e gate successivi esplicitati |
+| STACK.md | b70504d | QA con mount; D6 e unità candidate descritti |
+| design-and-security.md | b70504d | limiti D6 e mount QA esplicitati |
+| deployment.md | b70504d | timer D6 e mount QA ancora locali |
+| dev-testing.md | b70504d | nove prove D6; guardia mount e unità verificate localmente |
+| current-work.md | b70504d | D6 candidato e gate operativi aperti |
 | roadmap.md | 9ee87b4 | solo struttura |
 
 ## Punto di ripresa
 
-Passo corrente: completare la milestone documentale dei sette ingressi Seeweb e la chiusura con verifica remota/impronta; poi leggere dashboard e registri del firewall senza modificare configurazioni. Lettore dei report già versionato e pubblicato in a5fe489; nessuna raccolta Seeweb automatica sulla VM. Copia delle mail e canali/permessi rimangono aperti. Nove file del template di altra lavorazione restano fuori dalla chiusura del censimento. Timeline e contesto rete aggiornati insieme; offline Nebula rimandato e quattro pendenze conservati.
+Passo corrente: chiudere il gate WindTre 89/90 per il primo esercizio AdS. Il servizio D6 è preparato ma non installato; prima dell'attivazione servono lista approvata, segnale reale per sorgente, relay, prova di consegna e verifica retrospettiva dei giorni saltati. D7 e custodia indipendente bloccano la catena notturna operativa. Seeweb attende risposta sul ticket; QA e hub restano filoni distinti. Lavoro parallelo del sito in `D:/network-design` da preservare.
 
 Ultima verifica: volumi reali acquisiti e ricalcolati senza rete il 13/10 alle 15:10 locali; report e metadati identici. Raccolta VM non attivata, risultati propagati nel progetto rete; comando di volume già concluso.
 
