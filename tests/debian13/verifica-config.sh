@@ -33,18 +33,25 @@ sed 's/ilo: \[\]/ilo: ["127.0.0.1"]/' "$root/tests/fixtures/parametri-completi.y
 sed 's/seeweb_opnsense: \[\]/seeweb_opnsense: ["127.0.0.2"]/' "$root/tests/fixtures/parametri-completi.yaml" >"$work/parametri-seeweb.yaml"
 "$py" "$root/bin/ads-render.py" --parametri "$work/parametri-seeweb.yaml" \
     --sorgente "$root/config/collettore" --destinazione "$work/seeweb-tree" >/dev/null
+sed 's/windows_pilota: \[\]/windows_pilota: ["127.0.0.1"]/' "$root/tests/fixtures/parametri-completi.yaml" >"$work/parametri-heartbeat.yaml"
+"$py" "$root/bin/ads-render.py" --parametri "$work/parametri-heartbeat.yaml" \
+    --sorgente "$root/config/collettore" --destinazione "$work/heartbeat-tree" >/dev/null
 
 # Su Git Bash il percorso va passato a Docker in forma Windows.
 mount_src=$work/tree
 mount_ilo=$work/ilo-tree
 mount_seeweb=$work/seeweb-tree
+mount_heartbeat=$work/heartbeat-tree
+mount_bin=$root/bin
 if command -v cygpath >/dev/null; then
     mount_src=$(cygpath -w "$work/tree")
     mount_ilo=$(cygpath -w "$work/ilo-tree")
     mount_seeweb=$(cygpath -w "$work/seeweb-tree")
+    mount_heartbeat=$(cygpath -w "$work/heartbeat-tree")
+    mount_bin=$(cygpath -w "$root/bin")
 fi
 
-MSYS_NO_PATHCONV=1 docker run --rm --cap-add NET_ADMIN -v "$mount_src:/tree:ro" -v "$mount_ilo:/ilo-tree:ro" -v "$mount_seeweb:/seeweb-tree:ro" "$IMAGE" bash -c '
+MSYS_NO_PATHCONV=1 docker run --rm --cap-add NET_ADMIN -v "$mount_src:/tree:ro" -v "$mount_ilo:/ilo-tree:ro" -v "$mount_seeweb:/seeweb-tree:ro" -v "$mount_heartbeat:/heartbeat-tree:ro" -v "$mount_bin:/ads-bin:ro" "$IMAGE" bash -c '
 set -euo pipefail
 fail() { echo "FALLITO: $*"; exit 1; }
 ok() { echo "ok  $*"; }
@@ -211,6 +218,51 @@ grep -qF "ADS_TEST_EVENT" "$f" || fail "sorgente AdS locale persa"
 [ "$(stat -c "%U:%G %a" "$tech")" = "root:root 640" ] || fail "permessi file Seeweb"
 [ "$(stat -c "%U:%G %a" "$(dirname "$tech")")" = "root:root 750" ] || fail "permessi cartella Seeweb"
 ok "Seeweb: sorgente UDP distinta, file tecnico root:root e zero righe nel flusso AdS"
+
+# Il segnale Windows deve attraversare TLS da una sorgente autorizzata e arrivare nel file
+# letto da D6; lo stesso APP-NAME su UDP e un RFC 3164 restano nel flusso tecnico separato.
+kill "$(cat /run/rsyslogd-ads.pid)"
+for i in 1 2 3 4 5 6 7 8 9 10; do [ ! -e /run/rsyslogd-ads.pid ] && break; sleep 0.2; done
+install -m 0644 /heartbeat-tree/etc/rsyslog.d/10-ads.conf /etc/rsyslog.d/
+rsyslogd -N1 >/dev/null 2>&1 || { rsyslogd -N1; fail "rsyslogd -N1 rifiuta il filtro heartbeat"; }
+rsyslogd -i /run/rsyslogd-ads.pid
+sleep 1
+printf "<134>1 2026-10-26T09:00:00Z win-test ads-heartbeat - - - heartbeat-tls\n" \
+    | timeout 5 openssl s_client -connect 127.0.0.1:6514 -quiet -CAfile /etc/rsyslog.d/tls/ca.pem >/dev/null 2>&1 || true
+python3 - <<'PY'
+import socket
+import ssl
+
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+sock.bind(("127.0.0.2", 0))
+sock.settimeout(5)
+context = ssl.create_default_context(cafile="/etc/rsyslog.d/tls/ca.pem")
+context.check_hostname = False
+with context.wrap_socket(sock, server_hostname="127.0.0.1") as transport:
+    transport.connect(("127.0.0.1", 6514))
+    transport.sendall(b"<134>1 2026-10-26T09:00:00Z win-test ads-heartbeat - - - heartbeat-unlisted\n")
+PY
+printf "<134>1 2026-10-26T09:00:00Z win-test ads-heartbeat - - - heartbeat-udp\n" > /dev/udp/127.0.0.1/514
+printf "<134>Oct 26 09:00:00 win-test ads-heartbeat: heartbeat-3164\n" > /dev/udp/127.0.0.1/514
+sleep 2
+hb=/var/lib/ads/heartbeats/127.0.0.1/$(date +%Y-%m-%d).heartbeat
+rejected=/var/log/ads-heartbeat-rejected/127.0.0.1/$(date +%Y-%m-%d).log
+rejected_unlisted=/var/log/ads-heartbeat-rejected/127.0.0.2/$(date +%Y-%m-%d).log
+[ -f "$hb" ] && [ -f "$rejected" ] && [ -f "$rejected_unlisted" ] || fail "manca il segnale D6 o il flusso tecnico rifiutato"
+grep -qF "heartbeat-tls" "$hb" || fail "heartbeat TLS autorizzato non ricevuto"
+grep -qF "heartbeat-udp" "$rejected" || fail "heartbeat UDP non separato"
+grep -qF "heartbeat-3164" "$rejected" || fail "heartbeat RFC 3164 non separato"
+grep -qF "heartbeat-unlisted" "$rejected_unlisted" || fail "heartbeat TLS da IP non autorizzato non separato"
+grep -qF "heartbeat-unlisted" "$hb" && fail "heartbeat TLS da IP non autorizzato contato da D6"
+grep -qF "heartbeat-udp" "$hb" && fail "heartbeat UDP contato da D6"
+grep -qF "heartbeat-3164" "$hb" && fail "heartbeat RFC 3164 contato da D6"
+grep -qF "heartbeat-" "$f" && fail "heartbeat entrato nel flusso AdS"
+[ "$(stat -c "%U:%G %a" "$hb")" = "root:ads 640" ] || fail "permessi del segnale D6"
+[ "$(stat -c "%U:%G %a" "$rejected")" = "root:root 640" ] || fail "permessi del heartbeat rifiutato"
+printf "{\"version\":2,\"sources\":[{\"id\":\"127.0.0.1\",\"signal\":\"daily_heartbeat\",\"active_from\":\"$(date +%Y-%m-%d)\"}]}\n" > /tmp/heartbeat-policy.json
+python3 /ads-bin/ads-silence.py --policy /tmp/heartbeat-policy.json --day "$(date +%Y-%m-%d)" > /tmp/heartbeat-report.json || fail "D6 non vede il heartbeat ricevuto"
+grep -qF "\"status\":\"observed\"" /tmp/heartbeat-report.json || fail "D6 non classifica il segnale come osservato"
+ok "heartbeat: TLS autorizzato osservato da D6, IP estraneo, UDP e RFC 3164 separati, nessuna riga AdS"
 
 echo "tutte le verifiche superate"
 '

@@ -5,7 +5,7 @@ generated-date: 2026-09-30
 covers-paths:
   - config/**
   - docs/handoff-sviluppo-collettore.md
-last-verified-commit: 3d72338a215d8134405f32630803f6ed76f00082
+last-verified-commit: 143696921a5cbf8282e0b921d3659c5aaae34f24
 ---
 
 # Deployment
@@ -20,7 +20,7 @@ Il job e il verificatore rifiutano directory simboliche nei percorsi dello stato
 
 ## Timer D6 candidato, 26/10/2026
 
-`ads-silence.service` e `.timer` sono nel repository, non sulla VM: esecuzione alle 00:45 come `ads`, politica privata `/etc/ads/silence-policy.json`, report nel journal e uscita non zero in caso di assenza o errore. Il servizio verifica il mount `/srv/ads` e non apre rete. Nel nuovo diff chiede 213 giorni retrospettivi, entro la data `active_from` di ciascuna sorgente; oltre quell'orizzonte e senza prova di custodia resta un buco da esaminare. Per l'esercizio mancano policy approvata, produttore heartbeat e allarme esterno. Il ricevitore QA su mount reale è stato provato solo nel namespace WSL, non sul volume di destinazione.
+`ads-silence.service` e `.timer` sono nel repository, non sulla VM: esecuzione alle 00:45 come `ads`, politica privata `/etc/ads/silence-policy.json`, report nel journal e uscita non zero in caso di assenza o errore. Il servizio verifica il mount `/srv/ads` e non apre rete. Chiede 213 giorni retrospettivi, entro la data `active_from` di ciascuna sorgente; oltre quell'orizzonte e senza prova di custodia resta un buco da esaminare. Il ricevente Windows candidato richiede l'IP pilota in `sorgenti.windows_pilota`; i marker non validi finiscono in `/var/log/ads-heartbeat-rejected/`. Per l'esercizio mancano lista e policy approvate, produttore Windows provato, ACL sulla VM, ritenzione del flusso rifiutato e allarme esterno. Il ricevitore QA su mount reale è stato provato solo nel namespace WSL, non sul volume di destinazione.
 
 ## Consegna QA ancora fuori dalla VM, 23/10/2026
 

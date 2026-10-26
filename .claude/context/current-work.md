@@ -8,11 +8,15 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 3d72338a215d8134405f32630803f6ed76f00082
+last-verified-commit: 143696921a5cbf8282e0b921d3659c5aaae34f24
 stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai punti 3 e 7; eventi iLO tecnici separati con ritenzione 90 giorni attiva; catena locale provata in WSL, non installata; D7 bloccato da nomina ed elenco AdS
 ---
 
 # Lavoro in corso
+
+## Ricezione heartbeat Windows candidata, 26/10/2026
+
+Collettore `1436969` pubblicato dall'utente e remoto allineato. Nel nuovo diff il template rsyslog distingue il marker `ads-heartbeat` dagli accessi AdS: solo RFC 5424 su TLS 6514 dall'IP pilota ammesso scrive il file che D6 legge; UDP, RFC 3164 e IP estranei finiscono in un flusso tecnico. Lo studio Windows separa i tag `ads.win` e `ads.hb` e corregge `Mode tcp` con `tls on`; la configurazione del mittente resta da validare sulla versione Fluent Bit Windows fissata. Il test Debian 13 prova ricezione e lettura D6; nessuna installazione, policy IP reale, ritenzione del rifiutato o allarme è stata attivata. La rete resta a `3f5d7ff` con modifiche parallele del sito da preservare; propagarvi il checkpoint solo dopo il `chiudi` manuale del collettore. WindTre 89/90 e ISO-30 restano aperti.
 
 ## Percorsi della catena locale, 26/10/2026
 

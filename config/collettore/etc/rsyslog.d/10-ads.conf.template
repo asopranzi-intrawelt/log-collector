@@ -17,6 +17,10 @@ global(DefaultNetstreamDriverCAFile="/etc/rsyslog.d/tls/ca.pem"
        DefaultNetstreamDriverKeyFile="/etc/rsyslog.d/tls/collector.key")
 
 template(name="AdsFile" type="string" string="/srv/ads/%fromhost-ip%/%$year%-%$month%-%$day%.log")
+# Il heartbeat Windows ha un percorso tecnico distinto da quello degli accessi AdS.
+template(name="AdsHeartbeatFile" type="string" string="/var/lib/ads/heartbeats/%fromhost-ip%/%$year%-%$month%-%$day%.heartbeat")
+# Un marker heartbeat da UDP o da un IP non approvato resta ispezionabile ma non conta come segnale.
+template(name="AdsHeartbeatRejectedFile" type="string" string="/var/log/ads-heartbeat-rejected/%fromhost-ip%/%$year%-%$month%-%$day%.log")
 # Gli eventi iLO diversi dagli accessi espliciti vanno in un flusso separato. La destinazione
 # comprende anche eventi non ancora classificati: va ispezionata prima dell'attivazione reale.
 template(name="AdsIloOtherFile" type="string" string="/var/log/ads-ilo-other/%fromhost-ip%/%$year%-%$month%-%$day%.log")
@@ -42,7 +46,17 @@ ruleset(name="ads" parser=["rsyslog.rfc5424", "ads.rfc3164anno"]) {
     } else {
         set $!ads_msg = $syslogtag & $msg;
     }
-    if {{ rsyslog_ip_match(sorgenti.seeweb_opnsense) }} then {
+    if $app-name == "ads-heartbeat" or $programname == "ads-heartbeat" then {
+        if $protocol-version == "1" and $inputname == "ads-tls" and {{ rsyslog_ip_match(sorgenti.windows_pilota) }} then {
+            action(type="omfile" dynaFile="AdsHeartbeatFile" template="AdsLine"
+                   fileOwner="root" fileGroup="ads" fileCreateMode="0640"
+                   dirOwner="root" dirGroup="ads" dirCreateMode="0750")
+        } else {
+            action(type="omfile" dynaFile="AdsHeartbeatRejectedFile" template="AdsLine"
+                   fileOwner="root" fileGroup="root" fileCreateMode="0640"
+                   dirOwner="root" dirGroup="root" dirCreateMode="0750")
+        }
+    } else if {{ rsyslog_ip_match(sorgenti.seeweb_opnsense) }} then {
         action(type="omfile" dynaFile="AdsSeewebTechnicalFile" template="AdsLine"
                fileOwner="root" fileGroup="root" fileCreateMode="0640"
                dirOwner="root" dirGroup="root" dirCreateMode="0750")
@@ -73,7 +87,7 @@ ruleset(name="ads" parser=["rsyslog.rfc5424", "ads.rfc3164anno"]) {
 }
 
 input(type="imudp" port="514" ruleset="ads")
-input(type="imtcp" port="6514" ruleset="ads")
+input(type="imtcp" port="6514" name="ads-tls" ruleset="ads")
 
 # Accessi al collettore stesso: anche il login al collettore e' un accesso AdS. I messaggi locali
 # di autenticazione vanno anche nel ruleset ads, cioe' in /srv/ads/127.0.0.1/, oltre che nei log

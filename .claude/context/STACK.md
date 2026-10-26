@@ -8,7 +8,7 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 3d72338a215d8134405f32630803f6ed76f00082
+last-verified-commit: 143696921a5cbf8282e0b921d3659c5aaae34f24
 ---
 
 # Stack applicativo
@@ -23,7 +23,7 @@ Prima di aggiungere un manifest, il job rilegge e verifica l'intera catena local
 
 ## Segnale per sorgente D6, 26/10/2026
 
-`ads-silence.py` legge una politica privata con sorgenti e segnale `daily_event` oppure `daily_heartbeat`; nessun heartbeat è ancora prodotto. Le unità candidate `ads-silence.service` e `.timer` avviano il controllo alle 00:45, senza installazione. Il nuovo diff usa una data `active_from` per sorgente e scandisce fino a 213 giorni locali senza stato mutabile; il report limita le anomalie dettagliate a 100 e conserva il totale. Il ricevitore QA richiede invece un mount dedicato prima di archiviare i byte; la sua prova su tmpfs WSL non equivale al volume di destinazione.
+`ads-silence.py` legge una politica privata con sorgenti e segnale `daily_event` oppure `daily_heartbeat`; nessun heartbeat reale è ancora prodotto. Il candidato rsyslog ora scrive un marker Windows RFC 5424 via TLS, da IP pilota ammesso, in `/var/lib/ads/heartbeats/<IP>/<giorno>.heartbeat` e respinge gli altri marker in un flusso tecnico. Le unità candidate `ads-silence.service` e `.timer` avviano il controllo alle 00:45, senza installazione. La policy usa `active_from` per sorgente e scandisce fino a 213 giorni locali senza stato mutabile; il report limita le anomalie dettagliate a 100 e conserva il totale. Il ricevitore QA richiede un mount dedicato prima di archiviare i byte; la sua prova su tmpfs WSL non equivale al volume di destinazione.
 
 ## Ricezione QA via comando SSH forzato, 23/10/2026
 

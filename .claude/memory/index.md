@@ -1,5 +1,9 @@
 # Snapshot di sincronizzazione
 
+## Heartbeat Windows ricevuto dal candidato D6, 26/10/2026
+
+Collettore `1436969` pubblicato dall'utente e allineato al remoto; rete `3f5d7ff` allineata, con lavoro parallelo del sito non toccato. Nel nuovo diff rsyslog scrive il marker Windows RFC 5424 via TLS e da IP pilota ammesso nel file `daily_heartbeat` letto da D6, mentre UDP, RFC 3164 e IP estranei via TLS vanno nel flusso tecnico. La prova integrata Debian 13 con rsyslog 8.2504 è verde, come 34 prove mirate di renderer e silenzio. Lo studio corregge `Mode tcp` più `tls on` e separa `ads.win` da `ads.hb`. Nessuna prova Fluent Bit Windows o installazione sulla VM; identità del client non autenticata da TLS, ritenzione del rifiutato, elenco IP, policy, allarme esterno e gate WindTre 89/90 ancora aperti. Cinque schede ancorate a `1436969` e contenuto del diff descritti; ISO-30 in corso. La rete va propagata dopo il `chiudi` manuale di questo checkpoint, isolando i file del sito.
+
 ## Catena locale rifiuta directory simboliche, 26/10/2026
 
 Rete `3f5d7ff` pubblicata e allineata al remoto. Nel nuovo diff del collettore il job e il verificatore rifiutano radici e directory di archivio simboliche; due prove WSL erano rosse sul codice precedente, che scriveva o certificava byte fuori dall'albero previsto, e sono ora verdi. Le cinque schede tecniche sono ancorate al commit pubblicato `3d72338`; il diff sui link è descritto ma non ancora versionato. La prova non copre sostituzioni concorrenti o permessi della VM. I gate AdS entro 30/10 e WindTre 89/90 restano aperti.

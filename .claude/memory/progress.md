@@ -1,5 +1,13 @@
 # Work-log
 
+## 2026-10-26 - Ricezione del marker Windows per D6
+
+Dopo il `chiudi` manuale dell'utente, collettore `1436969` e `origin/main` coincidono; la rete resta a `3f5d7ff`, con modifiche parallele del sito preservate. L'analisi ha trovato che `ads-silence.py` cercava un file heartbeat non prodotto da rsyslog, mentre lo studio Windows avrebbe inviato `ads.hb` nello stesso output degli accessi e dichiarava `Mode tls`, non ammesso dalla documentazione Fluent Bit 4.1. Il candidato distingue ora `APP-NAME=ads-heartbeat` con RFC 5424, ingresso TLS e IP pilota ammesso; scrive il file D6 `root:ads`. I marker via UDP, RFC 3164 e da IP estraneo TLS restano nel file tecnico `root:root`, fuori da `/srv/ads/`.
+
+La prova integrata Debian 13 con rsyslog 8.2504 ha verificato file, permessi, separazione e lettura `observed` da `ads-silence.py`; `tests/test_render.py` e `tests/test_ads_silence.py` hanno 34 prove verdi. Sintassi Bash, diff e schede rigorose verdi. Il mittente Fluent Bit è ancora una configurazione documentata, da provare sulla versione Windows scelta; il client TLS di rsyslog è anonimo. Prima dell'installazione servono IP e policy approvati, ACL sulla VM, ritenzione e capienza del rifiutato, evento Windows ricevuto e allarme esterno consegnato. Aggiornati template, test Debian, studio, runbook, handoff, cinque schede, indice e work-log. Nessun Git di scrittura o deploy dell'agente. La rete sarà allineata dopo la chiusura manuale del collettore, senza incorporare il lavoro parallelo del sito.
+
+**Template:** nessuna.
+
 ## 2026-10-26 - Directory simboliche nella catena AdS
 
 Ricevuto dall'utente il commit di rete `3f5d7ff` con push; `origin/main` coincide e i file paralleli del sito restano fuori dal commit. Il collettore è a `3d72338`, con i tre aggiornamenti di memoria e contesto del giro precedente ancora nel diff.

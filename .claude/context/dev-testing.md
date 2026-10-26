@@ -6,7 +6,7 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 3d72338a215d8134405f32630803f6ed76f00082
+last-verified-commit: 143696921a5cbf8282e0b921d3659c5aaae34f24
 ---
 
 # Test di sviluppo
@@ -20,6 +20,8 @@ Una copia con il primo di quattro manifest alterato faceva passare il job preced
 Due prove WSL nuove erano rosse sul codice precedente: il job scriveva attraverso una directory archivio simbolica e `ads-verify.sh` accettava la stessa catena con la directory spostata fuori dallo stato. Ora le prove passano; passa anche il rifiuto della radice di stato simbolica prima di creare un manifest. Sono percorsi temporanei controllati, non un test di concorrenza o dei permessi Debian.
 
 ## Controllo di silenzio D6, 26/10/2026
+
+Il test integrato `tests/debian13/verifica-config.sh` genera il ricevente con IP pilota di loopback, manda un marker RFC 5424 via TLS, controlla il file `root:ads` letto dal vero `ads-silence.py`, e verifica che i marker via UDP, RFC 3164 e da IP estraneo via TLS vadano nel file tecnico `root:root`, senza righe AdS. È una prova del ricevente in container con rsyslog 8.2504, non del Fluent Bit su Windows né della VM reale.
 
 `tests/test_ads_silence.py`: 16/16 prove su segnali, policy e mount, più recupero dei giorni precedenti, data di attivazione, chiavi JSON duplicate, limite del dettaglio nel report e confine del calendario; Ruff verde. Cinque mutazioni mirate sono state rilevate: heartbeat mancante marcato `observed`, guardia mount rimossa, finestra ridotta al solo D-1, filtro `active_from` rimosso e chiavi JSON duplicate ammesse; i test diventano rossi e i ripristini SHA-256 sono verificati. La nuova prova sul 31/12/9999 era rossa per `OverflowError` e passa dopo la correzione del ciclo. Su WSL `/dev/shm` è riconosciuto come mount: la prova sintetica di tre giorni conta sei anomalie e nessun errore di mount. `systemd-analyze verify` accetta le unità, con soli avvisi sui permessi virtuali di DrvFs. Nessuna unità installata o prova del produttore reale; prima dell'esercizio servono heartbeat, relay e verifica della mail ricevuta.
 

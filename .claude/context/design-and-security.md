@@ -6,7 +6,7 @@ covers-paths:
   - bin/**
   - config/**
   - pilot/monitoring-hub/**
-last-verified-commit: 3d72338a215d8134405f32630803f6ed76f00082
+last-verified-commit: 143696921a5cbf8282e0b921d3659c5aaae34f24
 ---
 
 # Design e sicurezza applicativa
@@ -21,7 +21,7 @@ Le radici e directory di archivio simboliche sono rifiutate prima della scrittur
 
 ## Limiti del segnale D6 e del mount QA, 26/10/2026
 
-Un evento giornaliero assente indica `no_events`, non una sorgente guasta; un heartbeat mancante è `heartbeat_missing` solo se il produttore è stato collaudato. Il servizio D6 rifiuta una politica mancante, chiavi JSON duplicate e un `/srv/ads` non montato, opera come `ads` senza rete e non può leggere `/etc/ads/secrets`. Nel nuovo diff `active_from` impedisce di dichiarare controllati giorni anteriori all'ingresso di una sorgente; la finestra massima di 213 giorni e il totale delle anomalie restano espliciti nel report, mentre il dettaglio è limitato a 100. Il giornale locale e il codice di uscita non sostituiscono un allarme esterno né una prova di custodia oltre la finestra. Il controllo mount del ricevitore QA è passato su tmpfs WSL, ma la custodia e la quota del volume di destinazione restano da provare.
+Un evento giornaliero assente indica `no_events`, non una sorgente guasta; un heartbeat mancante è `heartbeat_missing` solo se il produttore è stato collaudato. Il servizio D6 rifiuta una politica mancante, chiavi JSON duplicate e un `/srv/ads` non montato, opera come `ads` senza rete e non può leggere `/etc/ads/secrets`. `active_from` impedisce di dichiarare controllati giorni anteriori all'ingresso di una sorgente; la finestra massima di 213 giorni e il totale delle anomalie restano espliciti nel report, mentre il dettaglio è limitato a 100. Il ricevente candidato distingue trasporto TLS, RFC 5424 e IP autorizzato prima di creare il file di heartbeat; i marker rifiutati vanno fuori da `/srv/ads/`. Il TLS esistente autentica il server, ma i client rsyslog sono anonimi: l'IP non prova l'identità crittografica della postazione. Ritenzione e capienza del flusso rifiutato restano da definire. Il giornale locale e il codice di uscita non sostituiscono un allarme esterno né una prova di custodia oltre la finestra. Il controllo mount del ricevitore QA è passato su tmpfs WSL, ma la custodia e la quota del volume di destinazione restano da provare.
 
 ## Identità e ricevuta del flusso QA, 23/10/2026
 

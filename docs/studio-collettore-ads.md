@@ -80,18 +80,26 @@ Regola per il campo "Data e ora": il collettore scrive **sempre due tempi**, ric
     storage.type               filesystem
     Event_Query                <QueryList><Query Id="0" Path="Security"><Select Path="Security">*[System[(EventID=4624 or EventID=4625 or EventID=4634 or EventID=4647 or EventID=4648)]] and *[EventData[(Data[@Name='TargetUserName']='__ADS1__' or Data[@Name='TargetUserName']='__ADS2__')]]</Select><Select Path="Security">*[System[(EventID=1102 or EventID=4719 or EventID=4720 or EventID=4732 or EventID=4733)]]</Select></Query></QueryList>
 
+[INPUT]
+    Name          dummy
+    Tag           ads.hb
+    Dummy         {"message":"heartbeat"}
+    Interval_Sec  3600
+    storage.type  filesystem
+
 [FILTER]
     Name    lua
-    Match   ads.*
+    Match   ads.win
     script  C:\Program Files\fluent-bit\conf\ads.lua
     call    ads
 
 [OUTPUT]
     Name                syslog
-    Match               ads.*
+    Match               ads.win
     Host                ${ADS_COLLECTOR}
     Port                6514
-    Mode                tls
+    Mode                tcp
+    tls                 on
     tls.verify          on
     tls.ca_file         C:\Program Files\fluent-bit\conf\ca.pem
     Syslog_Format       rfc5424
@@ -100,8 +108,24 @@ Regola per il campo "Data e ora": il collettore scrive **sempre due tempi**, ric
     Syslog_Message_Key  message
     Retry_Limit         no_limits
     storage.total_limit_size 500M
+
+[OUTPUT]
+    Name                syslog
+    Match               ads.hb
+    Host                ${ADS_COLLECTOR}
+    Port                6514
+    Mode                tcp
+    tls                 on
+    tls.verify          on
+    tls.ca_file         C:\Program Files\fluent-bit\conf\ca.pem
+    Syslog_Format       rfc5424
+    Syslog_Hostname_Preset  ${COMPUTERNAME}
+    Syslog_Appname_Preset   ads-heartbeat
+    Syslog_Message_Key     message
+    Retry_Limit         no_limits
+    storage.total_limit_size 500M
 ```
-- [V] `mode tls` abilita TLS senza `tls on`; `syslog_message_key` indica la chiave del messaggio; formato rfc5424 predefinito (docs.fluentbit.io, output Syslog).
+- La [documentazione ufficiale dell'output Syslog](https://docs.fluentbit.io/manual/4.1/data-pipeline/outputs/syslog) ammette `Mode tcp` o `udp` e abilita TLS separatamente con `tls on`; `Syslog_Message_Key` è obbligatorio. Il precedente `Mode tls` era errato. La [documentazione dell'input Dummy](https://docs.fluentbit.io/manual/4.1/data-pipeline/inputs/dummy) specifica `Interval_sec`: il modello produce un evento ogni 3600 secondi. La configurazione resta candidata fino alla verifica della versione Windows installata, del nome host interpolato e di un evento completo end-to-end.
 - [V] Senza `DB` il plugin riparte dalla coda a ogni avvio: `DB` è obbligatorio per non perdere eventi durante i riavvii.
 - Il secondo `Select` (log cancellato, criteri modificati, account creati, membri aggiunti/rimossi dai gruppi) non è filtrato per utente: sono eventi rari che rilevano la creazione di amministratori fuori elenco.
 - **[Non verificato]** sensibilità a maiuscole/minuscole del confronto su `TargetUserName` nella query XPath: provare con un account scritto in modo diverso.
@@ -117,7 +141,7 @@ function ads(tag, ts, r)
   return 1, ts, r
 end
 ```
-- **Heartbeat (D6)**: un secondo input `dummy` con tag `ads.hb` e intervallo di 1 ora, inoltrato dallo stesso output. **[Non verificato]** nome del parametro di intervallo del plugin `dummy` sulla versione fissata.
+- **Heartbeat (D6)**: il tag `ads.hb` usa un output separato con `APP-NAME=ads-heartbeat`; il filtro Lua e l'output degli accessi leggono solo `ads.win`. Sul collettore soltanto RFC 5424 ricevuto via TLS dalla lista `sorgenti.windows_pilota` scrive `/var/lib/ads/heartbeats/<IP>/<giorno>.heartbeat`. I marker da UDP, RFC 3164 o IP estranei vanno a `/var/log/ads-heartbeat-rejected/` e non entrano in `/srv/ads/`. Il monitor di silenzio legge il primo percorso. Il client TLS verifica il server; il server rsyslog accetta client anonimi e quindi l'IP è il solo vincolo sul mittente, non una prova crittografica d'identità. Prima dell'attivazione servono lista IP verificata, politica di conservazione e capacità del flusso rifiutato, prova Windows e allarme esterno.
 
 ### 3.4 Monitoraggio NinjaOne
 Condition sul servizio `fluent-bit` non in esecuzione → alert + script di riavvio. Policy di aggiornamento: nuova versione prima sul gruppo pilota.
@@ -126,27 +150,10 @@ Condition sul servizio `fluent-bit` non in esecuzione → alert + script di riav
 
 ## 4. Collettore rsyslog (Debian)
 
-```
-module(load="imudp")
-module(load="imtcp" StreamDriver.Name="gtls" StreamDriver.Mode="1" StreamDriver.AuthMode="anon")
-global(DefaultNetstreamDriverCAFile="/etc/rsyslog.d/tls/ca.pem"
-       DefaultNetstreamDriverCertFile="/etc/rsyslog.d/tls/collector.pem"
-       DefaultNetstreamDriverKeyFile="/etc/rsyslog.d/tls/collector.key")
-
-template(name="AdsFile" type="string" string="/srv/ads/%fromhost-ip%/%$year%-%$month%-%$day%.log")
-template(name="AdsLine" type="string"
-  string="%timegenerated:::date-rfc3339% %fromhost-ip% %timereported:::date-rfc3339% %hostname% %$!ads_msg:::drop-last-lf%\n")
-
-ruleset(name="ads") {
-  action(type="omfile" dynaFile="AdsFile" template="AdsLine"
-         dirCreateMode="0750" fileCreateMode="0640")
-}
-input(type="imudp" port="514"  ruleset="ads")
-input(type="imtcp" port="6514" ruleset="ads")
-```
+La configurazione candidata è il [template rsyslog](../config/collettore/etc/rsyslog.d/10-ads.conf.template); il renderer inserisce gli IP approvati. Il ruleset separa accessi AdS, eventi iLO e Seeweb tecnici e i marker D6. L'ingresso TCP 6514 ha nome `ads-tls`; la porta UDP 514 usa lo stesso parser ma non è ammessa per attestare il marker Windows. Installazione e configurazione reale si seguono dal runbook del componente 2.
 - Directory per **IP di provenienza** (`fromhost-ip`), non per hostname dichiarato: l'hostname nel messaggio lo sceglie il mittente.
 - `%$year%-%$month%-%$day%` usa l'ora del collettore: il cambio file avviene a mezzanotte locale del collettore.
-- TLS lato server con client anonimi; l'autenticazione del mittente è data dall'IP: **nftables** sul collettore accetta 514/udp e 6514/tcp solo dalle subnet gestite, SSH solo dall'IP di amministrazione della credenziale non MSP.
+- TLS lato server con client anonimi; la selezione del mittente si basa sull'IP, senza autenticarne l'identità crittografica: **nftables** sul collettore accetta 514/udp e 6514/tcp solo dalle subnet gestite, SSH solo dall'IP di amministrazione della credenziale non MSP.
 - Smistamento D7 per QNAP: prima dell'`omfile`, distinguere con un elenco AdS approvato le righe dei loro accessi da quelle degli altri utenti del NAS. Scrivere le prime in `/srv/ads/` e le seconde in un flusso distinto, con politica di accesso e conservazione autonoma. Finché l'elenco e la destinazione non sono definiti, lo smistamento non è pronto per l'esercizio; le righe non AdS già arrivate in `/srv/ads/` vanno registrate come contaminazione, senza cancellazioni implicite.
 - [V] Sintassi dei parametri TLS verificata il 2026-10-01 in container `debian:trixie` con rsyslog 8.2504, la versione installata sul collettore: `rsyslogd -N1` accetta la configurazione, un messaggio inviato in TLS sulla 6514 arriva, uno inviato in TCP in chiaro sulla stessa porta viene scartato (`tests/debian13/verifica-config.sh`).
 - Correzione del 2026-10-01, provata nello stesso container: con `%syslogtag%%msg%` i messaggi RFC 5424, il cui tag non finisce con `:` e il cui testo non comincia con uno spazio, uscivano con tag e messaggio fusi (`prova-udpmessaggio udp`); la forma `%msg:::sp-if-no-1st-sp%%msg:::drop-last-lf%`, quella del formato tradizionale di rsyslog, separa i due campi in entrambi i formati. Seconda correzione, del 2026-10-02, che supera la prima: con il firewall Zyxel, che dopo il nome del sistema non scrive un nome di programma, rsyslog prende `src="<ip>:` per tag, e la regola dello spazio aggiunto se manca lo infilava dentro l'indirizzo (`src="192.0.2.73: 0"`), alterando la prova. Il campo messaggio è ora `$!ads_msg`, calcolato nel ruleset: per RFC 3164 tag e testo riattaccati esattamente, per RFC 5424 separati da uno spazio (`$protocol-version`). Inoltre ZLD scrive l'anno dopo l'ora, e senza il parser `pmrfc3164` con `detect.YearAfterTimestamp="on"` il campo sistema valeva `2026`.
@@ -238,7 +245,8 @@ Il collettore deve poter raggiungere la TSA in uscita (HTTP/HTTPS): regola da ap
 ## Fonti consultate in questa verifica
 - Garante privacy, provvedimento 27/11/2008 (mod. 25/06/2009): access log con completezza, inalterabilità, verificabilità dell'integrità; conservazione non inferiore a sei mesi; verifica almeno annuale dell'operato degli AdS.
 - docs.fluentbit.io - input Windows Event logs (winevtlog), pagina corrente: `event_data_as_map`, `event_query` XPath/XML Query, `db`, privilegi per il canale Security.
-- docs.fluentbit.io - output Syslog: modalità udp/tcp/tls/dtls, `syslog_message_key`, formato rfc5424.
+- [Fluent Bit 4.1, output Syslog](https://docs.fluentbit.io/manual/4.1/data-pipeline/outputs/syslog): `mode` tcp/udp, TLS separato, `syslog_message_key`, formato RFC 5424.
+- [Fluent Bit 4.1, input Dummy](https://docs.fluentbit.io/manual/4.1/data-pipeline/inputs/dummy): `Interval_sec` e `Dummy`.
 - [HPE iLO 5 Licensing Guide](https://support.hpe.com/hpesc/public/docDisplay?docId=sd00001039en_us&docLocale=en_US): matrice delle funzioni per licenza, da confrontare con `License Type` sul dispositivo prima di scegliere definitivamente fra Remote Syslog e polling.
 - [HPE iLO 5 User Guide, iLO details](https://support.hpe.com/hpesc/public/docDisplay?docId=a00105236en_us&docLocale=en_US&page=GUID-33F615FB-B545-4045-9EBF-20569EB01EBF.html): `License Type` e versione firmware in Overview, confrontati con lo screenshot 102 il 07/10/2026.
 - [HPE iLO 5 User Guide, Remote syslog options](https://support.hpe.com/hpesc/public/docDisplay?docId=a00105236en_us&docLocale=en_US&page=GUID-D7147C7F-2016-0901-06D0-000000001272.html): server e porta configurabili; porta predefinita 514.
