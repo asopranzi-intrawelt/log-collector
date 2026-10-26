@@ -1,5 +1,13 @@
 # Snapshot di sincronizzazione
 
+## Catena storica verificata prima della nuova chiusura, 26/10/2026
+
+Nel diff corrente `ads-nightly.sh` esegue la verifica integrale della catena locale prima di aggiungere un manifest. Una prova WSL con il primo di quattro manifest alterato falliva sul codice precedente perché il quinto veniva creato; ora il job si ferma e il quinto resta assente. Il controllo dipende dagli originali e può avere costo I/O elevato: misurarlo sulla VM e definire la retention con ancoraggio verificabile. In `network-design` i nove file D6/ISO sono già nello stage e corrispondono al patch privato; commit e push restano all'utente. WindTre 89/90 e ISO-30 ancora aperti.
+
+## Catena AdS recupera i giorni dopo un fermo, 26/10/2026
+
+Il collettore `213d19b` è stato pubblicato dall'utente. La rete ha il delta D6/ISO-30 preparato sul commit `ba06650`: roadmap ISO e copie private allineate, timeline a 241 eventi, controlli verdi; poi è comparsa una modifica parallela a `lezioni-template.md`, quindi il `chiudi` globale della rete non è più isolato. Nel nuovo diff del collettore `ads-nightly.sh` chiude fino a 213 giorni mancanti dopo l'ultimo manifest, rifiuta un fermo più lungo prima di scrivere e blocca archivi precedenti senza manifest al primo avvio. Il servizio e lo script verificano che `/srv/ads` sia montato. Le prove WSL del fermo, dell'archivio orfano e del mount erano rosse prima delle correzioni e ora passano con controllo della catena, ora legale, idempotenza e ripresa dell'archivio D-1. Timer non installato, D7, prova VM, TSA, WORM e allarme esterno aperti. WindTre 89/90 e ISO-30 ancora in corso.
+
 ## D6 recupera i giorni nella finestra locale, 26/10/2026
 
 Il collettore `3e12aa6` è pubblicato e allineato al remoto. Il nuovo diff porta la politica D6 a `version=2` con `active_from` per sorgente e scandisce fino a 213 giorni; il report conserva totale delle anomalie e prime 100, senza marcare i giorni prima dell'attivazione. Sedici prove e Ruff verdi; tre mutazioni del recupero, del filtro per sorgente e delle chiavi JSON duplicate sono rilevate e ripristinate con hash verificato. La prova sul 31/12/9999 ha rilevato e fatto correggere un overflow. WSL ha contato sei anomalie sintetiche su tre giorni su un mount reale. Nessuna unità, heartbeat o allarme installato. La rete ha pubblicato il checkpoint D6 dentro `fc95f42` e ISO-30 resta in corso; le tre correzioni testuali del filone sono pubblicate in `c387454`. WindTre 89/90 ancora aperte.
@@ -431,7 +439,7 @@ Propagazione rete completata: integrazione, memoria, contesto, timeline e resume
 
 ```
 Branch attivo:        main
-Commit di riferimento: 3e12aa6
+Commit di riferimento: 213d19b
 Data snapshot:        2026-10-26
 Albero autorevole:    unico
 Remoto:               git@github-corp:asopranzi-intrawelt/log-collector.git (primo push di 9ee87b4 il 2026-09-30)
@@ -442,11 +450,11 @@ Template:             E:\template-claude-developing @ ffcbdb3
 
 | Scheda | last-verified | Stato |
 |---|---|---|
-| STACK.md | 3e12aa6 | D6 retrospettivo e confine QA descritti |
-| design-and-security.md | 3e12aa6 | date di attivazione e limiti D6 esplicitati |
-| deployment.md | 3e12aa6 | timer D6 ancora locale e finestra candidata |
-| dev-testing.md | 3e12aa6 | sedici prove D6, cinque mutazioni rilevate |
-| current-work.md | 3e12aa6 | D6 retrospettivo candidato e gate operativi aperti |
+| STACK.md | 213d19b | D6 pubblicato e catena locale candidata descritta |
+| design-and-security.md | 213d19b | limiti D6 e catena locale esplicitati |
+| deployment.md | 213d19b | timer D6 e notturno non installati |
+| dev-testing.md | 213d19b | D6 pubblicato e ripresa della catena provata in WSL |
+| current-work.md | 213d19b | recupero notturno candidato e gate operativi aperti |
 | roadmap.md | 9ee87b4 | solo struttura |
 
 ## Punto di ripresa

@@ -8,11 +8,17 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 3e12aa63eeadb680e7237ca899efe3cda3141818
+last-verified-commit: 213d19b16baca9dbe4f06629b366d91c440c8832
 stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai punti 3 e 7; eventi iLO tecnici separati con ritenzione 90 giorni attiva; catena locale provata in WSL, non installata; D7 bloccato da nomina ed elenco AdS
 ---
 
 # Lavoro in corso
+
+## Catena AdS: recupero dei manifest, 26/10/2026
+
+Il collettore `213d19b` è pubblicato e `D:/network-design` registra quel checkpoint in un diff non ancora versionato con ISO-30 ancora in corso; una lezione del filone sito è comparsa in parallelo. Nel nuovo diff `ads-nightly.sh` recupera in ordine fino a 213 giorni dopo l'ultimo manifest, interrompe il bootstrap davanti ad archivi più vecchi senza manifest e riusa un archivio di D-1 verificato dopo un arresto. Il servizio richiede `/srv/ads` montato e lo script lo controlla prima di scrivere. Le prove WSL del fermo, dell'archivio orfano e del mount erano rosse prima delle correzioni; ora passano anche limite di finestra e cambio dell'ora. Timer notturno ancora non installato; D7, prova sulla VM, TSA, WORM e allarme restano aperti per WindTre 89/90. Dettaglio nel runbook del componente 5.
+
+Una quarta prova rossa ha mostrato che una rottura del primo di quattro manifest non fermava la chiusura del quinto. Il job ora verifica tutta la catena locale prima di aggiungere un manifest; la prova è verde e nessun nuovo manifest viene scritto quando lo storico è corrotto. Da misurare sulla VM durata e carico di questa scansione e da progettare il troncamento verificabile dopo 213 giorni. Nella rete i nove file D6/ISO sono già nello stage, identici al patch privato, mentre le modifiche del sito sono fuori stage; l'utente deve completare commit e push manuali.
 
 ## D6: segnale di silenzio candidato, 26/10/2026
 

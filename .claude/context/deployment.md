@@ -5,10 +5,16 @@ generated-date: 2026-09-30
 covers-paths:
   - config/**
   - docs/handoff-sviluppo-collettore.md
-last-verified-commit: 3e12aa63eeadb680e7237ca899efe3cda3141818
+last-verified-commit: 213d19b16baca9dbe4f06629b366d91c440c8832
 ---
 
 # Deployment
+
+## Chiusura giornaliera AdS candidata, 26/10/2026
+
+`ads-nightly.service` e `.timer` non sono installati sulla VM. Il servizio delle 00:15 ora locale chiuderebbe fino a 213 giorni mancanti, leggendo `/srv/ads` e scrivendo archivi e manifest in `/var/lib/ads`. `RequiresMountsFor=/srv/ads` ordina il servizio dopo il volume; `--require-log-mount` rifiuta il percorso non montato prima di qualsiasi scrittura. Oltre la finestra si ferma senza scrivere; al primo avvio non ricostruisce giorni anteriori a D-1. Prima dell'esercizio vanno risolti D7 e il perimetro AdS, provati utente `ads`, spazio e mount sulla VM, e predisposti TSA, WORM e allarme esterno.
+
+Il preflight verifica tutta la catena locale, inclusi archivi e originali: prima di attivare il timer vanno misurati tempo e carico su dati rappresentativi e definito come mantenere l'ancoraggio verificabile dopo la futura retention.
 
 ## Timer D6 candidato, 26/10/2026
 

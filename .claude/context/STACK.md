@@ -8,10 +8,16 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 3e12aa63eeadb680e7237ca899efe3cda3141818
+last-verified-commit: 213d19b16baca9dbe4f06629b366d91c440c8832
 ---
 
 # Stack applicativo
+
+## Catena notturna AdS, 26/10/2026
+
+`ads-nightly.sh` e `ads-verify.sh` preparano archivi e manifest concatenati; il nuovo diff chiude i giorni mancanti in ordine fino a D-1, entro 213 giorni dall'ultimo manifest. Il primo avvio crea `GENESIS` su D-1 e rifiuta archivi precedenti senza manifest; gli archivi di D-1 rimasti da un arresto sono confrontati e riusati. `ads-nightly.service` richiede il mount `/srv/ads` e passa `--require-log-mount` al job. Il timer è soltanto candidato. TSA, WORM e impronta esterna sono stadi non installati.
+
+Prima di aggiungere un manifest, il job rilegge e verifica l'intera catena locale esistente: una rottura vecchia blocca la nuova chiusura. Il costo di I/O su 213 giorni reali non è ancora misurato.
 
 ## Segnale per sorgente D6, 26/10/2026
 

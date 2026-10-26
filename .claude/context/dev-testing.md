@@ -6,10 +6,16 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 3e12aa63eeadb680e7237ca899efe3cda3141818
+last-verified-commit: 213d19b16baca9dbe4f06629b366d91c440c8832
 ---
 
 # Test di sviluppo
+
+## Recupero della catena AdS, 26/10/2026
+
+`tests/test-nightly.sh` su WSL usa solo `/tmp`: la prova del fermo di due giorni è caduta sul codice precedente (`catena discontinua`) e passa dopo il recupero sequenziale con quattro manifest verificati. Provati anche idempotenza, rifiuto oltre 213 giorni senza nuovi manifest, passaggio dell'ora di ottobre, blocco di un archivio vecchio senza manifest e riuso dell'archivio D-1 dopo un arresto. La prova del mount era rossa perché il vecchio comando rifiutava l'argomento senza verificare il mount; ora il percorso di prova è confermato non montato e il rifiuto precede il manifest. `systemd-analyze verify` accetta servizio e timer: gli avvisi sui bit eseguibili e scrivibili derivano dal file su DrvFs e non misurano i permessi dell'installazione Debian. La mutazione storica che elimina il confronto archivio/log continua a essere rilevata dalla prova del byte alterato. Nessun dato reale, timer attivo o allarme ricevuto; sulla VM mancano la prova dei permessi e dello spazio.
+
+Una copia con il primo di quattro manifest alterato faceva passare il job precedente e gli faceva creare il quinto: il nuovo test era rosso. Con il preflight integrale il test è verde e il quinto manifest resta assente. Il carico della verifica integrale non è stato misurato su dati della VM.
 
 ## Controllo di silenzio D6, 26/10/2026
 

@@ -18,6 +18,8 @@ Riferimento funzionale: `studio-collettore-ads.md`. Questo file dice **come e in
 
 Verifica in sola lettura sulla VM del collettore il 23/10, con SSH a chiave, `BatchMode=yes` e host key obbligatoria: `/srv/ads` risulta un mount ext4 `rw,nosuid,nodev,noexec` e `rsyslog` è `active`. `ads-nightly.timer` e `ads-silence.timer` restituiscono `not-found` e `inactive`; lo script notturno e la cartella manifest non sono visibili all'account interrogato. Quest'ultima osservazione non distingue assenza da permessi insufficienti. La catena locale provata in WSL non è installata come servizio: le righe WindTre 89/90 richiedono ancora prova sulla VM, custodia indipendente e conservazione verificabile. Le nuove unità D6 sono solo nel repository; il test su WSL e la verifica sintattica systemd non sostituiscono installazione, heartbeat o allarme consegnato. Nessuna configurazione è stata modificata.
 
+Prima dell'installazione del timer notturno, misurare su volume e dati rappresentativi la durata e il carico della verifica integrale della catena. Definire la retention degli originali e un ancoraggio verificabile prima di eliminarli: oggi la verifica si ferma se un originale di un manifest conservato manca.
+
 Queste righe distinguono lavoro interno e attese esterne. Per dichiarare chiusa una pendenza servono un artefatto ricevuto e una prova di integrazione, non soltanto il testo di una proposta. Il dossier tecnico di ciascuna sorgente conserva il dettaglio; questa è la vista di consegna al cliente.
 
 Scadenza indicata dall'utente: 20/12/2026 per le evidenze del questionario cliente, con accettazione interna entro venerdì 18/12. Questo collettore contribuisce direttamente alle righe 89 e 90; il programma esteso delle 59 sorgenti non coincide automaticamente con il perimetro del questionario. L'Annex consegnato indica `12/2026` anche per la riga 90; la proposta interna di completarla solo in parte entro dicembre attende conferma scritta del cliente. Date, capacità e criteri dei gate sono nella [roadmap](../.claude/context/roadmap.md); il mancato arrivo di una decisione o di un campione resta una pendenza con evidenza, non una verifica superata.
@@ -140,7 +142,7 @@ Resta vero (studio, sezione 6) che l'amministratore dell'hypervisor può acceder
 Regole comuni:
 - Ogni script scrive le righe nello **stesso formato** del template `AdsLine`: ora di ricezione, sorgente, ora dichiarata, sistema, messaggio.
 - Credenziali API (M365, NinjaOne, iLO) in `/etc/ads/secrets/` con modalità 0600, proprietario un utente di servizio `ads`. Gli script girano come `ads`, non come root.
-- `ads-nightly.sh` lavora **solo su D-1**, file già chiusi. Un errore in un passo fa fallire il job e manda la mail di errore: nessun passo viene saltato in silenzio.
+- `ads-nightly.sh` chiude i giorni mancanti fino a **D-1**, in ordine e per un massimo di 213 giorni dopo l'ultimo manifest. Il servizio candidato richiede `/srv/ads` montato e lo script lo controlla prima di scrivere. Al primo avvio crea `GENESIS` su D-1: lo storico precedente richiede un bootstrap separato. Un errore ferma la catena sul giorno interessato; la mail di errore resta uno stadio futuro, vincolato al relay e a una prova di consegna.
 - La cartella WORM si monta solo durante il job e si smonta alla fine.
 - Pulizia dei file oltre 213 giorni solo dopo aver verificato che il file sia presente in WORM.
 

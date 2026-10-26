@@ -24,6 +24,19 @@ expect_failure() {
     fi
 }
 
+command -v mountpoint >/dev/null
+if mountpoint -q -- "$ADS_LOG_ROOT"; then
+    printf 'ERRORE: il percorso di prova risulta montato\n' >&2
+    exit 1
+fi
+expect_failure env ADS_TODAY=2026-10-07 bash "$project_dir/bin/ads-nightly.sh" --require-log-mount
+grep -Fq 'radice dei log non montata' "$scratch/output" || {
+    printf 'ERRORE: il rifiuto non dipende dal mount\n' >&2
+    cat "$scratch/output" >&2
+    exit 1
+}
+[[ ! -e $ADS_STATE_ROOT/manifests/manifest-2026-10-06.txt ]]
+
 ADS_TODAY=2026-10-07 bash "$project_dir/bin/ads-nightly.sh"
 bash "$project_dir/bin/ads-verify.sh"
 ADS_TODAY=2026-10-07 bash "$project_dir/bin/ads-nightly.sh"
@@ -49,7 +62,72 @@ printf '2026-10-07T10:00:00Z source-a login ok\n' >"$ADS_LOG_ROOT/source-a/2026-
 ADS_TODAY=2026-10-08 bash "$project_dir/bin/ads-nightly.sh"
 bash "$project_dir/bin/ads-verify.sh"
 
+# Un solo riavvio del timer deve recuperare tutti i giorni saltati nella finestra locale.
+printf '2026-10-08T10:00:00Z source-a login ok\n' >"$ADS_LOG_ROOT/source-a/2026-10-08.log"
+printf '2026-10-09T10:00:00Z source-b login ok\n' >"$ADS_LOG_ROOT/source-b/2026-10-09.log"
+ADS_TODAY=2026-10-10 bash "$project_dir/bin/ads-nightly.sh"
+bash "$project_dir/bin/ads-verify.sh"
+[[ -f $ADS_STATE_ROOT/manifests/manifest-2026-10-08.txt ]]
+[[ -f $ADS_STATE_ROOT/manifests/manifest-2026-10-09.txt ]]
+[[ -f $ADS_STATE_ROOT/archives/source-a/2026-10-08.log.gz ]]
+[[ -f $ADS_STATE_ROOT/archives/source-b/2026-10-09.log.gz ]]
+ADS_TODAY=2026-10-10 bash "$project_dir/bin/ads-nightly.sh"
+
+# Una rottura remota dal giorno corrente deve fermare la nuova chiusura.
+(
+    export ADS_STATE_ROOT=$scratch/historic-state
+    cp -a -- "$scratch/state" "$ADS_STATE_ROOT"
+    printf 'x' >>"$ADS_STATE_ROOT/manifests/manifest-2026-10-06.txt"
+    expect_failure env ADS_TODAY=2026-10-11 bash "$project_dir/bin/ads-nightly.sh"
+    grep -Fq 'catena storica non verificabile' "$scratch/output"
+    [[ ! -e $ADS_STATE_ROOT/manifests/manifest-2026-10-10.txt ]]
+)
+
+# Un fermo oltre la finestra locale si arresta prima di chiudere giorni senza evidenza.
+expect_failure env ADS_TODAY=2027-06-01 bash "$project_dir/bin/ads-nightly.sh"
+grep -Fq 'oltre la finestra locale di 213' "$scratch/output"
+[[ ! -e $ADS_STATE_ROOT/manifests/manifest-2027-05-31.txt ]]
+[[ $(find "$ADS_STATE_ROOT/manifests" -maxdepth 1 -name 'manifest-*.txt' -type f | wc -l) -eq 4 ]]
+
+# Il cambio dell'ora di ottobre non deve creare o saltare una giornata civile.
+(
+    export ADS_LOG_ROOT=$scratch/dst-logs
+    export ADS_STATE_ROOT=$scratch/dst-state
+    mkdir -p -- "$ADS_LOG_ROOT/source-a" "$ADS_STATE_ROOT"
+    printf 'access\n' >"$ADS_LOG_ROOT/source-a/2026-10-24.log"
+    ADS_TODAY=2026-10-25 bash "$project_dir/bin/ads-nightly.sh"
+    printf 'access\n' >"$ADS_LOG_ROOT/source-a/2026-10-25.log"
+    printf 'access\n' >"$ADS_LOG_ROOT/source-a/2026-10-26.log"
+    ADS_TODAY=2026-10-27 bash "$project_dir/bin/ads-nightly.sh"
+    bash "$project_dir/bin/ads-verify.sh"
+    [[ -f $ADS_STATE_ROOT/manifests/manifest-2026-10-25.txt ]]
+    [[ -f $ADS_STATE_ROOT/manifests/manifest-2026-10-26.txt ]]
+)
+
+# Senza GENESIS, un archivio di una giornata precedente non può sparire dal perimetro.
+(
+    export ADS_LOG_ROOT=$scratch/orphan-logs
+    export ADS_STATE_ROOT=$scratch/orphan-state
+    mkdir -p -- "$ADS_LOG_ROOT/source-a" "$ADS_STATE_ROOT/archives/source-a"
+    printf 'access\n' >"$ADS_LOG_ROOT/source-a/2026-10-09.log"
+    printf 'orphan\n' >"$ADS_STATE_ROOT/archives/source-a/2026-10-08.log.gz"
+    expect_failure env ADS_TODAY=2026-10-10 bash "$project_dir/bin/ads-nightly.sh"
+    grep -Fq 'archivio senza manifest precedente' "$scratch/output"
+    [[ ! -e $ADS_STATE_ROOT/manifests/manifest-2026-10-09.txt ]]
+)
+
+# Un archivio di D-1 creato prima di un arresto viene riusato e verificato.
+(
+    export ADS_LOG_ROOT=$scratch/interrupted-logs
+    export ADS_STATE_ROOT=$scratch/interrupted-state
+    mkdir -p -- "$ADS_LOG_ROOT/source-a" "$ADS_STATE_ROOT/archives/source-a"
+    printf 'access\n' >"$ADS_LOG_ROOT/source-a/2026-10-09.log"
+    gzip -n -9 -c -- "$ADS_LOG_ROOT/source-a/2026-10-09.log" >"$ADS_STATE_ROOT/archives/source-a/2026-10-09.log.gz"
+    ADS_TODAY=2026-10-10 bash "$project_dir/bin/ads-nightly.sh"
+    bash "$project_dir/bin/ads-verify.sh" --date 2026-10-09
+)
+
 # Anche alterare il manifest precedente deve spezzare il legame del giorno seguente.
 printf 'x' >>"$ADS_STATE_ROOT/manifests/manifest-2026-10-06.txt"
 expect_failure bash "$project_dir/bin/ads-verify.sh"
-printf 'test-nightly: OK (due giorni, idempotenza, log alterato, catena alterata)\n'
+printf 'test-nightly: OK (recupero, 213 giorni, ora legale, idempotenza, alterazioni)\n'

@@ -6,10 +6,16 @@ covers-paths:
   - bin/**
   - config/**
   - pilot/monitoring-hub/**
-last-verified-commit: 3e12aa63eeadb680e7237ca899efe3cda3141818
+last-verified-commit: 213d19b16baca9dbe4f06629b366d91c440c8832
 ---
 
 # Design e sicurezza applicativa
+
+## Limite della catena locale dopo un fermo, 26/10/2026
+
+La ripresa dei manifest scorre i giorni mancanti fino a D-1 sotto un lock, ma non inventa evidenze oltre 213 giorni o prima del primo `GENESIS`. Il servizio richiede `/srv/ads` montato e il job verifica il mount prima di creare directory o manifest: un mount perso non diventa una giornata vuota da chiudere. Un manifest vuoto mantiene la continuità della catena, senza attestare che una sorgente fosse completa; D6 deve valutare i segnali attesi e un destinatario esterno deve ricevere l'allarme. Manifest, archivi e log restano nella stessa VM: TSA, WORM e impronta consegnata alla Direzione sono ancora necessari per una prova indipendente.
+
+Un preflight integrale rifiuta la nuova chiusura se la catena storica locale non è verificabile. Questa verifica dipende dagli originali ancora presenti; la futura eliminazione a 213 giorni richiede una politica esplicita di troncamento e un ancoraggio esterno, altrimenti il job si fermerà.
 
 ## Limiti del segnale D6 e del mount QA, 26/10/2026
 
