@@ -43,15 +43,17 @@ mount_ilo=$work/ilo-tree
 mount_seeweb=$work/seeweb-tree
 mount_heartbeat=$work/heartbeat-tree
 mount_bin=$root/bin
+mount_fixtures=$root/tests/fixtures
 if command -v cygpath >/dev/null; then
     mount_src=$(cygpath -w "$work/tree")
     mount_ilo=$(cygpath -w "$work/ilo-tree")
     mount_seeweb=$(cygpath -w "$work/seeweb-tree")
     mount_heartbeat=$(cygpath -w "$work/heartbeat-tree")
     mount_bin=$(cygpath -w "$root/bin")
+    mount_fixtures=$(cygpath -w "$root/tests/fixtures")
 fi
 
-MSYS_NO_PATHCONV=1 docker run --rm --cap-add NET_ADMIN -v "$mount_src:/tree:ro" -v "$mount_ilo:/ilo-tree:ro" -v "$mount_seeweb:/seeweb-tree:ro" -v "$mount_heartbeat:/heartbeat-tree:ro" -v "$mount_bin:/ads-bin:ro" "$IMAGE" bash -c '
+MSYS_NO_PATHCONV=1 docker run --rm --cap-add NET_ADMIN -v "$mount_src:/tree:ro" -v "$mount_ilo:/ilo-tree:ro" -v "$mount_seeweb:/seeweb-tree:ro" -v "$mount_heartbeat:/heartbeat-tree:ro" -v "$mount_bin:/ads-bin:ro" -v "$mount_fixtures:/ads-fixtures:ro" "$IMAGE" bash -c '
 set -euo pipefail
 fail() { echo "FALLITO: $*"; exit 1; }
 ok() { echo "ok  $*"; }
@@ -227,9 +229,10 @@ install -m 0644 /heartbeat-tree/etc/rsyslog.d/10-ads.conf /etc/rsyslog.d/
 rsyslogd -N1 >/dev/null 2>&1 || { rsyslogd -N1; fail "rsyslogd -N1 rifiuta il filtro heartbeat"; }
 rsyslogd -i /run/rsyslogd-ads.pid
 sleep 1
-printf "<134>1 2026-10-26T09:00:00Z win-test ads-heartbeat - - - heartbeat-tls\n" \
+# Byte catturati da Fluent Bit 4.1.1: RFC 5424 con PRI 14 e BOM UTF-8 prima del MSG.
+cat /ads-fixtures/fluent-bit-heartbeat-wire.bin \
     | timeout 5 openssl s_client -connect 127.0.0.1:6514 -quiet -CAfile /etc/rsyslog.d/tls/ca.pem >/dev/null 2>&1 || true
-python3 - <<'PY'
+python3 - <<PY
 import socket
 import ssl
 
@@ -249,14 +252,14 @@ hb=/var/lib/ads/heartbeats/127.0.0.1/$(date +%Y-%m-%d).heartbeat
 rejected=/var/log/ads-heartbeat-rejected/127.0.0.1/$(date +%Y-%m-%d).log
 rejected_unlisted=/var/log/ads-heartbeat-rejected/127.0.0.2/$(date +%Y-%m-%d).log
 [ -f "$hb" ] && [ -f "$rejected" ] && [ -f "$rejected_unlisted" ] || fail "manca il segnale D6 o il flusso tecnico rifiutato"
-grep -qF "heartbeat-tls" "$hb" || fail "heartbeat TLS autorizzato non ricevuto"
+grep -qF "$(printf "\357\273\277heartbeat")" "$hb" || fail "heartbeat TLS autorizzato non ricevuto"
 grep -qF "heartbeat-udp" "$rejected" || fail "heartbeat UDP non separato"
 grep -qF "heartbeat-3164" "$rejected" || fail "heartbeat RFC 3164 non separato"
 grep -qF "heartbeat-unlisted" "$rejected_unlisted" || fail "heartbeat TLS da IP non autorizzato non separato"
 grep -qF "heartbeat-unlisted" "$hb" && fail "heartbeat TLS da IP non autorizzato contato da D6"
 grep -qF "heartbeat-udp" "$hb" && fail "heartbeat UDP contato da D6"
 grep -qF "heartbeat-3164" "$hb" && fail "heartbeat RFC 3164 contato da D6"
-grep -qF "heartbeat-" "$f" && fail "heartbeat entrato nel flusso AdS"
+grep -qF "ads-heartbeat" "$f" && fail "heartbeat entrato nel flusso AdS"
 [ "$(stat -c "%U:%G %a" "$hb")" = "root:ads 640" ] || fail "permessi del segnale D6"
 [ "$(stat -c "%U:%G %a" "$rejected")" = "root:root 640" ] || fail "permessi del heartbeat rifiutato"
 printf "{\"version\":2,\"sources\":[{\"id\":\"127.0.0.1\",\"signal\":\"daily_heartbeat\",\"active_from\":\"$(date +%Y-%m-%d)\"}]}\n" > /tmp/heartbeat-policy.json

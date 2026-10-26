@@ -1,5 +1,15 @@
 # Work-log
 
+## 2026-10-26 - Fluent Bit reale e verifica del nome TLS
+
+L'utente ha pubblicato il collettore `2e57ad9`; `origin/main` coincide. La rete è a `3f5d7ff`: il delta di integrazione, ISO-30 e timeline è pronto, con patch privata che seleziona nove file e lascia fuori le modifiche parallele del sito. Nessun Git di scrittura dell'agente.
+
+La documentazione Fluent Bit 4.1 specifica che `tls.verify on` non controlla il nome per default. Lo studio imposta ora `tls.verify_hostname on` nei due output Syslog. Un Fluent Bit 4.1.1 in container con input `dummy` e certificato fittizio ha consegnato il marker quando l'IP era nel SAN; con lo stesso certificato attendibile e IP non presente nel SAN ha registrato `hostname mismatch (X509 code: 62)` e il ricevitore non ha scritto payload. Il test integrato Debian 13 inoltra una fixture sintetica di 76 byte catturata dal vero output Syslog, verifica il file separato e fa classificare il giorno come `observed` da D6. Questa prova collega il formato del mittente al ricevente, senza collaudare il plugin Windows, la coda sul pilota o la VM reale.
+
+Aggiornati `docs/studio-collettore-ads.md`, `docs/handoff-sviluppo-collettore.md`, `docs/runbook-componente-5-catena.md`, `tests/debian13/verifica-config.sh`, `tests/fixtures/fluent-bit-heartbeat-wire.bin`, cinque schede tecniche, indice, work-log, nota di ripresa e messaggio di commit. Restano ritenzione del rifiutato, lista IP e policy approvate, installazione Windows e allarme esterno; WindTre 89/90 e ISO-30 restano aperti.
+
+**Template:** nessuna.
+
 ## 2026-10-26 - Ricezione del marker Windows per D6
 
 Dopo il `chiudi` manuale dell'utente, collettore `1436969` e `origin/main` coincidono; la rete resta a `3f5d7ff`, con modifiche parallele del sito preservate. L'analisi ha trovato che `ads-silence.py` cercava un file heartbeat non prodotto da rsyslog, mentre lo studio Windows avrebbe inviato `ads.hb` nello stesso output degli accessi e dichiarava `Mode tls`, non ammesso dalla documentazione Fluent Bit 4.1. Il candidato distingue ora `APP-NAME=ads-heartbeat` con RFC 5424, ingresso TLS e IP pilota ammesso; scrive il file D6 `root:ads`. I marker via UDP, RFC 3164 e da IP estraneo TLS restano nel file tecnico `root:root`, fuori da `/srv/ads/`.

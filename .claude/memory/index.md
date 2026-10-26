@@ -1,5 +1,9 @@
 # Snapshot di sincronizzazione
 
+## Verifica del mittente Fluent Bit e del nome TLS, 26/10/2026
+
+Collettore `2e57ad9` pubblicato dall'utente e allineato al remoto. Nel diff corrente la configurazione candidata Windows abilita `tls.verify_hostname on` per entrambi gli output: Fluent Bit 4.1.1 ha consegnato il marker a un ricevitore TLS di prova con SAN corrispondente e lo ha rifiutato con `hostname mismatch` quando il SAN non corrispondeva. Il test Debian 13 usa una fixture di 76 byte catturata dal vero output Syslog, verifica il routing rsyslog e ottiene `observed` da D6. La prova è Linux sintetica; restano la versione Windows fissata, `winevtlog`, la coda, la VM reale, l'allarme esterno e i gate WindTre 89/90. In rete il delta del checkpoint pubblicato è pronto in nove file, isolato dal lavoro parallelo sul sito mediante patch privata di stage; ISO-30 resta in corso. Aggiornati studio, runbook, handoff, fixture, test Debian, cinque schede e memoria.
+
 ## Heartbeat Windows ricevuto dal candidato D6, 26/10/2026
 
 Collettore `1436969` pubblicato dall'utente e allineato al remoto; rete `3f5d7ff` allineata, con lavoro parallelo del sito non toccato. Nel nuovo diff rsyslog scrive il marker Windows RFC 5424 via TLS e da IP pilota ammesso nel file `daily_heartbeat` letto da D6, mentre UDP, RFC 3164 e IP estranei via TLS vanno nel flusso tecnico. La prova integrata Debian 13 con rsyslog 8.2504 è verde, come 34 prove mirate di renderer e silenzio. Lo studio corregge `Mode tcp` più `tls on` e separa `ads.win` da `ads.hb`. Nessuna prova Fluent Bit Windows o installazione sulla VM; identità del client non autenticata da TLS, ritenzione del rifiutato, elenco IP, policy, allarme esterno e gate WindTre 89/90 ancora aperti. Cinque schede ancorate a `1436969` e contenuto del diff descritti; ISO-30 in corso. La rete va propagata dopo il `chiudi` manuale di questo checkpoint, isolando i file del sito.

@@ -6,7 +6,7 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 143696921a5cbf8282e0b921d3659c5aaae34f24
+last-verified-commit: 2e57ad97ae6a7c4e06c23ab001c907bb44f87d2e
 ---
 
 # Test di sviluppo
@@ -22,6 +22,8 @@ Due prove WSL nuove erano rosse sul codice precedente: il job scriveva attravers
 ## Controllo di silenzio D6, 26/10/2026
 
 Il test integrato `tests/debian13/verifica-config.sh` genera il ricevente con IP pilota di loopback, manda un marker RFC 5424 via TLS, controlla il file `root:ads` letto dal vero `ads-silence.py`, e verifica che i marker via UDP, RFC 3164 e da IP estraneo via TLS vadano nel file tecnico `root:root`, senza righe AdS. È una prova del ricevente in container con rsyslog 8.2504, non del Fluent Bit su Windows né della VM reale.
+
+Il test Debian usa ora `tests/fixtures/fluent-bit-heartbeat-wire.bin`, 76 byte emessi dal vero Syslog output di Fluent Bit 4.1.1, compreso il BOM UTF-8. La suite integrata è verde e D6 classifica il file come `observed`. In un container separato Fluent Bit con input `dummy`, CA di test e `tls.verify_hostname on` ha consegnato il marker; con lo stesso certificato su un IP assente dal SAN ha registrato `hostname mismatch` e il ricevitore non ha scritto payload. Un primo tentativo DNS nella rete Docker interna è stato scartato; il test conclusivo usa IP statico. La prova resta Linux sintetica, non Windows né VM reale.
 
 `tests/test_ads_silence.py`: 16/16 prove su segnali, policy e mount, più recupero dei giorni precedenti, data di attivazione, chiavi JSON duplicate, limite del dettaglio nel report e confine del calendario; Ruff verde. Cinque mutazioni mirate sono state rilevate: heartbeat mancante marcato `observed`, guardia mount rimossa, finestra ridotta al solo D-1, filtro `active_from` rimosso e chiavi JSON duplicate ammesse; i test diventano rossi e i ripristini SHA-256 sono verificati. La nuova prova sul 31/12/9999 era rossa per `OverflowError` e passa dopo la correzione del ciclo. Su WSL `/dev/shm` è riconosciuto come mount: la prova sintetica di tre giorni conta sei anomalie e nessun errore di mount. `systemd-analyze verify` accetta le unità, con soli avvisi sui permessi virtuali di DrvFs. Nessuna unità installata o prova del produttore reale; prima dell'esercizio servono heartbeat, relay e verifica della mail ricevuta.
 

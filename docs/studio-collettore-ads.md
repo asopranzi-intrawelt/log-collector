@@ -101,6 +101,7 @@ Regola per il campo "Data e ora": il collettore scrive **sempre due tempi**, ric
     Mode                tcp
     tls                 on
     tls.verify          on
+    tls.verify_hostname on
     tls.ca_file         C:\Program Files\fluent-bit\conf\ca.pem
     Syslog_Format       rfc5424
     Syslog_Hostname_Key Computer
@@ -117,6 +118,7 @@ Regola per il campo "Data e ora": il collettore scrive **sempre due tempi**, ric
     Mode                tcp
     tls                 on
     tls.verify          on
+    tls.verify_hostname      on
     tls.ca_file         C:\Program Files\fluent-bit\conf\ca.pem
     Syslog_Format       rfc5424
     Syslog_Hostname_Preset  ${COMPUTERNAME}
@@ -125,7 +127,7 @@ Regola per il campo "Data e ora": il collettore scrive **sempre due tempi**, ric
     Retry_Limit         no_limits
     storage.total_limit_size 500M
 ```
-- La [documentazione ufficiale dell'output Syslog](https://docs.fluentbit.io/manual/4.1/data-pipeline/outputs/syslog) ammette `Mode tcp` o `udp` e abilita TLS separatamente con `tls on`; `Syslog_Message_Key` è obbligatorio. Il precedente `Mode tls` era errato. La [documentazione dell'input Dummy](https://docs.fluentbit.io/manual/4.1/data-pipeline/inputs/dummy) specifica `Interval_sec`: il modello produce un evento ogni 3600 secondi. La configurazione resta candidata fino alla verifica della versione Windows installata, del nome host interpolato e di un evento completo end-to-end.
+- La [documentazione ufficiale dell'output Syslog](https://docs.fluentbit.io/manual/4.1/data-pipeline/outputs/syslog) ammette `Mode tcp` o `udp` e abilita TLS separatamente con `tls on`; `Syslog_Message_Key` è obbligatorio. Il precedente `Mode tls` era errato. La [documentazione TLS](https://docs.fluentbit.io/manual/4.1/administration/transport-security) precisa che `tls.verify on` valida il certificato ma `tls.verify_hostname` è disattivato per default: attivarlo esplicitamente per confrontare `Host` con il SAN. La [documentazione dell'input Dummy](https://docs.fluentbit.io/manual/4.1/data-pipeline/inputs/dummy) specifica `Interval_sec`: il modello produce un evento ogni 3600 secondi. La configurazione resta candidata fino alla verifica della versione Windows installata, del nome host interpolato e di un evento completo end-to-end.
 - [V] Senza `DB` il plugin riparte dalla coda a ogni avvio: `DB` è obbligatorio per non perdere eventi durante i riavvii.
 - Il secondo `Select` (log cancellato, criteri modificati, account creati, membri aggiunti/rimossi dai gruppi) non è filtrato per utente: sono eventi rari che rilevano la creazione di amministratori fuori elenco.
 - **[Non verificato]** sensibilità a maiuscole/minuscole del confronto su `TargetUserName` nella query XPath: provare con un account scritto in modo diverso.
@@ -142,6 +144,8 @@ function ads(tag, ts, r)
 end
 ```
 - **Heartbeat (D6)**: il tag `ads.hb` usa un output separato con `APP-NAME=ads-heartbeat`; il filtro Lua e l'output degli accessi leggono solo `ads.win`. Sul collettore soltanto RFC 5424 ricevuto via TLS dalla lista `sorgenti.windows_pilota` scrive `/var/lib/ads/heartbeats/<IP>/<giorno>.heartbeat`. I marker da UDP, RFC 3164 o IP estranei vanno a `/var/log/ads-heartbeat-rejected/` e non entrano in `/srv/ads/`. Il monitor di silenzio legge il primo percorso. Il client TLS verifica il server; il server rsyslog accetta client anonimi e quindi l'IP è il solo vincolo sul mittente, non una prova crittografica d'identità. Prima dell'attivazione servono lista IP verificata, politica di conservazione e capacità del flusso rifiutato, prova Windows e allarme esterno.
+
+Prova locale del 26/10 con l'immagine ufficiale Fluent Bit **4.1.1**, digest `sha256:2a5cb41f99b7c5f3386bb34d42ce3b19eb47fbef6d93b64c0bd4afe9e6ec389c`: un input `dummy` a un secondo e un output Syslog con `tls.verify_hostname on` hanno consegnato a un ricevitore TLS fittizio un record RFC 5424 con `APP-NAME=ads-heartbeat`, messaggio `heartbeat` preceduto dal BOM UTF-8 e ritorno a capo. Spostando il ricevitore a un IP assente dal SAN, a parità di certificato attendibile, Fluent Bit ha registrato `hostname mismatch (X509 code: 62)` e il ricevitore non ha scritto payload. I 76 byte del primo campione, catturato prima di attivare il controllo del nome ma con la stessa forma di messaggio, sono nella [fixture sintetica](../tests/fixtures/fluent-bit-heartbeat-wire.bin), SHA-256 `44f8850564cc8c9664b939663bd8cec8e0d2ddbe1a8ff83943cda732c29e8ee4`; il test Debian 13 li inoltra al template rsyslog e verifica la lettura D6. Sono prove in container Linux: plugin `winevtlog`, interpolazione del nome Windows, coda dopo un fermo lungo e servizio sul pilota restano non provati.
 
 ### 3.4 Monitoraggio NinjaOne
 Condition sul servizio `fluent-bit` non in esecuzione → alert + script di riavvio. Policy di aggiornamento: nuova versione prima sul gruppo pilota.

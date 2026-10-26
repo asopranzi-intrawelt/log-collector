@@ -24,6 +24,8 @@ Il candidato ora rifiuta directory simboliche di stato e archivio; il verificato
 
 Per D6 il ricevente candidato distingue `APP-NAME=ads-heartbeat` dagli accessi Windows: RFC 5424 sulla porta TLS 6514 e IP presente in `sorgenti.windows_pilota` scrivono `/var/lib/ads/heartbeats/<IP>/<giorno>.heartbeat`, letto da `ads-silence.py`; UDP, RFC 3164 e IP estranei scrivono invece `/var/log/ads-heartbeat-rejected/` con permessi `root:root`. Nessun marker entra in `/srv/ads/`. Il test integrato Debian 13 verifica lo smistamento e la lettura D6; resta il collaudo dell'agent Windows con versione fissata, della lista IP e dei permessi reali. TLS autentica il server, non il client anonimo di rsyslog: non descrivere il marker come attestazione di identità della postazione. Il flusso rifiutato richiede politica di ritenzione e misura della capienza prima dell'installazione.
 
+Fluent Bit 4.1.1 Linux ha superato `--dry-run` e la consegna del marker a un ricevitore TLS fittizio con `tls.verify_hostname on`; spostando il ricevitore a un IP non presente nel SAN, il client ha rifiutato il certificato per `hostname mismatch` e nessun payload è arrivato. Il campione RFC 5424 sintetico del mittente è ora una fixture che il test Debian 13 inoltra al vero rsyslog e fa leggere da D6. La prova non usa il plugin Windows `winevtlog`, la versione ZIP del pilota o la VM reale: restano il collaudo Windows, la policy approvata e la consegna dell'allarme.
+
 Queste righe distinguono lavoro interno e attese esterne. Per dichiarare chiusa una pendenza servono un artefatto ricevuto e una prova di integrazione, non soltanto il testo di una proposta. Il dossier tecnico di ciascuna sorgente conserva il dettaglio; questa è la vista di consegna al cliente.
 
 Scadenza indicata dall'utente: 20/12/2026 per le evidenze del questionario cliente, con accettazione interna entro venerdì 18/12. Questo collettore contribuisce direttamente alle righe 89 e 90; il programma esteso delle 59 sorgenti non coincide automaticamente con il perimetro del questionario. L'Annex consegnato indica `12/2026` anche per la riga 90; la proposta interna di completarla solo in parte entro dicembre attende conferma scritta del cliente. Date, capacità e criteri dei gate sono nella [roadmap](../.claude/context/roadmap.md); il mancato arrivo di una decisione o di un campione resta una pendenza con evidenza, non una verifica superata.
@@ -119,7 +121,7 @@ Resta vero (studio, sezione 6) che l'amministratore dell'hypervisor può acceder
 
 - CA creata **fuori dal collettore** (postazione dell'amministratore non MSP); la chiave della CA non va sul collettore.
 - Certificato server del collettore con SAN = FQDN **e** IP del collettore; validità 2 anni, rinnovo a calendario.
-- [Inferenza] Con `tls.verify on` Fluent Bit confronta il nome in `Host` con il SAN: usare in `adsCollector` lo stesso nome presente nel certificato.
+- Con `tls.verify_hostname on` oltre a `tls.verify on`, Fluent Bit confronta `Host` con il SAN: usare in `adsCollector` lo stesso nome o IP presente nel certificato. Il solo `tls.verify on` non esegue il confronto del nome, secondo la [documentazione TLS di Fluent Bit 4.1](https://docs.fluentbit.io/manual/4.1/administration/transport-security).
 - File: `/etc/rsyslog.d/tls/{ca.pem,collector.pem,collector.key}`, chiave in modalità 0600.
 
 ---

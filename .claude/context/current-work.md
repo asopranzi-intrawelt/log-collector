@@ -8,11 +8,15 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 143696921a5cbf8282e0b921d3659c5aaae34f24
+last-verified-commit: 2e57ad97ae6a7c4e06c23ab001c907bb44f87d2e
 stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai punti 3 e 7; eventi iLO tecnici separati con ritenzione 90 giorni attiva; catena locale provata in WSL, non installata; D7 bloccato da nomina ed elenco AdS
 ---
 
 # Lavoro in corso
+
+## Fluent Bit e verifica del nome TLS, 26/10/2026
+
+L'utente ha pubblicato il collettore `2e57ad9` e il remoto coincide. Nella rete `3f5d7ff` il checkpoint è propagato in integrazione, timeline e ISO-30 ancora `in_corso`; la patch di stage privata seleziona nove file, comprese le nostre sole sezioni nei quattro file condivisi con il lavoro sul sito, e passa `git apply --cached --check --unidiff-zero`. Nessun Git di scrittura dell'agente. Nel nuovo diff del collettore il test Debian rilegge una fixture sintetica di 76 byte catturata da Fluent Bit 4.1.1 e D6 la classifica `observed`. La configurazione Windows documentata aggiunge `tls.verify_hostname on`: un certificato attendibile con SAN corrispondente ha consegnato il marker, il SAN diverso è stato rifiutato. Restano pilota Windows, VM, ritenzione tecnica e allarme esterno; WindTre 89/90 non sono chiusi.
 
 ## Ricezione heartbeat Windows candidata, 26/10/2026
 
