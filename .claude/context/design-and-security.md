@@ -6,14 +6,14 @@ covers-paths:
   - bin/**
   - config/**
   - pilot/monitoring-hub/**
-last-verified-commit: b70504de38b575ae958034db8ea5eea10be6ea88
+last-verified-commit: 3e12aa63eeadb680e7237ca899efe3cda3141818
 ---
 
 # Design e sicurezza applicativa
 
-## Limiti del segnale D6 e del mount QA, 23/10/2026
+## Limiti del segnale D6 e del mount QA, 26/10/2026
 
-Un evento giornaliero assente indica `no_events`, non una sorgente guasta; un heartbeat mancante è `heartbeat_missing` solo se il produttore è stato collaudato. Il servizio D6 rifiuta una politica mancante e un `/srv/ads` non montato, opera come `ads` senza rete e non può leggere `/etc/ads/secrets`. Il giornale locale e il codice di uscita non sostituiscono un allarme esterno. Il controllo mount del ricevitore QA è passato su tmpfs WSL, ma la custodia e la quota del volume di destinazione restano da provare.
+Un evento giornaliero assente indica `no_events`, non una sorgente guasta; un heartbeat mancante è `heartbeat_missing` solo se il produttore è stato collaudato. Il servizio D6 rifiuta una politica mancante, chiavi JSON duplicate e un `/srv/ads` non montato, opera come `ads` senza rete e non può leggere `/etc/ads/secrets`. Nel nuovo diff `active_from` impedisce di dichiarare controllati giorni anteriori all'ingresso di una sorgente; la finestra massima di 213 giorni e il totale delle anomalie restano espliciti nel report, mentre il dettaglio è limitato a 100. Il giornale locale e il codice di uscita non sostituiscono un allarme esterno né una prova di custodia oltre la finestra. Il controllo mount del ricevitore QA è passato su tmpfs WSL, ma la custodia e la quota del volume di destinazione restano da provare.
 
 ## Identità e ricevuta del flusso QA, 23/10/2026
 

@@ -1,5 +1,9 @@
 # Snapshot di sincronizzazione
 
+## D6 recupera i giorni nella finestra locale, 26/10/2026
+
+Il collettore `3e12aa6` è pubblicato e allineato al remoto. Il nuovo diff porta la politica D6 a `version=2` con `active_from` per sorgente e scandisce fino a 213 giorni; il report conserva totale delle anomalie e prime 100, senza marcare i giorni prima dell'attivazione. Sedici prove e Ruff verdi; tre mutazioni del recupero, del filtro per sorgente e delle chiavi JSON duplicate sono rilevate e ripristinate con hash verificato. La prova sul 31/12/9999 ha rilevato e fatto correggere un overflow. WSL ha contato sei anomalie sintetiche su tre giorni su un mount reale. Nessuna unità, heartbeat o allarme installato. La rete ha pubblicato il checkpoint D6 dentro `fc95f42` e ISO-30 resta in corso; le tre correzioni testuali del filone sono pubblicate in `c387454`. WindTre 89/90 ancora aperte.
+
 ## D6 schedulabile soltanto come candidato, 23/10/2026
 
 Collettore `b70504d` pubblicato dall'utente. Nel nuovo diff, unità systemd D6 alle 00:45 e guardia sul mount `/srv/ads`; nove prove verdi, Ruff verde, `systemd-analyze verify` accetta le unità con avvisi DrvFs, e una lettura WSL su `/dev/shm` produce `alert` anziché errore di mount. Nessun timer installato, nessun heartbeat prodotto e nessun allarme esterno; `Persistent=true` riavvia una sola esecuzione e non verifica tutti i giorni saltati. WindTre 89/90 e ISO-30 restano in corso. Le cinque schede tecniche sono state riconciliate per contenuto con HEAD `b70504d`; il diff corrente non è coperto da quell'ancora.
@@ -427,8 +431,8 @@ Propagazione rete completata: integrazione, memoria, contesto, timeline e resume
 
 ```
 Branch attivo:        main
-Commit di riferimento: b70504d
-Data snapshot:        2026-10-23
+Commit di riferimento: 3e12aa6
+Data snapshot:        2026-10-26
 Albero autorevole:    unico
 Remoto:               git@github-corp:asopranzi-intrawelt/log-collector.git (primo push di 9ee87b4 il 2026-09-30)
 Template:             E:\template-claude-developing @ ffcbdb3
@@ -438,16 +442,16 @@ Template:             E:\template-claude-developing @ ffcbdb3
 
 | Scheda | last-verified | Stato |
 |---|---|---|
-| STACK.md | b70504d | QA con mount; D6 e unità candidate descritti |
-| design-and-security.md | b70504d | limiti D6 e mount QA esplicitati |
-| deployment.md | b70504d | timer D6 e mount QA ancora locali |
-| dev-testing.md | b70504d | nove prove D6; guardia mount e unità verificate localmente |
-| current-work.md | b70504d | D6 candidato e gate operativi aperti |
+| STACK.md | 3e12aa6 | D6 retrospettivo e confine QA descritti |
+| design-and-security.md | 3e12aa6 | date di attivazione e limiti D6 esplicitati |
+| deployment.md | 3e12aa6 | timer D6 ancora locale e finestra candidata |
+| dev-testing.md | 3e12aa6 | sedici prove D6, cinque mutazioni rilevate |
+| current-work.md | 3e12aa6 | D6 retrospettivo candidato e gate operativi aperti |
 | roadmap.md | 9ee87b4 | solo struttura |
 
 ## Punto di ripresa
 
-Passo corrente: chiudere il gate WindTre 89/90 per il primo esercizio AdS. Il servizio D6 è preparato ma non installato; prima dell'attivazione servono lista approvata, segnale reale per sorgente, relay, prova di consegna e verifica retrospettiva dei giorni saltati. D7 e custodia indipendente bloccano la catena notturna operativa. Seeweb attende risposta sul ticket; QA e hub restano filoni distinti. Lavoro parallelo del sito in `D:/network-design` da preservare.
+Passo corrente: chiudere il gate WindTre 89/90 per il primo esercizio AdS. Il servizio D6 è preparato ma non installato; prima dell'attivazione servono lista e date approvate, heartbeat reale per le sorgenti quiete, relay e prova di consegna. La finestra di 213 giorni è un candidato locale, non un collaudo della retention o un recupero oltre quell'orizzonte. D7 e custodia indipendente bloccano la catena notturna operativa. Seeweb attende risposta sul ticket; QA e hub restano filoni distinti. Lavoro parallelo del sito in `D:/network-design` da preservare.
 
 Ultima verifica: volumi reali acquisiti e ricalcolati senza rete il 13/10 alle 15:10 locali; report e metadati identici. Raccolta VM non attivata, risultati propagati nel progetto rete; comando di volume già concluso.
 

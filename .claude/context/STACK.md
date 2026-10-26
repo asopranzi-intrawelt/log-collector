@@ -8,14 +8,14 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: b70504de38b575ae958034db8ea5eea10be6ea88
+last-verified-commit: 3e12aa63eeadb680e7237ca899efe3cda3141818
 ---
 
 # Stack applicativo
 
-## Segnale per sorgente D6, 23/10/2026
+## Segnale per sorgente D6, 26/10/2026
 
-`ads-silence.py` legge una politica privata con sorgenti e segnale `daily_event` oppure `daily_heartbeat`; nessun heartbeat è ancora prodotto. Le unità candidate `ads-silence.service` e `.timer` avviano il controllo di D-1 alle 00:45, senza installazione. Il ricevitore QA richiede invece un mount dedicato prima di archiviare i byte; la sua prova su tmpfs WSL non equivale al volume di destinazione.
+`ads-silence.py` legge una politica privata con sorgenti e segnale `daily_event` oppure `daily_heartbeat`; nessun heartbeat è ancora prodotto. Le unità candidate `ads-silence.service` e `.timer` avviano il controllo alle 00:45, senza installazione. Il nuovo diff usa una data `active_from` per sorgente e scandisce fino a 213 giorni locali senza stato mutabile; il report limita le anomalie dettagliate a 100 e conserva il totale. Il ricevitore QA richiede invece un mount dedicato prima di archiviare i byte; la sua prova su tmpfs WSL non equivale al volume di destinazione.
 
 ## Ricezione QA via comando SSH forzato, 23/10/2026
 

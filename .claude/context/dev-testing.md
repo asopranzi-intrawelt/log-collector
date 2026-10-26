@@ -6,14 +6,14 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: b70504de38b575ae958034db8ea5eea10be6ea88
+last-verified-commit: 3e12aa63eeadb680e7237ca899efe3cda3141818
 ---
 
 # Test di sviluppo
 
-## Controllo di silenzio D6, 23/10/2026
+## Controllo di silenzio D6, 26/10/2026
 
-`tests/test_ads_silence.py`: 9/9 prove su due segnali indipendenti, giornata senza eventi, heartbeat mancante, file vuoto, politica vuota/duplicata/traversal/invalida, data errata e mount assente; Ruff verde. Due mutazioni mirate sono state rilevate: heartbeat mancante marcato `observed` e guardia mount rimossa, che avrebbe restituito un semplice `no_events`; in entrambi i casi test rosso e ripristino SHA-256 verificato. Su WSL `/dev/shm` è riconosciuto come mount e il report dà `alert`, non `log_mount_missing`; `systemd-analyze verify` accetta le due unità, con soli avvisi sui permessi virtuali di DrvFs. Nessuna unità installata o prova del produttore reale; prima dell'esercizio servono heartbeat, relay e verifica della mail ricevuta.
+`tests/test_ads_silence.py`: 16/16 prove su segnali, policy e mount, più recupero dei giorni precedenti, data di attivazione, chiavi JSON duplicate, limite del dettaglio nel report e confine del calendario; Ruff verde. Cinque mutazioni mirate sono state rilevate: heartbeat mancante marcato `observed`, guardia mount rimossa, finestra ridotta al solo D-1, filtro `active_from` rimosso e chiavi JSON duplicate ammesse; i test diventano rossi e i ripristini SHA-256 sono verificati. La nuova prova sul 31/12/9999 era rossa per `OverflowError` e passa dopo la correzione del ciclo. Su WSL `/dev/shm` è riconosciuto come mount: la prova sintetica di tre giorni conta sei anomalie e nessun errore di mount. `systemd-analyze verify` accetta le unità, con soli avvisi sui permessi virtuali di DrvFs. Nessuna unità installata o prova del produttore reale; prima dell'esercizio servono heartbeat, relay e verifica della mail ricevuta.
 
 ## Mount Linux reale del ricevitore QA, 23/10/2026
 

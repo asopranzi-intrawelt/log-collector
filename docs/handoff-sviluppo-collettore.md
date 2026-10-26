@@ -134,7 +134,7 @@ Resta vero (studio, sezione 6) che l'amministratore dell'hypervisor può acceder
 | `ads-ninja.py` | Python | ogni giorno 00:05 | `/v2/activities` → `/srv/ads/ninjaone/` |
 | `ads-gravityzone.py` | Python | ogni ora **[Non verificato]** cadenza | accessi alla console via API pubblica → `/srv/ads/gravityzone/` (studio, D9) |
 | `ads-nightly.sh` | Bash | ogni giorno 00:15 | gzip, manifest a catena, marca TSA, copia WORM, mail (studio sez. 5) |
-| `ads-silence.py` | Python | timer candidato alle 00:45, non installato | report nel journal e uscita non zero per assenza del segnale atteso; mail dopo scelta del relay |
+| `ads-silence.py` | Python | timer candidato alle 00:45, non installato | finestra retrospettiva fino a 213 giorni dalla data di attivazione per sorgente; report nel journal e uscita non zero per assenza del segnale; mail dopo scelta del relay |
 | `ads-verify.sh` | Bash | manuale, mensile | ricalcolo catena + `openssl ts -verify` → verbale |
 
 Regole comuni:

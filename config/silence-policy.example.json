@@ -1,7 +1,7 @@
 {
-  "version": 1,
+  "version": 2,
   "sources": [
-    {"id": "192.0.2.1", "signal": "daily_event"},
-    {"id": "win-pilot", "signal": "daily_heartbeat"}
+    {"id": "192.0.2.1", "signal": "daily_event", "active_from": "2026-10-23"},
+    {"id": "win-pilot", "signal": "daily_heartbeat", "active_from": "2026-10-23"}
   ]
 }

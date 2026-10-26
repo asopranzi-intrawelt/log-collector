@@ -8,15 +8,15 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: b70504de38b575ae958034db8ea5eea10be6ea88
+last-verified-commit: 3e12aa63eeadb680e7237ca899efe3cda3141818
 stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai punti 3 e 7; eventi iLO tecnici separati con ritenzione 90 giorni attiva; catena locale provata in WSL, non installata; D7 bloccato da nomina ed elenco AdS
 ---
 
 # Lavoro in corso
 
-## D6: segnale di silenzio candidato, 23/10/2026
+## D6: segnale di silenzio candidato, 26/10/2026
 
-Il commit manuale `b70504d` contiene `ads-silence.py` e la politica di esempio. Nel nuovo diff le unità candidate schedulano D-1 alle 00:45; il servizio richiede `/srv/ads` montato, opera come `ads` senza rete e lascia report o errore nel journal. Nove prove sintetiche e Ruff verdi; su WSL la guardia riconosce un mount reale e `systemd-analyze verify` accetta le unità. Nessun timer, heartbeat Windows o mail installati; lista attesa, segnale per sorgente, relay e consegna dell'allarme restano gate D6. `Persistent=true` non ricostruisce tutti i giorni saltati. Dettagli nel runbook del componente 5. La rete `b29d82b` è pubblicata dall'utente per i 12 file esclusivi; memoria e gap della sessione concorrente restano nel suo albero.
+Il commit manuale `3e12aa6` contiene il timer D6 e la guardia del mount. Nel nuovo diff la politica passa a `version=2` con `active_from` per sorgente; il servizio scandisce una finestra retrospettiva fino a 213 giorni e limita a 100 le anomalie dettagliate, mantenendo il conteggio. Sedici prove sintetiche e Ruff verdi; le mutazioni che saltavano i giorni precedenti, ignoravano `active_from` o ammettevano chiavi JSON duplicate sono state rilevate e ripristinate con hash verificato. La prova sul 31/12/9999 ha trovato e fatto correggere un overflow del calendario. WSL ha contato sei anomalie su tre giorni di dati fittizi. Nessun timer, heartbeat Windows o mail installati; lista attesa, data di attivazione, relay e consegna dell'allarme restano gate D6. Dettagli nel runbook del componente 5. La rete ha già incluso il checkpoint `3e12aa6` in `fc95f42` con ISO-30 ancora in corso; le tre correzioni testuali sono pubblicate in `c387454`.
 
 ## Mount QA esercitato su Linux locale, 23/10/2026
 
