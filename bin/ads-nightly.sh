@@ -46,14 +46,23 @@ readonly TODAY_EPOCH=$(date -u -d "$TODAY" +%s)
 readonly TARGET_EPOCH=$((TODAY_EPOCH - 86400))
 readonly TARGET_DAY=$(date -u -d "@$TARGET_EPOCH" +%F)
 [[ -d $LOG_ROOT ]] || die 'radice dei log assente'
+[[ ! -L $LOG_ROOT ]] || die 'radice dei log simbolica'
 if [[ $require_log_mount == true ]] && ! mountpoint -q -- "$LOG_ROOT"; then
     die 'radice dei log non montata'
 fi
+for directory in "$STATE_ROOT" "$ARCHIVE_ROOT" "$MANIFEST_ROOT"; do
+    [[ ! -L $directory ]] || die 'directory di stato simbolica'
+done
 mkdir -p -- "$ARCHIVE_ROOT" "$MANIFEST_ROOT"
 exec 9>"$STATE_ROOT/nightly.lock"
 flock -n 9 || die 'un altro job notturno e in corso'
 
 shopt -s nullglob
+for directory in "$ARCHIVE_ROOT"/*; do
+    [[ ! -L $directory ]] || die 'directory archivio simbolica'
+    [[ -d $directory ]] || die 'voce archivio non directory'
+    valid_source "$(basename -- "$directory")" || die 'nome della sorgente archiviata non valido'
+done
 manifests=("$MANIFEST_ROOT"/manifest-????-??-??.txt)
 latest=''
 if ((${#manifests[@]})); then
@@ -106,6 +115,7 @@ close_day() {
         valid_source "$source" || die 'nome della sorgente non valido'
         [[ ! -L $raw && ! -L $(dirname -- "$raw") ]] || die 'sorgente simbolica non ammessa'
         destination=$ARCHIVE_ROOT/$source
+        [[ ! -L $destination ]] || die 'directory archivio simbolica'
         mkdir -p -- "$destination"
         archive=$destination/$DAY.log.gz
         [[ ! -L $archive ]] || die 'archivio simbolico non ammesso'

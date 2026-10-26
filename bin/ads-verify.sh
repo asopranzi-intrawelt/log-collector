@@ -59,7 +59,7 @@ verify_day() {
         archive=$ARCHIVE_ROOT/$source/$day.log.gz
         raw=$LOG_ROOT/$source/$day.log
         [[ -f $archive && ! -L $archive ]] || die "archivio assente o simbolico: $source/$day"
-        [[ -f $raw && ! -L $raw ]] || die "log di origine assente o simbolico: $source/$day"
+        [[ -f $raw && ! -L $raw && ! -L $(dirname -- "$raw") ]] || die "log di origine assente o simbolico: $source/$day"
         actual=$(hash_file "$archive")
         [[ $actual == "$digest" ]] || die "hash dell'archivio errato: $source/$day"
         gzip -dc -- "$archive" | cmp -s - "$raw" || die "log di origine diverso dall'archivio: $source/$day"
@@ -76,7 +76,15 @@ verify_day() {
     done
 }
 
-[[ -d $MANIFEST_ROOT ]] || die 'cartella manifest assente'
+for root in "$LOG_ROOT" "$STATE_ROOT" "$ARCHIVE_ROOT" "$MANIFEST_ROOT"; do
+    [[ -d $root && ! -L $root ]] || die "radice assente o simbolica: $root"
+done
+shopt -s nullglob
+for directory in "$ARCHIVE_ROOT"/*; do
+    [[ ! -L $directory ]] || die 'directory archivio simbolica'
+    [[ -d $directory ]] || die 'voce archivio non directory'
+    valid_source "$(basename -- "$directory")" || die 'nome della sorgente archiviata non valido'
+done
 if (($#)); then
     [[ $# -eq 2 && $1 == --date ]] || die 'uso: ads-verify.sh [--date AAAA-MM-GG]'
     valid_day "$2" || die 'data non valida'

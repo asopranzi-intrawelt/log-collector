@@ -1,5 +1,13 @@
 # Snapshot di sincronizzazione
 
+## Catena locale rifiuta directory simboliche, 26/10/2026
+
+Rete `3f5d7ff` pubblicata e allineata al remoto. Nel nuovo diff del collettore il job e il verificatore rifiutano radici e directory di archivio simboliche; due prove WSL erano rosse sul codice precedente, che scriveva o certificava byte fuori dall'albero previsto, e sono ora verdi. Le cinque schede tecniche sono ancorate al commit pubblicato `3d72338`; il diff sui link è descritto ma non ancora versionato. La prova non copre sostituzioni concorrenti o permessi della VM. I gate AdS entro 30/10 e WindTre 89/90 restano aperti.
+
+## Checkpoint AdS pubblicati, operatività ancora aperta, 26/10/2026
+
+Collettore `3d72338` e rete `0367ece`, poi `3f5d7ff`, pubblicati manualmente, remoti allineati. La rete registra la verifica storica della catena e ISO-30 ancora in corso; le modifiche parallele del sito non vi rientrano. Codice e prove locali possono avanzare, ma l'esercizio richiede entro il 30/10 decisioni su elenco e perimetro AdS, TSA/relay, custodia indipendente e allarme; poi collaudo su VM e misura del carico. WindTre 89/90 aperti.
+
 ## Catena storica verificata prima della nuova chiusura, 26/10/2026
 
 Nel diff corrente `ads-nightly.sh` esegue la verifica integrale della catena locale prima di aggiungere un manifest. Una prova WSL con il primo di quattro manifest alterato falliva sul codice precedente perché il quinto veniva creato; ora il job si ferma e il quinto resta assente. Il controllo dipende dagli originali e può avere costo I/O elevato: misurarlo sulla VM e definire la retention con ancoraggio verificabile. In `network-design` i nove file D6/ISO sono già nello stage e corrispondono al patch privato; commit e push restano all'utente. WindTre 89/90 e ISO-30 ancora aperti.

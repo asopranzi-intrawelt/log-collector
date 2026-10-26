@@ -37,6 +37,30 @@ grep -Fq 'radice dei log non montata' "$scratch/output" || {
 }
 [[ ! -e $ADS_STATE_ROOT/manifests/manifest-2026-10-06.txt ]]
 
+# La radice di stato non può spostare lock, archivi e manifest fuori volume.
+(
+    export ADS_LOG_ROOT=$scratch/state-link-logs
+    export ADS_STATE_ROOT=$scratch/state-link
+    mkdir -p -- "$ADS_LOG_ROOT/source-a" "$scratch/state-outside"
+    ln -s -- "$scratch/state-outside" "$ADS_STATE_ROOT"
+    printf 'access\n' >"$ADS_LOG_ROOT/source-a/2026-10-06.log"
+    expect_failure env ADS_TODAY=2026-10-07 bash "$project_dir/bin/ads-nightly.sh"
+    grep -Fq 'directory di stato simbolica' "$scratch/output"
+    [[ ! -e $scratch/state-outside/manifests/manifest-2026-10-06.txt ]]
+)
+
+# Un nome di sorgente valido non autorizza una directory archivio simbolica.
+(
+    export ADS_LOG_ROOT=$scratch/link-logs
+    export ADS_STATE_ROOT=$scratch/link-state
+    mkdir -p -- "$ADS_LOG_ROOT/source-a" "$ADS_STATE_ROOT/archives" "$scratch/outside"
+    ln -s -- "$scratch/outside" "$ADS_STATE_ROOT/archives/source-a"
+    printf 'access\n' >"$ADS_LOG_ROOT/source-a/2026-10-06.log"
+    expect_failure env ADS_TODAY=2026-10-07 bash "$project_dir/bin/ads-nightly.sh"
+    grep -Fq 'directory archivio simbolica' "$scratch/output"
+    [[ ! -e $scratch/outside/2026-10-06.log.gz ]]
+)
+
 ADS_TODAY=2026-10-07 bash "$project_dir/bin/ads-nightly.sh"
 bash "$project_dir/bin/ads-verify.sh"
 ADS_TODAY=2026-10-07 bash "$project_dir/bin/ads-nightly.sh"
@@ -72,6 +96,16 @@ bash "$project_dir/bin/ads-verify.sh"
 [[ -f $ADS_STATE_ROOT/archives/source-a/2026-10-08.log.gz ]]
 [[ -f $ADS_STATE_ROOT/archives/source-b/2026-10-09.log.gz ]]
 ADS_TODAY=2026-10-10 bash "$project_dir/bin/ads-nightly.sh"
+
+# Anche il verificatore isolato deve rifiutare un archivio esterno via link.
+(
+    export ADS_STATE_ROOT=$scratch/verify-link-state
+    cp -a -- "$scratch/state" "$ADS_STATE_ROOT"
+    mv -- "$ADS_STATE_ROOT/archives/source-a" "$scratch/verify-external"
+    ln -s -- "$scratch/verify-external" "$ADS_STATE_ROOT/archives/source-a"
+    expect_failure bash "$project_dir/bin/ads-verify.sh"
+    grep -Fq 'directory archivio simbolica' "$scratch/output"
+)
 
 # Una rottura remota dal giorno corrente deve fermare la nuova chiusura.
 (
@@ -130,4 +164,4 @@ grep -Fq 'oltre la finestra locale di 213' "$scratch/output"
 # Anche alterare il manifest precedente deve spezzare il legame del giorno seguente.
 printf 'x' >>"$ADS_STATE_ROOT/manifests/manifest-2026-10-06.txt"
 expect_failure bash "$project_dir/bin/ads-verify.sh"
-printf 'test-nightly: OK (recupero, 213 giorni, ora legale, idempotenza, alterazioni)\n'
+printf 'test-nightly: OK (recupero, 213 giorni, ora legale, idempotenza, alterazioni, link simbolici)\n'

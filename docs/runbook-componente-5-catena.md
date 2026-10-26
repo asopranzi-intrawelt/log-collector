@@ -16,9 +16,13 @@ Le unità candidate `ads-silence.service` e `ads-silence.timer` pianificano il c
 
 Prima di chiudere un giorno, il job verifica l'intera catena locale già presente, compresi archivi e log di origine. Se un manifest vecchio o un originale non è più verificabile, si ferma senza aggiungere il nuovo manifest: il solo ultimo anello integro non basta. Questa lettura completa può pesare su disco e CPU; durata e carico vanno misurati sulla VM con volume e dati rappresentativi prima di attivare il timer. Quando la retention di 213 giorni sarà implementata, il taglio di originali e manifest dovrà avere un ancoraggio verificabile della parte conservata: cancellare un originale oggi farebbe fallire questa verifica.
 
+Il job rifiuta radice dei log, directory di stato, archivio e manifest simboliche, e controlla le directory di sorgente prima di scrivere. Anche `ads-verify.sh`, invocato da solo, rifiuta radici o directory di archivio simboliche e directory di log simboliche per le sorgenti verificate: non deve certificare byte raggiunti fuori dai percorsi previsti. Sono guardie sui percorsi osservati durante il comando; non sostituiscono permessi e mount verificati sulla VM né proteggono da un processo che possa cambiare le directory in concorrenza.
+
 La prova WSL locale parte da due manifest, salta due esecuzioni e recupera entrambe le giornate con archivi e catena verificati; prima della correzione si fermava su `catena discontinua`. Sono provati anche il secondo avvio idempotente, il rifiuto oltre 213 giorni senza nuovi manifest, il cambio dell'ora di ottobre, il blocco dell'archivio orfano precedente e il riuso di quello di D-1. Il test del mount controlla che il percorso non sia un mount e che il rifiuto avvenga prima del primo manifest; prima della correzione l'argomento era rifiutato per uso scorretto. Non è una prova di installazione, permessi e spazio sulla VM, né di conservazione indipendente o invio di allarmi.
 
 Un'ulteriore prova altera il primo di quattro manifest e tenta di chiudere il giorno seguente: il codice precedente aggiungeva il nuovo manifest, mentre ora restituisce `catena storica non verificabile` e non lo crea. La prova usa una copia temporanea della catena e non tocca gli originali del progetto.
+
+Due casi con link simbolici erano rossi prima delle guardie: il job scriveva un archivio fuori dall'albero di stato e il verificatore isolato accettava una directory d'archivio spostata all'esterno. Ora entrambi si fermano; è provato anche il rifiuto della radice di stato simbolica prima del manifest.
 
 ## Stato e perimetro
 

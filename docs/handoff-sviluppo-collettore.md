@@ -20,6 +20,8 @@ Verifica in sola lettura sulla VM del collettore il 23/10, con SSH a chiave, `Ba
 
 Prima dell'installazione del timer notturno, misurare su volume e dati rappresentativi la durata e il carico della verifica integrale della catena. Definire la retention degli originali e un ancoraggio verificabile prima di eliminarli: oggi la verifica si ferma se un originale di un manifest conservato manca.
 
+Il candidato ora rifiuta directory simboliche di stato e archivio; il verificatore isolato applica la stessa guardia. La prova WSL usa link controllati in `/tmp` e non dimostra permessi, mount e assenza di cambi concorrenti sulla VM.
+
 Queste righe distinguono lavoro interno e attese esterne. Per dichiarare chiusa una pendenza servono un artefatto ricevuto e una prova di integrazione, non soltanto il testo di una proposta. Il dossier tecnico di ciascuna sorgente conserva il dettaglio; questa è la vista di consegna al cliente.
 
 Scadenza indicata dall'utente: 20/12/2026 per le evidenze del questionario cliente, con accettazione interna entro venerdì 18/12. Questo collettore contribuisce direttamente alle righe 89 e 90; il programma esteso delle 59 sorgenti non coincide automaticamente con il perimetro del questionario. L'Annex consegnato indica `12/2026` anche per la riga 90; la proposta interna di completarla solo in parte entro dicembre attende conferma scritta del cliente. Date, capacità e criteri dei gate sono nella [roadmap](../.claude/context/roadmap.md); il mancato arrivo di una decisione o di un campione resta una pendenza con evidenza, non una verifica superata.

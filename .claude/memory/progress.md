@@ -1,5 +1,27 @@
 # Work-log
 
+## 2026-10-26 - Directory simboliche nella catena AdS
+
+Ricevuto dall'utente il commit di rete `3f5d7ff` con push; `origin/main` coincide e i file paralleli del sito restano fuori dal commit. Il collettore è a `3d72338`, con i tre aggiornamenti di memoria e contesto del giro precedente ancora nel diff.
+
+Una prova WSL nuova ha mostrato che `ads-nightly.sh` accettava `archives/source-a` come link simbolico verso una cartella esterna e vi scriveva l'archivio. Dopo la guardia sullo stato e su tutte le directory di archivio, la prova passa e nessun file compare nella destinazione esterna. Una seconda prova ha spostato fuori dallo stato una directory contenente archivi già validi: `ads-verify.sh` precedente restituiva successo, mentre ora rifiuta la directory simbolica. Provato anche il rifiuto della radice di stato simbolica prima del manifest. Suite WSL verde; non sono state fatte scritture su VM. La difesa riguarda i percorsi osservati dal comando, non un processo concorrente con permessi di sostituzione. Aggiornati job, verificatore, test, runbook, handoff e cinque schede tecniche.
+
+Il controllo rigoroso delle schede ha trovato cinque ancore ancora ferme a `213d19b` dopo il commit `3d72338`; le schede già riconciliate per contenuto sono state ancorate a `3d72338a215d8134405f32630803f6ed76f00082`. Il diff corrente dei link simbolici è descritto ma resta non versionato.
+
+**Template:** nessuna.
+
+## 2026-10-26 - Chiusure manuali e allineamento del nuovo preflight
+
+L'utente ha eseguito `chiudi` nel collettore: commit `3d72338`, push e controllo `origin/main` riusciti. In rete ha committato esattamente i nove file D6/ISO già in stage come `0367ece` e pubblicato `main`; lo stage non includeva il lavoro parallelo sul sito. Le due repository risultano allineate ai remoti nella lettura successiva. Il patch privato di staging precedente è diventato superfluo.
+
+Nella rete sono stati aggiornati i soli file esclusivi di integrazione, contesto, roadmap e timeline per il nuovo preflight; ISO-30 ha un'altra nota datata ma resta `in_corso`. `IsoRoadmap.py check --desktop` conferma progetto e copie private; SVG rigenerato a 242 eventi, XML valido. VectorCraft 0.14.0 apre il file ma sostituisce Altro Var con Source Sans 3 e omette lo script inline, quindi non dimostra font o accordion nel browser. `chiudi -SoloControlli` termina con «Controlli verdi». Le modifiche parallele della rete in memoria, decisioni, lezioni e `deploy/` sono state preservate e non vanno incluse nel commit di questo filone. Nessun Git di scrittura o deploy eseguito dall'agente.
+
+Il primo controllo di chiusura del collettore si è interrotto nell'autotest di anonimizzazione con `Accesso negato` sulla cartella Temp di Windows. Ripetuto fuori sandbox con il permesso necessario: tutti i controlli verdi; non era un riscontro sui file del progetto. Il vecchio patch di staging e lo script temporaneo della rete sono stati rimossi dopo l'uso.
+
+Per WindTre 89/90 si continua con sviluppo e preparazione delle prove. La roadmap fissa al 30/10 la richiesta di nomina/elenco e perimetro AdS, custodia indipendente, TSA/relay e allarme; senza queste decisioni non si attiva il flusso né si chiudono le righe. Servono inoltre misura di durata/I/O sulla VM, prova del timer, heartbeat e allarme effettivamente ricevuto. La prova WSL non sostituisce queste evidenze.
+
+**Template:** nessuna.
+
 ## 2026-10-26 - Verifica della catena storica prima di scrivere
 
 L'utente ha ricevuto `Stage occupato: fermati` nella rete. Lettura dell'indice: HEAD ancora `ba06650`, stage con esattamente i nove file D6/ISO e 62 inserimenti, 10 rimozioni. `git apply --cached --reverse --check` conferma che il patch preparato è già applicato; le modifiche parallele del sito restano fuori stage. Il controllo ordinario del whitespace segnalava CRLF di `roadmap.md`; `git -c core.whitespace=cr-at-eol diff --cached --check` passa. Indicati all'utente solo commit e push manuali, senza riapplicare il patch. Non attribuita l'origine dello staging.

@@ -6,7 +6,7 @@ covers-paths:
   - bin/**
   - config/**
   - pilot/monitoring-hub/**
-last-verified-commit: 213d19b16baca9dbe4f06629b366d91c440c8832
+last-verified-commit: 3d72338a215d8134405f32630803f6ed76f00082
 ---
 
 # Design e sicurezza applicativa
@@ -16,6 +16,8 @@ last-verified-commit: 213d19b16baca9dbe4f06629b366d91c440c8832
 La ripresa dei manifest scorre i giorni mancanti fino a D-1 sotto un lock, ma non inventa evidenze oltre 213 giorni o prima del primo `GENESIS`. Il servizio richiede `/srv/ads` montato e il job verifica il mount prima di creare directory o manifest: un mount perso non diventa una giornata vuota da chiudere. Un manifest vuoto mantiene la continuità della catena, senza attestare che una sorgente fosse completa; D6 deve valutare i segnali attesi e un destinatario esterno deve ricevere l'allarme. Manifest, archivi e log restano nella stessa VM: TSA, WORM e impronta consegnata alla Direzione sono ancora necessari per una prova indipendente.
 
 Un preflight integrale rifiuta la nuova chiusura se la catena storica locale non è verificabile. Questa verifica dipende dagli originali ancora presenti; la futura eliminazione a 213 giorni richiede una politica esplicita di troncamento e un ancoraggio esterno, altrimenti il job si fermerà.
+
+Le radici e directory di archivio simboliche sono rifiutate prima della scrittura o della certificazione locale. La guardia esercitata in WSL non è una difesa contro la sostituzione concorrente da parte di un writer che abbia accesso alle stesse directory: proprietà, ACL e mount restano parte del collaudo operativo.
 
 ## Limiti del segnale D6 e del mount QA, 26/10/2026
 

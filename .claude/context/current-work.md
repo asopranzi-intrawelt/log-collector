@@ -8,11 +8,19 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 213d19b16baca9dbe4f06629b366d91c440c8832
+last-verified-commit: 3d72338a215d8134405f32630803f6ed76f00082
 stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai punti 3 e 7; eventi iLO tecnici separati con ritenzione 90 giorni attiva; catena locale provata in WSL, non installata; D7 bloccato da nomina ed elenco AdS
 ---
 
 # Lavoro in corso
+
+## Percorsi della catena locale, 26/10/2026
+
+La rete ha pubblicato l'allineamento del preflight storico a `3f5d7ff`, con `origin/main` coincidente; gli altri file del sito restano fuori da quel commit. Nel nuovo diff del collettore `ads-nightly.sh` blocca directory simboliche di stato e archivio prima di scrivere e `ads-verify.sh` le rifiuta anche nella verifica isolata. Due prove WSL hanno fallito sul codice precedente che scriveva o certificava attraverso un link verso l'esterno; ora la suite è verde. Il controllo statico dei percorsi non sostituisce la prova di proprietà, mount e assenza di sostituzioni concorrenti sulla VM. Nessun timer installato; WindTre 89/90 e ISO-30 ancora aperti.
+
+## Checkpoint pubblicati e prossimo gate AdS, 26/10/2026
+
+L'utente ha pubblicato il collettore `3d72338`, l'allineamento D6/ISO della rete `0367ece` e il preflight storico di rete `3f5d7ff`; `origin/main` coincide con tutti. ISO-30 resta `in_corso` e la timeline ha 242 eventi; i file del sito restano modifiche parallele fuori da questo perimetro. Si può continuare con codice e preparazione del collaudo. Prima dell'esercizio vanno acquisiti elenco AdS e perimetro approvati, custodia indipendente, scelta TSA/relay e recapito degli allarmi; la roadmap chiede queste decisioni entro il 30/10. Carico della verifica integrale, timer, heartbeat e allarme ricevuto vanno provati sulla VM. WindTre 89/90 non sono chiusi.
 
 ## Catena AdS: recupero dei manifest, 26/10/2026
 
