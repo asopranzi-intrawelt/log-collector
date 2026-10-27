@@ -6,7 +6,7 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 2344c5ee0f56364a74afc996e4f0379f8f238ef0
+last-verified-commit: 55af8ca622f277b29e80ac666c46ffae52bdd9ae
 ---
 
 # Test di sviluppo
@@ -15,7 +15,7 @@ last-verified-commit: 2344c5ee0f56364a74afc996e4f0379f8f238ef0
 
 Fluent Bit Windows 5.1.3 ZIP ufficiale: SHA-256 verificato, `--version` e `--dry-run` del bundle con identità fittizie `DOMINIO/utente` riusciti. L'input `winevtlog` su Application ha emesso solo nomi di campi nel probe privato: `EventID`, `Computer`, `EventRecordID`, `TimeCreated` ed `EventData` come mappa. La query con nome e dominio nei campi Target e Subject è stata accettata da Event Log su Application e dal `--dry-run` del bundle; Security ha negato la lettura all'account locale. `tests/windows/prove_wire.py` ha fatto emettere al binario tre eventi sintetici e un heartbeat via TLS; SAN errato ha dato zero byte, mentre disattivare solo `tls.verify_hostname` ha ripristinato la consegna. Il 4648 conserva attore e bersaglio con i rispettivi domini. La fixture di 740 byte è passata nel test Debian 13: tre eventi AdS, un heartbeat D6, domini conservati e `observed`. Sei test del renderer e Ruff sono verdi. Togliere il predicato `TargetDomainName` rende rosso il test della query; il sorgente è stato ripristinato con SHA-256 verificato. `tests/windows/prove_backlog.py` ha fermato il binario con un chunk fittizio su disco e il ricevitore TLS spento: dopo il riavvio sono arrivati sia il vecchio record sia uno nuovo, in 18,2 secondi nel giro misurato. Queste prove non misurano permessi Security, grafie dei domini negli eventi reali, bookmark `winevtlog` dopo fermo, invio alla VM, capienza o servizio Windows.
 
-Il controllo `ads-windows-queue-health.ps1` ha due prove PowerShell 5.1: byte e chunk osservati, soglia della coda, chunk vecchio, metadati vecchi ignorati, spazio libero insufficiente e directory assente come errore. Eliminare temporaneamente la condizione sui byte fa fallire la prova; il sorgente è stato ripristinato con SHA-256 verificato. Nel probe Fluent Bit 5.1.3 con ricevitore spento il controllo ha segnalato il chunk reale (`HEALTH_OFFLINE=alert`), poi il vecchio record è stato recuperato in 18,1 secondi nel giro successivo. Non sono misurati permessi NinjaOne o recapito dell'allarme.
+Il controllo `ads-windows-queue-health.ps1` ha ora quattro prove PowerShell 5.1: byte e chunk osservati, soglie, misura assente e scelta della directory `storage.path` nel file Fluent Bit passato con `-ConfigFile`. Le prove nuove erano rosse sul vecchio contratto che ignorava la configurazione; dieci prove mirate del monitor e renderer sono verdi. Una mutazione che torna a leggere la directory predefinita rende rossa proprio la prova del runtime diverso, con sorgente ripristinato e SHA-256 verificato. Il primo tentativo di mutazione nel sandbox non ha esercitato il test per WinError 5 sulla directory temporanea; solo la ripetizione fuori sandbox conta. Nel probe Fluent Bit 5.1.3 il monitor ha segnalato il chunk reale offline (`HEALTH_OFFLINE=alert`), poi il vecchio e il nuovo record sono arrivati una volta ciascuno in 19,2 secondi nel giro misurato. Non sono misurati permessi NinjaOne o recapito dell'allarme.
 
 ## Recupero della catena AdS, 26/10/2026
 

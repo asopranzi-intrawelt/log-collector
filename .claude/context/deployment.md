@@ -5,7 +5,7 @@ generated-date: 2026-09-30
 covers-paths:
   - config/**
   - docs/handoff-sviluppo-collettore.md
-last-verified-commit: 2344c5ee0f56364a74afc996e4f0379f8f238ef0
+last-verified-commit: 55af8ca622f277b29e80ac666c46ffae52bdd9ae
 ---
 
 # Deployment
@@ -14,7 +14,7 @@ last-verified-commit: 2344c5ee0f56364a74afc996e4f0379f8f238ef0
 
 Il candidato Fluent Bit Windows 5.1.3 è generato localmente per ciascun nome macchina con `bin/ads-render-windows.py`; la destinazione con le identità AdS reali `DOMINIO/utente` deve essere privata. I file `fluent-bit.conf` e `ads.lua` e la CA pubblica appartengono alla configurazione del pilota, ma la CA non è inclusa nel bundle. La prova con il binario Windows ha consegnato tre eventi e un heartbeat sintetici a un ricevitore TLS locale; il test Debian 13 ne ha verificato lo smistamento e la conservazione dei domini. Una prova locale separata ha recuperato un chunk dopo riavvio con input `dummy` e ricevitore inizialmente assente. Prima di installare il servizio: nomina ed elenco approvati, valori e grafie esatti dei domini sui campioni Security, certificato con SAN corrispondente, ACL del buffer, monitor della saturazione, consegna alla VM e replay degli eventi Security dopo fermo. Nessuna modifica a Windows o a NinjaOne eseguita.
 
-Il renderer copia ora anche `ads-windows-queue-health.ps1` nel bundle. Prima di pianificarlo in NinjaOne vanno misurate coda e spazio del pilota per fissare tre soglie esplicite, protetto il percorso dello script e provata la consegna dell'allarme. Il codice 3 indica controllo non riuscito, non stato sano; il servizio Fluent Bit richiede una condition separata.
+Il renderer copia anche `ads-windows-queue-health.ps1` nel bundle. Il job NinjaOne candidato deve passare con `-ConfigFile` il medesimo `fluent-bit.conf` usato dal servizio; il monitor ne legge `storage.path` e rifiuta l'assenza o l'ambiguità del percorso. Prima di pianificarlo vanno misurate coda e spazio del pilota per fissare tre soglie esplicite, protetto il percorso dello script e provata la consegna dell'allarme. Il codice 3 indica controllo non riuscito, non stato sano; il servizio Fluent Bit richiede una condition separata.
 
 Sulla VM il 27/10 `/srv/ads` è montato ext4 e rsyslog è attivo; `ads-nightly.timer` e `ads-silence.timer` non sono caricati. La misura dell'archivio non è riuscita perché l'account SSH non ha sudo senza password. Nessun timer attivato.
 

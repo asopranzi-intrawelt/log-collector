@@ -1,8 +1,10 @@
 # Snapshot di sincronizzazione
 
-## Coda Windows candidata e rete riallineata, 27/10/2026
+## Coda Windows pubblicata e rete riallineata, 27/10/2026
 
-Collettore `2344c5e` e remoto allineati. Nel diff corrente il bundle Windows comprende un controllo PowerShell di sola lettura della coda, con soglie obbligatorie e fallimento esplicito quando la misura manca. Due prove sono verdi e la rimozione della soglia byte rende rossa quella pertinente; il binario Fluent Bit 5.1.3 ha prodotto un chunk offline che il controllo ha segnalato e il motore ha poi recuperato. La rete `6ed90d1` ha nove file allineati a `2344c5e`, ISO-30 in corso e timeline a 245 eventi; solo l'utente farà il `chiudi`. Security reale, misura di capienza, NinjaOne, VM e allarme esterno restano aperti, così come D7 e WindTre 89/90. Cinque schede ancorate al commit pubblicato `2344c5e`; il nuovo diff del monitor è descritto ma non ancora pubblicato.
+Collettore `55af8ca` e rete `7ab60f4` pubblicati e allineati ai remoti. Il bundle Windows comprende un controllo PowerShell di sola lettura della coda, con soglie obbligatorie e fallimento esplicito quando la misura manca. Due prove sono verdi e la rimozione della soglia byte rende rossa quella pertinente; il binario Fluent Bit 5.1.3 ha prodotto un chunk offline che il controllo ha segnalato e il motore ha poi recuperato. La rete ha nove file di nuovo allineamento a `55af8ca`, ISO-30 in corso, copie ISO verificate e timeline a 246 eventi; solo l'utente farà il `chiudi`. Security reale, misura di capienza, NinjaOne, VM e allarme esterno restano aperti, così come D7 e WindTre 89/90. Cinque schede ancorate al commit pubblicato `55af8ca`.
+
+Nel diff corrente il monitor usa `storage.path` letto dal `-ConfigFile` obbligatorio, evitando il ripiego automatico sulla directory predefinita quando Fluent Bit ne usa un'altra. La prova del runtime diverso era rossa prima della correzione; dieci test mirati e il probe del binario Windows sono verdi. Il monitor ha segnalato un chunk offline e i due record sono arrivati dopo il riavvio in 19,2 secondi nel giro misurato. Il file passato al monitor dovrà essere verificato contro il servizio sul pilota; nessun job NinjaOne è installato.
 
 ## Trasporto Fluent Bit Windows verificato su dati sintetici, checkpoint precedente
 
@@ -471,7 +473,7 @@ Propagazione rete completata: integrazione, memoria, contesto, timeline e resume
 
 ```
 Branch attivo:        main
-Commit di riferimento: 2344c5e
+Commit di riferimento: 55af8ca
 Data snapshot:        2026-10-27
 Albero autorevole:    unico
 Remoto:               git@github-corp:asopranzi-intrawelt/log-collector.git (primo push di 9ee87b4 il 2026-09-30)
@@ -482,11 +484,11 @@ Template:             E:\template-claude-developing @ ffcbdb3
 
 | Scheda | last-verified | Stato |
 |---|---|---|
-| STACK.md | 2344c5e | query e bundle Windows 5.1.3 descritti |
-| design-and-security.md | 2344c5e | soggetti, dominio, TLS e coda esplicitati |
-| deployment.md | 2344c5e | pilota e timer non installati, gate operativi aperti |
-| dev-testing.md | 2344c5e | tre eventi Windows e D6 smistati su Debian 13 |
-| current-work.md | 2344c5e | stato pubblicato e diff corrente distinti |
+| STACK.md | 55af8ca | query, bundle e monitor Windows descritti |
+| design-and-security.md | 55af8ca | soggetti, dominio, TLS e coda esplicitati |
+| deployment.md | 55af8ca | pilota e timer non installati, gate operativi aperti |
+| dev-testing.md | 55af8ca | tre eventi Windows e D6 smistati su Debian 13 |
+| current-work.md | 55af8ca | stato pubblicato e diff corrente distinti |
 | roadmap.md | 9ee87b4 | solo struttura |
 
 ## Punto di ripresa

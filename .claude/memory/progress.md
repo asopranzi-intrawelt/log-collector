@@ -1,5 +1,13 @@
 # Work-log
 
+## 2026-10-27 - Coda Windows letta dalla configurazione effettiva
+
+L'utente ha pubblicato collettore `55af8ca` e rete `7ab60f4`, puliti e uguali ai remoti. Cinque schede del collettore sono state rilette e ancorate a `55af8ca`. Nove file della rete sono stati aggiornati al monitor pubblicato: ISO-30 resta `in_corso`, copie HTML allineate e timeline generata a 246 eventi; lo stage è vuoto e il `chiudi` resta all'utente.
+
+Il monitor Windows pubblicato usava un runtime predefinito: con uno `storage.path` diverso avrebbe potuto riportare sano mentre la coda vera cresceva. Nel nuovo diff `-ConfigFile` è obbligatorio e il monitor legge `storage.path` da `[SERVICE]`, rifiutando percorso assente o ambiguo. Le prove nuove erano rosse sul vecchio contratto; dieci prove mirate e Ruff sono verdi. La prova senza argomenti era rossa per il binding PowerShell e ora termina con codice 3 senza prompt. Nel probe con Fluent Bit 5.1.3 lo stesso file di configurazione alimenta processo e monitor: chunk segnalato con ricevitore TLS spento, record vecchio e nuovo ricevuti dopo riavvio in 19,2 secondi. La mutazione che forza il runtime predefinito rende rossa la prova discriminante, con SHA-256 del sorgente ripristinato. Il primo lancio della mutazione nel sandbox ha incontrato WinError 5 su pytest e non è stato contato; il successivo fuori sandbox ha esercitato l'asserzione. Nessun servizio, job NinjaOne o VM modificato. Restano soglie misurate, file effettivamente usato dal servizio, Security, bookmark, VM e allarme esterno; D7 e WindTre 89/90 restano aperti. Aggiornati monitor, prove, studio, runbook, handoff, cinque schede, indice, work-log e note private; nessun Git di scrittura dell'agente.
+
+**Template:** nessuna.
+
 ## 2026-10-27 - Monitor locale della coda Windows e allineamento ISO-30
 
 L'utente ha pubblicato il collettore `2344c5e`, uguale al remoto. I nove file già aperti di `D:/network-design` sono stati allineati a questo commit senza toccare il lavoro del sito: ISO-30 resta `in_corso`, le copie HTML sono verificate e la timeline generata conta 245 eventi. La prima copia della vista ISO su OneDrive ha ricevuto WinError 5; `IsoRoadmap.py build --desktop` e `check --desktop` sono poi riusciti. Controlli di rete verdi, stage vuoto; il versionamento spetta all'utente.

@@ -120,7 +120,8 @@ def run(
     return stderr.decode("utf-8", errors="replace"), elapsed
 
 
-offline_log, _ = run(configuration("backlog-old"), seconds=4)
+offline_config = configuration("backlog-old")
+offline_log, _ = run(offline_config, seconds=4)
 (work / "offline.log").write_text(offline_log, encoding="utf-8")
 chunks = list((runtime / "storage").rglob("*.flb"))
 if not chunks:
@@ -130,7 +131,7 @@ health = subprocess.run(
         shutil.which("powershell") or "powershell",
         "-NoProfile", "-ExecutionPolicy", "Bypass", "-File",
         str(root / "bin/ads-windows-queue-health.ps1"),
-        "-RuntimeDir", str(runtime),
+        "-ConfigFile", str(offline_config),
         "-MaxQueueBytes", "1",
         "-MinFreeBytes", "1",
         "-MaxOldestChunkMinutes", "60",

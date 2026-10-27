@@ -9,15 +9,17 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 2344c5ee0f56364a74afc996e4f0379f8f238ef0
+last-verified-commit: 55af8ca622f277b29e80ac666c46ffae52bdd9ae
 stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai punti 3 e 7; eventi iLO tecnici separati con ritenzione 90 giorni attiva; catena locale provata in WSL, non installata; D7 bloccato da nomina ed elenco AdS
 ---
 
 # Lavoro in corso
 
-## Monitor della coda Windows candidato, 27/10/2026
+## Monitor della coda Windows pubblicato, 27/10/2026
 
-Collettore `2344c5e` pubblicato e pulito alla ripresa. La rete `6ed90d1` ha nel worktree nove file allineati al nuovo commit: filtro `DOMINIO/utente`, fixture Windows da 740 byte, replay locale e ISO-30 ancora in corso; copie ISO e timeline a 245 eventi verificate, `chiudi` manuale della rete pronto. Nel nuovo diff il bundle Windows include `ads-windows-queue-health.ps1`: soglie obbligatorie per byte, spazio libero ed età del chunk `.flb`, codici 0/2/3 per sano/allarme/misura impossibile. Due prove PowerShell passano; la mutazione della soglia byte rende rossa quella pertinente, con SHA-256 ripristinato. Con il binario Fluent Bit 5.1.3 e ricevitore TLS spento il controllo ha segnalato il chunk persistente; dopo il riavvio sono arrivati vecchio e nuovo record in 18,1 secondi nel giro misurato. Nessun job NinjaOne o servizio installato. Per l'esercizio mancano elenco e nomina AdS, grafie Security, bookmark, capienza e soglie misurate, consegna alla VM e allarme esterno; D7, ISO-30 e WindTre 89/90 restano aperti.
+Collettore `55af8ca` e rete `7ab60f4` pubblicati dall'utente e allineati ai remoti. Il bundle Windows contiene `ads-windows-queue-health.ps1`: soglie obbligatorie per byte, spazio libero ed età del chunk `.flb`, codici 0/2/3 per sano/allarme/misura impossibile. Due prove PowerShell passano; la mutazione della soglia byte rende rossa quella pertinente, con SHA-256 ripristinato. Con il binario Fluent Bit 5.1.3 e ricevitore TLS spento il controllo ha segnalato il chunk persistente; dopo il riavvio sono arrivati vecchio e nuovo record in 18,1 secondi nel giro misurato. La rete ha nel nuovo worktree nove file che registrano il monitor: ISO-30 resta in corso, copie ISO allineate, timeline a 246 eventi; `chiudi` manuale della rete pronto dopo i controlli. Nessun job NinjaOne o servizio installato. Per l'esercizio mancano elenco e nomina AdS, grafie Security, bookmark, capienza e soglie misurate, consegna alla VM e allarme esterno; D7, ISO-30 e WindTre 89/90 restano aperti.
+
+Nel nuovo diff il monitor richiede `-ConfigFile` e usa `storage.path` della configurazione Fluent Bit, evitando un verde falso se il runtime predefinito è vuoto e quello effettivo contiene chunk. La nuova prova era rossa sul contratto precedente; dieci prove mirate passano dopo la correzione. Il binario Windows ha superato di nuovo il fermo del ricevitore usando lo stesso file per processo e monitor: chunk segnalato, vecchio e nuovo record consegnati in 19,2 secondi. Una mutazione che ripristina la directory predefinita rende rossa la prova discriminante; il sorgente è stato ripristinato con SHA-256 verificato. Il job deve ancora essere collegato a NinjaOne con il file usato davvero dal servizio, soglie misurate e destinatario dell'allarme verificato.
 
 ## Trasporto Windows provato in locale, checkpoint precedente
 
