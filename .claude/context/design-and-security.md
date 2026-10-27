@@ -6,12 +6,14 @@ covers-paths:
   - bin/**
   - config/**
   - pilot/monitoring-hub/**
-last-verified-commit: f5acb3beb6f4771872d8ebb683d0a27a471061c4
+last-verified-commit: 40654b50d3e2eaba0f7d4b60eeeb9997a8f43079
 ---
 
 # Design e sicurezza applicativa
 
 ## Confine del pilota Windows, 27/10/2026
+
+Il nuovo probe Security usa `Get-WinEvent` e `auditpol /list` in sola lettura. Parsea l'XML ma porta nell'output solo i nomi di campo da un elenco fisso, GUID pubblici e conteggi; errori dei comandi non sono stampati. Distingue eventi assenti, schema incompleto ed errore di lettura. Il campo `audit_policy_enabled=not_checked` impedisce di scambiare la presenza della sottocategoria per l'abilitazione dell'audit. I valori degli account richiedono una verifica controllata separata.
 
 Il renderer non emette una configurazione con elenco AdS vuoto, identità senza dominio, duplicati o caratteri che possano iniettare XPath; le query sono una `Select` per identità `DOMINIO/utente` più gli eventi di controllo globali. Target e Subject sono confrontati con i rispettivi campi di dominio; il Lua distingue attore e credenziali usate con i domini. Questo evita di includere automaticamente omonimi di un altro dominio, ma un valore o una grafia diversa nei veri eventi Security può far perdere eventi: va campionata prima dell'installazione. Gli eventi globali non sono limitati all'elenco. Il bundle con le identità reali non va in un percorso tracciabile. `tls.verify_hostname on` autentica il server: con CA attendibile e SAN errato il binario Windows 5.1.3 non ha consegnato byte al ricevitore locale; disattivando solo il controllo del nome li ha consegnati. Il collettore accetta client TLS anonimi e vincola gli heartbeat all'IP ammesso. Un chunk fittizio è sopravvissuto all'arresto del binario con ricevitore assente ed è arrivato dopo il riavvio, ma il Syslog TCP non dà una ricevuta applicativa né prova consegna una volta sola. La coda `storage.total_limit_size 500M` dello studio è stata rimossa perché il produttore documenta lo scarto dei chunk più vecchi al raggiungimento del limite. Disco pieno e Security log sovrascritto restano rischi da misurare e allarmare.
 

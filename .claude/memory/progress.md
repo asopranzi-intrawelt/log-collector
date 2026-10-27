@@ -1,5 +1,19 @@
 # Work-log
 
+## 2026-10-27 - Probe Security Windows di sola lettura
+
+L'utente ha chiuso il precedente checkpoint: collettore `40654b5` e remoto coincidono, albero inizialmente pulito. La rete è a `5d352a4`, uguale al remoto, con quattro file paralleli su sito e memoria. Le cinque schede tecniche del collettore sono state confrontate con il preflight pubblicato e ancorate a `40654b5`. Il nuovo probe nel bundle usa `auditpol /list /subcategory:* /v` e `Get-WinEvent` per sei ID; estrae soltanto nomi di campo previsti, GUID e conteggi, senza valori, nomi macchina o messaggi. Le costanti Microsoft confermano la mappatura dei cinque GUID; policy abilitata e campioni del pilota non sono verificati. L'output distingue `not_observed`, `schema_incomplete` e `read_error`, con codici 2 e 3 per evidenza incompleta o lettura impossibile.
+
+La prova del comando completo ha inizialmente esposto un falso verde: la mappa ordinata con chiavi numeriche restituiva liste di campi richiesti vuote. Le chiavi sono ora testuali e il test richiede esplicitamente i campi del 4672. Le prove con PowerShell sostitutivo verificano assenza, eccezione `NoMatchingEventsFound`, errore di accesso simulato, maiuscole dei campi, codici d'uscita e assenza di valori sintetici nel JSON. Nessun Security log reale o host del pilota è stato letto. La rete non è stata modificata: il probe non cambia sorgenti, regole o stato ISO. Aggiornati script, renderer, prove, studio, handoff, cinque schede, indice, work-log e note private; Git resta manuale dell'utente.
+
+La verifica mirata finale esegue 21 prove Windows verdi. Un campione `auditpol /list` senza parentesi graffe attorno ai GUID è ora riconosciuto e provato, senza accettare una stringa esadecimale più lunga come corrispondenza. Ruff e il controllo rigoroso delle schede sono verdi. `chiudi -SoloControlli` ha concluso con «Controlli verdi» sul diff finale, dopo l'estensione della regex. Nessun file è stato messo in stage dall'agente.
+
+Dopo la chiusura manuale precedente, l'utente ha mostrato il timeout SSH della verifica finale di `40654b5`. Una nuova lettura `git ls-remote origin refs/heads/main` ha restituito lo SHA completo `40654b50d3e2eaba0f7d4b60eeeb9997a8f43079`, uguale a HEAD e a `origin/main`: il push precedente è confermato sul server. Il probe Security è ancora nel diff locale, senza stage né commit; quella chiusura non lo includeva.
+
+L'avviso non bloccante del vecchio hook `test-identita-personali.py` deriva da tre righe di fixture diverse fra la copia del progetto e il template di macchina: una costruzione di elenco e due domini fittizi. È un riallineamento del template distinto dal probe, da verificare con i controlli di anonimizzazione prima di copiarlo; il nuovo commit del probe può procedere senza dichiarare risolto l'avviso.
+
+**Template:** nessuna.
+
 ## 2026-10-27 - Chiusura fermata dai controlli e anonimizzazione risolta
 
 L'utente ha eseguito `chiudi` sul collettore, che si è fermato prima del commit: `md-unwrap` segnalava due paragrafi consecutivi senza riga vuota in `current-work.md` e `progress.md`; `Test-Anonymization.py` segnalava 47 riscontri bloccanti. La verifica di ripresa ha trovato 42 modificati e 14 non tracciati rispetto all'impronta precedente, coerenti con il diff già documentato e con il lavoro parallelo del template. Le due righe vuote sono state inserite; `md-unwrap --check` sui due file è verde.

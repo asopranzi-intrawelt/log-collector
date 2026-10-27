@@ -1,5 +1,9 @@
 # Snapshot di sincronizzazione
 
+## Probe Security Windows candidato, 27/10/2026
+
+Collettore `40654b5` e rete `5d352a4` pubblicati dall'utente e uguali ai rispettivi remoti alla ripresa; il collettore era pulito. Le cinque schede coperte sono state rilette sul commit `40654b5` e ancorate a quel commit; il nuovo diff non è ancora pubblicato. Il bundle Windows include ora un probe di sola lettura che elenca i cinque GUID di audit e campiona i nomi dei campi per sei ID Security, emettendo solo GUID, ID, nomi fissi e conteggi. La mappatura dei GUID è confermata dalle costanti Microsoft, ma sul pilota non sono ancora stati letti eventi né lo stato di abilitazione della policy. I test locali usano eventi sintetici, inclusi valori segreti fittizi non presenti nell'output. Rete occupata da quattro file paralleli del sito e della memoria; questo probe non cambia la topologia o la copertura, quindi non richiede un allineamento ISO immediato. Servizio, lista AdS approvata, filtro su eventi reali, bookmark, VM, coda e allarme restano gate; D7 e WindTre 89/90 aperti.
+
 ## Preflight statico Windows candidato, 27/10/2026
 
 Collettore `f5acb3b` e rete `4c48bdf` pubblicati e allineati ai remoti alla ripresa. Le cinque schede tecniche del collettore sono state verificate sul codice pubblicato e ancorate a `f5acb3b`. Nove file della rete registrano il nuovo riferimento, ISO-30 resta in corso e la timeline ha 247 eventi; il versionamento è dell'utente. Nel diff corrente il renderer aggiunge al bundle un preflight PowerShell: verifica macchina, CA pubblica, TLS e retry per output, versione 5.1.3 e dry run. Quattordici prove Windows mirate e il binario effettivo sono verdi; togliere la guardia del nome macchina rende rossa la prova pertinente, poi il sorgente è ripristinato con SHA-256. Una prova rossa ha rilevato che due impostazioni TLS nello stesso output potevano mascherare l'assenza nell'altro; il controllo è ora per output. Il preflight è statico: servizio, Security, VM, allarme e soglie reali restano da collaudare. D7 e WindTre 89/90 restano aperti.
@@ -496,11 +500,11 @@ Template:             E:\template-claude-developing @ ffcbdb3
 
 | Scheda | last-verified | Stato |
 |---|---|---|
-| STACK.md | 55af8ca | query, bundle e monitor Windows descritti |
-| design-and-security.md | 55af8ca | soggetti, dominio, TLS e coda esplicitati |
-| deployment.md | 55af8ca | pilota e timer non installati, gate operativi aperti |
-| dev-testing.md | 55af8ca | tre eventi Windows e D6 smistati su Debian 13 |
-| current-work.md | 55af8ca | stato pubblicato e diff corrente distinti |
+| STACK.md | 40654b5 | bundle e probe Security descritti |
+| design-and-security.md | 40654b5 | confine dei dati del probe esplicitato |
+| deployment.md | 40654b5 | pilota e timer non installati, gate operativi aperti |
+| dev-testing.md | 40654b5 | prove sintetiche del probe separate dal pilota |
+| current-work.md | 40654b5 | stato pubblicato e diff corrente distinti |
 | roadmap.md | 9ee87b4 | solo struttura |
 
 ## Punto di ripresa

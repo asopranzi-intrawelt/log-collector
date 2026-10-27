@@ -9,11 +9,15 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: f5acb3beb6f4771872d8ebb683d0a27a471061c4
+last-verified-commit: 40654b50d3e2eaba0f7d4b60eeeb9997a8f43079
 stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai punti 3 e 7; eventi iLO tecnici separati con ritenzione 90 giorni attiva; catena locale provata in WSL, non installata; D7 bloccato da nomina ed elenco AdS
 ---
 
 # Lavoro in corso
+
+## Ricognizione Security del pilota Windows, 27/10/2026
+
+L'utente ha pubblicato il preflight e il template nel collettore `40654b5`; l'albero era pulito all'avvio. Nel nuovo diff il bundle include un probe di sola lettura dei cinque GUID di audit e dei nomi dei campi per gli ID Security 4624, 4625, 4634, 4647, 4648 e 4672. Il rapporto omette valori degli eventi, nomi macchina e messaggi grezzi; codice 2 segnala campioni assenti o schema incompleto, codice 3 errore di lettura. La mappatura GUID è confermata dalle costanti Microsoft, ma nessuna policy o evento Security di un pilota è stata letta: lo stato effettivo di audit, le grafie degli account e la selezione reale restano aperti. D7 e WindTre 89/90 non sono chiusi. Rete `5d352a4` pubblicata ma occupata dal lavoro parallelo sul sito: nessuna scrittura in rete per questo probe, che non cambia topologia o copertura.
 
 ## Preflight statico del pilota Windows, 27/10/2026
 

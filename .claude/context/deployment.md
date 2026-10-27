@@ -5,12 +5,14 @@ generated-date: 2026-09-30
 covers-paths:
   - config/**
   - docs/handoff-sviluppo-collettore.md
-last-verified-commit: f5acb3beb6f4771872d8ebb683d0a27a471061c4
+last-verified-commit: 40654b50d3e2eaba0f7d4b60eeeb9997a8f43079
 ---
 
 # Deployment
 
 ## Bundle Windows non distribuito, 27/10/2026
+
+Il bundle candidato aggiunge un probe Security da lanciare soltanto sul pilota autorizzato, con accesso sufficiente al canale: la sua uscita non contiene identità né contenuto degli eventi. Un codice 0 qualifica solo presenza dei GUID e schema dei sei ID campionati, non l'abilitazione della policy, il filtro sugli account reali o l'esercizio. Il servizio e il probe non sono stati distribuiti.
 
 Il candidato Fluent Bit Windows 5.1.3 è generato localmente per ciascun nome macchina con `bin/ads-render-windows.py`; la destinazione con le identità AdS reali `DOMINIO/utente` deve essere privata. I file `fluent-bit.conf` e `ads.lua` e la CA pubblica appartengono alla configurazione del pilota, ma la CA non è inclusa nel bundle. La prova con il binario Windows ha consegnato tre eventi e un heartbeat sintetici a un ricevitore TLS locale; il test Debian 13 ne ha verificato lo smistamento e la conservazione dei domini. Una prova locale separata ha recuperato un chunk dopo riavvio con input `dummy` e ricevitore inizialmente assente. Prima di installare il servizio: nomina ed elenco approvati, valori e grafie esatti dei domini sui campioni Security, certificato con SAN corrispondente, ACL del buffer, monitor della saturazione, consegna alla VM e replay degli eventi Security dopo fermo. Nessuna modifica a Windows o a NinjaOne eseguita.
 

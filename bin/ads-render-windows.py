@@ -118,6 +118,10 @@ def main(argv: list[str] | None = None) -> int:
             ROOT / "bin/ads-windows-pilot-preflight.ps1",
             staging / "ads-windows-pilot-preflight.ps1",
         )
+        shutil.copyfile(
+            ROOT / "bin/ads-windows-security-probe.ps1",
+            staging / "ads-windows-security-probe.ps1",
+        )
         staging.rename(destination)
     except BaseException:
         if staging.resolve().is_relative_to(destination.parent.resolve()):

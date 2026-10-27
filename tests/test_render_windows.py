@@ -44,6 +44,9 @@ def test_query_per_account_e_controlli_globali(tmp_path, params_text):
     conf = (dest / "fluent-bit.conf").read_text(encoding="utf-8")
     assert (dest / "ads-windows-queue-health.ps1").is_file()
     assert (dest / "ads-windows-pilot-preflight.ps1").is_file()
+    assert (dest / "ads-windows-security-probe.ps1").read_bytes() == (
+        render.ROOT / "bin/ads-windows-security-probe.ps1"
+    ).read_bytes()
     query = next(line.split(None, 1)[1] for line in conf.splitlines() if "Event_Query" in line)
     selects = ElementTree.fromstring(query).findall(".//Select")
     assert len(selects) == 3

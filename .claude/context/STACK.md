@@ -8,12 +8,14 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: f5acb3beb6f4771872d8ebb683d0a27a471061c4
+last-verified-commit: 40654b50d3e2eaba0f7d4b60eeeb9997a8f43079
 ---
 
 # Stack applicativo
 
 ## Pilota Windows candidato, 27/10/2026
+
+Il preflight statico Windows è pubblicato nel commit `40654b5`. Nel nuovo diff il renderer aggiunge al bundle `ads-windows-security-probe.ps1`: legge solo la lista dei GUID `auditpol` e un massimo di dieci eventi per ciascuno dei sei ID Security; il JSON conserva ID, nomi di campo attesi e conteggi, senza i valori degli eventi. Nessun servizio o criterio di audit viene modificato.
 
 `bin/ads-render-windows.py` genera da parametri privati un bundle per computer con `config/windows-pilota/fluent-bit.conf.template` e `ads.lua`. L'input `winevtlog` e il buffer su filesystem sono fissati a Fluent Bit Windows 5.1.3; gli output Syslog TLS di accessi e heartbeat sono separati. Il renderer richiede identità approvate `DOMINIO/utente`, blocca nomi senza dominio, duplicati e caratteri che possono alterare XPath. La query confronta nome e dominio nei campi Target o Subject secondo l'evento; il Lua conserva attore e credenziali usate con i rispettivi domini. La fixture di 740 byte del binario Windows è stata smistata da rsyslog Debian 13 in tre eventi AdS e un heartbeat D6. Un input `dummy` ha inoltre provato la ripresa di un chunk persistente dopo l'arresto di Fluent Bit con ricevitore assente. Nessun servizio Windows installato, evento Security o invio alla VM collaudato.
 
