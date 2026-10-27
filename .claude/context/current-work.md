@@ -9,11 +9,15 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 40654b50d3e2eaba0f7d4b60eeeb9997a8f43079
+last-verified-commit: 9ea6e3ee8b771257a6a90ff53d2553bb6aebe0da
 stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai punti 3 e 7; eventi iLO tecnici separati con ritenzione 90 giorni attiva; catena locale provata in WSL, non installata; D7 bloccato da nomina ed elenco AdS
 ---
 
 # Lavoro in corso
+
+## Policy di sistema e capacità Security del pilota, 27/10/2026
+
+L'utente ha pubblicato il probe `0286195`, poi il template parallelo è avanzato a `9ea6e3e`; il diff del nuovo controllo è limitato a probe, test, studio e handoff prima della riconciliazione di memoria e schede. Il probe legge ora anche i bit `auditpol /get` della policy di sistema e il massimo configurato del Security log: Logon richiede successo e fallimento, le altre quattro sottocategorie almeno successo; il log deve essere abilitato e configurato ad almeno 256 MB. Valori assenti o non interpretabili non diventano un verde. Le prove sono sintetiche; un `auditpol /get` sul PC di sviluppo ha restituito 1314 per privilegi insufficienti, senza interrogare il pilota. Restano le eventuali eccezioni per utente, la policy reale, l'elenco AdS approvato, i valori degli eventi, la misura di durata del Security log, servizio, bookmark, VM e allarme. D7 e WindTre 89/90 ancora aperti. Nessuna modifica necessaria alla rete finché sorgenti e stato ISO non cambiano.
 
 ## Ricognizione Security del pilota Windows, 27/10/2026
 

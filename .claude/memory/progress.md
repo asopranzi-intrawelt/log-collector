@@ -1,5 +1,17 @@
 # Work-log
 
+## 2026-10-27 - Policy di sistema e capacità del Security log
+
+L'utente ha pubblicato il probe Security `0286195`; `origin/main` coincideva. Durante il giro la sessione del template ha pubblicato `9ea6e3e` con otto file propri, senza sovrapposizione con il diff del probe. Le cinque schede sono state confrontate con il codice e ancorate al nuovo HEAD. La rete è a `2c859ed`, uguale al remoto, con modifiche parallele su sito e memoria; non è stata scritta perché questo giro non ha attivato una sorgente né cambiato ISO-30.
+
+Il probe ora legge il CSV di `auditpol /get /subcategory:* /r` e i metadati del Security log in sola lettura. Richiede per Logon i bit successo e fallimento, per Logoff, Special Logon, Security Group Management e Audit Policy Change almeno successo; il log deve essere abilitato e avere un massimo configurato di almeno 268435456 byte. Il JSON espone soltanto GUID, maschere numeriche, nomi di campo fissati, conteggi e byte configurati: non stampa CSV, valori degli eventi o nome macchina. Una riga GUID assente, duplicata o non numerica e un errore di accesso sono `read_error`; un bit mancante, log disabilitato o piccolo ed evento assente sono `incomplete`. La [specifica Microsoft del CSV](https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-gpac/d77939fe-8fdc-4d06-b08a-13670cc8cbe7) conferma colonne e valori 0/1/3; [`auditpol /get`](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/auditpol-get) interroga la policy di sistema senza `/user`. Eventuali eccezioni per utente non sono misurate. Una lettura locale sul PC di sviluppo ha restituito codice 1314, permesso mancante; nessun pilota è stato interrogato.
+
+Le fixture PowerShell coprono policy piena, Logon senza fallimento, riga mancante o riferita a un utente anziché a `System`, comando fallito, Security log piccolo o disabilitato, schemi ed errori già esistenti. Il controllo mirato verifica che un CSV riferito a un utente non possa attestare la policy di sistema. Ventiquattro prove Windows mirate e Ruff sono verdi. Il massimo configurato a 256 MB non è una misura della durata disponibile per replay: il volume reale e il bookmark restano da collaudare. Aggiornati probe, prove, studio, handoff, cinque schede, indice, work-log e note private; Git resta manuale dell'utente.
+
+La chiusura di controllo sul diff della milestone termina con «Controlli verdi»; stage vuoto. Il messaggio privato prepara un commit separato dalla precedente sincronizzazione del template.
+
+**Template:** nessuna.
+
 ## 2026-10-27 - Probe Security Windows di sola lettura
 
 L'utente ha chiuso il precedente checkpoint: collettore `40654b5` e remoto coincidono, albero inizialmente pulito. La rete è a `5d352a4`, uguale al remoto, con quattro file paralleli su sito e memoria. Le cinque schede tecniche del collettore sono state confrontate con il preflight pubblicato e ancorate a `40654b5`. Il nuovo probe nel bundle usa `auditpol /list /subcategory:* /v` e `Get-WinEvent` per sei ID; estrae soltanto nomi di campo previsti, GUID e conteggi, senza valori, nomi macchina o messaggi. Le costanti Microsoft confermano la mappatura dei cinque GUID; policy abilitata e campioni del pilota non sono verificati. L'output distingue `not_observed`, `schema_incomplete` e `read_error`, con codici 2 e 3 per evidenza incompleta o lettura impossibile.

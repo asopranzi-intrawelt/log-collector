@@ -1,5 +1,9 @@
 # Snapshot di sincronizzazione
 
+## Audit di sistema Windows candidato, 27/10/2026
+
+Il probe Security è stato pubblicato dall'utente in `0286195`, poi il template parallelo è avanzato a `9ea6e3e`, uguale a `origin/main`; le cinque schede coperte sono state rilette e ancorate a questo HEAD. Nel diff corrente, ancora non pubblicato, il probe legge `auditpol /get` per i bit richiesti della policy di sistema e la capacità configurata del Security log, oltre a GUID e schema degli eventi. Ventiquattro prove Windows mirate e Ruff sono verdi con dati sintetici; il PC di sviluppo ha restituito 1314 a `auditpol /get`, quindi i bit di sistema non sono misurati su alcun pilota. Rete `2c859ed` pubblicata ma con lavoro parallelo su sito e memoria; non cambia la copertura ISO perché nessun pilota è stato interrogato. Lista AdS approvata, eccezioni per utente, grafie reali, servizio, bookmark, VM, capacità misurata e allarme restano gate. D7 e WindTre 89/90 sono aperti.
+
 ## Probe Security Windows candidato, 27/10/2026
 
 Collettore `40654b5` e rete `5d352a4` pubblicati dall'utente e uguali ai rispettivi remoti alla ripresa; il collettore era pulito. Le cinque schede coperte sono state rilette sul commit `40654b5` e ancorate a quel commit; il nuovo diff non è ancora pubblicato. Il bundle Windows include ora un probe di sola lettura che elenca i cinque GUID di audit e campiona i nomi dei campi per sei ID Security, emettendo solo GUID, ID, nomi fissi e conteggi. La mappatura dei GUID è confermata dalle costanti Microsoft, ma sul pilota non sono ancora stati letti eventi né lo stato di abilitazione della policy. I test locali usano eventi sintetici, inclusi valori segreti fittizi non presenti nell'output. Rete occupata da quattro file paralleli del sito e della memoria; questo probe non cambia la topologia o la copertura, quindi non richiede un allineamento ISO immediato. Servizio, lista AdS approvata, filtro su eventi reali, bookmark, VM, coda e allarme restano gate; D7 e WindTre 89/90 aperti.
@@ -500,11 +504,11 @@ Template:             E:\template-claude-developing @ ffcbdb3
 
 | Scheda | last-verified | Stato |
 |---|---|---|
-| STACK.md | 40654b5 | bundle e probe Security descritti |
-| design-and-security.md | 40654b5 | confine dei dati del probe esplicitato |
-| deployment.md | 40654b5 | pilota e timer non installati, gate operativi aperti |
-| dev-testing.md | 40654b5 | prove sintetiche del probe separate dal pilota |
-| current-work.md | 40654b5 | stato pubblicato e diff corrente distinti |
+| STACK.md | 9ea6e3e | bundle e nuovo controllo audit descritti |
+| design-and-security.md | 9ea6e3e | confine del CSV e dei dati del probe esplicitato |
+| deployment.md | 9ea6e3e | pilota e timer non installati, gate operativi aperti |
+| dev-testing.md | 9ea6e3e | prove sintetiche distinte dalla policy reale |
+| current-work.md | 9ea6e3e | commit pubblicato e diff corrente distinti |
 | roadmap.md | 9ee87b4 | solo struttura |
 
 ## Punto di ripresa

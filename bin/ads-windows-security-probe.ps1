@@ -1,6 +1,6 @@
 <#
-Ricognizione di sola lettura dei GUID di audit e dello schema Security.
-L'output JSON contiene solo GUID, ID evento, nomi di campo fissi e conteggi.
+Ricognizione di sola lettura dell'audit e dello schema Security.
+L'output JSON contiene solo GUID, bit di audit, ID evento, nomi di campo fissi e conteggi.
 Non stampa i valori degli eventi, il nome del computer o l'output grezzo dei comandi.
 Exit 0: tutti i campioni osservati; 2: campioni assenti; 3: lettura impossibile.
 #>
@@ -23,6 +23,21 @@ function Get-EventFieldNames {
     return $names
 }
 
+function Get-AuditPolicySetting {
+    param([string]$ReportCsv, [string]$Guid)
+    $columns = @('machine', 'target', 'name', 'guid', 'inclusion', 'exclusion', 'setting')
+    $rows = @(($ReportCsv -split '\r?\n' | Where-Object { $_.Trim() }) |
+        ConvertFrom-Csv -Header $columns)
+    $matchingRows = @($rows | Where-Object {
+        $_.target -eq 'System' -and
+        (($_.guid -replace '^\{', '') -replace '\}$', '') -ieq $Guid
+    })
+    if ($matchingRows.Count -ne 1) { throw 'riga GUID assente o duplicata' }
+    $value = [string]$matchingRows[0].setting
+    if ($value -notmatch '^[0-3]$') { throw 'valore audit non valido' }
+    return [int]$value
+}
+
 function Invoke-WindowsSecurityProbe {
     param([int]$WindowHours, [int]$Limit)
 
@@ -33,6 +48,7 @@ function Invoke-WindowsSecurityProbe {
         '0CCE9237-69AE-11D9-BED3-505054503030',
         '0CCE922F-69AE-11D9-BED3-505054503030'
     )
+    $requiredMasks = @(3, 1, 1, 1, 1)
     $required = [ordered]@{
         '4624' = @('TargetUserName', 'TargetDomainName', 'LogonType', 'IpAddress')
         '4625' = @('TargetUserName', 'TargetDomainName', 'LogonType', 'IpAddress')
@@ -48,8 +64,17 @@ function Invoke-WindowsSecurityProbe {
         $policyText = (& auditpol.exe /list /subcategory:* /v 2>$null | Out-String)
         if ($LASTEXITCODE -eq 0 -and $policyText.Length -gt 0) { $policyStatus = 'read' }
     } catch { }
+    $policyReportStatus = 'read_error'
+    $policyReport = ''
+    try {
+        $policyReport = (& auditpol.exe /get /subcategory:* /r 2>$null | Out-String)
+        if ($LASTEXITCODE -eq 0 -and $policyReport.Length -gt 0) {
+            $policyReportStatus = 'read'
+        }
+    } catch { }
     $guids = @()
-    foreach ($guid in $expectedGuids) {
+    for ($index = 0; $index -lt $expectedGuids.Count; $index++) {
+        $guid = $expectedGuids[$index]
         $present = $false
         if ($policyStatus -eq 'read') {
             $present = [regex]::IsMatch(
@@ -57,7 +82,46 @@ function Invoke-WindowsSecurityProbe {
                 '(?i)(?<![0-9a-f])\{?' + [regex]::Escape($guid) + '\}?(?![0-9a-f])'
             )
         }
-        $guids += [pscustomobject]@{ guid = $guid; present = $present }
+        $observedMask = $null
+        if ($policyReportStatus -eq 'read') {
+            try {
+                $observedMask = Get-AuditPolicySetting -ReportCsv $policyReport -Guid $guid
+            } catch {
+                $policyReportStatus = 'parse_error'
+            }
+        }
+        $enabled = $false
+        if ($null -ne $observedMask) {
+            $enabled = ($observedMask -band $requiredMasks[$index]) -eq $requiredMasks[$index]
+        }
+        $guids += [pscustomobject]@{
+            guid = $guid
+            present = $present
+            required_mask = $requiredMasks[$index]
+            observed_mask = $observedMask
+            enabled = $enabled
+        }
+    }
+
+    $policyEnabled = 'unknown'
+    if ($policyReportStatus -eq 'read') {
+        $policyEnabled = 'yes'
+        if (@($guids | Where-Object { -not $_.enabled }).Count -gt 0) {
+            $policyEnabled = 'no'
+        }
+    }
+
+    $logMinimum = [long]268435456
+    $logMaximum = $null
+    $logStatus = 'read_error'
+    try {
+        $logConfiguration = Get-WinEvent -ListLog Security -ErrorAction Stop
+        $logMaximum = [long]$logConfiguration.MaximumSizeInBytes
+        if (-not $logConfiguration.IsEnabled) { $logStatus = 'disabled' }
+        elseif ($logMaximum -lt $logMinimum) { $logStatus = 'below_minimum' }
+        else { $logStatus = 'configured' }
+    } catch {
+        $logMaximum = $null
     }
 
     $since = (Get-Date).AddHours(-$WindowHours)
@@ -100,13 +164,17 @@ function Invoke-WindowsSecurityProbe {
     }
 
     $status = 'observed'
-    if ($policyStatus -ne 'read' -or @($guids | Where-Object { -not $_.present }).Count -gt 0) {
+    if ($policyStatus -ne 'read' -or $policyEnabled -ne 'yes' -or
+        $logStatus -ne 'configured' -or
+        @($guids | Where-Object { -not $_.present }).Count -gt 0) {
         $status = 'incomplete'
     }
     if (@($eventResults | Where-Object { $_.status -ne 'observed' }).Count -gt 0) {
         $status = 'incomplete'
     }
-    if ($policyStatus -eq 'read_error' -or @($eventResults | Where-Object { $_.status -eq 'read_error' }).Count -gt 0) {
+    if ($policyStatus -eq 'read_error' -or $policyReportStatus -in @('read_error', 'parse_error') -or
+        $logStatus -eq 'read_error' -or
+        @($eventResults | Where-Object { $_.status -eq 'read_error' }).Count -gt 0) {
         $status = 'read_error'
     }
     return [pscustomobject]@{
@@ -115,8 +183,14 @@ function Invoke-WindowsSecurityProbe {
         window_hours = $WindowHours
         max_events_per_id = $Limit
         audit_guid_list_status = $policyStatus
-        audit_policy_enabled = 'not_checked'
+        audit_policy_query_status = $policyReportStatus
+        system_audit_policy_enabled = $policyEnabled
         audit_guids = $guids
+        security_log_capacity = [pscustomobject]@{
+            status = $logStatus
+            configured_max_bytes = $logMaximum
+            required_min_bytes = $logMinimum
+        }
         security_events = $eventResults
     }
 }

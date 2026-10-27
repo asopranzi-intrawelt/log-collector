@@ -5,12 +5,14 @@ generated-date: 2026-09-30
 covers-paths:
   - config/**
   - docs/handoff-sviluppo-collettore.md
-last-verified-commit: 40654b50d3e2eaba0f7d4b60eeeb9997a8f43079
+last-verified-commit: 9ea6e3ee8b771257a6a90ff53d2553bb6aebe0da
 ---
 
 # Deployment
 
 ## Bundle Windows non distribuito, 27/10/2026
+
+Il probe pubblicato nel bundle ha nel diff corrente un gate aggiuntivo: legge policy effettiva e dimensione massima configurata del Security log, senza cambiare la macchina. Il minimo candidato di 256 MB è una configurazione da confermare con il volume osservato; non garantisce il replay dopo un fermo. Un errore di permessi su `auditpol /get`, come il 1314 sul PC di sviluppo, produce stato non verificabile. Nessuna esecuzione sul pilota o installazione del servizio.
 
 Il bundle candidato aggiunge un probe Security da lanciare soltanto sul pilota autorizzato, con accesso sufficiente al canale: la sua uscita non contiene identità né contenuto degli eventi. Un codice 0 qualifica solo presenza dei GUID e schema dei sei ID campionati, non l'abilitazione della policy, il filtro sugli account reali o l'esercizio. Il servizio e il probe non sono stati distribuiti.
 
