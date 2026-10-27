@@ -6,6 +6,7 @@ import argparse
 import datetime as dt
 import ipaddress
 import os
+import shutil
 import socket
 import ssl
 import subprocess
@@ -124,6 +125,23 @@ offline_log, _ = run(configuration("backlog-old"), seconds=4)
 chunks = list((runtime / "storage").rglob("*.flb"))
 if not chunks:
     raise SystemExit(f"nessun chunk persistente prima del riavvio: {offline_log[-800:]}")
+health = subprocess.run(
+    [
+        shutil.which("powershell") or "powershell",
+        "-NoProfile", "-ExecutionPolicy", "Bypass", "-File",
+        str(root / "bin/ads-windows-queue-health.ps1"),
+        "-RuntimeDir", str(runtime),
+        "-MaxQueueBytes", "1",
+        "-MinFreeBytes", "1",
+        "-MaxOldestChunkMinutes", "60",
+    ],
+    cwd=root,
+    capture_output=True,
+    text=True,
+    check=False,
+)
+if health.returncode != 2 or "reason=queue_bytes" not in health.stdout:
+    raise SystemExit(f"monitor non rileva il chunk offline: {health.stdout} {health.stderr}")
 
 receiver = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 receiver.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -184,6 +202,7 @@ print(
     f"PERSISTED_CHUNKS={len(chunks)} OLD_RECEIVED={old_count} "
     f"NEW_RECEIVED={new_count} REPLAY_SECONDS={replay_seconds:.1f}"
 )
+print("HEALTH_OFFLINE=alert")
 print(f"PROBE_PRIVATE={work}")
 if old_count < 1 or new_count < 1:
     raise SystemExit(f"replay o evento nuovo assente: {online_log[-800:]}")

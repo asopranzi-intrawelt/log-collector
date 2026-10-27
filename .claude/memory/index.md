@@ -1,6 +1,10 @@
 # Snapshot di sincronizzazione
 
-## Trasporto Fluent Bit Windows verificato su dati sintetici, 27/10/2026
+## Coda Windows candidata e rete riallineata, 27/10/2026
+
+Collettore `2344c5e` e remoto allineati. Nel diff corrente il bundle Windows comprende un controllo PowerShell di sola lettura della coda, con soglie obbligatorie e fallimento esplicito quando la misura manca. Due prove sono verdi e la rimozione della soglia byte rende rossa quella pertinente; il binario Fluent Bit 5.1.3 ha prodotto un chunk offline che il controllo ha segnalato e il motore ha poi recuperato. La rete `6ed90d1` ha nove file allineati a `2344c5e`, ISO-30 in corso e timeline a 245 eventi; solo l'utente farà il `chiudi`. Security reale, misura di capienza, NinjaOne, VM e allarme esterno restano aperti, così come D7 e WindTre 89/90. Cinque schede ancorate al commit pubblicato `2344c5e`; il nuovo diff del monitor è descritto ma non ancora pubblicato.
+
+## Trasporto Fluent Bit Windows verificato su dati sintetici, checkpoint precedente
 
 Collettore `b0ef599` e remoto allineati alla ripresa. Nel diff corrente il renderer richiede `DOMINIO/utente`, la query Security confronta nome e dominio nei campi Target o Subject secondo l'evento, e il Lua conserva i domini di attore e bersaglio. Il binario Windows 5.1.3 ha emesso tre eventi e un heartbeat sintetici via TLS locale; la fixture di 740 byte è passata in rsyslog Debian 13: tre eventi in AdS con dominio e heartbeat D6 `observed`. Il binario ha anche ripreso un chunk fittizio dopo un arresto con ricevitore assente, ma bookmark Security e capienza restano da provare. Le cinque schede coperte dal commit sono state verificate per contenuto e ancorate a `b0ef599`; il diff attuale è descritto ma non ancora pubblicato. Rete `6ed90d1` allineata nel worktree a `b0ef599` con ISO-30 in corso; chiusura manuale dell'utente. Security reale, grafie dei domini, VM e allarme esterno restano aperti, così come D7 e WindTre 89/90.
 
@@ -467,7 +471,7 @@ Propagazione rete completata: integrazione, memoria, contesto, timeline e resume
 
 ```
 Branch attivo:        main
-Commit di riferimento: b0ef599
+Commit di riferimento: 2344c5e
 Data snapshot:        2026-10-27
 Albero autorevole:    unico
 Remoto:               git@github-corp:asopranzi-intrawelt/log-collector.git (primo push di 9ee87b4 il 2026-09-30)
@@ -478,11 +482,11 @@ Template:             E:\template-claude-developing @ ffcbdb3
 
 | Scheda | last-verified | Stato |
 |---|---|---|
-| STACK.md | b0ef599 | query e bundle Windows 5.1.3 descritti |
-| design-and-security.md | b0ef599 | soggetti, dominio, TLS e coda esplicitati |
-| deployment.md | b0ef599 | pilota e timer non installati, gate operativi aperti |
-| dev-testing.md | b0ef599 | tre eventi Windows e D6 smistati su Debian 13 |
-| current-work.md | b0ef599 | stato pubblicato e diff corrente distinti |
+| STACK.md | 2344c5e | query e bundle Windows 5.1.3 descritti |
+| design-and-security.md | 2344c5e | soggetti, dominio, TLS e coda esplicitati |
+| deployment.md | 2344c5e | pilota e timer non installati, gate operativi aperti |
+| dev-testing.md | 2344c5e | tre eventi Windows e D6 smistati su Debian 13 |
+| current-work.md | 2344c5e | stato pubblicato e diff corrente distinti |
 | roadmap.md | 9ee87b4 | solo struttura |
 
 ## Punto di ripresa

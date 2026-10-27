@@ -6,7 +6,7 @@ covers-paths:
   - bin/**
   - config/**
   - pilot/monitoring-hub/**
-last-verified-commit: b0ef5991bae4c6e7066da802f2ba1ee35040c43b
+last-verified-commit: 2344c5ee0f56364a74afc996e4f0379f8f238ef0
 ---
 
 # Design e sicurezza applicativa
@@ -14,6 +14,8 @@ last-verified-commit: b0ef5991bae4c6e7066da802f2ba1ee35040c43b
 ## Confine del pilota Windows, 27/10/2026
 
 Il renderer non emette una configurazione con elenco AdS vuoto, identità senza dominio, duplicati o caratteri che possano iniettare XPath; le query sono una `Select` per identità `DOMINIO/utente` più gli eventi di controllo globali. Target e Subject sono confrontati con i rispettivi campi di dominio; il Lua distingue attore e credenziali usate con i domini. Questo evita di includere automaticamente omonimi di un altro dominio, ma un valore o una grafia diversa nei veri eventi Security può far perdere eventi: va campionata prima dell'installazione. Gli eventi globali non sono limitati all'elenco. Il bundle con le identità reali non va in un percorso tracciabile. `tls.verify_hostname on` autentica il server: con CA attendibile e SAN errato il binario Windows 5.1.3 non ha consegnato byte al ricevitore locale; disattivando solo il controllo del nome li ha consegnati. Il collettore accetta client TLS anonimi e vincola gli heartbeat all'IP ammesso. Un chunk fittizio è sopravvissuto all'arresto del binario con ricevitore assente ed è arrivato dopo il riavvio, ma il Syslog TCP non dà una ricevuta applicativa né prova consegna una volta sola. La coda `storage.total_limit_size 500M` dello studio è stata rimossa perché il produttore documenta lo scarto dei chunk più vecchi al raggiungimento del limite. Disco pieno e Security log sovrascritto restano rischi da misurare e allarmare.
+
+Il controllo di coda candidato richiede tre soglie positive, legge solo metadati e rifiuta directory assente, reparse point e volume non disponibile con codice 3. Il conteggio include tutti i file di `storage`, mentre l'anzianità riguarda l'ultima modifica del chunk `.flb` più vecchio: non è il tempo dell'evento né un attestato di consegna. Una condition separata deve rilevare il servizio fermo; nessun job o canale d'allarme è installato.
 
 ## Limite della catena locale dopo un fermo, 26/10/2026
 

@@ -110,6 +110,10 @@ def main(argv: list[str] | None = None) -> int:
     try:
         (staging / "fluent-bit.conf").write_text(template, encoding="utf-8", newline="\n")
         shutil.copyfile(SOURCE / "ads.lua", staging / "ads.lua")
+        shutil.copyfile(
+            ROOT / "bin/ads-windows-queue-health.ps1",
+            staging / "ads-windows-queue-health.ps1",
+        )
         staging.rename(destination)
     except BaseException:
         if staging.resolve().is_relative_to(destination.parent.resolve()):

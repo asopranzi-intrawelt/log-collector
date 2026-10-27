@@ -9,13 +9,17 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: b0ef5991bae4c6e7066da802f2ba1ee35040c43b
+last-verified-commit: 2344c5ee0f56364a74afc996e4f0379f8f238ef0
 stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai punti 3 e 7; eventi iLO tecnici separati con ritenzione 90 giorni attiva; catena locale provata in WSL, non installata; D7 bloccato da nomina ed elenco AdS
 ---
 
 # Lavoro in corso
 
-## Trasporto Windows provato in locale, 27/10/2026
+## Monitor della coda Windows candidato, 27/10/2026
+
+Collettore `2344c5e` pubblicato e pulito alla ripresa. La rete `6ed90d1` ha nel worktree nove file allineati al nuovo commit: filtro `DOMINIO/utente`, fixture Windows da 740 byte, replay locale e ISO-30 ancora in corso; copie ISO e timeline a 245 eventi verificate, `chiudi` manuale della rete pronto. Nel nuovo diff il bundle Windows include `ads-windows-queue-health.ps1`: soglie obbligatorie per byte, spazio libero ed età del chunk `.flb`, codici 0/2/3 per sano/allarme/misura impossibile. Due prove PowerShell passano; la mutazione della soglia byte rende rossa quella pertinente, con SHA-256 ripristinato. Con il binario Fluent Bit 5.1.3 e ricevitore TLS spento il controllo ha segnalato il chunk persistente; dopo il riavvio sono arrivati vecchio e nuovo record in 18,1 secondi nel giro misurato. Nessun job NinjaOne o servizio installato. Per l'esercizio mancano elenco e nomina AdS, grafie Security, bookmark, capienza e soglie misurate, consegna alla VM e allarme esterno; D7, ISO-30 e WindTre 89/90 restano aperti.
+
+## Trasporto Windows provato in locale, checkpoint precedente
 
 Il collettore `b0ef599` è pubblicato e pulito alla ripresa. Nel nuovo diff il renderer richiede `DOMINIO/utente` e la query Security confronta nome e dominio per gli eventi selezionati, compresi attore del 4648 e destinatario del 4672. Il Lua conserva attore e credenziali usate con i rispettivi domini. Il binario Fluent Bit Windows 5.1.3 ha inviato tre eventi e un heartbeat sintetici a un TLS locale: 740 byte RFC 5424. Con CA attendibile ma `Host` fuori dal SAN, zero byte; disattivando solo la verifica del nome, consegna ripristinata. La fixture è passata in rsyslog Debian 13: tre eventi in AdS, heartbeat in D6, domini conservati e report `observed`. Query XML accettata su Application e `--dry-run` verde; Security resta non leggibile dall'account locale. Una seconda prova ha fermato il binario con ricevitore assente: il chunk fittizio su disco è arrivato dopo il riavvio insieme a un nuovo record, in 18,2 secondi nel giro misurato. Prima del servizio sul pilota servono grafie effettive dei domini, bookmark `winevtlog` dopo fermo, misura di capienza, ricezione sulla VM e allarme esterno. La rete `6ed90d1` ha nel worktree l'allineamento al commit pubblicato `b0ef599` e ISO-30 in corso; solo l'utente ne farà il versionamento. WindTre 89/90 e D7 restano aperti.
 
