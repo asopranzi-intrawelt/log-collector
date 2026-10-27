@@ -1,8 +1,8 @@
 <#
 Ricognizione di sola lettura dell'audit e dello schema Security.
-L'output JSON contiene solo GUID, bit di audit, ID evento, nomi di campo fissi e conteggi.
+L'output JSON contiene solo GUID, bit di audit, ID, nomi di campo fissi e misure aggregate.
 Non stampa i valori degli eventi, il nome del computer o l'output grezzo dei comandi.
-Exit 0: tutti i campioni osservati; 2: campioni assenti; 3: lettura impossibile.
+Exit 0: policy, log e campioni osservati; 2: requisito incompleto; 3: lettura impossibile.
 #>
 param(
     [ValidateRange(1, 168)][int]$Hours = 24,
@@ -113,10 +113,22 @@ function Invoke-WindowsSecurityProbe {
 
     $logMinimum = [long]268435456
     $logMaximum = $null
+    $logFileSize = $null
+    $logRecordCount = $null
+    $logMode = 'unknown'
     $logStatus = 'read_error'
     try {
         $logConfiguration = Get-WinEvent -ListLog Security -ErrorAction Stop
         $logMaximum = [long]$logConfiguration.MaximumSizeInBytes
+        if ($null -ne $logConfiguration.FileSize) {
+            $logFileSize = [long]$logConfiguration.FileSize
+        }
+        if ($null -ne $logConfiguration.RecordCount) {
+            $logRecordCount = [long]$logConfiguration.RecordCount
+        }
+        if ([string]$logConfiguration.LogMode -in @('Circular', 'AutoBackup', 'Retain')) {
+            $logMode = [string]$logConfiguration.LogMode
+        }
         if (-not $logConfiguration.IsEnabled) { $logStatus = 'disabled' }
         elseif ($logMaximum -lt $logMinimum) { $logStatus = 'below_minimum' }
         else { $logStatus = 'configured' }
@@ -124,7 +136,8 @@ function Invoke-WindowsSecurityProbe {
         $logMaximum = $null
     }
 
-    $since = (Get-Date).AddHours(-$WindowHours)
+    $observedAt = Get-Date
+    $since = $observedAt.AddHours(-$WindowHours)
     $eventResults = @()
     foreach ($id in $required.Keys) {
         $status = 'observed'
@@ -163,9 +176,42 @@ function Invoke-WindowsSecurityProbe {
         }
     }
 
+    $historyStatus = 'read_error'
+    $oldestAgeHours = $null
+    $observedSpanHours = $null
+    if ($logStatus -ne 'read_error') {
+        try {
+            $oldestRecords = @(Get-WinEvent -LogName Security -Oldest -MaxEvents 1 -ErrorAction Stop)
+            $newestRecords = @(Get-WinEvent -LogName Security -MaxEvents 1 -ErrorAction Stop)
+            if ($oldestRecords.Count -eq 0 -and $newestRecords.Count -eq 0 -and
+                $logRecordCount -eq 0) {
+                $historyStatus = 'empty'
+            } elseif ($oldestRecords.Count -eq 1 -and $newestRecords.Count -eq 1 -and
+                $null -ne $oldestRecords[0].TimeCreated -and
+                $null -ne $newestRecords[0].TimeCreated) {
+                $oldestTime = ([datetime]$oldestRecords[0].TimeCreated).ToUniversalTime()
+                $newestTime = ([datetime]$newestRecords[0].TimeCreated).ToUniversalTime()
+                $age = ($observedAt.ToUniversalTime() - $oldestTime).TotalHours
+                $span = ($newestTime - $oldestTime).TotalHours
+                if ($age -ge 0 -and $span -ge 0) {
+                    $oldestAgeHours = [math]::Round($age, 2)
+                    $observedSpanHours = [math]::Round($span, 2)
+                    $historyStatus = 'observed'
+                } else {
+                    $historyStatus = 'time_inconsistent'
+                }
+            }
+        } catch {
+            if ($_.FullyQualifiedErrorId -like 'NoMatchingEventsFound*' -and
+                $logRecordCount -eq 0) {
+                $historyStatus = 'empty'
+            }
+        }
+    }
+
     $status = 'observed'
     if ($policyStatus -ne 'read' -or $policyEnabled -ne 'yes' -or
-        $logStatus -ne 'configured' -or
+        $logStatus -ne 'configured' -or $historyStatus -in @('empty', 'time_inconsistent') -or
         @($guids | Where-Object { -not $_.present }).Count -gt 0) {
         $status = 'incomplete'
     }
@@ -173,7 +219,7 @@ function Invoke-WindowsSecurityProbe {
         $status = 'incomplete'
     }
     if ($policyStatus -eq 'read_error' -or $policyReportStatus -in @('read_error', 'parse_error') -or
-        $logStatus -eq 'read_error' -or
+        $logStatus -eq 'read_error' -or $historyStatus -eq 'read_error' -or
         @($eventResults | Where-Object { $_.status -eq 'read_error' }).Count -gt 0) {
         $status = 'read_error'
     }
@@ -190,6 +236,14 @@ function Invoke-WindowsSecurityProbe {
             status = $logStatus
             configured_max_bytes = $logMaximum
             required_min_bytes = $logMinimum
+            file_size_bytes = $logFileSize
+            record_count = $logRecordCount
+            log_mode = $logMode
+        }
+        security_log_history = [pscustomobject]@{
+            status = $historyStatus
+            oldest_age_hours = $oldestAgeHours
+            observed_span_hours = $observedSpanHours
         }
         security_events = $eventResults
     }

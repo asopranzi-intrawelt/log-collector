@@ -1,5 +1,9 @@
 # Snapshot di sincronizzazione
 
+## Storico Security Windows candidato, 27/10/2026
+
+Collettore `0232d8f` pubblicato dall'utente e pulito alla ripresa; cinque schede tecniche confrontate con quel commit e ancorate a esso. Il diff corrente aggiunge al probe metadati di capacità e anzianità osservata del Security log senza esportare valori: 13 prove sintetiche del probe passano e la prova dell'età rileva la rimozione di `-Oldest`. Nessun pilota interrogato, servizio installato o flusso attivato. Lo storico osservato non attesta la durata futura; elenco AdS, eventi e policy reali, volume, bookmark, VM e allarme restano gate. D7 e WindTre 89/90 sono aperti. Nessun aggiornamento di rete è richiesto finché non cambia la copertura effettiva.
+
 ## Audit di sistema Windows candidato, 27/10/2026
 
 Il probe Security è stato pubblicato dall'utente in `0286195`, poi il template parallelo è avanzato a `9ea6e3e`, uguale a `origin/main`; le cinque schede coperte sono state rilette e ancorate a questo HEAD. Nel diff corrente, ancora non pubblicato, il probe legge `auditpol /get` per i bit richiesti della policy di sistema e la capacità configurata del Security log, oltre a GUID e schema degli eventi. Ventiquattro prove Windows mirate e Ruff sono verdi con dati sintetici; il PC di sviluppo ha restituito 1314 a `auditpol /get`, quindi i bit di sistema non sono misurati su alcun pilota. Rete `2c859ed` pubblicata ma con lavoro parallelo su sito e memoria; non cambia la copertura ISO perché nessun pilota è stato interrogato. Lista AdS approvata, eccezioni per utente, grafie reali, servizio, bookmark, VM, capacità misurata e allarme restano gate. D7 e WindTre 89/90 sono aperti.

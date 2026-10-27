@@ -42,6 +42,11 @@ def fixture(
     policy_target: str = "System",
     log_max_bytes: int = 268435456,
     log_enabled: bool = True,
+    history_oldest_hours: int = 36,
+    history_newest_hours: int = 1,
+    history_empty: bool = False,
+    history_error: bool = False,
+    log_record_count: int = 1000,
     direct: bool = False,
 ) -> str:
     behavior = ""
@@ -85,6 +90,18 @@ def fixture(
         else f"$global:LASTEXITCODE = 0\n        @'\n{policy_csv}\n'@\n        return"
     )
     enabled_literal = "$true" if log_enabled else "$false"
+    history_behavior = (
+        "throw 'private-history-error'"
+        if history_error
+        else "return"
+        if history_empty
+        else f"""
+        if ($Oldest) {{
+            return [pscustomobject]@{{ TimeCreated = (Get-Date).AddHours(-{history_oldest_hours}) }}
+        }}
+        return [pscustomobject]@{{ TimeCreated = (Get-Date).AddHours(-{history_newest_hours}) }}
+        """
+    )
     final = (
         f"& '{PROBE.as_posix()}' -Hours 24 -MaxEventsPerId 2\nexit $LASTEXITCODE"
         if direct
@@ -101,13 +118,17 @@ function auditpol.exe {{
     @({audit_guid_literals})
 }}
 function Get-WinEvent {{
-    param($FilterHashtable, $MaxEvents, $ListLog)
+    param($FilterHashtable, $MaxEvents, $ListLog, $LogName, [switch]$Oldest)
     if ($ListLog) {{
         return [pscustomobject]@{{
             MaximumSizeInBytes = {log_max_bytes}
             IsEnabled = {enabled_literal}
+            FileSize = 134217728
+            RecordCount = {log_record_count}
+            LogMode = 'Circular'
         }}
     }}
+    if ($LogName) {{ {history_behavior} }}
     {behavior}
     $eventRecord = [pscustomobject]@{{ Payload = @'
 <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event"><EventData>
@@ -135,6 +156,12 @@ def test_probe_reports_schema_without_identifying_values():
     assert report["system_audit_policy_enabled"] == "yes"
     assert report["audit_policy_query_status"] == "read"
     assert report["security_log_capacity"]["status"] == "configured"
+    assert report["security_log_capacity"]["file_size_bytes"] == 134217728
+    assert report["security_log_capacity"]["record_count"] == 1000
+    assert report["security_log_capacity"]["log_mode"] == "Circular"
+    assert report["security_log_history"]["status"] == "observed"
+    assert 35.9 <= report["security_log_history"]["oldest_age_hours"] <= 36.1
+    assert 34.9 <= report["security_log_history"]["observed_span_hours"] <= 35.1
     assert len(report["audit_guids"]) == 5
     assert all(item["present"] for item in report["audit_guids"])
     assert [item["observed_mask"] for item in report["audit_guids"]] == [3, 1, 1, 1, 1]
@@ -208,6 +235,38 @@ def test_disabled_security_log_is_not_green():
     report = json.loads(result.stdout)
     assert report["status"] == "incomplete"
     assert report["security_log_capacity"]["status"] == "disabled"
+
+
+def test_short_observed_history_is_reported_without_claiming_future_retention():
+    result = run_ps(fixture(history_oldest_hours=2, history_newest_hours=1))
+    assert result.returncode == 0, result.stderr
+    report = json.loads(result.stdout)
+    assert report["status"] == "observed"
+    assert report["security_log_history"]["status"] == "observed"
+    assert 1.9 <= report["security_log_history"]["oldest_age_hours"] <= 2.1
+    assert 0.9 <= report["security_log_history"]["observed_span_hours"] <= 1.1
+
+
+def test_empty_history_and_clock_inconsistency_are_not_green():
+    for kwargs, expected in (
+        ({"history_empty": True, "log_record_count": 0}, "empty"),
+        ({"history_oldest_hours": 1, "history_newest_hours": 2}, "time_inconsistent"),
+    ):
+        result = run_ps(fixture(**kwargs))
+        assert result.returncode == 0, result.stderr
+        report = json.loads(result.stdout)
+        assert report["status"] == "incomplete"
+        assert report["security_log_history"]["status"] == expected
+        assert report["security_log_history"]["oldest_age_hours"] is None
+
+
+def test_history_read_error_is_not_mistaken_for_empty_log():
+    result = run_ps(fixture(history_error=True, log_record_count=0))
+    assert result.returncode == 0, result.stderr
+    report = json.loads(result.stdout)
+    assert report["status"] == "read_error"
+    assert report["security_log_history"]["status"] == "read_error"
+    assert "private-history-error" not in result.stdout
 
 
 def test_no_matching_events_exception_is_not_read_error():

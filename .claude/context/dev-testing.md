@@ -6,14 +6,14 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 9ea6e3ee8b771257a6a90ff53d2553bb6aebe0da
+last-verified-commit: 0232d8f46893503a31de8a88bc1f01ccf4404b08
 ---
 
 # Test di sviluppo
 
 ## Pilota Windows candidato, 27/10/2026
 
-Il diff sulla policy è coperto da fixture CSV con le sette colonne del report Microsoft e da `Get-WinEvent -ListLog` sostituito: maschera Logon parziale, riga assente, comando `auditpol /get` fallito, log piccolo o disabilitato non passano. Il test non stampa il nome macchina fittizio contenuto nel CSV. Ventiquattro prove Windows mirate e Ruff passano dopo il cambiamento; la macchina di sviluppo ha negato `auditpol /get` con codice 1314, quindi nessuna lettura reale conferma i bit sul pilota.
+Il checkpoint `0232d8f` copre la policy con fixture CSV a sette colonne e `Get-WinEvent -ListLog` sostituito: maschera Logon parziale, riga assente, comando `auditpol /get` fallito, log piccolo o disabilitato non passano. Nel diff corrente si provano anche storico corto, vuoto, orari incoerenti ed errore di lettura senza esportare contenuti. Il test che richiede il record più vecchio è diventato rosso togliendo `-Oldest`; il sorgente è stato ripristinato e verificato con SHA-256. La macchina di sviluppo ha negato `auditpol /get` con codice 1314, quindi nessuna lettura reale conferma i bit sul pilota.
 
 Il probe Security nel diff corrente è verificato con funzioni PowerShell sostitutive: i valori sintetici dell'XML e un errore costruito restano fuori dal JSON; assenza di evento, errore di lettura e nome di campo con maiuscole errate sono distinti. La prima prova del comando completo ha scoperto che le chiavi numeriche della mappa ordinata lasciavano vuota la lista dei campi richiesti; chiavi testuali e asserzione sui campi del 4672 correggono quel falso verde. La prova usa dati sintetici: nessuna lettura del Security log del pilota.
 

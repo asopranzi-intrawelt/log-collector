@@ -9,11 +9,15 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 9ea6e3ee8b771257a6a90ff53d2553bb6aebe0da
+last-verified-commit: 0232d8f46893503a31de8a88bc1f01ccf4404b08
 stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai punti 3 e 7; eventi iLO tecnici separati con ritenzione 90 giorni attiva; catena locale provata in WSL, non installata; D7 bloccato da nomina ed elenco AdS
 ---
 
 # Lavoro in corso
+
+## Storico osservato del Security log, 27/10/2026
+
+L'utente ha pubblicato `0232d8f`; l'albero era pulito alla ripresa. Il diff corrente estende il probe Security con dimensione effettiva del file, conteggio record, modalità del canale e due letture da un solo evento per stimare età del record più vecchio e ampiezza dello storico, senza esportare eventi o orari assoluti. Tredici prove del probe passano; togliendo `-Oldest` il test dell'età fallisce e il sorgente è stato ripristinato con SHA-256 verificato. Nessun pilota è stato interrogato. Lo storico attuale non garantisce la durata futura né il recupero da bookmark. Restano elenco e nomina AdS, policy ed eventi reali, misura dei volumi, servizio, invio alla VM e allarme esterno; D7 e WindTre 89/90 aperti. La rete non cambia perché nessuna sorgente o copertura ISO è stata attivata.
 
 ## Policy di sistema e capacità Security del pilota, 27/10/2026
 

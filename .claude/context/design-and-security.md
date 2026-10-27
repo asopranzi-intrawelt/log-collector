@@ -6,14 +6,14 @@ covers-paths:
   - bin/**
   - config/**
   - pilot/monitoring-hub/**
-last-verified-commit: 9ea6e3ee8b771257a6a90ff53d2553bb6aebe0da
+last-verified-commit: 0232d8f46893503a31de8a88bc1f01ccf4404b08
 ---
 
 # Design e sicurezza applicativa
 
 ## Confine del pilota Windows, 27/10/2026
 
-La policy viene letta dal CSV di `auditpol /get` per GUID, destinazione `System` e bit numerici, senza affidarsi ai nomi localizzati delle sottocategorie; una riga mancante, duplicata, di altro destinatario o non numerica fallisce chiusa. Il JSON espone solo GUID e maschere, non il CSV grezzo che contiene il nome macchina. `Get-WinEvent -ListLog` fornisce il massimo configurato e lo stato abilitato del Security log: non misura quanti giorni i record restano disponibili né prova il recupero da bookmark.
+La policy viene letta dal CSV di `auditpol /get` per GUID, destinazione `System` e bit numerici, senza affidarsi ai nomi localizzati delle sottocategorie; una riga mancante, duplicata, di altro destinatario o non numerica fallisce chiusa. Il JSON espone solo GUID e maschere, non il CSV grezzo che contiene il nome macchina. `Get-WinEvent -ListLog` fornisce massimo configurato, stato abilitato, dimensione del file, numero di record e modalità del Security log. Due letture da un record forniscono l'età del più vecchio e l'ampiezza dello storico, senza includere tempi assoluti o contenuti. La misura puntuale non dimostra la durata futura né il recupero da bookmark.
 
 Il probe Security usa `Get-WinEvent` e `auditpol` in sola lettura. Parsea l'XML ma porta nell'output solo i nomi di campo da un elenco fisso, GUID pubblici, maschere e conteggi; errori e risposte grezze non sono stampati. Distingue eventi assenti, schema incompleto, policy senza i bit richiesti ed errore di lettura. `system_audit_policy_enabled` è `yes`, `no` o `unknown`: una sottocategoria elencata non basta da sola a dimostrare l'abilitazione. Eccezioni per utente e valori degli account richiedono verifiche controllate separate.
 

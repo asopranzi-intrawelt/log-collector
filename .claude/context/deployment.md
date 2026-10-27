@@ -5,16 +5,16 @@ generated-date: 2026-09-30
 covers-paths:
   - config/**
   - docs/handoff-sviluppo-collettore.md
-last-verified-commit: 9ea6e3ee8b771257a6a90ff53d2553bb6aebe0da
+last-verified-commit: 0232d8f46893503a31de8a88bc1f01ccf4404b08
 ---
 
 # Deployment
 
 ## Bundle Windows non distribuito, 27/10/2026
 
-Il probe pubblicato nel bundle ha nel diff corrente un gate aggiuntivo: legge policy effettiva e dimensione massima configurata del Security log, senza cambiare la macchina. Il minimo candidato di 256 MB è una configurazione da confermare con il volume osservato; non garantisce il replay dopo un fermo. Un errore di permessi su `auditpol /get`, come il 1314 sul PC di sviluppo, produce stato non verificabile. Nessuna esecuzione sul pilota o installazione del servizio.
+Il probe pubblicato legge policy effettiva e dimensione massima configurata del Security log, senza cambiare la macchina. Nel diff corrente misura anche dimensione del file, numero di record, modalità del canale, età del record più vecchio e ampiezza dello storico. Il minimo candidato di 256 MB è da confermare con il volume osservato; nemmeno l'età dello storico garantisce il replay dopo un fermo futuro. Un errore di permessi su `auditpol /get`, come il 1314 sul PC di sviluppo, produce stato non verificabile. Nessuna esecuzione sul pilota o installazione del servizio.
 
-Il bundle candidato aggiunge un probe Security da lanciare soltanto sul pilota autorizzato, con accesso sufficiente al canale: la sua uscita non contiene identità né contenuto degli eventi. Un codice 0 qualifica solo presenza dei GUID e schema dei sei ID campionati, non l'abilitazione della policy, il filtro sugli account reali o l'esercizio. Il servizio e il probe non sono stati distribuiti.
+Il bundle candidato include un probe Security da lanciare soltanto sul pilota autorizzato, con accesso sufficiente al canale: la sua uscita non contiene identità né contenuto degli eventi. Un codice 0 qualifica GUID, bit della policy di sistema, dimensione massima configurata e schema dei sei ID campionati; non qualifica filtro sugli account reali, durata futura del log o esercizio. Il servizio e il probe non sono stati distribuiti.
 
 Il candidato Fluent Bit Windows 5.1.3 è generato localmente per ciascun nome macchina con `bin/ads-render-windows.py`; la destinazione con le identità AdS reali `DOMINIO/utente` deve essere privata. I file `fluent-bit.conf` e `ads.lua` e la CA pubblica appartengono alla configurazione del pilota, ma la CA non è inclusa nel bundle. La prova con il binario Windows ha consegnato tre eventi e un heartbeat sintetici a un ricevitore TLS locale; il test Debian 13 ne ha verificato lo smistamento e la conservazione dei domini. Una prova locale separata ha recuperato un chunk dopo riavvio con input `dummy` e ricevitore inizialmente assente. Prima di installare il servizio: nomina ed elenco approvati, valori e grafie esatti dei domini sui campioni Security, certificato con SAN corrispondente, ACL del buffer, monitor della saturazione, consegna alla VM e replay degli eventi Security dopo fermo. Nessuna modifica a Windows o a NinjaOne eseguita.
 

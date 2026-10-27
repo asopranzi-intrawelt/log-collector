@@ -1,5 +1,13 @@
 # Work-log
 
+## 2026-10-27 - Misura senza contenuto dello storico Security
+
+Ripresa su `0232d8f`, pubblicato dall'utente e coincidente con `origin/main`; albero pulito. Il probe Windows legge in sola lettura `FileSize`, `RecordCount` e `LogMode` dal canale Security, poi il record più vecchio e il più recente con `Get-WinEvent -MaxEvents 1`, usando `-Oldest` sul primo. Riporta soltanto età e intervallo in ore, non timestamp assoluti, identità, XML o messaggi. Un log vuoto e orari incoerenti sono `incomplete`; letture non riuscite sono `read_error`. Uno storico breve resta una misura, senza soglia di recupero inventata. Nessun host pilota è stato interrogato; il recupero da bookmark e i volumi di esercizio restano aperti.
+
+Tredici prove sintetiche del probe e 27 prove Windows mirate passano, con Ruff e schede rigorose verdi. Una mutazione controllata ha tolto `-Oldest`: la prova sull'età è fallita perché riceveva un record recente; il sorgente è stato ripristinato con SHA-256 verificato. La documentazione nello studio e nell'handoff distingue la misura dalla capacità futura. Nessun cambio di sorgenti o stato ISO nella rete. `chiudi -SoloControlli` termina con «Controlli verdi» e stage vuoto. Aggiornati probe, test, studio, handoff, cinque schede, indice, work-log e note private; Git, deploy e interventi sugli host restano dell'utente.
+
+**Template:** nessuna.
+
 ## 2026-10-27 - Policy di sistema e capacità del Security log
 
 L'utente ha pubblicato il probe Security `0286195`; `origin/main` coincideva. Durante il giro la sessione del template ha pubblicato `9ea6e3e` con otto file propri, senza sovrapposizione con il diff del probe. Le cinque schede sono state confrontate con il codice e ancorate al nuovo HEAD. La rete è a `2c859ed`, uguale al remoto, con modifiche parallele su sito e memoria; non è stata scritta perché questo giro non ha attivato una sorgente né cambiato ISO-30.
