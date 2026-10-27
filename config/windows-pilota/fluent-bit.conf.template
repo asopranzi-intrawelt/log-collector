@@ -1,0 +1,62 @@
+[SERVICE]
+    Flush                     5
+    Log_Level                 info
+    storage.path              @@RUNTIME_DIR@@/storage
+    storage.sync              full
+
+[INPUT]
+    Name                      winevtlog
+    Tag                       ads.win
+    Channels                  Security
+    DB                        @@RUNTIME_DIR@@/winevtlog.sqlite
+    Read_Existing_Events      false
+    Event_Data_As_Map         true
+    Event_Template_Cache_Size 256
+    Event_Query               @@EVENT_QUERY@@
+    storage.type              filesystem
+
+[INPUT]
+    Name                      dummy
+    Tag                       ads.hb
+    Dummy                     {"message":"heartbeat"}
+    Interval_Sec              3600
+    storage.type              filesystem
+
+[FILTER]
+    Name                      lua
+    Match                     ads.win
+    Script                    ads.lua
+    Call                      ads
+
+[OUTPUT]
+    Name                      syslog
+    Match                     ads.win
+    Host                      @@COLLECTOR_HOST@@
+    Port                      6514
+    Mode                      tcp
+    tls                       on
+    tls.verify                on
+    tls.verify_hostname       on
+    tls.ca_file               @@CA_FILE@@
+    Syslog_Format             rfc5424
+    Syslog_Hostname_Key       Computer
+    Syslog_Hostname_Preset    @@COMPUTER_NAME@@
+    Syslog_Appname_Preset     ads-win
+    Syslog_Message_Key        message
+    Retry_Limit               no_limits
+
+[OUTPUT]
+    Name                      syslog
+    Match                     ads.hb
+    Host                      @@COLLECTOR_HOST@@
+    Port                      6514
+    Mode                      tcp
+    tls                       on
+    tls.verify                on
+    tls.verify_hostname       on
+    tls.ca_file               @@CA_FILE@@
+    Syslog_Format             rfc5424
+    Syslog_Hostname_Preset    @@COMPUTER_NAME@@
+    Syslog_Appname_Preset     ads-heartbeat
+    Syslog_Message_Key        message
+    Retry_Limit               no_limits

@@ -57,96 +57,26 @@ Regola per il campo "Data e ora": il collettore scrive **sempre due tempi**, ric
 3. **NTP**: `w32tm /config /manualpeerlist:"ntp1.inrim.it,0x8 ntp2.inrim.it,0x8" /syncfromflags:manual /update`.
 
 ### 3.2 Installazione
-- Pacchetto **ZIP** da `packages.fluentbit.io`, versione fissata, verifica SHA-256 contro l'hash pubblicato, estrazione in `C:\Program Files\fluent-bit`.
-- Servizio: `sc.exe create fluent-bit binpath= "\"C:\Program Files\fluent-bit\bin\fluent-bit.exe\" -c \"C:\Program Files\fluent-bit\conf\fluent-bit.conf\"" start= auto` come LocalSystem. [V] La lettura del canale Security richiede privilegi amministrativi (docs.fluentbit.io).
-- **Versione**: deve includere `event_data_as_map`. [V] Il parametro è documentato nella pagina corrente del plugin e restituisce EventData come mappa con nomi di campo; non compare nella documentazione 4.0. **[Non verificato]** la versione minima: fissare l'ultima stabile al momento del pilota.
-- Custom Fields NinjaOne: `adsAccounts` (testo, elenco separato da virgole), `adsCollector` (host:porta), certificato CA in campo secure. Lo script genera la query e la config dai campi e riavvia il servizio solo se il file cambia.
+- Pacchetto **ZIP** da `packages.fluentbit.io`, versione fissata, verifica SHA-256 contro l'hash pubblicato, estrazione in `C:\Program Files\fluent-bit`. Il candidato verificato è 5.1.3; il bundle di configurazione si genera separatamente con `bin/ads-render-windows.py`.
+- Il bundle compilato va in `C:\ProgramData\fluent-bit\conf\` insieme alla CA pubblica; il binario resta in `C:\Program Files\fluent-bit\bin\`. La registrazione come servizio LocalSystem è ancora da eseguire e collaudare sul pilota autorizzato: il canale Security richiede privilegi amministrativi ([documentazione Windows di Fluent Bit](https://docs.fluentbit.io/manual/installation/downloads/windows)).
+- **Versione**: 5.1.3 include `event_data_as_map`, verificato con il binario Windows. La documentazione 4.1 non elenca il parametro: il campione Linux 4.1.1 non qualifica il mittente Windows.
+- Distribuzione NinjaOne ancora da realizzare: il bundle generato localmente va trasferito solo sul pilota autorizzato, insieme alla CA pubblica. L'eventuale uso di Custom Fields e il riavvio condizionale del servizio non sono implementati.
 
-### 3.3 Configurazione (template)
+### 3.3 Configurazione candidata del pilota
+
+La fonte di configurazione è `config/windows-pilota/`, compilata da `bin/ads-render-windows.py` in un bundle privato per ciascun computer. Il generatore legge `collettore.fqdn` e `ads.elenco_approvato` da `config/parametri.yaml`, rifiuta l'elenco vuoto, i duplicati e i nomi che potrebbero alterare la query XPath. Il bundle contiene `fluent-bit.conf` e `ads.lua`; nessun nome reale degli AdS va nel repository. Il parametro `--computer-name` è il nome effettivo del pilota, usato anche nell'heartbeat. La destinazione non deve esistere e, se è dentro il repository, deve stare in `_notes/`.
+
+```powershell
+python bin/ads-render-windows.py --parametri config/parametri.yaml --computer-name <NOME_PILOTA> --destinazione _notes/windows-pilota/<NOME_PILOTA>
 ```
-[SERVICE]
-    Flush          5
-    Log_Level      info
-    storage.path   C:\ProgramData\fluent-bit\storage
-    storage.sync   full
 
-[INPUT]
-    Name                       winevtlog
-    Tag                        ads.win
-    Channels                   Security
-    DB                         C:\ProgramData\fluent-bit\winevtlog.sqlite
-    Event_Data_As_Map          true
-    Event_Template_Cache_Size  256
-    storage.type               filesystem
-    Event_Query                <QueryList><Query Id="0" Path="Security"><Select Path="Security">*[System[(EventID=4624 or EventID=4625 or EventID=4634 or EventID=4647 or EventID=4648)]] and *[EventData[(Data[@Name='TargetUserName']='__ADS1__' or Data[@Name='TargetUserName']='__ADS2__')]]</Select><Select Path="Security">*[System[(EventID=1102 or EventID=4719 or EventID=4720 or EventID=4732 or EventID=4733)]]</Select></Query></QueryList>
+Il candidato è fissato a Fluent Bit Windows **5.1.3**, ZIP `fluent-bit-5.1.3-win64.zip`, SHA-256 `2a06c1a3c0ecddc970f50486a94a775b54fa28bf2ebe42c57a325511d33c0bb5`, verificato sul download ufficiale il 27/10. Le [istruzioni Windows e il checksum](https://docs.fluentbit.io/manual/installation/downloads/windows) sono del produttore; la [scheda `winevtlog`](https://docs.fluentbit.io/manual/data-pipeline/inputs/windows-event-log-winevtlog) documenta `event_data_as_map` e `event_template_cache_size` per la serie corrente. La vecchia prova Linux 4.1.1 riguarda solo il trasporto Syslog dell'heartbeat: la [scheda `winevtlog` 4.1](https://docs.fluentbit.io/manual/4.1/data-pipeline/inputs/windows-event-log-winevtlog) non elenca `event_data_as_map`, quindi 4.1.1 non è una versione qualificata per questo filtro Windows.
 
-[INPUT]
-    Name          dummy
-    Tag           ads.hb
-    Dummy         {"message":"heartbeat"}
-    Interval_Sec  3600
-    storage.type  filesystem
+Sul Windows locale il binario 5.1.3 ha superato `--dry-run` sul bundle generato con due account fittizi. L'input `winevtlog` su Application ha restituito `EventID`, `Computer`, `TimeCreated`, `EventRecordID` ed `EventData` come mappa; il filtro Lua ha formato un record sintetico con quegli stessi campi. Una query XML della stessa forma è stata accettata da Event Log su Application. Il canale Security non era leggibile dall'account di prova: **nomi dei campi dei suoi eventi, confronto di `TargetUserName`, permessi, backlog, heartbeat e consegna TLS al collettore richiedono ancora il pilota con privilegi e lista approvati**. Non è stato creato un servizio Windows né modificato un audit policy.
 
-[FILTER]
-    Name    lua
-    Match   ads.win
-    script  C:\Program Files\fluent-bit\conf\ads.lua
-    call    ads
+La configurazione usa il bookmark `DB`, `Read_Existing_Events false`, filesystem buffer, TLS con verifica del nome e due output distinti (`ads.win` e `ads.hb`). Il primo avvio parte dalla coda del Security log: l'eventuale recupero storico va progettato con data e base giuridica esplicite. È stato tolto `storage.total_limit_size 500M`: secondo la [documentazione del buffering](https://docs.fluentbit.io/manual/data-pipeline/buffering), quando quel limite si raggiunge Fluent Bit scarta i chunk più vecchi. Spazio del buffer, crescita, saturazione e recupero dopo fermo restano da misurare e allarmare prima dell'esercizio. Il file CA va posto sul pilota in `C:/ProgramData/fluent-bit/conf/ca.pem` con accessi ristretti; il certificato server deve avere nel SAN il nome usato come `Host`.
 
-[OUTPUT]
-    Name                syslog
-    Match               ads.win
-    Host                ${ADS_COLLECTOR}
-    Port                6514
-    Mode                tcp
-    tls                 on
-    tls.verify          on
-    tls.verify_hostname on
-    tls.ca_file         C:\Program Files\fluent-bit\conf\ca.pem
-    Syslog_Format       rfc5424
-    Syslog_Hostname_Key Computer
-    Syslog_Appname_Preset ads-win
-    Syslog_Message_Key  message
-    Retry_Limit         no_limits
-    storage.total_limit_size 500M
-
-[OUTPUT]
-    Name                syslog
-    Match               ads.hb
-    Host                ${ADS_COLLECTOR}
-    Port                6514
-    Mode                tcp
-    tls                 on
-    tls.verify          on
-    tls.verify_hostname      on
-    tls.ca_file         C:\Program Files\fluent-bit\conf\ca.pem
-    Syslog_Format       rfc5424
-    Syslog_Hostname_Preset  ${COMPUTERNAME}
-    Syslog_Appname_Preset   ads-heartbeat
-    Syslog_Message_Key     message
-    Retry_Limit         no_limits
-    storage.total_limit_size 500M
-```
-- La [documentazione ufficiale dell'output Syslog](https://docs.fluentbit.io/manual/4.1/data-pipeline/outputs/syslog) ammette `Mode tcp` o `udp` e abilita TLS separatamente con `tls on`; `Syslog_Message_Key` è obbligatorio. Il precedente `Mode tls` era errato. La [documentazione TLS](https://docs.fluentbit.io/manual/4.1/administration/transport-security) precisa che `tls.verify on` valida il certificato ma `tls.verify_hostname` è disattivato per default: attivarlo esplicitamente per confrontare `Host` con il SAN. La [documentazione dell'input Dummy](https://docs.fluentbit.io/manual/4.1/data-pipeline/inputs/dummy) specifica `Interval_sec`: il modello produce un evento ogni 3600 secondi. La configurazione resta candidata fino alla verifica della versione Windows installata, del nome host interpolato e di un evento completo end-to-end.
-- [V] Senza `DB` il plugin riparte dalla coda a ogni avvio: `DB` è obbligatorio per non perdere eventi durante i riavvii.
-- Il secondo `Select` (log cancellato, criteri modificati, account creati, membri aggiunti/rimossi dai gruppi) non è filtrato per utente: sono eventi rari che rilevano la creazione di amministratori fuori elenco.
-- **[Non verificato]** sensibilità a maiuscole/minuscole del confronto su `TargetUserName` nella query XPath: provare con un account scritto in modo diverso.
-- **[Non verificato]** comportamento con account Entra ID sulle postazioni (formato del nome in `TargetUserName`).
-- `ads.lua` (nomi dei campi da confermare con un giro `-o stdout` nel pilota):
-```lua
-function ads(tag, ts, r)
-  local ed = r["EventData"] or {}
-  r["message"] = string.format("user=%s event=%s logon_type=%s system=%s src_ip=%s time=%s",
-    ed["TargetUserName"] or ed["SubjectUserName"] or "-",
-    tostring(r["EventID"]), ed["LogonType"] or "-",
-    r["Computer"] or "-", ed["IpAddress"] or "-", r["TimeCreated"] or "-")
-  return 1, ts, r
-end
-```
-- **Heartbeat (D6)**: il tag `ads.hb` usa un output separato con `APP-NAME=ads-heartbeat`; il filtro Lua e l'output degli accessi leggono solo `ads.win`. Sul collettore soltanto RFC 5424 ricevuto via TLS dalla lista `sorgenti.windows_pilota` scrive `/var/lib/ads/heartbeats/<IP>/<giorno>.heartbeat`. I marker da UDP, RFC 3164 o IP estranei vanno a `/var/log/ads-heartbeat-rejected/` e non entrano in `/srv/ads/`. Il monitor di silenzio legge il primo percorso. Il client TLS verifica il server; il server rsyslog accetta client anonimi e quindi l'IP è il solo vincolo sul mittente, non una prova crittografica d'identità. Prima dell'attivazione servono lista IP verificata, politica di conservazione e capacità del flusso rifiutato, prova Windows e allarme esterno.
-
-Prova locale del 26/10 con l'immagine ufficiale Fluent Bit **4.1.1**, digest `sha256:2a5cb41f99b7c5f3386bb34d42ce3b19eb47fbef6d93b64c0bd4afe9e6ec389c`: un input `dummy` a un secondo e un output Syslog con `tls.verify_hostname on` hanno consegnato a un ricevitore TLS fittizio un record RFC 5424 con `APP-NAME=ads-heartbeat`, messaggio `heartbeat` preceduto dal BOM UTF-8 e ritorno a capo. Spostando il ricevitore a un IP assente dal SAN, a parità di certificato attendibile, Fluent Bit ha registrato `hostname mismatch (X509 code: 62)` e il ricevitore non ha scritto payload. I 76 byte del primo campione, catturato prima di attivare il controllo del nome ma con la stessa forma di messaggio, sono nella [fixture sintetica](../tests/fixtures/fluent-bit-heartbeat-wire.bin), SHA-256 `44f8850564cc8c9664b939663bd8cec8e0d2ddbe1a8ff83943cda732c29e8ee4`; il test Debian 13 li inoltra al template rsyslog e verifica la lettura D6. Sono prove in container Linux: plugin `winevtlog`, interpolazione del nome Windows, coda dopo un fermo lungo e servizio sul pilota restano non provati.
-
+L'heartbeat (D6) usa un output RFC 5424 con `APP-NAME=ads-heartbeat`, distinto dagli accessi. Sul collettore solo il marker via TLS da un IP presente in `sorgenti.windows_pilota` entra in `/var/lib/ads/heartbeats/`; i marker rifiutati vanno al flusso tecnico. Il server TLS autentica il collettore verso Fluent Bit; il ricevitore rsyslog non autentica crittograficamente il client, quindi l'IP resta un vincolo di rete e non un'identità forte. Per i dettagli della prova del ricevente e della fixture Linux vedi il runbook del componente 5.
 ### 3.4 Monitoraggio NinjaOne
 Condition sul servizio `fluent-bit` non in esecuzione → alert + script di riavvio. Policy di aggiornamento: nuova versione prima sul gruppo pilota.
 

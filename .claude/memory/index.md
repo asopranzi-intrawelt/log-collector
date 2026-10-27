@@ -1,5 +1,9 @@
 # Snapshot di sincronizzazione
 
+## Pilota Windows candidato dopo chiusura manuale, 27/10/2026
+
+Collettore `b09b3ea` pubblicato dall'utente e pulito all'avvio. Nel nuovo diff il bundle Fluent Bit Windows 5.1.3 è compilato soltanto con elenco AdS approvato non vuoto e viene confinato in `_notes` se generato nel progetto. Hash del ZIP ufficiale verificato; binario e Lua provati su Application e record sintetico, query XML accettata su Application. Security non accessibile all'account locale; nessuna installazione o invio alla VM. Rimosso dal candidato il limite di coda che scarterebbe i chunk più vecchi. Lettura VM: mount AdS ext4 e rsyslog attivi, timer assenti; archivio non misurato perché `sudo -n` richiede password. D7, WindTre 89/90 e ISO-30 aperti. Rete `7999a40` con riorganizzazione parallela ancora da riconciliare; nessun Git di scrittura dell'agente.
+
 ## Ritenzione tecnica dei marker rifiutati, 27/10/2026
 
 Collettore `8773aa6` pubblicato; nel diff il motore di ritenzione tecnica Seeweb è condiviso con i marker heartbeat rifiutati tramite wrapper a radici distinte. `--apply` richiede giorni espliciti, le unità sono candidate non installate. I test Linux Seeweb e heartbeat sono verdi, la mutazione della radice heartbeat fa fallire il secondo, e systemd accetta le unità su copie Linux 0644. Nessuna durata, quota, misura sulla VM o allarme esterno è stata approvata o collaudata. La rete `7999a40` è pubblicata con il precedente checkpoint D6 e sito; il riferimento `8773aa6` e ISO-30 in corso sono nel worktree, che nel frattempo ha oltre cento cambi della riorganizzazione documentale. Il vecchio patch di stage è stato rimosso perché obsoleto. Nessun Git di scrittura dell'agente.

@@ -8,11 +8,15 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 8773aa6dfa3708a34b0cd7b3b530aabaeaef2fb3
+last-verified-commit: b09b3ea4a806a4830d088c799dc945e224bf2469
 stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai punti 3 e 7; eventi iLO tecnici separati con ritenzione 90 giorni attiva; catena locale provata in WSL, non installata; D7 bloccato da nomina ed elenco AdS
 ---
 
 # Lavoro in corso
+
+## Bundle del pilota Windows e lettura VM, 27/10/2026
+
+Il commit `b09b3ea` è pubblicato dall'utente e il collettore era pulito all'avvio. Nel nuovo diff un renderer genera la configurazione Fluent Bit 5.1.3 e il filtro Lua soltanto con elenco AdS non vuoto. ZIP ufficiale Windows scaricato nel tmp privato, SHA-256 corrispondente al produttore; `--dry-run`, `winevtlog` su Application e record sintetico Lua riusciti. Query XML di pari forma accettata su Application; Security negato all'account locale, quindi filtro reale e backlog non provati. I test del renderer passano. Lo studio elimina il limite di coda che scarterebbe eventi vecchi; spazio e allarme ancora da dimensionare. Sulla VM, lettura sola del mount ext4 e di rsyslog attivo; timer nightly e silence assenti. `sudo -n find` non ha potuto misurare l'archivio perché richiede password. D7 resta bloccato dall'elenco AdS e dalla politica del secondo flusso NAS; WindTre 89/90 e ISO-30 aperti. La rete conserva una riorganizzazione parallela ampia: riconciliare dopo chiusura del collettore, senza stage globale.
 
 ## Ritenzione dei marker heartbeat rifiutati, 27/10/2026
 

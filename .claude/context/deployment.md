@@ -5,10 +5,16 @@ generated-date: 2026-09-30
 covers-paths:
   - config/**
   - docs/handoff-sviluppo-collettore.md
-last-verified-commit: 8773aa6dfa3708a34b0cd7b3b530aabaeaef2fb3
+last-verified-commit: b09b3ea4a806a4830d088c799dc945e224bf2469
 ---
 
 # Deployment
+
+## Bundle Windows non distribuito, 27/10/2026
+
+Il candidato Fluent Bit Windows 5.1.3 è generato localmente per ciascun nome macchina con `bin/ads-render-windows.py`; la destinazione con i nomi AdS reali deve essere privata. I file `fluent-bit.conf` e `ads.lua` e la CA pubblica appartengono alla configurazione del pilota, ma la CA non è inclusa nel bundle. Prima di installare il servizio: nomina ed elenco approvati, account e IP reali verificati sui campioni Security, certificato con SAN corrispondente, ACL del buffer, monitor della saturazione, consegna e replay dopo fermo. Nessuna modifica a Windows o a NinjaOne eseguita.
+
+Sulla VM il 27/10 `/srv/ads` è montato ext4 e rsyslog è attivo; `ads-nightly.timer` e `ads-silence.timer` non sono caricati. La misura dell'archivio non è riuscita perché l'account SSH non ha sudo senza password. Nessun timer attivato.
 
 ## Chiusura giornaliera AdS candidata, 26/10/2026
 

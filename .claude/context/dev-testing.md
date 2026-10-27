@@ -6,10 +6,14 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 8773aa6dfa3708a34b0cd7b3b530aabaeaef2fb3
+last-verified-commit: b09b3ea4a806a4830d088c799dc945e224bf2469
 ---
 
 # Test di sviluppo
+
+## Pilota Windows candidato, 27/10/2026
+
+Fluent Bit Windows 5.1.3 ZIP ufficiale: SHA-256 verificato, `--version` e `--dry-run` del bundle con due account fittizi riusciti. L'input `winevtlog` su Application ha emesso solo nomi di campi nel probe privato: `EventID`, `Computer`, `EventRecordID`, `TimeCreated` ed `EventData` come mappa. Una query XML con gli stessi predicati è stata accettata da Event Log su Application; Security ha negato la lettura all'account locale. Il filtro Lua del progetto ha formato il messaggio atteso da un record sintetico, anche con script relativo al file di configurazione. `tests/test_render_windows.py` copre elenco vuoto, due account, iniezione XPath, duplicati e destinazione tracciabile. Queste prove non misurano permessi Security, equivalenza degli account reali, coda dopo fermo, TLS al collettore o servizi Windows.
 
 ## Recupero della catena AdS, 26/10/2026
 

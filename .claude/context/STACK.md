@@ -8,10 +8,14 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 8773aa6dfa3708a34b0cd7b3b530aabaeaef2fb3
+last-verified-commit: b09b3ea4a806a4830d088c799dc945e224bf2469
 ---
 
 # Stack applicativo
+
+## Pilota Windows candidato, 27/10/2026
+
+`bin/ads-render-windows.py` genera da parametri privati un bundle per computer con `config/windows-pilota/fluent-bit.conf.template` e `ads.lua`. L'input `winevtlog` e il buffer su filesystem sono fissati a Fluent Bit Windows 5.1.3; gli output Syslog TLS di accessi e heartbeat sono separati. Il renderer richiede elenco AdS approvato e nome del pilota, blocca duplicati e caratteri che possono alterare XPath e non scrive bundle con account reali in percorsi tracciabili. È codice candidato: nessun servizio Windows installato, campo Security o invio alla VM collaudato.
 
 ## Catena notturna AdS, 26/10/2026
 

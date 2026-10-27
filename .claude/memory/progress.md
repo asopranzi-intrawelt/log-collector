@@ -1,5 +1,13 @@
 # Work-log
 
+## 2026-10-27 - Bundle Fluent Bit Windows candidato
+
+Ricevuto il `chiudi` manuale del collettore: `b09b3ea` coincide con il remoto. Il tentativo di leggere i soli metadati di `/srv/ads` sulla VM si è fermato perché `sudo -n` richiede password; mount ext4, rsyslog attivo e timer nightly/silence assenti sono invece verificati in sola lettura. D7 non si completa senza elenco AdS e politica del secondo archivio NAS.
+
+Scaricato in `_notes/tmp` il ZIP ufficiale Fluent Bit Windows 5.1.3; SHA-256 corrisponde alla pagina del produttore. Il binario ha accettato `winevtlog` con `Event_Data_As_Map` e il bundle generato con due account fittizi. Su Application ha restituito i nomi dei campi attesi; un record sintetico è passato nel Lua del progetto. La struttura XML della query è stata accettata su Application; l'account locale non può leggere Security. Implementati renderer e template candidati con rifiuto dell'elenco vuoto, duplicati e caratteri che alterano XPath; cinque prove mirate e Ruff verdi. La quota `storage.total_limit_size 500M` è stata tolta dal candidato perché al limite il produttore scarta gli eventi più vecchi. Coda, spazio, servizio Windows e consegna TLS reale restano da provare. Aggiornati studio, handoff, cinque schede, indice e questo registro; nessun deploy o Git di scrittura.
+
+**Template:** nessuna.
+
 ## 2026-10-27 - Ritenzione dei marker rifiutati preparata
 
 Il motore Seeweb è stato estratto in `bin/ads-technical-retain.sh`; i wrapper Seeweb e heartbeat fissano radici ed etichette separate. Il servizio e timer heartbeat `@.service/.timer` restano candidati, senza durata di default né installazione. Il test Seeweb preesistente resta verde; il test heartbeat verifica ispezione, dry run, cancellazione al confine di una durata fittizia, isolamento da AdS e Seeweb, e rifiuto del link. Su una copia temporanea, sostituire la variabile della radice heartbeat con quella Seeweb rende il test rosso; SHA-256 del sorgente invariato dopo il test. Sintassi Bash e verifica systemd su copie Linux 0644 verdi. Restano misura del volume sulla VM, durata approvata, quota fisica e allarme consegnato.
