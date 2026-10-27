@@ -8,14 +8,14 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: cd8441d2d69e6282c5ef584fcd2f88e52bc28d3e
+last-verified-commit: 5e5bdd141d6ce166930a10094b16b6d955dd3185
 ---
 
 # Stack applicativo
 
 ## Pilota Windows candidato, 27/10/2026
 
-`bin/ads-render-windows.py` genera da parametri privati un bundle per computer con `config/windows-pilota/fluent-bit.conf.template` e `ads.lua`. L'input `winevtlog` e il buffer su filesystem sono fissati a Fluent Bit Windows 5.1.3; gli output Syslog TLS di accessi e heartbeat sono separati. Il renderer richiede elenco AdS approvato e nome del pilota, blocca duplicati e caratteri che possono alterare XPath e non scrive bundle con account reali in percorsi tracciabili. Il binario Windows ha inviato due messaggi sintetici via TLS; la fixture è stata smistata da rsyslog Debian 13 verso AdS e D6. Nessun servizio Windows installato, evento Security o invio alla VM collaudato.
+`bin/ads-render-windows.py` genera da parametri privati un bundle per computer con `config/windows-pilota/fluent-bit.conf.template` e `ads.lua`. L'input `winevtlog` e il buffer su filesystem sono fissati a Fluent Bit Windows 5.1.3; gli output Syslog TLS di accessi e heartbeat sono separati. Il renderer richiede elenco AdS approvato e nome del pilota, blocca duplicati e caratteri che possono alterare XPath. La query considera `TargetUserName` negli accessi e anche `SubjectUserName` per 4648/4672; il Lua distingue attore e credenziali usate. La fixture di 648 byte del binario Windows è stata smistata da rsyslog Debian 13 in tre eventi AdS e un heartbeat D6. Nessun servizio Windows installato, evento Security o invio alla VM collaudato.
 
 ## Catena notturna AdS, 26/10/2026
 

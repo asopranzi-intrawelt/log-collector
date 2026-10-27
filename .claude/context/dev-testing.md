@@ -6,14 +6,14 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: cd8441d2d69e6282c5ef584fcd2f88e52bc28d3e
+last-verified-commit: 5e5bdd141d6ce166930a10094b16b6d955dd3185
 ---
 
 # Test di sviluppo
 
 ## Pilota Windows candidato, 27/10/2026
 
-Fluent Bit Windows 5.1.3 ZIP ufficiale: SHA-256 verificato, `--version` e `--dry-run` del bundle con due account fittizi riusciti. L'input `winevtlog` su Application ha emesso solo nomi di campi nel probe privato: `EventID`, `Computer`, `EventRecordID`, `TimeCreated` ed `EventData` come mappa. Una query XML con gli stessi predicati è stata accettata da Event Log su Application; Security ha negato la lettura all'account locale. Il filtro Lua del progetto ha formato il messaggio atteso da un record sintetico, anche con script relativo al file di configurazione. Un ricevitore TLS locale ha catturato accesso e heartbeat dal binario Windows; SAN errato ha dato zero byte, mentre disattivare solo `tls.verify_hostname` ha ripristinato la consegna. La fixture binaria è passata nel test Debian 13: un accesso AdS, un heartbeat D6 e `observed`. `tests/test_render_windows.py` copre elenco vuoto, due account, iniezione XPath, duplicati e destinazione tracciabile. Queste prove non misurano permessi Security, equivalenza degli account reali, coda dopo fermo, invio alla VM o servizi Windows.
+Fluent Bit Windows 5.1.3 ZIP ufficiale: SHA-256 verificato, `--version` e `--dry-run` del bundle con due account fittizi riusciti. L'input `winevtlog` su Application ha emesso solo nomi di campi nel probe privato: `EventID`, `Computer`, `EventRecordID`, `TimeCreated` ed `EventData` come mappa. La query aggiornata con `TargetUserName` e `SubjectUserName` è stata accettata da Event Log su Application e dal `--dry-run` del bundle; Security ha negato la lettura all'account locale. `tests/windows/prove_wire.py` ha fatto emettere al binario tre eventi sintetici e un heartbeat via TLS; SAN errato ha dato zero byte, mentre disattivare solo `tls.verify_hostname` ha ripristinato la consegna. Il 4648 conserva attore e bersaglio distinti. La fixture di 648 byte è passata nel test Debian 13: tre eventi AdS, un heartbeat D6 e `observed`. Cinque test del renderer e Ruff sono verdi. Queste prove non misurano permessi Security, account omonimi, coda dopo fermo, invio alla VM o servizi Windows.
 
 ## Recupero della catena AdS, 26/10/2026
 

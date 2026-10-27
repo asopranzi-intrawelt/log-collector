@@ -22,11 +22,14 @@ WINDOWS_PATH = re.compile(r"[A-Za-z]:/[A-Za-z0-9_./-]+\Z")
 
 
 def event_query(accounts: list[str]) -> str:
-    """Usa una Select breve per account, più gli eventi di controllo globali."""
-    selected = " or ".join(f"EventID={n}" for n in (4624, 4625, 4634, 4647, 4648))
+    """Seleziona l'account coinvolto come destinatario o come attore dell'evento."""
+    target_ids = " or ".join(f"EventID={n}" for n in (4624, 4625, 4634, 4647, 4648))
+    subject_ids = "EventID=4648 or EventID=4672"
     selects = [
-        f'<Select Path="Security">*[System[({selected})] and '
-        f"EventData[Data[@Name='TargetUserName']='{account}']]</Select>"
+        f'<Select Path="Security">*[(System[({target_ids})] and '
+        f"EventData[Data[@Name='TargetUserName']='{account}']) or "
+        f"(System[({subject_ids})] and "
+        f"EventData[Data[@Name='SubjectUserName']='{account}'])]</Select>"
         for account in accounts
     ]
     global_ids = " or ".join(f"EventID={n}" for n in (1102, 4719, 4720, 4732, 4733))
@@ -43,7 +46,7 @@ def _read_values(path: Path) -> tuple[str, list[str]]:
     if not isinstance(accounts, list) or not accounts:
         raise ValueError("ads.elenco_approvato vuoto: serve l'elenco approvato")
     if any(not ACCOUNT.fullmatch(item) for item in accounts):
-        raise ValueError("ads.elenco_approvato: usare i nomi esatti di TargetUserName")
+        raise ValueError("ads.elenco_approvato: usare i nomi esatti degli account Security")
     if len({item.casefold() for item in accounts}) != len(accounts):
         raise ValueError("ads.elenco_approvato contiene duplicati")
     return host, accounts

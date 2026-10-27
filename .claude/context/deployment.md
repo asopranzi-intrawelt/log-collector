@@ -5,14 +5,14 @@ generated-date: 2026-09-30
 covers-paths:
   - config/**
   - docs/handoff-sviluppo-collettore.md
-last-verified-commit: cd8441d2d69e6282c5ef584fcd2f88e52bc28d3e
+last-verified-commit: 5e5bdd141d6ce166930a10094b16b6d955dd3185
 ---
 
 # Deployment
 
 ## Bundle Windows non distribuito, 27/10/2026
 
-Il candidato Fluent Bit Windows 5.1.3 è generato localmente per ciascun nome macchina con `bin/ads-render-windows.py`; la destinazione con i nomi AdS reali deve essere privata. I file `fluent-bit.conf` e `ads.lua` e la CA pubblica appartengono alla configurazione del pilota, ma la CA non è inclusa nel bundle. La prova con il binario Windows ha consegnato due messaggi sintetici a un ricevitore TLS locale, e il test Debian 13 ha verificato lo smistamento dei loro byte. Prima di installare il servizio: nomina ed elenco approvati, account e IP reali verificati sui campioni Security, certificato con SAN corrispondente, ACL del buffer, monitor della saturazione, consegna alla VM e replay dopo fermo. Nessuna modifica a Windows o a NinjaOne eseguita.
+Il candidato Fluent Bit Windows 5.1.3 è generato localmente per ciascun nome macchina con `bin/ads-render-windows.py`; la destinazione con i nomi AdS reali deve essere privata. I file `fluent-bit.conf` e `ads.lua` e la CA pubblica appartengono alla configurazione del pilota, ma la CA non è inclusa nel bundle. La prova con il binario Windows ha consegnato tre eventi e un heartbeat sintetici a un ricevitore TLS locale; il test Debian 13 ne ha verificato lo smistamento. Prima di installare il servizio: nomina ed elenco approvati, corrispondenza di nome e dominio degli account sui campioni Security, certificato con SAN corrispondente, ACL del buffer, monitor della saturazione, consegna alla VM e replay dopo fermo. Nessuna modifica a Windows o a NinjaOne eseguita.
 
 Sulla VM il 27/10 `/srv/ads` è montato ext4 e rsyslog è attivo; `ads-nightly.timer` e `ads-silence.timer` non sono caricati. La misura dell'archivio non è riuscita perché l'account SSH non ha sudo senza password. Nessun timer attivato.
 

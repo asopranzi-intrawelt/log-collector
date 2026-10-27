@@ -5,10 +5,11 @@ generated-date: 2026-09-30
 covers-paths:
   - bin/**
   - config/collettore/**
+  - config/windows-pilota/**
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: cd8441d2d69e6282c5ef584fcd2f88e52bc28d3e
+last-verified-commit: 5e5bdd141d6ce166930a10094b16b6d955dd3185
 stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai punti 3 e 7; eventi iLO tecnici separati con ritenzione 90 giorni attiva; catena locale provata in WSL, non installata; D7 bloccato da nomina ed elenco AdS
 ---
 
@@ -16,7 +17,7 @@ stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai p
 
 ## Trasporto Windows provato in locale, 27/10/2026
 
-Il collettore `cd8441d` è pubblicato e pulito alla ripresa. Il binario Fluent Bit Windows 5.1.3 ha inviato accesso e heartbeat sintetici con il Lua del bundle a un ricevitore TLS locale: 262 byte RFC 5424. Con CA attendibile ma `Host` fuori dal SAN, zero byte; disattivando solo la verifica del nome, consegna ripristinata. La fixture è stata inoltrata a rsyslog Debian 13: accesso in AdS, heartbeat nel file D6, report `observed`. Il test completo è verde. Restano Security con account approvati, servizio sul pilota, buffer e replay, ricezione sulla VM e allarme esterno. La rete `6ed90d1` ha nel worktree l'allineamento al commit `cd8441d` e ISO-30 in corso; solo l'utente ne farà il versionamento. WindTre 89/90 e D7 restano aperti.
+Il collettore `5e5bdd1` è pubblicato e pulito alla ripresa. Nel nuovo diff la query Security include l'attore del 4648 e il destinatario del 4672; il Lua distingue attore e credenziali usate. Il binario Fluent Bit Windows 5.1.3 ha inviato tre eventi e un heartbeat sintetici a un TLS locale: 648 byte RFC 5424. Con CA attendibile ma `Host` fuori dal SAN, zero byte; disattivando solo la verifica del nome, consegna ripristinata. La fixture è passata in rsyslog Debian 13: tre eventi in AdS, heartbeat in D6, report `observed`. Query XML accettata su Application e `--dry-run` verde; Security resta non leggibile dall'account locale. Da verificare omonimie di dominio, servizio sul pilota, buffer e replay, ricezione sulla VM e allarme esterno. La rete `6ed90d1` ha nel worktree l'allineamento al commit pubblicato `5e5bdd1` e ISO-30 in corso; solo l'utente ne farà il versionamento. WindTre 89/90 e D7 restano aperti.
 
 ## Bundle del pilota Windows e lettura VM, 27/10/2026
 

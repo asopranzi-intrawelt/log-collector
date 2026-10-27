@@ -46,6 +46,9 @@ def test_query_per_account_e_controlli_globali(tmp_path, params_text):
     selects = ElementTree.fromstring(query).findall(".//Select")
     assert len(selects) == 3
     assert all("TargetUserName" in (item.text or "") for item in selects[:2])
+    assert all("SubjectUserName" in (item.text or "") for item in selects[:2])
+    assert all("EventID=4672" in (item.text or "") for item in selects[:2])
+    assert all("EventID=4648" in (item.text or "") for item in selects[:2])
     assert "ads_a" in selects[0].text
     assert "ads_b" in selects[1].text
     assert "1102" in selects[2].text

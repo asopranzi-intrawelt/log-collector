@@ -96,6 +96,17 @@ def config(host: str, port: int, suffix: str, *, verify_hostname: bool = True) -
         '"TimeCreated":"2026-10-27T08:00:00Z","EventData":'
         '{"TargetUserName":"ads_test","LogonType":"10","IpAddress":"192.0.2.10"}}\n'
         '    Interval_Sec 1\n    storage.type filesystem\n\n'
+        '[INPUT]\n    Name dummy\n    Tag ads.win\n'
+        '    Dummy {"EventID":4648,"Computer":"PILOT-01","EventRecordID":43,'
+        '"TimeCreated":"2026-10-27T08:01:00Z","EventData":'
+        '{"SubjectUserName":"ads_test","TargetUserName":"other_test",'
+        '"IpAddress":"192.0.2.11"}}\n'
+        '    Interval_Sec 1\n    storage.type filesystem\n\n'
+        '[INPUT]\n    Name dummy\n    Tag ads.win\n'
+        '    Dummy {"EventID":4672,"Computer":"PILOT-01","EventRecordID":44,'
+        '"TimeCreated":"2026-10-27T08:02:00Z","EventData":'
+        '{"SubjectUserName":"ads_test"}}\n'
+        '    Interval_Sec 1\n    storage.type filesystem\n\n'
     )
     text = text[:start] + synthetic + text[end:]
     text = text.replace("Interval_Sec              3600", "Interval_Sec              1")
@@ -188,16 +199,22 @@ def run(host: str, suffix: str, *, verify_hostname: bool = True) -> tuple[list[b
 
 positive, positive_log = run("127.0.0.1", "positive")
 lines = [line for stream in positive for line in stream.splitlines(keepends=True)]
-access = next((line for line in lines if b" ads-win " in line and b"ads_test" in line), None)
+access = next((line for line in lines if b' event="4624"' in line and b"ads_test" in line), None)
+explicit = next((line for line in lines if b' event="4648"' in line), None)
+privileged = next((line for line in lines if b' event="4672"' in line), None)
 heartbeat = next(
     (line for line in lines if b" ads-heartbeat " in line and b"heartbeat" in line),
     None,
 )
-if access is None or heartbeat is None:
+if access is None or explicit is None or privileged is None or heartbeat is None:
     raise SystemExit(
         f"mancano i due messaggi: streams={len(positive)}, lines={len(lines)}; "
         f"{positive_log[-500:]}"
     )
+if b'user="ads_test"' not in explicit or b'target_user="other_test"' not in explicit:
+    raise SystemExit("4648 non distingue l'attore dalle credenziali usate")
+if b'user="ads_test"' not in privileged:
+    raise SystemExit("4672 non attribuito all'account destinatario dei privilegi")
 
 negative, negative_log = run("localhost", "wrong-san")
 if any(negative):
@@ -210,8 +227,8 @@ if not any(b" ads-win " in part and b"ads_test" in part for part in control):
     raise SystemExit(f"controllo con verifica nome spenta non consegna: {control_log[-500:]}")
 
 wire = work / "fluent-bit-windows-wire.bin"
-wire.write_bytes(access + heartbeat)
-print(f"ACCESS_LEN={len(access)} HEARTBEAT_LEN={len(heartbeat)}")
+wire.write_bytes(access + explicit + privileged + heartbeat)
+print(f"ACCESS_LEN={len(access) + len(explicit) + len(privileged)} HEARTBEAT_LEN={len(heartbeat)}")
 print(f"WRONG_SAN_PAYLOAD={sum(map(len, negative))} TLS_MISMATCH=True")
 print(f"NAME_CHECK_OFF_PAYLOAD={sum(map(len, control))}")
 print(f"FIXTURE_PRIVATE={wire}")

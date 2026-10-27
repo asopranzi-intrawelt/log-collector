@@ -1,5 +1,13 @@
 # Work-log
 
+## 2026-10-27 - Correzione dell'attore negli eventi Windows
+
+Dopo il `chiudi` manuale, collettore `5e5bdd1` pulito e uguale al remoto. Il worktree della rete `6ed90d1` era già pronto: sei documenti aggiornati a `5e5bdd1`, ISO-30 mantenuto in corso con `IsoRoadmap.py advance`, vista HTML e copie allineate, timeline rigenerata a 244 eventi. Nove file di rete e messaggio privato pronti al `chiudi` manuale dell'utente. Nessun Git di scrittura dell'agente.
+
+La query Windows precedente selezionava 4648 soltanto per `TargetUserName`: secondo Microsoft `SubjectUserName` identifica invece chi richiede la sessione con credenziali esplicite, e in 4672 l'account che riceve privilegi è `SubjectUserName`. Aggiunti i due percorsi al filtro e distinto nel Lua `user` da `target_user` quando cambiano. La query XML sulla forma Application è accettata da Event Log e il bundle da Fluent Bit 5.1.3 `--dry-run`. Il binario ha emesso tre eventi fittizi 4624, 4648, 4672 e un heartbeat via TLS locale; la fixture di 648 byte è passata nel test Debian 13 con tre righe AdS, un marker D6 e report `observed`. La prova negativa SAN e il controllo che disattiva solo il nome restano verdi; cinque prove del renderer e Ruff verdi. Security reale, omonimie fra domini, servizio, buffer/replay, VM e allarme esterno non verificati. Aggiornati renderer, Lua, fixture e test, studio, runbook, handoff, cinque schede, indice e questo work-log. Le schede sono ancorate al commit pubblicato `5e5bdd1`; il diff corrente resta fuori dall'ancora.
+
+**Template:** nessuna.
+
 ## 2026-10-27 - Trasporto Windows e routing AdS/D6 sintetici
 
 Dopo il `chiudi` manuale, collettore `cd8441d` pulito e uguale al remoto. La rete `6ed90d1` era pulita; il suo dossier, ISO-30, timeline e memoria sono stati allineati al commit del bundle Windows senza includere lavoro del sito. Il delta di rete è pronto al `chiudi` dell'utente, senza Git di scrittura dell'agente.

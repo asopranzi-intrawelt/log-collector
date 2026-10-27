@@ -1,2 +1,4 @@
-<14>1 2026-10-27T09:16:37.235356Z PILOT-01 ads-win - - - ﻿user="ads_test" event="4624" logon_type="10" system="PILOT-01" src_ip="192.0.2.10" time="2026-10-27T08:00:00Z" record_id="42"
-<14>1 2026-10-27T09:16:37.235817Z PILOT-01 ads-heartbeat - - - ﻿heartbeat
+<14>1 2026-10-27T09:38:44.610443Z PILOT-01 ads-win - - - ﻿user="ads_test" event="4624" logon_type="10" system="PILOT-01" src_ip="192.0.2.10" time="2026-10-27T08:00:00Z" record_id="42"
+<14>1 2026-10-27T09:38:44.610964Z PILOT-01 ads-win - - - ﻿user="ads_test" event="4648" logon_type="-" system="PILOT-01" src_ip="192.0.2.11" time="2026-10-27T08:01:00Z" record_id="43" target_user="other_test"
+<14>1 2026-10-27T09:38:44.611288Z PILOT-01 ads-win - - - ﻿user="ads_test" event="4672" logon_type="-" system="PILOT-01" src_ip="-" time="2026-10-27T08:02:00Z" record_id="44"
+<14>1 2026-10-27T09:38:44.611526Z PILOT-01 ads-heartbeat - - - ﻿heartbeat
