@@ -26,7 +26,7 @@ sorgenti:                  # elenco atteso per il controllo di silenzio; ilo ide
   windows_pilota: []
   gravityzone: ""         # console GravityZone come sorgente attesa (studio, D9)
 ads:
-  elenco_approvato: []     # BLOCCANTE: account AdS approvati dalla Direzione
+  elenco_approvato: []     # BLOCCANTE: identita' DOMINIO/utente approvate dalla Direzione
   upn_m365: []
 integrita:
   tsa_url: ""              # BLOCCANTE per la marca temporale

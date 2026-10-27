@@ -6,14 +6,14 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 5e5bdd141d6ce166930a10094b16b6d955dd3185
+last-verified-commit: b0ef5991bae4c6e7066da802f2ba1ee35040c43b
 ---
 
 # Test di sviluppo
 
 ## Pilota Windows candidato, 27/10/2026
 
-Fluent Bit Windows 5.1.3 ZIP ufficiale: SHA-256 verificato, `--version` e `--dry-run` del bundle con due account fittizi riusciti. L'input `winevtlog` su Application ha emesso solo nomi di campi nel probe privato: `EventID`, `Computer`, `EventRecordID`, `TimeCreated` ed `EventData` come mappa. La query aggiornata con `TargetUserName` e `SubjectUserName` è stata accettata da Event Log su Application e dal `--dry-run` del bundle; Security ha negato la lettura all'account locale. `tests/windows/prove_wire.py` ha fatto emettere al binario tre eventi sintetici e un heartbeat via TLS; SAN errato ha dato zero byte, mentre disattivare solo `tls.verify_hostname` ha ripristinato la consegna. Il 4648 conserva attore e bersaglio distinti. La fixture di 648 byte è passata nel test Debian 13: tre eventi AdS, un heartbeat D6 e `observed`. Cinque test del renderer e Ruff sono verdi. Queste prove non misurano permessi Security, account omonimi, coda dopo fermo, invio alla VM o servizi Windows.
+Fluent Bit Windows 5.1.3 ZIP ufficiale: SHA-256 verificato, `--version` e `--dry-run` del bundle con identità fittizie `DOMINIO/utente` riusciti. L'input `winevtlog` su Application ha emesso solo nomi di campi nel probe privato: `EventID`, `Computer`, `EventRecordID`, `TimeCreated` ed `EventData` come mappa. La query con nome e dominio nei campi Target e Subject è stata accettata da Event Log su Application e dal `--dry-run` del bundle; Security ha negato la lettura all'account locale. `tests/windows/prove_wire.py` ha fatto emettere al binario tre eventi sintetici e un heartbeat via TLS; SAN errato ha dato zero byte, mentre disattivare solo `tls.verify_hostname` ha ripristinato la consegna. Il 4648 conserva attore e bersaglio con i rispettivi domini. La fixture di 740 byte è passata nel test Debian 13: tre eventi AdS, un heartbeat D6, domini conservati e `observed`. Sei test del renderer e Ruff sono verdi. Togliere il predicato `TargetDomainName` rende rosso il test della query; il sorgente è stato ripristinato con SHA-256 verificato. `tests/windows/prove_backlog.py` ha fermato il binario con un chunk fittizio su disco e il ricevitore TLS spento: dopo il riavvio sono arrivati sia il vecchio record sia uno nuovo, in 18,2 secondi nel giro misurato. Queste prove non misurano permessi Security, grafie dei domini negli eventi reali, bookmark `winevtlog` dopo fermo, invio alla VM, capienza o servizio Windows.
 
 ## Recupero della catena AdS, 26/10/2026
 

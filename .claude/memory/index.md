@@ -2,7 +2,7 @@
 
 ## Trasporto Fluent Bit Windows verificato su dati sintetici, 27/10/2026
 
-Collettore `5e5bdd1` e remoto allineati alla ripresa. Nel diff corrente la query Security include gli AdS in `SubjectUserName` per 4648 e 4672, e il Lua distingue attore da credenziali usate. Il binario Windows 5.1.3 ha emesso tre eventi e un heartbeat sintetici via TLS locale; la fixture di 648 byte è passata in rsyslog Debian 13: tre eventi in AdS e heartbeat D6 `observed`. Le cinque schede coperte dal commit sono state verificate per contenuto e ancorate a `5e5bdd1`; il diff attuale è descritto ma non ancora pubblicato. Rete `6ed90d1` allineata nel worktree a `5e5bdd1` con ISO-30 in corso; chiusura manuale dell'utente. Security reale, omonimie di dominio, buffer e replay, VM e allarme esterno restano aperti, così come D7 e WindTre 89/90.
+Collettore `b0ef599` e remoto allineati alla ripresa. Nel diff corrente il renderer richiede `DOMINIO/utente`, la query Security confronta nome e dominio nei campi Target o Subject secondo l'evento, e il Lua conserva i domini di attore e bersaglio. Il binario Windows 5.1.3 ha emesso tre eventi e un heartbeat sintetici via TLS locale; la fixture di 740 byte è passata in rsyslog Debian 13: tre eventi in AdS con dominio e heartbeat D6 `observed`. Il binario ha anche ripreso un chunk fittizio dopo un arresto con ricevitore assente, ma bookmark Security e capienza restano da provare. Le cinque schede coperte dal commit sono state verificate per contenuto e ancorate a `b0ef599`; il diff attuale è descritto ma non ancora pubblicato. Rete `6ed90d1` allineata nel worktree a `b0ef599` con ISO-30 in corso; chiusura manuale dell'utente. Security reale, grafie dei domini, VM e allarme esterno restano aperti, così come D7 e WindTre 89/90.
 
 ## Pilota Windows candidato dopo chiusura manuale, 27/10/2026
 
@@ -467,7 +467,7 @@ Propagazione rete completata: integrazione, memoria, contesto, timeline e resume
 
 ```
 Branch attivo:        main
-Commit di riferimento: 5e5bdd1
+Commit di riferimento: b0ef599
 Data snapshot:        2026-10-27
 Albero autorevole:    unico
 Remoto:               git@github-corp:asopranzi-intrawelt/log-collector.git (primo push di 9ee87b4 il 2026-09-30)
@@ -478,11 +478,11 @@ Template:             E:\template-claude-developing @ ffcbdb3
 
 | Scheda | last-verified | Stato |
 |---|---|---|
-| STACK.md | 5e5bdd1 | query e bundle Windows 5.1.3 descritti |
-| design-and-security.md | 5e5bdd1 | soggetti, dominio, TLS e coda esplicitati |
-| deployment.md | 5e5bdd1 | pilota e timer non installati, gate operativi aperti |
-| dev-testing.md | 5e5bdd1 | tre eventi Windows e D6 smistati su Debian 13 |
-| current-work.md | 5e5bdd1 | stato pubblicato e diff corrente distinti |
+| STACK.md | b0ef599 | query e bundle Windows 5.1.3 descritti |
+| design-and-security.md | b0ef599 | soggetti, dominio, TLS e coda esplicitati |
+| deployment.md | b0ef599 | pilota e timer non installati, gate operativi aperti |
+| dev-testing.md | b0ef599 | tre eventi Windows e D6 smistati su Debian 13 |
+| current-work.md | b0ef599 | stato pubblicato e diff corrente distinti |
 | roadmap.md | 9ee87b4 | solo struttura |
 
 ## Punto di ripresa

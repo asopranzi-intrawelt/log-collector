@@ -9,7 +9,7 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 5e5bdd141d6ce166930a10094b16b6d955dd3185
+last-verified-commit: b0ef5991bae4c6e7066da802f2ba1ee35040c43b
 stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai punti 3 e 7; eventi iLO tecnici separati con ritenzione 90 giorni attiva; catena locale provata in WSL, non installata; D7 bloccato da nomina ed elenco AdS
 ---
 
@@ -17,7 +17,7 @@ stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai p
 
 ## Trasporto Windows provato in locale, 27/10/2026
 
-Il collettore `5e5bdd1` è pubblicato e pulito alla ripresa. Nel nuovo diff la query Security include l'attore del 4648 e il destinatario del 4672; il Lua distingue attore e credenziali usate. Il binario Fluent Bit Windows 5.1.3 ha inviato tre eventi e un heartbeat sintetici a un TLS locale: 648 byte RFC 5424. Con CA attendibile ma `Host` fuori dal SAN, zero byte; disattivando solo la verifica del nome, consegna ripristinata. La fixture è passata in rsyslog Debian 13: tre eventi in AdS, heartbeat in D6, report `observed`. Query XML accettata su Application e `--dry-run` verde; Security resta non leggibile dall'account locale. Da verificare omonimie di dominio, servizio sul pilota, buffer e replay, ricezione sulla VM e allarme esterno. La rete `6ed90d1` ha nel worktree l'allineamento al commit pubblicato `5e5bdd1` e ISO-30 in corso; solo l'utente ne farà il versionamento. WindTre 89/90 e D7 restano aperti.
+Il collettore `b0ef599` è pubblicato e pulito alla ripresa. Nel nuovo diff il renderer richiede `DOMINIO/utente` e la query Security confronta nome e dominio per gli eventi selezionati, compresi attore del 4648 e destinatario del 4672. Il Lua conserva attore e credenziali usate con i rispettivi domini. Il binario Fluent Bit Windows 5.1.3 ha inviato tre eventi e un heartbeat sintetici a un TLS locale: 740 byte RFC 5424. Con CA attendibile ma `Host` fuori dal SAN, zero byte; disattivando solo la verifica del nome, consegna ripristinata. La fixture è passata in rsyslog Debian 13: tre eventi in AdS, heartbeat in D6, domini conservati e report `observed`. Query XML accettata su Application e `--dry-run` verde; Security resta non leggibile dall'account locale. Una seconda prova ha fermato il binario con ricevitore assente: il chunk fittizio su disco è arrivato dopo il riavvio insieme a un nuovo record, in 18,2 secondi nel giro misurato. Prima del servizio sul pilota servono grafie effettive dei domini, bookmark `winevtlog` dopo fermo, misura di capienza, ricezione sulla VM e allarme esterno. La rete `6ed90d1` ha nel worktree l'allineamento al commit pubblicato `b0ef599` e ISO-30 in corso; solo l'utente ne farà il versionamento. WindTre 89/90 e D7 restano aperti.
 
 ## Bundle del pilota Windows e lettura VM, 27/10/2026
 

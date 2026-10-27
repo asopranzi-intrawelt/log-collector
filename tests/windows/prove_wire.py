@@ -94,18 +94,20 @@ def config(host: str, port: int, suffix: str, *, verify_hostname: bool = True) -
         '[INPUT]\n    Name dummy\n    Tag ads.win\n'
         '    Dummy {"EventID":4624,"Computer":"PILOT-01","EventRecordID":42,'
         '"TimeCreated":"2026-10-27T08:00:00Z","EventData":'
-        '{"TargetUserName":"ads_test","LogonType":"10","IpAddress":"192.0.2.10"}}\n'
+        '{"TargetUserName":"ads_test","TargetDomainName":"PILOT-01",'
+        '"LogonType":"10","IpAddress":"192.0.2.10"}}\n'
         '    Interval_Sec 1\n    storage.type filesystem\n\n'
         '[INPUT]\n    Name dummy\n    Tag ads.win\n'
         '    Dummy {"EventID":4648,"Computer":"PILOT-01","EventRecordID":43,'
         '"TimeCreated":"2026-10-27T08:01:00Z","EventData":'
-        '{"SubjectUserName":"ads_test","TargetUserName":"other_test",'
+        '{"SubjectUserName":"ads_test","SubjectDomainName":"EXAMPLE",'
+        '"TargetUserName":"other_test","TargetDomainName":"PILOT-01",'
         '"IpAddress":"192.0.2.11"}}\n'
         '    Interval_Sec 1\n    storage.type filesystem\n\n'
         '[INPUT]\n    Name dummy\n    Tag ads.win\n'
         '    Dummy {"EventID":4672,"Computer":"PILOT-01","EventRecordID":44,'
         '"TimeCreated":"2026-10-27T08:02:00Z","EventData":'
-        '{"SubjectUserName":"ads_test"}}\n'
+        '{"SubjectUserName":"ads_test","SubjectDomainName":"EXAMPLE"}}\n'
         '    Interval_Sec 1\n    storage.type filesystem\n\n'
     )
     text = text[:start] + synthetic + text[end:]
@@ -211,9 +213,10 @@ if access is None or explicit is None or privileged is None or heartbeat is None
         f"mancano i due messaggi: streams={len(positive)}, lines={len(lines)}; "
         f"{positive_log[-500:]}"
     )
-if b'user="ads_test"' not in explicit or b'target_user="other_test"' not in explicit:
+if (b'user="ads_test"' not in explicit or b'user_domain="EXAMPLE"' not in explicit
+        or b'target_user="other_test" target_domain="PILOT-01"' not in explicit):
     raise SystemExit("4648 non distingue l'attore dalle credenziali usate")
-if b'user="ads_test"' not in privileged:
+if b'user="ads_test"' not in privileged or b'user_domain="EXAMPLE"' not in privileged:
     raise SystemExit("4672 non attribuito all'account destinatario dei privilegi")
 
 negative, negative_log = run("localhost", "wrong-san")

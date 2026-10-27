@@ -1,5 +1,11 @@
 # Work-log
 
+## 2026-10-27 - Identità AdS qualificate dal dominio
+
+Il `chiudi` manuale ha pubblicato il collettore `b0ef599`, allineato al remoto. La rete `6ed90d1` è stata allineata a quel checkpoint nei suoi nove file di ISO-30, dossier e timeline, senza includere il lavoro del sito; il versionamento della rete resta all'utente. Nel nuovo diff il renderer richiede identità `DOMINIO/utente` e la query Windows confronta insieme nome e dominio di Target o Subject. Il Lua conserva `user_domain` e, per il 4648, le credenziali usate con `target_domain`. Due omonimi fittizi in domini diversi producono filtri distinti; i nomi senza dominio sono rifiutati. Il binario Fluent Bit 5.1.3 ha accettato il bundle e la query XML su Application; ha emesso via TLS tre eventi e un heartbeat fittizi. La fixture di 740 byte ha superato il test integrato Debian 13 con tre eventi AdS, domini conservati e heartbeat D6 `observed`; sei prove renderer e Ruff verdi. La rimozione temporanea del predicato `TargetDomainName` ha fatto fallire il test della query, poi il sorgente è stato ripristinato con SHA-256 verificato e i sei test sono tornati verdi. Una prova locale distinta con `dummy`, ricevitore TLS spento e arresto forzato ha lasciato un chunk su disco: al riavvio, con lo stesso `storage.path`, sono arrivati il record vecchio e uno nuovo, in 18,2 secondi nel giro misurato. Un primo timeout di otto secondi aveva dato un falso negativo: il retry era ancora in coda. Non sono stati letti eventi Security reali, installati servizi o inviati dati alla VM. Valori effettivi dei domini, bookmark Security dopo fermo, capienza e allarme esterno restano il prossimo gate operativo. Aggiornati renderer, Lua, fixture e prove, studio, runbook, handoff, cinque schede, indice, work-log e note private. Nessun Git di scrittura dell'agente.
+
+**Template:** nessuna.
+
 ## 2026-10-27 - Correzione dell'attore negli eventi Windows
 
 Dopo il `chiudi` manuale, collettore `5e5bdd1` pulito e uguale al remoto. Il worktree della rete `6ed90d1` era già pronto: sei documenti aggiornati a `5e5bdd1`, ISO-30 mantenuto in corso con `IsoRoadmap.py advance`, vista HTML e copie allineate, timeline rigenerata a 244 eventi. Nove file di rete e messaggio privato pronti al `chiudi` manuale dell'utente. Nessun Git di scrittura dell'agente.

@@ -39,18 +39,28 @@ def test_senza_elenco_approvato_non_produce_bundle(tmp_path, params_text):
 
 
 def test_query_per_account_e_controlli_globali(tmp_path, params_text):
-    code, dest = run(tmp_path, params(tmp_path, params_text, '["ads_a", "ads_b"]'))
+    code, dest = run(tmp_path, params(tmp_path, params_text, '["PILOT-01/ads_a", "EXAMPLE/ads_a"]'))
     assert code == 0
     conf = (dest / "fluent-bit.conf").read_text(encoding="utf-8")
     query = next(line.split(None, 1)[1] for line in conf.splitlines() if "Event_Query" in line)
     selects = ElementTree.fromstring(query).findall(".//Select")
     assert len(selects) == 3
     assert all("TargetUserName" in (item.text or "") for item in selects[:2])
+    assert all("TargetDomainName" in (item.text or "") for item in selects[:2])
     assert all("SubjectUserName" in (item.text or "") for item in selects[:2])
+    assert all("SubjectDomainName" in (item.text or "") for item in selects[:2])
     assert all("EventID=4672" in (item.text or "") for item in selects[:2])
     assert all("EventID=4648" in (item.text or "") for item in selects[:2])
     assert "ads_a" in selects[0].text
-    assert "ads_b" in selects[1].text
+    assert "PILOT-01" in selects[0].text
+    assert "ads_a" in selects[1].text
+    assert "EXAMPLE" in selects[1].text
+    for item, domain in zip(selects[:2], ("PILOT-01", "EXAMPLE"), strict=True):
+        for role in ("Target", "Subject"):
+            assert (
+                f"Data[@Name='{role}UserName']='ads_a' and "
+                f"Data[@Name='{role}DomainName']='{domain}'"
+            ) in item.text
     assert "1102" in selects[2].text
     assert "TargetUserName" not in selects[2].text
     assert "tls.verify_hostname       on" in conf
@@ -59,20 +69,27 @@ def test_query_per_account_e_controlli_globali(tmp_path, params_text):
 
 
 def test_account_che_inietta_xpath_viene_rifiutato(tmp_path, params_text):
-    bad = '["ads_a\u0027 or 1=1"]'
+    bad = '["PILOT-01/ads_a\u0027 or 1=1"]'
     code, dest = run(tmp_path, params(tmp_path, params_text, bad))
     assert code == 1
     assert not dest.exists()
 
 
 def test_account_duplicato_viene_rifiutato(tmp_path, params_text):
-    code, dest = run(tmp_path, params(tmp_path, params_text, '["ads_a", "ADS_A"]'))
+    duplicate = '["PILOT-01/ads_a", "pilot-01/ADS_A"]'
+    code, dest = run(tmp_path, params(tmp_path, params_text, duplicate))
+    assert code == 1
+    assert not dest.exists()
+
+
+def test_account_senza_dominio_viene_rifiutato(tmp_path, params_text):
+    code, dest = run(tmp_path, params(tmp_path, params_text, '["ads_a"]'))
     assert code == 1
     assert not dest.exists()
 
 
 def test_destinazione_tracciabile_viene_rifiutata(tmp_path, params_text):
-    path = params(tmp_path, params_text, '["ads_a"]')
+    path = params(tmp_path, params_text, '["PILOT-01/ads_a"]')
     dest = render.ROOT / "config" / "windows-pilota" / "bundle-reale"
     code = render.main(
         ["--parametri", str(path), "--computer-name", "PILOT-01", "--destinazione", str(dest)]

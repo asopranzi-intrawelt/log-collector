@@ -6,14 +6,14 @@ covers-paths:
   - bin/**
   - config/**
   - pilot/monitoring-hub/**
-last-verified-commit: 5e5bdd141d6ce166930a10094b16b6d955dd3185
+last-verified-commit: b0ef5991bae4c6e7066da802f2ba1ee35040c43b
 ---
 
 # Design e sicurezza applicativa
 
 ## Confine del pilota Windows, 27/10/2026
 
-Il renderer non emette una configurazione con elenco AdS vuoto, account duplicati o caratteri che possano iniettare XPath; le query sono una `Select` per account più gli eventi di controllo globali. `SubjectUserName` intercetta l'attore del 4648 e il destinatario del 4672, oltre al `TargetUserName` degli accessi; il Lua distingue l'attore dalle credenziali usate. Il confronto per ora usa solo il nome: due account omonimi di domini diversi potrebbero allargare il perimetro, da verificare prima di collegare Security. Il bundle con i nomi reali non va in un percorso tracciabile. `tls.verify_hostname on` autentica il server: con CA attendibile e SAN errato il binario Windows 5.1.3 non ha consegnato byte al ricevitore locale; disattivando solo il controllo del nome li ha consegnati. Il collettore accetta client TLS anonimi e vincola gli heartbeat all'IP ammesso. La coda `storage.total_limit_size 500M` dello studio è stata rimossa perché il produttore documenta lo scarto dei chunk più vecchi al raggiungimento del limite. Disco pieno e Security log sovrascritto restano rischi da misurare e allarmare.
+Il renderer non emette una configurazione con elenco AdS vuoto, identità senza dominio, duplicati o caratteri che possano iniettare XPath; le query sono una `Select` per identità `DOMINIO/utente` più gli eventi di controllo globali. Target e Subject sono confrontati con i rispettivi campi di dominio; il Lua distingue attore e credenziali usate con i domini. Questo evita di includere automaticamente omonimi di un altro dominio, ma un valore o una grafia diversa nei veri eventi Security può far perdere eventi: va campionata prima dell'installazione. Gli eventi globali non sono limitati all'elenco. Il bundle con le identità reali non va in un percorso tracciabile. `tls.verify_hostname on` autentica il server: con CA attendibile e SAN errato il binario Windows 5.1.3 non ha consegnato byte al ricevitore locale; disattivando solo il controllo del nome li ha consegnati. Il collettore accetta client TLS anonimi e vincola gli heartbeat all'IP ammesso. Un chunk fittizio è sopravvissuto all'arresto del binario con ricevitore assente ed è arrivato dopo il riavvio, ma il Syslog TCP non dà una ricevuta applicativa né prova consegna una volta sola. La coda `storage.total_limit_size 500M` dello studio è stata rimossa perché il produttore documenta lo scarto dei chunk più vecchi al raggiungimento del limite. Disco pieno e Security log sovrascritto restano rischi da misurare e allarmare.
 
 ## Limite della catena locale dopo un fermo, 26/10/2026
 
