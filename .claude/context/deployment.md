@@ -5,14 +5,14 @@ generated-date: 2026-09-30
 covers-paths:
   - config/**
   - docs/handoff-sviluppo-collettore.md
-last-verified-commit: b09b3ea4a806a4830d088c799dc945e224bf2469
+last-verified-commit: cd8441d2d69e6282c5ef584fcd2f88e52bc28d3e
 ---
 
 # Deployment
 
 ## Bundle Windows non distribuito, 27/10/2026
 
-Il candidato Fluent Bit Windows 5.1.3 è generato localmente per ciascun nome macchina con `bin/ads-render-windows.py`; la destinazione con i nomi AdS reali deve essere privata. I file `fluent-bit.conf` e `ads.lua` e la CA pubblica appartengono alla configurazione del pilota, ma la CA non è inclusa nel bundle. Prima di installare il servizio: nomina ed elenco approvati, account e IP reali verificati sui campioni Security, certificato con SAN corrispondente, ACL del buffer, monitor della saturazione, consegna e replay dopo fermo. Nessuna modifica a Windows o a NinjaOne eseguita.
+Il candidato Fluent Bit Windows 5.1.3 è generato localmente per ciascun nome macchina con `bin/ads-render-windows.py`; la destinazione con i nomi AdS reali deve essere privata. I file `fluent-bit.conf` e `ads.lua` e la CA pubblica appartengono alla configurazione del pilota, ma la CA non è inclusa nel bundle. La prova con il binario Windows ha consegnato due messaggi sintetici a un ricevitore TLS locale, e il test Debian 13 ha verificato lo smistamento dei loro byte. Prima di installare il servizio: nomina ed elenco approvati, account e IP reali verificati sui campioni Security, certificato con SAN corrispondente, ACL del buffer, monitor della saturazione, consegna alla VM e replay dopo fermo. Nessuna modifica a Windows o a NinjaOne eseguita.
 
 Sulla VM il 27/10 `/srv/ads` è montato ext4 e rsyslog è attivo; `ads-nightly.timer` e `ads-silence.timer` non sono caricati. La misura dell'archivio non è riuscita perché l'account SSH non ha sudo senza password. Nessun timer attivato.
 
@@ -28,7 +28,7 @@ Il job e il verificatore rifiutano directory simboliche nei percorsi dello stato
 
 `ads-silence.service` e `.timer` sono nel repository, non sulla VM: esecuzione alle 00:45 come `ads`, politica privata `/etc/ads/silence-policy.json`, report nel journal e uscita non zero in caso di assenza o errore. Il servizio verifica il mount `/srv/ads` e non apre rete. Chiede 213 giorni retrospettivi, entro la data `active_from` di ciascuna sorgente; oltre quell'orizzonte e senza prova di custodia resta un buco da esaminare. Il ricevente Windows candidato richiede l'IP pilota in `sorgenti.windows_pilota`; i marker non validi finiscono in `/var/log/ads-heartbeat-rejected/`. Per l'esercizio mancano lista e policy approvate, produttore Windows provato, ACL sulla VM, ritenzione del flusso rifiutato e allarme esterno. Il ricevitore QA su mount reale è stato provato solo nel namespace WSL, non sul volume di destinazione.
 
-Il test locale dell'output Fluent Bit 4.1.1 usa un certificato fittizio e rete Docker interna; il SAN è verificato grazie a `tls.verify_hostname on`. Sul pilota vanno fissati versione ZIP e hash, interpolazione del nome `COMPUTERNAME`, certificato CA e SAN reali, persistenza della coda e ricezione durante e dopo un fermo, prima di abilitare l'avvio automatico.
+I test locali dell'output Syslog usano certificati fittizi: Fluent Bit 4.1.1 Linux e 5.1.3 Windows verificano il SAN grazie a `tls.verify_hostname on`. La versione ZIP Windows e l'hash sono fissati nel progetto; sul pilota restano interpolazione del nome macchina, CA e SAN reali, persistenza della coda e ricezione sulla VM durante e dopo un fermo, prima di abilitare l'avvio automatico.
 
 Il servizio candidato `ads-heartbeat-rejected-retain@.service` cancella solo file giornalieri tecnici dopo una durata passata nell'istanza `%i`; il timer candidato gira alle 03:20 con `Persistent=true`. Entrambi restano nel repository. Prima di installarli servono misura del volume reale, durata approvata, prova dei permessi `root:root` e del namespace systemd e un allarme esterno per spazio o fallimento.
 

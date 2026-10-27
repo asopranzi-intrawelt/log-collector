@@ -8,11 +8,15 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: b09b3ea4a806a4830d088c799dc945e224bf2469
+last-verified-commit: cd8441d2d69e6282c5ef584fcd2f88e52bc28d3e
 stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai punti 3 e 7; eventi iLO tecnici separati con ritenzione 90 giorni attiva; catena locale provata in WSL, non installata; D7 bloccato da nomina ed elenco AdS
 ---
 
 # Lavoro in corso
+
+## Trasporto Windows provato in locale, 27/10/2026
+
+Il collettore `cd8441d` è pubblicato e pulito alla ripresa. Il binario Fluent Bit Windows 5.1.3 ha inviato accesso e heartbeat sintetici con il Lua del bundle a un ricevitore TLS locale: 262 byte RFC 5424. Con CA attendibile ma `Host` fuori dal SAN, zero byte; disattivando solo la verifica del nome, consegna ripristinata. La fixture è stata inoltrata a rsyslog Debian 13: accesso in AdS, heartbeat nel file D6, report `observed`. Il test completo è verde. Restano Security con account approvati, servizio sul pilota, buffer e replay, ricezione sulla VM e allarme esterno. La rete `6ed90d1` ha nel worktree l'allineamento al commit `cd8441d` e ISO-30 in corso; solo l'utente ne farà il versionamento. WindTre 89/90 e D7 restano aperti.
 
 ## Bundle del pilota Windows e lettura VM, 27/10/2026
 

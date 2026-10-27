@@ -232,6 +232,11 @@ sleep 1
 # Byte catturati da Fluent Bit 4.1.1: RFC 5424 con PRI 14 e BOM UTF-8 prima del MSG.
 cat /ads-fixtures/fluent-bit-heartbeat-wire.bin \
     | timeout 5 openssl s_client -connect 127.0.0.1:6514 -quiet -CAfile /etc/rsyslog.d/tls/ca.pem >/dev/null 2>&1 || true
+# Due messaggi sintetici emessi dal binario Windows 5.1.3 con il filtro Lua del progetto.
+# Il messaggio di accesso deve entrare in AdS e il marker nel solo segnale D6.
+ads_before_windows=$(wc -l < "$f")
+cat /ads-fixtures/fluent-bit-windows-wire.bin \
+    | timeout 5 openssl s_client -connect 127.0.0.1:6514 -quiet -CAfile /etc/rsyslog.d/tls/ca.pem >/dev/null 2>&1 || true
 python3 - <<PY
 import socket
 import ssl
@@ -253,6 +258,10 @@ rejected=/var/log/ads-heartbeat-rejected/127.0.0.1/$(date +%Y-%m-%d).log
 rejected_unlisted=/var/log/ads-heartbeat-rejected/127.0.0.2/$(date +%Y-%m-%d).log
 [ -f "$hb" ] && [ -f "$rejected" ] && [ -f "$rejected_unlisted" ] || fail "manca il segnale D6 o il flusso tecnico rifiutato"
 grep -qF "$(printf "\357\273\277heartbeat")" "$hb" || fail "heartbeat TLS autorizzato non ricevuto"
+[ "$(wc -l < "$hb")" -eq 2 ] || fail "heartbeat Windows 5.1.3 non ricevuto una volta"
+grep -qF "user=\"ads_test\" event=\"4624\"" "$f" || fail "evento Windows 5.1.3 non entrato nel flusso AdS"
+grep -qF "record_id=\"42\"" "$f" || fail "record ID Windows assente dal flusso AdS"
+[ "$(wc -l < "$f")" -eq "$((ads_before_windows + 1))" ] || fail "numero di accessi Windows inatteso nel flusso AdS"
 grep -qF "heartbeat-udp" "$rejected" || fail "heartbeat UDP non separato"
 grep -qF "heartbeat-3164" "$rejected" || fail "heartbeat RFC 3164 non separato"
 grep -qF "heartbeat-unlisted" "$rejected_unlisted" || fail "heartbeat TLS da IP non autorizzato non separato"
@@ -265,7 +274,7 @@ grep -qF "ads-heartbeat" "$f" && fail "heartbeat entrato nel flusso AdS"
 printf "{\"version\":2,\"sources\":[{\"id\":\"127.0.0.1\",\"signal\":\"daily_heartbeat\",\"active_from\":\"$(date +%Y-%m-%d)\"}]}\n" > /tmp/heartbeat-policy.json
 python3 /ads-bin/ads-silence.py --policy /tmp/heartbeat-policy.json --day "$(date +%Y-%m-%d)" > /tmp/heartbeat-report.json || fail "D6 non vede il heartbeat ricevuto"
 grep -qF "\"status\":\"observed\"" /tmp/heartbeat-report.json || fail "D6 non classifica il segnale come osservato"
-ok "heartbeat: TLS autorizzato osservato da D6, IP estraneo, UDP e RFC 3164 separati, nessuna riga AdS"
+ok "Windows 5.1.3: evento AdS e heartbeat D6 separati; IP estraneo, UDP e RFC 3164 rifiutati"
 
 echo "tutte le verifiche superate"
 '

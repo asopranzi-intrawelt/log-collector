@@ -6,14 +6,14 @@ covers-paths:
   - bin/**
   - config/**
   - pilot/monitoring-hub/**
-last-verified-commit: b09b3ea4a806a4830d088c799dc945e224bf2469
+last-verified-commit: cd8441d2d69e6282c5ef584fcd2f88e52bc28d3e
 ---
 
 # Design e sicurezza applicativa
 
 ## Confine del pilota Windows, 27/10/2026
 
-Il renderer non emette una configurazione con elenco AdS vuoto, account duplicati o caratteri che possano iniettare XPath; le query sono una `Select` per account più gli eventi di controllo globali. Il bundle con i nomi reali non va in un percorso tracciabile. `tls.verify_hostname on` autentica il server; il collettore accetta client TLS anonimi e vincola gli heartbeat all'IP ammesso. La coda `storage.total_limit_size 500M` dello studio è stata rimossa perché il produttore documenta lo scarto dei chunk più vecchi al raggiungimento del limite. Nessuna perdita automatica pianificata equivale a capacità garantita: un disco pieno e un Security log sovrascritto restano rischi da misurare e allarmare.
+Il renderer non emette una configurazione con elenco AdS vuoto, account duplicati o caratteri che possano iniettare XPath; le query sono una `Select` per account più gli eventi di controllo globali. Il bundle con i nomi reali non va in un percorso tracciabile. `tls.verify_hostname on` autentica il server: con CA attendibile e SAN errato il binario Windows 5.1.3 non ha consegnato byte al ricevitore locale; disattivando solo il controllo del nome li ha consegnati. Il collettore accetta client TLS anonimi e vincola gli heartbeat all'IP ammesso. La coda `storage.total_limit_size 500M` dello studio è stata rimossa perché il produttore documenta lo scarto dei chunk più vecchi al raggiungimento del limite. Nessuna perdita automatica pianificata equivale a capacità garantita: un disco pieno e un Security log sovrascritto restano rischi da misurare e allarmare.
 
 ## Limite della catena locale dopo un fermo, 26/10/2026
 

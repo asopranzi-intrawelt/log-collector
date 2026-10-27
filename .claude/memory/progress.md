@@ -1,5 +1,13 @@
 # Work-log
 
+## 2026-10-27 - Trasporto Windows e routing AdS/D6 sintetici
+
+Dopo il `chiudi` manuale, collettore `cd8441d` pulito e uguale al remoto. La rete `6ed90d1` era pulita; il suo dossier, ISO-30, timeline e memoria sono stati allineati al commit del bundle Windows senza includere lavoro del sito. Il delta di rete è pronto al `chiudi` dell'utente, senza Git di scrittura dell'agente.
+
+Il binario Fluent Bit Windows 5.1.3 ha emesso con input `dummy` e Lua del bundle un accesso fittizio e un heartbeat via TLS a un ricevitore locale, per 262 byte RFC 5424. Con CA attendibile e `Host localhost` fuori dal SAN `127.0.0.1`, zero byte e verifica fallita; spegnendo solo `tls.verify_hostname`, consegna ripristinata. La fixture sintetica è ora nel test Debian 13: rsyslog 8.2504 scrive un accesso in `/srv/ads/`, due marker nel file D6 e `ads-silence.py` restituisce `observed`; i controlli di rifiuto precedenti restano verdi. Il primo test Debian si era fermato per una virgoletta nell'aggiunta e non aveva misurato il flusso; dopo correzione il test completo è passato. Non sono stati letti eventi Security né inviati dati alla VM reale. Aggiornati fixture e test, studio, runbook, handoff, cinque schede, indice, work-log e note private. Le cinque schede sono state confrontate con il codice e ancorate al commit pubblicato `cd8441d`; il diff corrente resta non verificato dall'ancora.
+
+**Template:** nessuna.
+
 ## 2026-10-27 - Bundle Fluent Bit Windows candidato
 
 Ricevuto il `chiudi` manuale del collettore: `b09b3ea` coincide con il remoto. Il tentativo di leggere i soli metadati di `/srv/ads` sulla VM si è fermato perché `sudo -n` richiede password; mount ext4, rsyslog attivo e timer nightly/silence assenti sono invece verificati in sola lettura. D7 non si completa senza elenco AdS e politica del secondo archivio NAS.

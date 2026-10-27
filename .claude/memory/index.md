@@ -1,5 +1,9 @@
 # Snapshot di sincronizzazione
 
+## Trasporto Fluent Bit Windows verificato su dati sintetici, 27/10/2026
+
+Collettore `cd8441d` e remoto allineati alla ripresa. Nel diff corrente il binario Windows 5.1.3 ha emesso accesso e heartbeat RFC 5424 con il Lua del bundle: il ricevitore TLS locale ha catturato 262 byte, il SAN errato ha bloccato la consegna e il controllo con sola verifica del nome disattivata l'ha ripristinata. La fixture è passata in rsyslog Debian 13: accesso in AdS e heartbeat D6 `observed`. Le cinque schede coperte dal commit sono state verificate per contenuto e ancorate a `cd8441d`; il diff attuale è descritto ma non ancora pubblicato. Rete `6ed90d1` allineata nel worktree a `cd8441d` con ISO-30 in corso; chiusura manuale dell'utente. Security, buffer e replay, VM e allarme esterno restano aperti, così come D7 e WindTre 89/90.
+
 ## Pilota Windows candidato dopo chiusura manuale, 27/10/2026
 
 Collettore `b09b3ea` pubblicato dall'utente e pulito all'avvio. Nel nuovo diff il bundle Fluent Bit Windows 5.1.3 è compilato soltanto con elenco AdS approvato non vuoto e viene confinato in `_notes` se generato nel progetto. Hash del ZIP ufficiale verificato; binario e Lua provati su Application e record sintetico, query XML accettata su Application. Security non accessibile all'account locale; nessuna installazione o invio alla VM. Rimosso dal candidato il limite di coda che scarterebbe i chunk più vecchi. Lettura VM: mount AdS ext4 e rsyslog attivi, timer assenti; archivio non misurato perché `sudo -n` richiede password. D7, WindTre 89/90 e ISO-30 aperti. Rete `7999a40` con riorganizzazione parallela ancora da riconciliare; nessun Git di scrittura dell'agente.
@@ -463,8 +467,8 @@ Propagazione rete completata: integrazione, memoria, contesto, timeline e resume
 
 ```
 Branch attivo:        main
-Commit di riferimento: 213d19b
-Data snapshot:        2026-10-26
+Commit di riferimento: cd8441d
+Data snapshot:        2026-10-27
 Albero autorevole:    unico
 Remoto:               git@github-corp:asopranzi-intrawelt/log-collector.git (primo push di 9ee87b4 il 2026-09-30)
 Template:             E:\template-claude-developing @ ffcbdb3
@@ -474,11 +478,11 @@ Template:             E:\template-claude-developing @ ffcbdb3
 
 | Scheda | last-verified | Stato |
 |---|---|---|
-| STACK.md | 213d19b | D6 pubblicato e catena locale candidata descritta |
-| design-and-security.md | 213d19b | limiti D6 e catena locale esplicitati |
-| deployment.md | 213d19b | timer D6 e notturno non installati |
-| dev-testing.md | 213d19b | D6 pubblicato e ripresa della catena provata in WSL |
-| current-work.md | 213d19b | recupero notturno candidato e gate operativi aperti |
+| STACK.md | cd8441d | bundle Windows 5.1.3 e prova sintetica descritti |
+| design-and-security.md | cd8441d | nome TLS, anonimato client e coda esplicitati |
+| deployment.md | cd8441d | pilota e timer non installati, gate operativi aperti |
+| dev-testing.md | cd8441d | invio Windows locale e smistamento Debian 13 provati |
+| current-work.md | cd8441d | stato pubblicato e diff corrente distinti |
 | roadmap.md | 9ee87b4 | solo struttura |
 
 ## Punto di ripresa

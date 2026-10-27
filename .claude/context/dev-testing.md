@@ -6,14 +6,14 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: b09b3ea4a806a4830d088c799dc945e224bf2469
+last-verified-commit: cd8441d2d69e6282c5ef584fcd2f88e52bc28d3e
 ---
 
 # Test di sviluppo
 
 ## Pilota Windows candidato, 27/10/2026
 
-Fluent Bit Windows 5.1.3 ZIP ufficiale: SHA-256 verificato, `--version` e `--dry-run` del bundle con due account fittizi riusciti. L'input `winevtlog` su Application ha emesso solo nomi di campi nel probe privato: `EventID`, `Computer`, `EventRecordID`, `TimeCreated` ed `EventData` come mappa. Una query XML con gli stessi predicati è stata accettata da Event Log su Application; Security ha negato la lettura all'account locale. Il filtro Lua del progetto ha formato il messaggio atteso da un record sintetico, anche con script relativo al file di configurazione. `tests/test_render_windows.py` copre elenco vuoto, due account, iniezione XPath, duplicati e destinazione tracciabile. Queste prove non misurano permessi Security, equivalenza degli account reali, coda dopo fermo, TLS al collettore o servizi Windows.
+Fluent Bit Windows 5.1.3 ZIP ufficiale: SHA-256 verificato, `--version` e `--dry-run` del bundle con due account fittizi riusciti. L'input `winevtlog` su Application ha emesso solo nomi di campi nel probe privato: `EventID`, `Computer`, `EventRecordID`, `TimeCreated` ed `EventData` come mappa. Una query XML con gli stessi predicati è stata accettata da Event Log su Application; Security ha negato la lettura all'account locale. Il filtro Lua del progetto ha formato il messaggio atteso da un record sintetico, anche con script relativo al file di configurazione. Un ricevitore TLS locale ha catturato accesso e heartbeat dal binario Windows; SAN errato ha dato zero byte, mentre disattivare solo `tls.verify_hostname` ha ripristinato la consegna. La fixture binaria è passata nel test Debian 13: un accesso AdS, un heartbeat D6 e `observed`. `tests/test_render_windows.py` copre elenco vuoto, due account, iniezione XPath, duplicati e destinazione tracciabile. Queste prove non misurano permessi Security, equivalenza degli account reali, coda dopo fermo, invio alla VM o servizi Windows.
 
 ## Recupero della catena AdS, 26/10/2026
 
