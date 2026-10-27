@@ -8,7 +8,7 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 2e57ad97ae6a7c4e06c23ab001c907bb44f87d2e
+last-verified-commit: 8773aa6dfa3708a34b0cd7b3b530aabaeaef2fb3
 ---
 
 # Stack applicativo
@@ -25,7 +25,9 @@ Prima di aggiungere un manifest, il job rilegge e verifica l'intera catena local
 
 `ads-silence.py` legge una politica privata con sorgenti e segnale `daily_event` oppure `daily_heartbeat`; nessun heartbeat reale è ancora prodotto. Il candidato rsyslog ora scrive un marker Windows RFC 5424 via TLS, da IP pilota ammesso, in `/var/lib/ads/heartbeats/<IP>/<giorno>.heartbeat` e respinge gli altri marker in un flusso tecnico. Le unità candidate `ads-silence.service` e `.timer` avviano il controllo alle 00:45, senza installazione. La policy usa `active_from` per sorgente e scandisce fino a 213 giorni locali senza stato mutabile; il report limita le anomalie dettagliate a 100 e conserva il totale. Il ricevitore QA richiede un mount dedicato prima di archiviare i byte; la sua prova su tmpfs WSL non equivale al volume di destinazione.
 
-Il diff corrente aggiunge la fixture binaria del marker emesso da Fluent Bit 4.1.1 e la fa leggere al test Debian 13. Il template Windows nello studio imposta ora `tls.verify_hostname on` su entrambi gli output; una prova locale con certificato fidato e SAN corretto consegna il marker, quella con SAN errato fallisce. Il plugin Windows e il servizio sul pilota restano da collaudare.
+Il commit `8773aa6` aggiunge la fixture binaria del marker emesso da Fluent Bit 4.1.1 e la fa leggere al test Debian 13. Il template Windows nello studio imposta `tls.verify_hostname on` su entrambi gli output; una prova locale con certificato fidato e SAN corretto consegna il marker, quella con SAN errato fallisce. Il plugin Windows e il servizio sul pilota restano da collaudare.
+
+Il candidato per i marker heartbeat rifiutati riusa `bin/ads-technical-retain.sh`, il motore della ritenzione tecnica Seeweb. Due wrapper fissano radici ed etichette distinte; il nuovo servizio e timer `ads-heartbeat-rejected-retain@` restano nel repository, non installati. La durata non ha default: `--apply` richiede `--days N`.
 
 ## Ricezione QA via comando SSH forzato, 23/10/2026
 

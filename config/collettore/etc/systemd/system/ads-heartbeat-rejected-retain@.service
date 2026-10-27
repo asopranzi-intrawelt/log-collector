@@ -1,0 +1,14 @@
+[Unit]
+Description=Scadenza dei marker heartbeat rifiutati dopo %i giorni
+Documentation=file:/opt/ads/bin/ads-heartbeat-rejected-retain.sh
+
+[Service]
+Type=oneshot
+User=root
+Group=root
+ExecStart=/usr/bin/bash /opt/ads/bin/ads-heartbeat-rejected-retain.sh --apply --days %i
+NoNewPrivileges=true
+ProtectSystem=strict
+ReadWritePaths=-/var/log/ads-heartbeat-rejected
+ProtectHome=true
+PrivateTmp=true

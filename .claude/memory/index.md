@@ -1,8 +1,12 @@
 # Snapshot di sincronizzazione
 
+## Ritenzione tecnica dei marker rifiutati, 27/10/2026
+
+Collettore `8773aa6` pubblicato; nel diff il motore di ritenzione tecnica Seeweb è condiviso con i marker heartbeat rifiutati tramite wrapper a radici distinte. `--apply` richiede giorni espliciti, le unità sono candidate non installate. I test Linux Seeweb e heartbeat sono verdi, la mutazione della radice heartbeat fa fallire il secondo, e systemd accetta le unità su copie Linux 0644. Nessuna durata, quota, misura sulla VM o allarme esterno è stata approvata o collaudata. La rete `7999a40` è pubblicata con il precedente checkpoint D6 e sito; il riferimento `8773aa6` e ISO-30 in corso sono nel worktree, che nel frattempo ha oltre cento cambi della riorganizzazione documentale. Il vecchio patch di stage è stato rimosso perché obsoleto. Nessun Git di scrittura dell'agente.
+
 ## Verifica del mittente Fluent Bit e del nome TLS, 26/10/2026
 
-Collettore `2e57ad9` pubblicato dall'utente e allineato al remoto. Nel diff corrente la configurazione candidata Windows abilita `tls.verify_hostname on` per entrambi gli output: Fluent Bit 4.1.1 ha consegnato il marker a un ricevitore TLS di prova con SAN corrispondente e lo ha rifiutato con `hostname mismatch` quando il SAN non corrispondeva. Il test Debian 13 usa una fixture di 76 byte catturata dal vero output Syslog, verifica il routing rsyslog e ottiene `observed` da D6. La prova è Linux sintetica; restano la versione Windows fissata, `winevtlog`, la coda, la VM reale, l'allarme esterno e i gate WindTre 89/90. In rete il delta del checkpoint pubblicato è pronto in nove file, isolato dal lavoro parallelo sul sito mediante patch privata di stage; ISO-30 resta in corso. Aggiornati studio, runbook, handoff, fixture, test Debian, cinque schede e memoria.
+Collettore `8773aa6` pubblicato dall'utente e allineato al remoto. La configurazione candidata Windows abilita `tls.verify_hostname on` per entrambi gli output: Fluent Bit 4.1.1 ha consegnato il marker a un ricevitore TLS di prova con SAN corrispondente e lo ha rifiutato con `hostname mismatch` quando il SAN non corrispondeva. Il test Debian 13 usa una fixture di 76 byte catturata dal vero output Syslog, verifica il routing rsyslog e ottiene `observed` da D6. La prova è Linux sintetica; restano la versione Windows fissata, `winevtlog`, la coda, la VM reale, l'allarme esterno e i gate WindTre 89/90. Le quattro schede coperte dal commit sono state ancorate a `8773aa6` dopo il controllo del contenuto. La rete conserva l'avanzamento in ISO-30 senza dichiararlo completato.
 
 ## Heartbeat Windows ricevuto dal candidato D6, 26/10/2026
 

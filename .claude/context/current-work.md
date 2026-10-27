@@ -8,15 +8,19 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 2e57ad97ae6a7c4e06c23ab001c907bb44f87d2e
+last-verified-commit: 8773aa6dfa3708a34b0cd7b3b530aabaeaef2fb3
 stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai punti 3 e 7; eventi iLO tecnici separati con ritenzione 90 giorni attiva; catena locale provata in WSL, non installata; D7 bloccato da nomina ed elenco AdS
 ---
 
 # Lavoro in corso
 
+## Ritenzione dei marker heartbeat rifiutati, 27/10/2026
+
+In questo diff il motore Seeweb di ispezione e scadenza dei log tecnici è condiviso tramite `ads-technical-retain.sh`, con wrapper distinti per Seeweb e marker heartbeat rifiutati. Due unità systemd candidate sono preparate ma non installate. I test Linux di entrambe le radici sono verdi; una mutazione che sostituisce la radice heartbeat con quella Seeweb fa cadere il test. La verifica systemd su copie Linux 0644 è pulita. Restano durata fondata sui volumi, quota e allarme esterno, pilota Windows e VM reale; ISO-30 e WindTre 89/90 aperti.
+
 ## Fluent Bit e verifica del nome TLS, 26/10/2026
 
-L'utente ha pubblicato il collettore `2e57ad9` e il remoto coincide. Nella rete `3f5d7ff` il checkpoint è propagato in integrazione, timeline e ISO-30 ancora `in_corso`; la patch di stage privata seleziona nove file, comprese le nostre sole sezioni nei quattro file condivisi con il lavoro sul sito, e passa `git apply --cached --check --unidiff-zero`. Nessun Git di scrittura dell'agente. Nel nuovo diff del collettore il test Debian rilegge una fixture sintetica di 76 byte catturata da Fluent Bit 4.1.1 e D6 la classifica `observed`. La configurazione Windows documentata aggiunge `tls.verify_hostname on`: un certificato attendibile con SAN corrispondente ha consegnato il marker, il SAN diverso è stato rifiutato. Restano pilota Windows, VM, ritenzione tecnica e allarme esterno; WindTre 89/90 non sono chiusi.
+L'utente ha pubblicato il collettore `8773aa6` e il remoto coincide. La rete ha pubblicato `7999a40`, che comprende il checkpoint D6 precedente e lavoro parallelo sul sito. Il nuovo riferimento `8773aa6` è stato scritto in integrazione, roadmap e ISO-30, ma una riorganizzazione simultanea della rete ha spostato i dossier e lasciato oltre cento percorsi modificati: il vecchio patch di stage è stato eliminato perché obsoleto e il nuovo diff di rete non va versionato selettivamente finché i percorsi non si stabilizzano. Il test Debian del collettore legge una fixture sintetica di 76 byte catturata da Fluent Bit 4.1.1 e D6 la classifica `observed`; `tls.verify_hostname on` ha respinto un SAN errato. Restano pilota Windows, VM, politica di ritenzione e allarme esterno; WindTre 89/90 non sono chiusi.
 
 ## Ricezione heartbeat Windows candidata, 26/10/2026
 

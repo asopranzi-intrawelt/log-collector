@@ -1,5 +1,9 @@
 # Normalizzazione, retention e capienza del collettore
 
+## Marker heartbeat rifiutati, 27/10/2026
+
+L'archivio tecnico `/var/log/ads-heartbeat-rejected/` ha un meccanismo candidato di ispezione e scadenza che riusa il motore dei log Seeweb con radice separata. La cancellazione richiede `--apply --days N`; nessun valore è preimpostato o attivato sulla VM. Il test Linux su file fittizi verifica il confine dei giorni, l'isolamento dagli originali AdS e Seeweb, il rifiuto dei link e l'assenza di cancellazioni nel dry run. La soglia dell'80% segnala soltanto nel journal; mancano volume reale, limite fisico dell'archivio, durata approvata, allarme ricevuto e verifica del timer sul Debian. Dettaglio nel [runbook della catena](runbook-componente-5-catena.md).
+
 ## Limite logico del ricevitore QA, 22/10/2026
 
 Il ricevitore QA offline del collettore richiede un budget in byte per le voci dell'archivio privato e una riserva minima di byte liberi del filesystem. Su POSIX serializza i writer cooperativi con un lock sulla directory, conta anche i temporanei residui e rifiuta una nuova voce oltre il budget o quando il preflight non lascerebbe la riserva; un retry identico resta riconoscibile. La prova con spazio disponibile controllato verifica il byte al confine e cade se si toglie la guardia. In WSL due processi simultanei con budget logico per un solo evento hanno dato una ricevuta e un rifiuto. Questi controlli non sono una quota del filesystem, non riservano blocchi, non proteggono da altri writer e non inviano allarmi: montaggio, spazio e inode, retention e soglie effettive restano da misurare e collaudare prima di ricevere QA reale. Dettaglio nel [dossier QA](integrazione-log-qa-verifier.md).

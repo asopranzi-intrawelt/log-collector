@@ -5,7 +5,7 @@ generated-date: 2026-09-30
 covers-paths:
   - config/**
   - docs/handoff-sviluppo-collettore.md
-last-verified-commit: 2e57ad97ae6a7c4e06c23ab001c907bb44f87d2e
+last-verified-commit: 8773aa6dfa3708a34b0cd7b3b530aabaeaef2fb3
 ---
 
 # Deployment
@@ -23,6 +23,8 @@ Il job e il verificatore rifiutano directory simboliche nei percorsi dello stato
 `ads-silence.service` e `.timer` sono nel repository, non sulla VM: esecuzione alle 00:45 come `ads`, politica privata `/etc/ads/silence-policy.json`, report nel journal e uscita non zero in caso di assenza o errore. Il servizio verifica il mount `/srv/ads` e non apre rete. Chiede 213 giorni retrospettivi, entro la data `active_from` di ciascuna sorgente; oltre quell'orizzonte e senza prova di custodia resta un buco da esaminare. Il ricevente Windows candidato richiede l'IP pilota in `sorgenti.windows_pilota`; i marker non validi finiscono in `/var/log/ads-heartbeat-rejected/`. Per l'esercizio mancano lista e policy approvate, produttore Windows provato, ACL sulla VM, ritenzione del flusso rifiutato e allarme esterno. Il ricevitore QA su mount reale è stato provato solo nel namespace WSL, non sul volume di destinazione.
 
 Il test locale dell'output Fluent Bit 4.1.1 usa un certificato fittizio e rete Docker interna; il SAN è verificato grazie a `tls.verify_hostname on`. Sul pilota vanno fissati versione ZIP e hash, interpolazione del nome `COMPUTERNAME`, certificato CA e SAN reali, persistenza della coda e ricezione durante e dopo un fermo, prima di abilitare l'avvio automatico.
+
+Il servizio candidato `ads-heartbeat-rejected-retain@.service` cancella solo file giornalieri tecnici dopo una durata passata nell'istanza `%i`; il timer candidato gira alle 03:20 con `Persistent=true`. Entrambi restano nel repository. Prima di installarli servono misura del volume reale, durata approvata, prova dei permessi `root:root` e del namespace systemd e un allarme esterno per spazio o fallimento.
 
 ## Consegna QA ancora fuori dalla VM, 23/10/2026
 

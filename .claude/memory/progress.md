@@ -1,5 +1,19 @@
 # Work-log
 
+## 2026-10-27 - Ritenzione dei marker rifiutati preparata
+
+Il motore Seeweb è stato estratto in `bin/ads-technical-retain.sh`; i wrapper Seeweb e heartbeat fissano radici ed etichette separate. Il servizio e timer heartbeat `@.service/.timer` restano candidati, senza durata di default né installazione. Il test Seeweb preesistente resta verde; il test heartbeat verifica ispezione, dry run, cancellazione al confine di una durata fittizia, isolamento da AdS e Seeweb, e rifiuto del link. Su una copia temporanea, sostituire la variabile della radice heartbeat con quella Seeweb rende il test rosso; SHA-256 del sorgente invariato dopo il test. Sintassi Bash e verifica systemd su copie Linux 0644 verdi. Restano misura del volume sulla VM, durata approvata, quota fisica e allarme consegnato.
+
+Nel repository rete l'utente ha pubblicato `7999a40`, includendo il precedente checkpoint D6 e il lavoro parallelo sul sito. La rete è stata aggiornata nel solo filone D6 a `8773aa6`, con ISO-30 ancora `in_corso`, vista e copie HTML allineate e timeline a 243 eventi. Subito dopo è iniziata una riorganizzazione parallela che ha spostato i dossier e lasciato oltre cento percorsi modificati; il vecchio patch di stage è stato rimosso perché obsoleto e il nuovo diff richiede riconciliazione prima del versionamento. Nessun commit o push dell'agente. File scritti qui: motore e wrapper, unità, test, runbook e handoff esistenti, schede, indice, work-log e note private.
+
+**Template:** nessuna.
+
+## 2026-10-26 - Checkpoint 8773aa6 e stato di esercizio
+
+L'utente ha eseguito `chiudi`: collettore `8773aa6` su `main`, uguale a `origin/main`, albero pulito prima del riallineamento delle schede. Il commit contiene la fixture Fluent Bit 4.1.1 e la verifica esplicita del nome TLS; il contenuto delle quattro schede coperte era già aggiornato, ma le ancore restavano a `2e57ad9`. Ancore portate a `8773aa6` dopo controllo del diff e verifica rigorosa. La VM conserva i componenti 1 e 2 e il flusso iLO operativo; la catena notturna, D6 e Fluent Bit Windows non sono installati. Il delta di rete resta non versionato e va aggiornato al nuovo SHA senza includere il lavoro parallelo del sito. File scritti: quattro schede tecniche, indice, work-log, ripresa privata e messaggio di commit.
+
+**Template:** nessuna.
+
 ## 2026-10-26 - Fluent Bit reale e verifica del nome TLS
 
 L'utente ha pubblicato il collettore `2e57ad9`; `origin/main` coincide. La rete è a `3f5d7ff`: il delta di integrazione, ISO-30 e timeline è pronto, con patch privata che seleziona nove file e lascia fuori le modifiche parallele del sito. Nessun Git di scrittura dell'agente.

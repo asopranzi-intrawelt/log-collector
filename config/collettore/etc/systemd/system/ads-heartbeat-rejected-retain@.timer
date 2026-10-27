@@ -1,0 +1,10 @@
+[Unit]
+Description=Controllo giornaliero della ritenzione dei marker heartbeat rifiutati (%i giorni)
+
+[Timer]
+OnCalendar=*-*-* 03:20:00
+Persistent=true
+Unit=ads-heartbeat-rejected-retain@%i.service
+
+[Install]
+WantedBy=timers.target

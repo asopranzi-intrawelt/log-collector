@@ -16,6 +16,8 @@ Questa configurazione non è installata sulla VM. Prima di abilitarla servono l'
 
 ## Due difetti trovati dalle prove, e corretti
 
+Il motore di ispezione e scadenza dei file tecnici è ora condiviso con i marker heartbeat rifiutati tramite `bin/ads-technical-retain.sh`. Il comando Seeweb, il formato dell'uscita e la relativa unità restano invariati; la prova Linux Seeweb passa dopo il refactor. Una futura installazione dello script Seeweb deve copiare in `/opt/ads/bin/` sia il wrapper `ads-seeweb-technical-retain.sh` sia il motore `ads-technical-retain.sh`, altrimenti il servizio fallisce. Il percorso heartbeat ha uno script e unità propri, descritti nel [runbook della catena](runbook-componente-5-catena.md). Nessuna delle due unità è stata installata o abilitata da questo intervento.
+
 Il primo stava nel modello `AdsLine` dello studio: con `%syslogtag%%msg%` un messaggio RFC 5424, il cui tag non finisce con `:` e il cui testo non comincia con uno spazio, usciva con tag e messaggio fusi. La prova in container `debian:trixie` lo ha mostrato con una riga `prova-udpmessaggio udp`; la forma corretta, `%msg:::sp-if-no-1st-sp%%msg:::drop-last-lf%`, è quella del formato tradizionale di rsyslog, ed è ora anche nello studio.
 
 Il secondo è emerso solo sul collettore vero: da OpenSSH 9.8, e Debian 13 ha la 10.0, i login SSH non li scrive `sshd` ma `sshd-session`, e il filtro sul nome esatto `sshd` li perdeva. La prova in container era verde perché generava il messaggio con `logger -t sshd`, cioè con la stessa ipotesi del codice. Il filtro ora prende ogni nome che comincia con `sshd`, e la prova usa i nomi copiati dal log reale del collettore; rimettendo il filtro vecchio la prova fallisce.
