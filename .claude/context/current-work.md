@@ -9,11 +9,25 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 55af8ca622f277b29e80ac666c46ffae52bdd9ae
+last-verified-commit: f5acb3beb6f4771872d8ebb683d0a27a471061c4
 stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai punti 3 e 7; eventi iLO tecnici separati con ritenzione 90 giorni attiva; catena locale provata in WSL, non installata; D7 bloccato da nomina ed elenco AdS
 ---
 
 # Lavoro in corso
+
+## Preflight statico del pilota Windows, 27/10/2026
+
+Collettore `f5acb3b` e rete `4c48bdf` pubblicati dall'utente, puliti e allineati ai remoti alla ripresa. La rete ha nove file documentali riallineati a `f5acb3b`, ISO-30 ancora in corso, copie ISO aggiornate e timeline a 247 eventi; `chiudi` resta all'utente. Nel nuovo diff il bundle Windows include `ads-windows-pilot-preflight.ps1`: controlla nome della macchina, CA pubblica, TLS e retry per ciascun output, storage, versione 5.1.3 e `--dry-run` con il binario reale. Quattro prove mirate e sei del renderer passano; il probe locale con il vero Fluent Bit 5.1.3 è riuscito. Una mutazione che disabilita il controllo del nome macchina fa fallire il test pertinente; una prova rossa ha rivelato e fatto correggere il controllo TLS per file anziché per output. Nessun servizio, job NinjaOne o collegamento alla VM modificato. Security reale, elenco e nomina AdS, capienza e soglie, comando del servizio, invio alla VM e allarme esterno restano aperti; D7 e WindTre 89/90 non sono chiusi.
+
+Durante la verifica finale la rete è avanzata in parallelo a `162bba0`, già uguale a `origin/main`: quel commit include i nove file di allineamento del collettore e il lavoro ISO della sessione di rete. Il suo worktree contiene ora modifiche parallele su template e sito; il controllo di sicurezza ha fermato ogni ulteriore scrittura dell'agente in quel repository. Non chiedere un altro `chiudi` di rete per questo checkpoint.
+
+Anche nel collettore è iniziato un allineamento parallelo del template: `chiudi -SoloControlli` ora segnala 47 riscontri bloccanti di anonimizzazione nei file del template, mentre i 14 test Windows mirati, Ruff, le schede e il diff di questo intervento passano. Non lanciare `chiudi` globale finché il filone parallelo non ha chiuso i propri riscontri; mantenere distinto il preflight Windows.
+
+L'analisi mirata con gli stessi pattern sui 15 file del checkpoint Windows restituisce zero riscontri bloccanti, zero manuali e nessun file saltato; non sostituisce il controllo globale, che resta rosso per il filone parallelo.
+
+Correzione dopo il `chiudi` manuale fallito: i 47 riscontri globali provenivano da 40 importi normativi nelle skill GRC copiate, quattro importi fittizi nell'autotest dell'anonimizzazione e tre email costruite nei test degli identificativi. Il file privato dei pattern esclude solo la categoria `IMPORTO` sotto il pacchetto GRC, come già previsto dal suo esempio versionato; i sette casi nei test sono stati riscritti con dati fittizi senza perdere le asserzioni. Il controllo globale ora dà zero bloccanti e zero manuali; autotest 22/22 e 31/31. I due paragrafi delle note segnalati da `md-unwrap` sono stati separati e verificati. Ripetere `chiudi -SoloControlli` prima di proporre una nuova chiusura.
+
+La ripetizione di `chiudi -SoloControlli` è verde su tutti i controlli del repository, compresi `md-unwrap`, anonimizzazione e schede; stage vuoto. Il commit resta manuale dell'utente e includerà anche il filone template già presente nell'albero di lavoro.
 
 ## Monitor della coda Windows pubblicato, 27/10/2026
 

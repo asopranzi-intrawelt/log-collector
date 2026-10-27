@@ -6,7 +6,7 @@ covers-paths:
   - bin/**
   - config/**
   - pilot/monitoring-hub/**
-last-verified-commit: 55af8ca622f277b29e80ac666c46ffae52bdd9ae
+last-verified-commit: f5acb3beb6f4771872d8ebb683d0a27a471061c4
 ---
 
 # Design e sicurezza applicativa
@@ -16,6 +16,8 @@ last-verified-commit: 55af8ca622f277b29e80ac666c46ffae52bdd9ae
 Il renderer non emette una configurazione con elenco AdS vuoto, identità senza dominio, duplicati o caratteri che possano iniettare XPath; le query sono una `Select` per identità `DOMINIO/utente` più gli eventi di controllo globali. Target e Subject sono confrontati con i rispettivi campi di dominio; il Lua distingue attore e credenziali usate con i domini. Questo evita di includere automaticamente omonimi di un altro dominio, ma un valore o una grafia diversa nei veri eventi Security può far perdere eventi: va campionata prima dell'installazione. Gli eventi globali non sono limitati all'elenco. Il bundle con le identità reali non va in un percorso tracciabile. `tls.verify_hostname on` autentica il server: con CA attendibile e SAN errato il binario Windows 5.1.3 non ha consegnato byte al ricevitore locale; disattivando solo il controllo del nome li ha consegnati. Il collettore accetta client TLS anonimi e vincola gli heartbeat all'IP ammesso. Un chunk fittizio è sopravvissuto all'arresto del binario con ricevitore assente ed è arrivato dopo il riavvio, ma il Syslog TCP non dà una ricevuta applicativa né prova consegna una volta sola. La coda `storage.total_limit_size 500M` dello studio è stata rimossa perché il produttore documenta lo scarto dei chunk più vecchi al raggiungimento del limite. Disco pieno e Security log sovrascritto restano rischi da misurare e allarmare.
 
 Il controllo di coda candidato richiede tre soglie positive, legge solo metadati e rifiuta directory assente, reparse point e volume non disponibile con codice 3. Nel nuovo diff `-ConfigFile` è richiesto e la sua assenza fallisce senza prompt: `storage.path` viene dalla sezione `[SERVICE]` e non da un percorso predefinito che potrebbe essere vuoto mentre la coda vera cresce. Il conteggio include tutti i file di `storage`, mentre l'anzianità riguarda l'ultima modifica del chunk `.flb` più vecchio: non è il tempo dell'evento né un attestato di consegna. Occorre ancora verificare sul pilota che il file passato sia quello usato dal servizio. Una condition separata deve rilevare il servizio fermo; nessun job o canale d'allarme è installato.
+
+Il preflight Windows candidato rifiuta bundle per un altro computer, CA assente o non CA, verifica TLS disattivata o retry limitato in uno dei due output, versione diversa da 5.1.3 e dry run fallito. Rifiuta file del bundle collegati; è un controllo statico e non dimostra ACL del buffer, identità del server TLS in esercizio, comando del servizio o consegna dei log.
 
 ## Limite della catena locale dopo un fermo, 26/10/2026
 

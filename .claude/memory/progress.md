@@ -1,5 +1,29 @@
 # Work-log
 
+## 2026-10-27 - Chiusura fermata dai controlli e anonimizzazione risolta
+
+L'utente ha eseguito `chiudi` sul collettore, che si è fermato prima del commit: `md-unwrap` segnalava due paragrafi consecutivi senza riga vuota in `current-work.md` e `progress.md`; `Test-Anonymization.py` segnalava 47 riscontri bloccanti. La verifica di ripresa ha trovato 42 modificati e 14 non tracciati rispetto all'impronta precedente, coerenti con il diff già documentato e con il lavoro parallelo del template. Le due righe vuote sono state inserite; `md-unwrap --check` sui due file è verde.
+
+I 47 riscontri erano 40 importi normativi nelle skill GRC copiate, quattro importi fittizi dell'autotest dell'anonimizzazione e tre email costruite nei test degli identificativi. Il pattern privato ora applica soltanto a `.claude/templates/grc-skills/skills/` l'esclusione della categoria `IMPORTO` già prevista dal modello versionato; tutte le altre categorie continuano a essere controllate. L'autotest degli importi costruisce il campione al momento dell'esecuzione; i test email usano un dominio `.example` e un elenco di righe senza separatori ambigui. Il controllo globale trova zero bloccanti e zero manuali, con 40 esclusi dichiarati. Gli autotest passano 22/22 e 31/31; il primo tentativo dell'autotest identità nel sandbox era fallito su WinError 5 prima delle asserzioni, ripetuto fuori sandbox. Nessun file GRC copiato è stato riscritto. Aggiornati pattern privato, tre test/strumenti, contesto, indice, work-log e note private; nessun Git di scrittura dell'agente.
+
+`chiudi -SoloControlli` ripetuto dopo le correzioni: tutti i controlli verdi, stage vuoto. Il messaggio di commit privato copre preflight Windows e template già presenti nell'albero; l'utente eseguirà la chiusura manuale.
+
+**Template:** nessuna.
+
+## 2026-10-27 - Preflight statico del bundle Windows
+
+L'utente ha pubblicato collettore `f5acb3b` e rete `4c48bdf`, puliti e uguali ai remoti. Le cinque schede del collettore sono state rilette e ancorate a `f5acb3b`. La rete ha nove file aggiornati al riferimento pubblicato: ISO-30 resta `in_corso`, copie ISO rigenerate e timeline a 247 eventi; lo stage resta vuoto e il `chiudi` spetta all'utente.
+
+Nel corso della verifica la sessione parallela di rete ha pubblicato `162bba0`, contenente anche i nove file del collettore e il suo lavoro ISO, con `origin/main` coincidente. Sono comparse modifiche nuove a template e sito. Lo script privato di aggiornamento delle note ha rilevato HEAD cambiato e si è fermato prima di scrivere; nessuna ulteriore operazione è stata fatta nel repository di rete. Il suo `chiudi` per questo checkpoint non va ripetuto.
+
+Nello stesso intervallo il collettore ha ricevuto modifiche parallele al template, distinte dal preflight Windows. L'ultimo `chiudi -SoloControlli` fallisce su 47 riscontri di anonimizzazione in test e documenti del template; quattro controlli del preflight, sei del renderer, quattro del monitor, Ruff, schede e diff del proprio filone sono verdi. Non proporre un `chiudi` globale mentre l'altro filone è in questo stato; non correggere in questa sessione i suoi file condivisi.
+
+Usando le stesse funzioni e gli stessi pattern del controllo di progetto sui soli 15 file del checkpoint Windows si ottengono zero riscontri bloccanti o manuali e zero file saltati. È una verifica del perimetro del checkpoint, non una sanatoria dei 47 riscontri globali.
+
+Nel nuovo diff `ads-render-windows.py` copia un preflight PowerShell nel bundle privato. Il controllo rifiuta macchina diversa, CA non valida, TLS o retry indeboliti in ciascun output, versione non 5.1.3 e dry run fallito. Quattro prove del preflight, sei del renderer e quattro del monitor sono verdi. Il test iniziale ha trovato un rifiuto improprio dei file CRLF; il probe col binario reale 5.1.3 ha trovato che il banner su stderr veniva scambiato per fallimento nonostante codice 0. Entrambi corretti e riprovati. Una prova negativa, rossa prima della correzione, ha dimostrato che due `tls.verify_hostname on` nello stesso output potevano mascherare l'assenza nell'altro; il parser ora controlla ogni output separatamente. La mutazione che disabilita il confronto del nome macchina fa fallire l'asserzione pertinente; backup privato creato e verificato prima della mutazione, sorgente ripristinato con SHA-256 dopo. Due tentativi nel sandbox sono esclusi perché pytest riceveva WinError 5 prima di eseguire il test; la prova valida è stata eseguita fuori sandbox. La fixture contiene solo un certificato CA sintetico pubblico. Nessun servizio, job NinjaOne, rete o VM modificato; nome del server TLS, ACL, Security reale, bookmark, capienza, recapito e allarme restano aperti. Aggiornati preflight, renderer, prove, studio, runbook, handoff, cinque schede, indice e note private. Nessun Git di scrittura dell'agente.
+
+**Template:** nessuna.
+
 ## 2026-10-27 - Coda Windows letta dalla configurazione effettiva
 
 L'utente ha pubblicato collettore `55af8ca` e rete `7ab60f4`, puliti e uguali ai remoti. Cinque schede del collettore sono state rilette e ancorate a `55af8ca`. Nove file della rete sono stati aggiornati al monitor pubblicato: ISO-30 resta `in_corso`, copie HTML allineate e timeline generata a 246 eventi; lo stage è vuoto e il `chiudi` resta all'utente.

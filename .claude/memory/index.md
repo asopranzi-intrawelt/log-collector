@@ -1,5 +1,17 @@
 # Snapshot di sincronizzazione
 
+## Preflight statico Windows candidato, 27/10/2026
+
+Collettore `f5acb3b` e rete `4c48bdf` pubblicati e allineati ai remoti alla ripresa. Le cinque schede tecniche del collettore sono state verificate sul codice pubblicato e ancorate a `f5acb3b`. Nove file della rete registrano il nuovo riferimento, ISO-30 resta in corso e la timeline ha 247 eventi; il versionamento è dell'utente. Nel diff corrente il renderer aggiunge al bundle un preflight PowerShell: verifica macchina, CA pubblica, TLS e retry per output, versione 5.1.3 e dry run. Quattordici prove Windows mirate e il binario effettivo sono verdi; togliere la guardia del nome macchina rende rossa la prova pertinente, poi il sorgente è ripristinato con SHA-256. Una prova rossa ha rilevato che due impostazioni TLS nello stesso output potevano mascherare l'assenza nell'altro; il controllo è ora per output. Il preflight è statico: servizio, Security, VM, allarme e soglie reali restano da collaudare. D7 e WindTre 89/90 restano aperti.
+
+Aggiornamento durante il giro: la rete ha pubblicato `162bba0` includendo i nove file di allineamento e lavoro ISO parallelo; `origin/main` coincide. Il worktree di rete è ora occupato dal filone template/sito, quindi nessuna ulteriore scrittura o chiusura di rete è richiesta qui. Resta da chiudere manualmente il solo diff corrente del collettore.
+
+Il collettore ha ricevuto intanto modifiche parallele al template. Il controllo globale `chiudi -SoloControlli` è bloccato da 47 riscontri di anonimizzazione in quel filone; nessun `chiudi` globale va proposto finché non sono risolti. Il preflight Windows ha 14 test mirati verdi, probe binario riuscito, schede e diff verificati.
+
+Dopo il `chiudi` manuale fermato prima del commit, sono stati risolti i 47 riscontri: 40 importi normativi confinati alla categoria `IMPORTO` delle skill GRC nel pattern privato, quattro importi fittizi e tre email di test riscritti. Il controllo globale è pulito; gli autotest del controllo e delle identità passano 22/22 e 31/31. `md-unwrap` sui due file segnalati è verde. Serve la nuova verifica completa `chiudi -SoloControlli` prima della chiusura manuale.
+
+La verifica completa `chiudi -SoloControlli` è ora verde; stage vuoto e HEAD ancora `f5acb3b` al controllo. Il messaggio privato prepara un commit manuale che comprende preflight Windows e allineamento del template.
+
 ## Coda Windows pubblicata e rete riallineata, 27/10/2026
 
 Collettore `55af8ca` e rete `7ab60f4` pubblicati e allineati ai remoti. Il bundle Windows comprende un controllo PowerShell di sola lettura della coda, con soglie obbligatorie e fallimento esplicito quando la misura manca. Due prove sono verdi e la rimozione della soglia byte rende rossa quella pertinente; il binario Fluent Bit 5.1.3 ha prodotto un chunk offline che il controllo ha segnalato e il motore ha poi recuperato. La rete ha nove file di nuovo allineamento a `55af8ca`, ISO-30 in corso, copie ISO verificate e timeline a 246 eventi; solo l'utente farà il `chiudi`. Security reale, misura di capienza, NinjaOne, VM e allarme esterno restano aperti, così come D7 e WindTre 89/90. Cinque schede ancorate al commit pubblicato `55af8ca`.
