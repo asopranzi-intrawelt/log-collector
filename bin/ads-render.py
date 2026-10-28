@@ -33,6 +33,23 @@ DOTTED = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*\.[A-Za-z_][A-Za-z0-9_]*$")
 RSYSLOG_IP_MATCH = re.compile(r"^rsyslog_ip_match\(([^()]*)\)$")
 NFT_UDP_SOURCE_RULE = re.compile(r"^nft_udp_source_rule\(([^()]*)\)$")
 SUFFIX = ".template"
+STRICT_RSYSLOG_PATH = Path("etc/rsyslog.d/10-ads.conf")
+SYSLOG_SOURCE_KEYS = (
+    "firewall_usg_flex",
+    "nebula_switch_ap",
+    "qnap",
+    "ilo",
+    "seeweb_opnsense",
+    "proxmox_host",
+    "windows_pilota",
+)
+ADS_SOURCE_KEYS = (
+    "firewall_usg_flex",
+    "nebula_switch_ap",
+    "qnap",
+    "proxmox_host",
+    "windows_pilota",
+)
 
 
 def _values(value: adsparams.Value) -> list[str]:
@@ -52,8 +69,8 @@ def render_text(text: str, params: adsparams.Params, where: str, errors: list[st
             try:
                 value = adsparams.lookup(params, key)
                 addresses = [str(ipaddress.IPv4Address(item)) for item in _values(value) if item]
-            except (adsparams.ParamsError, ValueError) as exc:
-                errors.append(f"{where}: {key}: indirizzo IPv4 non valido: {exc}")
+            except (adsparams.ParamsError, ValueError):
+                errors.append(f"{where}: {key}: indirizzo IPv4 non valido")
                 return match.group(0)
             return (
                 "ip saddr { " + ", ".join(addresses) + " } udp dport 514 accept"
@@ -68,8 +85,8 @@ def render_text(text: str, params: adsparams.Params, where: str, errors: list[st
             try:
                 value = adsparams.lookup(params, key)
                 addresses = [str(ipaddress.ip_address(item)) for item in _values(value) if item]
-            except (adsparams.ParamsError, ValueError) as exc:
-                errors.append(f"{where}: {key}: indirizzo IP non valido: {exc}")
+            except (adsparams.ParamsError, ValueError):
+                errors.append(f"{where}: {key}: indirizzo IP non valido")
                 return match.group(0)
             return (
                 "(" + " or ".join(f"$fromhost-ip == {json.dumps(ip)}" for ip in addresses) + ")"
@@ -111,6 +128,101 @@ def render_tree(source: Path, params: adsparams.Params) -> tuple[dict[Path, byte
     return files, errors
 
 
+def strict_syslog_addresses(params: adsparams.Params) -> list[str]:
+    """Valida tutte le classi Syslog; restituisce gli IP ammessi nel flusso AdS."""
+    seen: dict[str, str] = {}
+    by_key: dict[str, list[str]] = {}
+    for key in SYSLOG_SOURCE_KEYS:
+        value = adsparams.lookup(params, f"sorgenti.{key}")
+        addresses = [] if value == "" else _values(value)
+        by_key[key] = []
+        for item in addresses:
+            try:
+                address = str(ipaddress.IPv4Address(item))
+            except ValueError:
+                raise adsparams.ParamsError(
+                    f"sorgenti.{key}: indirizzo IPv4 non valido"
+                ) from None
+            if address in seen:
+                raise adsparams.ParamsError(
+                    f"sorgenti.{key}: indirizzo duplicato in sorgenti.{seen[address]}"
+                )
+            seen[address] = key
+            by_key[key].append(address)
+    allowed = [address for key in ADS_SOURCE_KEYS for address in by_key[key]]
+    if not allowed:
+        raise adsparams.ParamsError(
+            "--strict-syslog-sources: elenco delle sorgenti AdS vuoto"
+        )
+    return allowed
+
+
+def strict_rsyslog_conf(conf: str, addresses: list[str]) -> str:
+    """Sostituisce solo il fallback di rete e isola gli accessi locali.
+
+    Le ancore esatte fanno fallire il rendering se il template cambia: la modalita'
+    strict non deve mai ricadere inavvertitamente nel catch-all originale.
+    """
+    old_fallback = '''    } else {
+        action(type="omfile" dynaFile="AdsFile" template="AdsLine"
+               fileOwner="root" fileGroup="ads" fileCreateMode="0640"
+               dirOwner="root" dirGroup="ads" dirCreateMode="0750")
+    }
+}
+
+input(type="imudp"'''
+    match = " or ".join(f"$fromhost-ip == {json.dumps(ip)}" for ip in addresses)
+    new_fallback = f'''    }} else if ({match}) then {{
+        action(type="omfile" dynaFile="AdsFile" template="AdsLine"
+               fileOwner="root" fileGroup="ads" fileCreateMode="0640"
+               dirOwner="root" dirGroup="ads" dirCreateMode="0750")
+    }} else {{
+        action(type="omfile" dynaFile="AdsUnclassifiedFile" template="AdsLine"
+               fileOwner="root" fileGroup="root" fileCreateMode="0640"
+               dirOwner="root" dirGroup="root" dirCreateMode="0750")
+    }}
+}}
+
+# Gli accessi al collettore restano AdS anche quando l'IP locale non e' una sorgente di rete.
+ruleset(name="ads-local") {{
+    if $protocol-version == "1" then {{
+        set $!ads_msg = $syslogtag & " " & $msg;
+    }} else {{
+        set $!ads_msg = $syslogtag & $msg;
+    }}
+    action(type="omfile" dynaFile="AdsFile" template="AdsLine"
+           fileOwner="root" fileGroup="ads" fileCreateMode="0640"
+           dirOwner="root" dirGroup="ads" dirCreateMode="0750")
+}}
+
+input(type="imudp"'''
+    local_call = "    call ads\n}"
+    if conf.count(old_fallback) != 1 or conf.count(local_call) != 1:
+        raise adsparams.ParamsError(
+            "10-ads.conf: struttura del fallback cambiata; strict non generato"
+        )
+    conf = conf.replace(old_fallback, new_fallback, 1)
+    conf = conf.replace(local_call, "    call ads-local\n}", 1)
+    declaration = (
+        'template(name="AdsSeewebTechnicalFile" type="string" '
+        'string="/var/log/ads-seeweb-technical/%fromhost-ip%/'
+        '%$year%-%$month%-%$day%.log")'
+    )
+    if conf.count(declaration) != 1:
+        raise adsparams.ParamsError(
+            "10-ads.conf: template tecnico Seeweb cambiato; strict non generato"
+        )
+    conf = conf.replace(
+        declaration,
+        declaration + '\n# Quarantena tecnica per le sorgenti di rete non censite.\n'
+        'template(name="AdsUnclassifiedFile" type="string" '
+        'string="/var/log/ads-unclassified/%fromhost-ip%/'
+        '%$year%-%$month%-%$day%.log")',
+        1,
+    )
+    return conf
+
+
 def write_tree(files: dict[Path, bytes], destination: Path) -> None:
     """Scrive in una cartella temporanea accanto alla destinazione e la rinomina alla fine."""
     destination.parent.mkdir(parents=True, exist_ok=True)
@@ -131,6 +243,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--parametri", required=True, type=Path, help="percorso di parametri.yaml")
     parser.add_argument("--sorgente", required=True, type=Path, help="cartella dei template")
     parser.add_argument("--destinazione", required=True, type=Path, help="cartella da creare")
+    parser.add_argument(
+        "--strict-syslog-sources",
+        action="store_true",
+        help="isola in un archivio tecnico le sorgenti Syslog di rete non censite",
+    )
     args = parser.parse_args(argv)
 
     if not args.sorgente.is_dir():
@@ -148,7 +265,27 @@ def main(argv: list[str] | None = None) -> int:
         print(f"errore: {exc}", file=sys.stderr)
         return 1
 
+    addresses: list[str] = []
+    if args.strict_syslog_sources:
+        try:
+            addresses = strict_syslog_addresses(params)
+        except adsparams.ParamsError as exc:
+            print(f"errore: {exc}", file=sys.stderr)
+            return 1
+
     files, errors = render_tree(args.sorgente, params)
+    if args.strict_syslog_sources and not errors:
+        try:
+            if STRICT_RSYSLOG_PATH not in files:
+                raise adsparams.ParamsError(
+                    "10-ads.conf assente: strict richiede l'albero collettore"
+                )
+            strict = strict_rsyslog_conf(
+                files[STRICT_RSYSLOG_PATH].decode("utf-8"), addresses
+            )
+            files[STRICT_RSYSLOG_PATH] = strict.encode("utf-8")
+        except adsparams.ParamsError as exc:
+            errors.append(str(exc))
     if errors:
         for line in errors:
             print(f"errore: {line}", file=sys.stderr)

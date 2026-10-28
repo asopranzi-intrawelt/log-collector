@@ -8,10 +8,14 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 87ed83a5a0f6f6cfdf669808363c66e86f0f5826
+last-verified-commit: 68b696c7c11c1152b02748165c7487c2a1dff014
 ---
 
 # Stack applicativo
+
+## Variante strict del ricevitore, 28/10/2026
+
+`bin/ads-render.py --strict-syslog-sources` prepara un ruleset rsyslog con lista IPv4 esplicita per le fonti AdS di rete, deposito tecnico `ads-unclassified` per le altre e ruleset locale separato per gli accessi al collettore. La modalità ordinaria conserva il template corrente. Il nuovo deposito non ha ancora ritenzione e allarme operativi; la variante resta candidata.
 
 ## Inventario dei mittenti AdS, 28/10/2026
 

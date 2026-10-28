@@ -8,11 +8,12 @@ SOURCE = ROOT / "config" / "collettore"
 ADMINS = 'ip_admin_non_msp:\n    - "203.0.113.10"\n    - "203.0.113.11"'
 
 
-def run(tmp_path, params_file, source=SOURCE):
+def run(tmp_path, params_file, source=SOURCE, *, strict=False):
     dest = tmp_path / "out"
-    code = render.main(
-        ["--parametri", str(params_file), "--sorgente", str(source), "--destinazione", str(dest)]
-    )
+    args = ["--parametri", str(params_file), "--sorgente", str(source), "--destinazione", str(dest)]
+    if strict:
+        args.append("--strict-syslog-sources")
+    code = render.main(args)
     return code, dest
 
 
@@ -120,6 +121,83 @@ def test_seeweb_rifiuta_ip_non_valido_senza_scrivere_output(tmp_path, params_tex
     assert code == 1
     assert not dest.exists()
     assert "sorgenti.seeweb_opnsense: indirizzo IPv4 non valido" in capsys.readouterr().err
+
+
+def test_default_conserva_il_fallback_attuale(tmp_path):
+    code, dest = run(tmp_path, FIXTURES / "parametri-completi.yaml")
+    assert code == 0
+    conf = (dest / "etc" / "rsyslog.d" / "10-ads.conf").read_text(encoding="utf-8")
+    assert "AdsUnclassifiedFile" not in conf
+    assert "ads-local" not in conf
+    assert '    call ads\n}' in conf
+    assert '''    } else {
+        action(type="omfile" dynaFile="AdsFile" template="AdsLine"
+               fileOwner="root" fileGroup="ads" fileCreateMode="0640"
+               dirOwner="root" dirGroup="ads" dirCreateMode="0750")
+    }
+}
+
+input(type="imudp"''' in conf
+
+
+def test_strict_separa_sorgenti_note_ignote_e_accessi_locali(tmp_path):
+    code, dest = run(tmp_path, FIXTURES / "parametri-completi.yaml", strict=True)
+    assert code == 0
+    conf = (dest / "etc" / "rsyslog.d" / "10-ads.conf").read_text(encoding="utf-8")
+    for ip in ("192.0.2.1", "192.0.2.2", "192.0.2.3", "192.0.2.4", "192.0.2.5"):
+        assert f'$fromhost-ip == "{ip}"' in conf
+    assert 'dynaFile="AdsUnclassifiedFile"' in conf
+    assert '/var/log/ads-unclassified/%fromhost-ip%' in conf
+    assert 'fileOwner="root" fileGroup="root" fileCreateMode="0640"' in conf
+    assert 'dirOwner="root" dirGroup="root" dirCreateMode="0750"' in conf
+    assert 'ruleset(name="ads-local")' in conf
+    assert '    call ads-local\n}' in conf
+    assert '    call ads\n}' not in conf
+
+
+def test_strict_rifiuta_duplicato_anche_tra_classi(tmp_path, params_text, capsys):
+    path = tmp_path / "params.yaml"
+    path.write_text(
+        params_text.replace('ilo: []', 'ilo: ["192.0.2.1"]'), encoding="utf-8"
+    )
+    code, dest = run(tmp_path, path, strict=True)
+    assert code == 1 and not dest.exists()
+    assert "duplicato in sorgenti.firewall_usg_flex" in capsys.readouterr().err
+
+
+def test_strict_non_stampa_il_valore_ip_errato(tmp_path, params_text, capsys):
+    path = tmp_path / "params.yaml"
+    marker = "SENTINELLA-PRIVATA-DA-NON-STAMPARE"
+    path.write_text(
+        params_text.replace('firewall_usg_flex: "192.0.2.1"', f'firewall_usg_flex: "{marker}"'),
+        encoding="utf-8",
+    )
+    code, dest = run(tmp_path, path, strict=True)
+    err = capsys.readouterr().err
+    assert code == 1 and not dest.exists()
+    assert "sorgenti.firewall_usg_flex: indirizzo IPv4 non valido" in err
+    assert marker not in err
+
+
+def test_strict_rifiuta_ipv6_e_lista_ads_vuota(tmp_path, params_text, capsys):
+    path = tmp_path / "params.yaml"
+    path.write_text(
+        params_text.replace('firewall_usg_flex: "192.0.2.1"', 'firewall_usg_flex: "::1"'),
+        encoding="utf-8",
+    )
+    code, dest = run(tmp_path, path, strict=True)
+    assert code == 1 and not dest.exists()
+    assert "sorgenti.firewall_usg_flex: indirizzo IPv4 non valido" in capsys.readouterr().err
+
+    path.write_text(
+        params_text.replace('firewall_usg_flex: "192.0.2.1"', 'firewall_usg_flex: ""')
+        .replace('nebula_switch_ap: ["192.0.2.2", "192.0.2.3"]', 'nebula_switch_ap: []')
+        .replace('  qnap:\n    - "192.0.2.4"\n    - "192.0.2.5"', '  qnap: []'),
+        encoding="utf-8",
+    )
+    code, dest = run(tmp_path, path, strict=True)
+    assert code == 1 and not dest.exists()
+    assert "elenco delle sorgenti AdS vuoto" in capsys.readouterr().err
 
 
 def test_un_solo_amministratore_scritto_come_scalare(tmp_path, params_text):

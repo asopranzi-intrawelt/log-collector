@@ -6,10 +6,14 @@ covers-paths:
   - bin/**
   - config/**
   - pilot/monitoring-hub/**
-last-verified-commit: 87ed83a5a0f6f6cfdf669808363c66e86f0f5826
+last-verified-commit: 68b696c7c11c1152b02748165c7487c2a1dff014
 ---
 
 # Design e sicurezza applicativa
+
+## Confine opt-in della variante strict, 28/10/2026
+
+Il renderer strict rifiuta IPv4 invalidi, duplicati fra categorie e la lista AdS di rete vuota. Seeweb e iLO conservano le proprie destinazioni tecniche o classificate; gli altri IP di rete non censiti vanno in `ads-unclassified` con permessi `root:root` 0640/0750. L'accesso locale usa un ruleset separato. La configurazione ordinaria resta identica; il deposito tecnico necessita ancora di ritenzione, misura e allarme prima di un uso reale.
 
 ## Confine dei mittenti non censiti, 28/10/2026
 

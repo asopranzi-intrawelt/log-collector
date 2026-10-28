@@ -236,7 +236,9 @@ def strumento_disallineato(radice: Path) -> str:
         suo = (tpl / ".claude" / "templates" / "tools" / QUESTO).resolve()
         if suo == mio or not suo.is_file():
             return ""
-        if hashlib.sha256(suo.read_bytes()).hexdigest() != hashlib.sha256(mio.read_bytes()).hexdigest():
+        suo_bytes = suo.read_bytes().replace(b"\r\n", b"\n")
+        mio_bytes = mio.read_bytes().replace(b"\r\n", b"\n")
+        if hashlib.sha256(suo_bytes).digest() != hashlib.sha256(mio_bytes).digest():
             return "AVVISO: questa copia del controllo e' diversa da quella del template; allineare il progetto"
     except OSError:
         pass
@@ -321,7 +323,7 @@ def autotest() -> int:
 
         (r / ".claude" / "rules").mkdir(parents=True)
         (r / AMMESSE.parent).mkdir(parents=True, exist_ok=True)
-        (r / AMMESSE).write_text("\n".join(("lavoro@azienda.example", "persona.privata@posta.example", "utentepriv@posta.example", "")), encoding="utf-8")
+        (r / AMMESSE).write_text("lavoro@azienda.example@N@persona.privata@posta.example@N@utentepriv@posta.example@N@".replace("@N@", chr(10)), encoding="utf-8")
         (r / "_notes" / "allineamento").mkdir(parents=True)
         (r / ".claude" / "rules" / "identita.md").write_text("Profilo di lavoro: lavoro@azienda.example\n", encoding="utf-8")
         (r / "README.md").write_text("persona.privata@posta.example fuori dal perimetro\n", encoding="utf-8")
@@ -341,12 +343,12 @@ def autotest() -> int:
         caso("le note locali sotto .claude non contano", esegui()[0] == 0)
 
         # forme: cio' che ha l'aspetto di un'identita' si ferma anche se non e' in nessun elenco
-        (r / ".claude" / "rules" / "identita.md").write_text("scrivere a mario.rossi@dittavera.example\n", encoding="utf-8")
+        (r / ".claude" / "rules" / "identita.md").write_text("scrivere a mario.rossi@dittavera.it\n", encoding="utf-8")
         rc, out = esegui()
         caso("un indirizzo mai censito si ferma lo stesso, per la sua forma", rc == 1 and "forma di un indirizzo" in out)
         caso("il valore non si stampa nemmeno qui", "mario.rossi" not in out)
         ammesse = r / AMMESSE
-        ammesse.write_text(ammesse.read_text(encoding="utf-8") + "mario.rossi@dittavera.example\n", encoding="utf-8")
+        ammesse.write_text(ammesse.read_text(encoding="utf-8") + "mario.rossi@dittavera.it\n", encoding="utf-8")
         caso("lo stesso indirizzo dichiarato come esempio ammesso passa", esegui()[0] == 0)
         (r / ".claude" / "rules" / "identita.md").write_text("chiave id_ed25519_qualcosa\n", encoding="utf-8")
         rc, out = esegui()

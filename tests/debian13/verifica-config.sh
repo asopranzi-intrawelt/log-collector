@@ -36,12 +36,20 @@ sed 's/seeweb_opnsense: \[\]/seeweb_opnsense: ["127.0.0.2"]/' "$root/tests/fixtu
 sed 's/windows_pilota: \[\]/windows_pilota: ["127.0.0.1"]/' "$root/tests/fixtures/parametri-completi.yaml" >"$work/parametri-heartbeat.yaml"
 "$py" "$root/bin/ads-render.py" --parametri "$work/parametri-heartbeat.yaml" \
     --sorgente "$root/config/collettore" --destinazione "$work/heartbeat-tree" >/dev/null
+sed -e 's/firewall_usg_flex: "192.0.2.1"/firewall_usg_flex: "127.0.0.2"/' \
+    -e 's/ilo: \[\]/ilo: ["127.0.0.5"]/' \
+    -e 's/seeweb_opnsense: \[\]/seeweb_opnsense: ["127.0.0.4"]/' \
+    "$root/tests/fixtures/parametri-completi.yaml" >"$work/parametri-strict.yaml"
+"$py" "$root/bin/ads-render.py" --parametri "$work/parametri-strict.yaml" \
+    --sorgente "$root/config/collettore" --destinazione "$work/strict-tree" \
+    --strict-syslog-sources >/dev/null
 
 # Su Git Bash il percorso va passato a Docker in forma Windows.
 mount_src=$work/tree
 mount_ilo=$work/ilo-tree
 mount_seeweb=$work/seeweb-tree
 mount_heartbeat=$work/heartbeat-tree
+mount_strict=$work/strict-tree
 mount_bin=$root/bin
 mount_fixtures=$root/tests/fixtures
 if command -v cygpath >/dev/null; then
@@ -49,11 +57,12 @@ if command -v cygpath >/dev/null; then
     mount_ilo=$(cygpath -w "$work/ilo-tree")
     mount_seeweb=$(cygpath -w "$work/seeweb-tree")
     mount_heartbeat=$(cygpath -w "$work/heartbeat-tree")
+    mount_strict=$(cygpath -w "$work/strict-tree")
     mount_bin=$(cygpath -w "$root/bin")
     mount_fixtures=$(cygpath -w "$root/tests/fixtures")
 fi
 
-MSYS_NO_PATHCONV=1 docker run --rm --cap-add NET_ADMIN -v "$mount_src:/tree:ro" -v "$mount_ilo:/ilo-tree:ro" -v "$mount_seeweb:/seeweb-tree:ro" -v "$mount_heartbeat:/heartbeat-tree:ro" -v "$mount_bin:/ads-bin:ro" -v "$mount_fixtures:/ads-fixtures:ro" "$IMAGE" bash -c '
+MSYS_NO_PATHCONV=1 docker run --rm --cap-add NET_ADMIN -v "$mount_src:/tree:ro" -v "$mount_ilo:/ilo-tree:ro" -v "$mount_seeweb:/seeweb-tree:ro" -v "$mount_heartbeat:/heartbeat-tree:ro" -v "$mount_strict:/strict-tree:ro" -v "$mount_bin:/ads-bin:ro" -v "$mount_fixtures:/ads-fixtures:ro" "$IMAGE" bash -c '
 set -euo pipefail
 fail() { echo "FALLITO: $*"; exit 1; }
 ok() { echo "ok  $*"; }
@@ -61,7 +70,7 @@ ok() { echo "ok  $*"; }
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -qq
 apt-get install -y -qq --no-install-recommends nftables openssh-server chrony \
-    unattended-upgrades qemu-guest-agent rsyslog rsyslog-gnutls sudo openssl iproute2 python3-minimal >/dev/null
+    unattended-upgrades qemu-guest-agent rsyslog rsyslog-gnutls sudo openssl iproute2 procps python3-minimal >/dev/null
 ok "pacchetti installabili su $(. /etc/os-release && echo "$PRETTY_NAME")"
 
 nft -c -f /tree/etc/nftables.conf || fail "nft -c rifiuta il ruleset"
@@ -280,6 +289,63 @@ printf "{\"version\":2,\"sources\":[{\"id\":\"127.0.0.1\",\"signal\":\"daily_hea
 python3 /ads-bin/ads-silence.py --policy /tmp/heartbeat-policy.json --day "$(date +%Y-%m-%d)" > /tmp/heartbeat-report.json || fail "D6 non vede il heartbeat ricevuto"
 grep -qF "\"status\":\"observed\"" /tmp/heartbeat-report.json || fail "D6 non classifica il segnale come osservato"
 ok "Windows 5.1.3: tre eventi AdS e heartbeat D6 separati; IP estraneo, UDP e RFC 3164 rifiutati"
+
+# Strict: IP di provenienza del datagramma e non il nome dichiarato decide la destinazione.
+# La prova usa quattro mittenti reali distinti e un accesso locale via /dev/log.
+if [ -f /run/rsyslogd-ads.pid ]; then
+    kill "$(cat /run/rsyslogd-ads.pid)"
+fi
+pkill -x rsyslogd || true
+for i in 1 2 3 4 5 6 7 8 9 10; do [ ! -e /run/rsyslogd-ads.pid ] && break; sleep 0.2; done
+[ -d /etc/rsyslog.d ] || { ls -ld /etc/rsyslog* || true; fail "strict: directory rsyslog.d scomparsa"; }
+install -m 0644 /strict-tree/etc/rsyslog.d/10-ads.conf /etc/rsyslog.d/
+rsyslogd -N1 >/dev/null 2>&1 || { rsyslogd -N1; fail "rsyslogd -N1 rifiuta la variante strict"; }
+rsyslogd -i /run/rsyslogd-ads.pid
+sleep 1
+python3 - <<PY
+import socket
+import time
+
+events = (
+    ("127.0.0.2", b"<134>Oct 28 12:00:00 firewall STRICT_KNOWN_EVENT\n"),
+    ("127.0.0.3", b"<134>Oct 28 12:00:01 usgflex500 STRICT_UNKNOWN_EVENT\n"),
+    ("127.0.0.3", b"<134>1 2026-10-28T12:00:01Z usgflex500 ads-heartbeat - - - STRICT_UNKNOWN_HEARTBEAT\n"),
+    ("127.0.0.4", b"<134>Oct 28 12:00:02 opnsense STRICT_SEEWEB_EVENT\n"),
+    ("127.0.0.5", b"<134>Oct 28 12:00:03 ilo-test iLO5 Browser login: administrator - 192.0.2.73(DNS name not found).\n"),
+)
+for source, payload in events:
+    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sender:
+        sender.bind((source, 0))
+        sender.sendto(payload, ("127.0.0.1", 514))
+    time.sleep(0.1)
+PY
+logger -t sshd-session "STRICT_LOCAL_LOGIN Accepted publickey for admuno"
+day=$(date +%Y-%m-%d)
+known=/srv/ads/127.0.0.2/$day.log
+unknown=/var/log/ads-unclassified/127.0.0.3/$day.log
+unknown_heartbeat=/var/log/ads-heartbeat-rejected/127.0.0.3/$day.log
+seeweb_strict=/var/log/ads-seeweb-technical/127.0.0.4/$day.log
+ilo_strict=/srv/ads/127.0.0.5/$day.log
+for i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15; do
+    [ -f "$known" ] && [ -f "$unknown" ] && [ -f "$unknown_heartbeat" ] &&
+        [ -f "$seeweb_strict" ] && [ -f "$ilo_strict" ] && break
+    sleep 1
+done
+for path in "$known" "$unknown" "$unknown_heartbeat" "$seeweb_strict" "$ilo_strict"; do
+    [ -f "$path" ] || { find /srv/ads /var/log/ads-unclassified /var/log/ads-seeweb-technical /var/log/ads-heartbeat-rejected -type f -print 2>/dev/null || true; ps -C rsyslogd -o pid,state,args; fail "strict: manca $path"; }
+done
+grep -qF "STRICT_KNOWN_EVENT" "$known" || fail "strict: sorgente censita persa"
+grep -qF "STRICT_UNKNOWN_EVENT" "$unknown" || fail "strict: sorgente ignota persa"
+grep -qF "STRICT_UNKNOWN_HEARTBEAT" "$unknown_heartbeat" || fail "strict: heartbeat ignoto non respinto"
+grep -qF "STRICT_SEEWEB_EVENT" "$seeweb_strict" || fail "strict: Seeweb non tecnico"
+grep -qF "iLO5 Browser login:" "$ilo_strict" || fail "strict: accesso iLO perso"
+grep -qF "STRICT_LOCAL_LOGIN" "$f" || fail "strict: accesso locale perso"
+[ ! -e "/srv/ads/127.0.0.3/$day.log" ] || fail "strict: sorgente ignota entrata in AdS"
+grep -R -qF "STRICT_UNKNOWN_EVENT" /srv/ads && fail "strict: evento ignoto presente in AdS"
+grep -R -qF "STRICT_UNKNOWN_HEARTBEAT" /srv/ads && fail "strict: heartbeat ignoto presente in AdS"
+[ "$(stat -c "%U:%G %a" "$unknown")" = "root:root 640" ] || fail "strict: permessi archivio ignoto"
+[ "$(stat -c "%U:%G %a" "$(dirname "$unknown")")" = "root:root 750" ] || fail "strict: permessi directory ignota"
+ok "strict: noto AdS, ignoto quarantena root:root, Seeweb tecnico, iLO e login locale conservati"
 
 echo "tutte le verifiche superate"
 '

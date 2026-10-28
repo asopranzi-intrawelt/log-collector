@@ -1,5 +1,9 @@
 # Snapshot di sincronizzazione
 
+## Ricevitore Syslog strict candidato e archivio VM non leggibile, 28/10/2026
+
+Collettore `7f412d2` e rete `98f270b` pubblicati dall'utente. La sonda SSH di sola lettura ha raggiunto la VM, ma l'account non ha aperto `/srv/ads/`: nessun mittente reale misurato. Il renderer prepara una modalità opt-in che separa sorgenti AdS censite, Seeweb, iLO, accessi locali e mittenti ignoti; non è installata e richiede censimento autorizzato, politica/capienza/allarme della quarantena. La rete registra il gate, con ISO-30 e Cliente-1 89/90 in corso. Il controllo delle identità del template ora confronta copie equivalenti CRLF/LF senza falso avviso; una differenza reale continua a produrlo. I cinque accenti segnalati dal controllo nelle nuove fonti del template e del progetto sono corretti. Git e deploy restano manuali.
+
 ## Risposta Seeweb inviata e preflight mittenti, 28/10/2026
 
 L'utente riferisce di aver inviato il seguito a Seeweb; testo e ricevuta non sono disponibili. Si attende l'IPv4 sorgente e l'esito della verifica del tunnel, senza attivare l'inoltro. Il ricevitore corrente ha un catch-all LAN verso l'archivio AdS, mentre i parametri privati censiscono solo una iLO fra le sorgenti Syslog: restringerlo subito rischierebbe di perdere fonti attive. Il nuovo preflight conta i mittenti AdS senza leggere log o mostrare IP; 14 prove e mutazione mirata passano, ma manca la misura sulla VM. I due dossier Seeweb della rete registrano l'invio riferito dall'utente; i file del sito parallelo restano intatti. Nessun host, servizio o filtro modificato. D7, TSA/WORM, elenco AdS e WindTre 89/90 aperti.

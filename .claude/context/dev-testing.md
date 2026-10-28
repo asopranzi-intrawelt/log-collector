@@ -6,10 +6,14 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 87ed83a5a0f6f6cfdf669808363c66e86f0f5826
+last-verified-commit: 68b696c7c11c1152b02748165c7487c2a1dff014
 ---
 
 # Test di sviluppo
+
+## Variante strict del ricevitore, 28/10/2026
+
+`tests/test_render.py` passa 23/23: comportamento ordinario invariato, IP duplicati/invalidi e lista AdS vuota rifiutati, output degli errori senza valore privato. Il test integrato Debian 13 passa su Docker: `rsyslogd -N1`, quattro IP loopback reali, hostname spoofato, quarantena assente dall'intero albero AdS, Seeweb, iLO, heartbeat rifiutato, login locale e permessi 0640/0750. Una mutazione in memoria che riporta il fallback ignoto verso `AdsFile` fa fallire l'asserzione strict. Ruff e diff check sono verdi. La copia privata reale dei parametri esce con codice 1 per lista AdS vuota e non crea la destinazione. La prova non sostituisce il censimento e il collaudo della VM.
 
 ## Preflight dei mittenti AdS, 28/10/2026
 

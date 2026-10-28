@@ -9,15 +9,19 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 87ed83a5a0f6f6cfdf669808363c66e86f0f5826
+last-verified-commit: 68b696c7c11c1152b02748165c7487c2a1dff014
 stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai punti 3 e 7; eventi iLO tecnici separati con ritenzione 90 giorni attiva; catena locale provata in WSL, non installata; D7 bloccato da nomina ed elenco AdS
 ---
 
 # Lavoro in corso
 
+## Ricevitore strict candidato e accesso VM negato, 28/10/2026
+
+Dopo i commit pubblicati dall'utente `7f412d2` nel collettore e `98f270b` nella rete, il renderer prepara una variante opt-in che separa gli IP di rete AdS censiti, Seeweb, iLO, accessi locali e sorgenti non censite. La sonda SSH di sola lettura ha raggiunto la VM, ma l'account non ha accesso a `/srv/ads/`: nessun mittente reale è stato contato. La variante non è installata; con la lista AdS privata vuota il render strict fallisce. La sessione parallela della rete ha poi pubblicato `678e563`, comprendendo i quattro file aggiornati qui; `origin/main` coincide e il worktree di rete è pulito. Restano inventario autorizzato, verifica delle fonti silenziose, ritenzione/capienza/allarme della quarantena, IP Seeweb, D7, TSA/WORM e WindTre 89/90.
+
 ## Risposta Seeweb inviata e inventario mittenti candidato, 28/10/2026
 
-L'utente riferisce di aver inviato a Seeweb la risposta che autorizza la sola verifica preliminare dell'IPv4 sorgente e della rotta; testo effettivo e ricevuta non sono disponibili qui. Restano attesi IP osservato ed esito del provider, senza inoltro attivo. La revisione del ruleset ha trovato un ramo finale che scrive in AdS anche messaggi LAN non censiti. I parametri privati letti il 28/10 riportano una sola iLO tra le sorgenti Syslog; non provano l'assenza delle altre. Un nuovo preflight di sola lettura conta i mittenti presenti, ma non è stato eseguito sulla VM. Il prossimo passo è riconciliare con il proprietario i mittenti osservati e quelli silenziosi prima di proporre un filtro chiuso; nessuna configurazione ricevente è stata cambiata. D7, TSA/WORM ed elenco AdS restano aperti.
+L'utente riferisce di aver inviato a Seeweb la risposta che autorizza la sola verifica preliminare dell'IPv4 sorgente e della rotta; testo effettivo e ricevuta non sono disponibili qui. Restano attesi IP osservato ed esito del provider, senza inoltro attivo. La revisione del ruleset ha trovato un ramo finale che scrive in AdS anche messaggi LAN non censiti. I parametri privati letti il 28/10 riportano una sola iLO tra le sorgenti Syslog; non provano l'assenza delle altre. Il preflight di sola lettura conta i mittenti presenti quando l'archivio è accessibile; il tentativo sulla VM è stato negato per permessi. Il prossimo passo è riconciliare con il proprietario i mittenti osservati e quelli silenziosi prima di installare un filtro chiuso; nessuna configurazione ricevente è stata cambiata. D7, TSA/WORM ed elenco AdS restano aperti.
 
 ## Risposta Seeweb e misura AdS, 28/10/2026
 

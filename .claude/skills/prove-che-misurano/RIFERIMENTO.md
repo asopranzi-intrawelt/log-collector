@@ -410,7 +410,7 @@ Salita il 2026-10-28 da un progetto istanziato (L-032 di my-wedding-day, nella s
 
 ## I sei modi in cui un'indagine prende un fatto per un altro
 
-Salita il 2026-10-28 da due progetti istanziati (L-005, L-007, L-008, L-009, L-012 di windows-status e L-001 dello stesso), e scritta qui e non fra le regole sempre attive perche' vale quando si indaga un guasto e non a ogni sessione: la sezione 24 di `.claude/PROJECT-SYSTEM.md` chiede che una norma situazionale viva dentro la skill che la governa. Le due indagini da cui viene erano condotte da agenti che si correggevano a vicenda e sbagliavano lo stesso, che e' la ragione per cui i sei modi stanno scritti invece di essere lasciati all'attenzione. I casi, con le misure, stanno in `.claude/norme/recupero-dei-fatti.md`.
+Salita il 2026-10-28 da due progetti istanziati (L-005, L-007, L-008, L-009, L-012 di windows-status e L-001 dello stesso), e scritta qui e non fra le regole sempre attive perché vale quando si indaga un guasto e non a ogni sessione: la sezione 24 di `.claude/PROJECT-SYSTEM.md` chiede che una norma situazionale viva dentro la skill che la governa. Le due indagini da cui viene erano condotte da agenti che si correggevano a vicenda e sbagliavano lo stesso, che è la ragione per cui i sei modi stanno scritti invece di essere lasciati all'attenzione. I casi, con le misure, stanno in `.claude/norme/recupero-dei-fatti.md`.
 
 Un'indagine su qualcosa che non funziona è lo stesso problema visto da vicino, e sbaglia in sei modi che si riconoscono prima di commetterli. Vengono da due indagini lunghe in progetti istanziati, condotte da agenti che si correggevano a vicenda e sbagliavano lo stesso, che è la ragione per cui stanno scritte invece di essere lasciate all'attenzione.
 

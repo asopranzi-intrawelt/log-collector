@@ -5,14 +5,18 @@ generated-date: 2026-09-30
 covers-paths:
   - config/**
   - docs/handoff-sviluppo-collettore.md
-last-verified-commit: 87ed83a5a0f6f6cfdf669808363c66e86f0f5826
+last-verified-commit: 68b696c7c11c1152b02748165c7487c2a1dff014
 ---
 
 # Deployment
 
+## Gate della variante strict, 28/10/2026
+
+Il rendering strict non viene installato: con i parametri privati attuali manca una lista AdS di rete e il censimento dell'archivio VM è fallito per permessi. La chiave SSH e l'host key hanno consentito di raggiungere la VM, ma l'account non ha letto `/srv/ads/`; nessuna directory o riga di log è stata acquisita. Occorrono lettura autorizzata, riconciliazione dei mittenti silenziosi, test per fonte e decisione su ritenzione, capienza e allarme di `/var/log/ads-unclassified/`.
+
 ## Preflight inventario prima del nuovo filtro, 28/10/2026
 
-Il comando candidato `ads-source-inventory.py` richiede la copia privata dei parametri e accesso di lettura alle directory immediate di `/srv/ads/`; non apre file di log. Non è installato né eseguito sulla VM. Un risultato locale `ok` non certifica sorgenti silenziose o flussi futuri. Prima di cambiare il catch-all del servizio occorrono inventario reale, proprietari, confronto con i parametri e smoke test per ogni sorgente attiva; l'eventuale esecuzione sulla VM segue l'autorizzazione per comando prevista dal progetto.
+Il comando candidato `ads-source-inventory.py` richiede la copia privata dei parametri e accesso di lettura alle directory immediate di `/srv/ads/`; non apre file di log. Non è installato sulla VM. Una sonda SSH equivalente di sola lettura è stata tentata il 28/10, ma l'accesso all'archivio è stato negato all'account usato. Un risultato locale `ok` non certifica sorgenti silenziose o flussi futuri. Prima di cambiare il catch-all del servizio occorrono inventario reale, proprietari, confronto con i parametri e smoke test per ogni sorgente attiva.
 
 ## Gate di attivazione Seeweb, 28/10/2026
 
