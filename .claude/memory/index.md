@@ -1,5 +1,9 @@
 # Snapshot di sincronizzazione
 
+## Controllo del servizio Windows candidato, 27/10/2026
+
+Collettore `f2c73f6` pubblicato dall'utente e pulito alla ripresa. Il diff corrente aggiunge al bundle un controllo di sola lettura del servizio `fluent-bit`: verifica LocalSystem, avvio automatico e corrispondenza di binario e configurazione fra registrazione e processo attivo. Trentotto prove Windows mirate e Ruff passano con CIM sintetico; una mutazione che elimina il confronto della riga di comando del processo rende rossa la prova pertinente e il sorgente è stato ripristinato. Nessun servizio del pilota è stato installato o interrogato. ACL, Security reale, bookmark, VM, coda e allarme restano aperti, così come D7 e WindTre 89/90. Nessun cambio di copertura da propagare alla rete.
+
 ## Storico Security Windows candidato, 27/10/2026
 
 Collettore `0232d8f` pubblicato dall'utente e pulito alla ripresa; cinque schede tecniche confrontate con quel commit e ancorate a esso. Il diff corrente aggiunge al probe metadati di capacità e anzianità osservata del Security log senza esportare valori: 13 prove sintetiche del probe passano e la prova dell'età rileva la rimozione di `-Oldest`. Nessun pilota interrogato, servizio installato o flusso attivato. Lo storico osservato non attesta la durata futura; elenco AdS, eventi e policy reali, volume, bookmark, VM e allarme restano gate. D7 e WindTre 89/90 sono aperti. Nessun aggiornamento di rete è richiesto finché non cambia la copertura effettiva.

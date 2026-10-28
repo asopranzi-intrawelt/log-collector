@@ -8,10 +8,14 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 0232d8f46893503a31de8a88bc1f01ccf4404b08
+last-verified-commit: f2c73f64f6b6f9d87fdc452e617967ad5afc75dd
 ---
 
 # Stack applicativo
+
+## Controllo del servizio Windows candidato, 27/10/2026
+
+Il commit `f2c73f6` pubblica la misura dello storico Security. Il diff corrente aggiunge al bundle `ads-windows-service-state.ps1`: interroga servizio e processo con CIM, confronta binario e file `-c` effettivamente usati, LocalSystem, avvio automatico e stato Running. Non installa il servizio né legge eventi; il suo esito non dimostra consegna alla VM.
 
 ## Pilota Windows candidato, 27/10/2026
 

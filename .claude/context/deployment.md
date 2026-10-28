@@ -5,10 +5,14 @@ generated-date: 2026-09-30
 covers-paths:
   - config/**
   - docs/handoff-sviluppo-collettore.md
-last-verified-commit: 0232d8f46893503a31de8a88bc1f01ccf4404b08
+last-verified-commit: f2c73f64f6b6f9d87fdc452e617967ad5afc75dd
 ---
 
 # Deployment
+
+## Servizio del pilota ancora da installare, 27/10/2026
+
+Il bundle candidato include un controllo successivo all'installazione: richiede il servizio `fluent-bit` in esecuzione come LocalSystem e con avvio automatico, e confronta la riga di comando registrata con quella del processo attivo e i file verificati dal preflight. La prova locale sostituisce CIM con risposte sintetiche. Il controllo non modifica la macchina e non qualifica ACL, lettura Security, bookmark, recapito TLS o allarme. Prima dell'installazione servono nomina ed elenco AdS approvati, campioni reali e soglie di coda; nessun servizio è stato creato.
 
 ## Bundle Windows non distribuito, 27/10/2026
 

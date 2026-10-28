@@ -6,10 +6,14 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 0232d8f46893503a31de8a88bc1f01ccf4404b08
+last-verified-commit: f2c73f64f6b6f9d87fdc452e617967ad5afc75dd
 ---
 
 # Test di sviluppo
+
+## Stato del servizio Windows, 27/10/2026
+
+`tests/test_windows_service_state.py` usa risposte CIM sostitutive per servizio e processo, più file temporanei reali. Copre corrispondenza, assenza, comando e processo diversi, identità, avvio manuale, stato fermo, PID non valido, errore di lettura e codici d'uscita. La prova sul binario Fluent Bit 5.1.3 ha escluso una dipendenza del percorso Lua dalla cartella corrente e ha visto `--dry-run` rifiutare Lua mancante o sintatticamente errato; nessuna guardia duplicata è stata aggiunta per quei casi. Il servizio reale del pilota non è stato interrogato.
 
 ## Pilota Windows candidato, 27/10/2026
 

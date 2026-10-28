@@ -119,6 +119,10 @@ def main(argv: list[str] | None = None) -> int:
             staging / "ads-windows-pilot-preflight.ps1",
         )
         shutil.copyfile(
+            ROOT / "bin/ads-windows-service-state.ps1",
+            staging / "ads-windows-service-state.ps1",
+        )
+        shutil.copyfile(
             ROOT / "bin/ads-windows-security-probe.ps1",
             staging / "ads-windows-security-probe.ps1",
         )

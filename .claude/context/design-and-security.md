@@ -6,10 +6,14 @@ covers-paths:
   - bin/**
   - config/**
   - pilot/monitoring-hub/**
-last-verified-commit: 0232d8f46893503a31de8a88bc1f01ccf4404b08
+last-verified-commit: f2c73f64f6b6f9d87fdc452e617967ad5afc75dd
 ---
 
 # Design e sicurezza applicativa
+
+## Confine del controllo servizio Windows, 27/10/2026
+
+La lettura CIM usa il nome fisso `fluent-bit` e il PID restituito dal servizio, non un processo scelto per nome. Il comando registrato e quello del processo devono corrispondere esattamente al binario e al `fluent-bit.conf` del bundle; file collegati, path non locali, identità diversa, avvio manuale e servizio fermo non diventano verdi. Il rapporto espone solo `status` e `reason` da valori fissi; le eccezioni CIM e le righe di comando private non sono stampate. Un controllo riuscito non autentica il collettore né prova che un evento sia stato archiviato.
 
 ## Confine del pilota Windows, 27/10/2026
 

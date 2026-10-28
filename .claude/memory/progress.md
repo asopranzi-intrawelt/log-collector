@@ -1,5 +1,13 @@
 # Work-log
 
+## 2026-10-27 - Controllo del servizio Windows effettivo
+
+Ripresa su `f2c73f6`, pubblicato dall'utente e allineato al remoto. Due ipotesi sul binario Fluent Bit 5.1.3 sono state misurate con una configurazione sintetica: avviato fuori dalla cartella del bundle, ha trovato il Lua relativo; `--dry-run` ha respinto Lua mancante e Lua con sintassi errata. Nessuna modifica è stata fatta per quelle ipotesi escluse. Il bundle ora comprende `ads-windows-service-state.ps1`: interroga con CIM il servizio `fluent-bit` e il PID che esso dichiara, confronta il comando registrato e quello del processo con binario e `fluent-bit.conf` del preflight, richiede LocalSystem, avvio automatico e stato Running. Il rapporto usa solo stati e motivi fissi; codici 0, 2 e 3 separano corrispondenza, requisito incompleto e lettura impossibile. Nessun servizio reale è stato interrogato o installato.
+
+Trentotto prove Windows mirate e Ruff sono verdi; il test del servizio usa CIM sintetico e copre anche assenza, comando o processo diversi, identità, avvio, PID, errori, argomenti assenti e codici d'uscita. La mutazione che rimuove il confronto della riga di comando del processo ha fatto fallire il caso `wrong_process`; SHA-256 del sorgente ripristinato verificato. Studio e handoff distinguono questo gate da ACL, Security reale, bookmark, recapito TLS e allarme. `chiudi -SoloControlli` termina con «Controlli verdi» e stage vuoto. Nessuna sorgente nuova e nessun cambio ISO nella rete. Aggiornati bundle, preflight, controllo servizio, test, studio, handoff, cinque schede, indice, work-log e note private; Git resta manuale dell'utente.
+
+**Template:** nessuna.
+
 ## 2026-10-27 - Misura senza contenuto dello storico Security
 
 Ripresa su `0232d8f`, pubblicato dall'utente e coincidente con `origin/main`; albero pulito. Il probe Windows legge in sola lettura `FileSize`, `RecordCount` e `LogMode` dal canale Security, poi il record più vecchio e il più recente con `Get-WinEvent -MaxEvents 1`, usando `-Oldest` sul primo. Riporta soltanto età e intervallo in ore, non timestamp assoluti, identità, XML o messaggi. Un log vuoto e orari incoerenti sono `incomplete`; letture non riuscite sono `read_error`. Uno storico breve resta una misura, senza soglia di recupero inventata. Nessun host pilota è stato interrogato; il recupero da bookmark e i volumi di esercizio restano aperti.

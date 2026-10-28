@@ -46,6 +46,7 @@ try {
     $config = Require-File (Join-Path $bundle.FullName 'fluent-bit.conf')
     $null = Require-File (Join-Path $bundle.FullName 'ads.lua')
     $null = Require-File (Join-Path $bundle.FullName 'ads-windows-queue-health.ps1')
+    $null = Require-File (Join-Path $bundle.FullName 'ads-windows-service-state.ps1')
     $exe = Require-File $FluentBitExe
 
     $phase = 'configuration'

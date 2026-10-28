@@ -9,11 +9,15 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 0232d8f46893503a31de8a88bc1f01ccf4404b08
+last-verified-commit: f2c73f64f6b6f9d87fdc452e617967ad5afc75dd
 stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai punti 3 e 7; eventi iLO tecnici separati con ritenzione 90 giorni attiva; catena locale provata in WSL, non installata; D7 bloccato da nomina ed elenco AdS
 ---
 
 # Lavoro in corso
+
+## Verifica del servizio del pilota, 27/10/2026
+
+L'utente ha pubblicato `f2c73f6`; il diff corrente aggiunge al bundle un controllo di sola lettura del servizio `fluent-bit` dopo l'installazione. Confronta binario e configurazione registrati con quelli del processo realmente in esecuzione, più LocalSystem e avvio automatico; restituisce solo stati fissi. Le prove locali usano CIM sintetico, nessun servizio del pilota è stato interrogato. Il binario Fluent Bit reale ha inoltre mostrato che il Lua relativo è trovato da un'altra cartella e che `--dry-run` respinge Lua assente o invalido: le due ipotesi di difetto sono state escluse. Restano installazione autorizzata, ACL, Security reale, replay bookmark, consegna alla VM e allarme; D7 e WindTre 89/90 aperti. Nessun cambio di copertura nella rete.
 
 ## Storico osservato del Security log, 27/10/2026
 
