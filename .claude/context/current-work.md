@@ -9,11 +9,15 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: f2c73f64f6b6f9d87fdc452e617967ad5afc75dd
+last-verified-commit: 55c2ddb6903dc89e75cc7777a1f46c3421674588
 stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai punti 3 e 7; eventi iLO tecnici separati con ritenzione 90 giorni attiva; catena locale provata in WSL, non installata; D7 bloccato da nomina ed elenco AdS
 ---
 
 # Lavoro in corso
+
+## Bookmark confinato nel runtime Windows, 28/10/2026
+
+L'utente ha pubblicato il controllo servizio `55c2ddb`; albero e remoto coincidevano alla ripresa. La prova negativa ha mostrato che il preflight accettava `DB` fuori dalla directory di `storage.path` e restituiva `static_ok`. Ora richiede `winevtlog.sqlite` e `storage` sotto lo stesso runtime e rifiuta traversali nel percorso. La prova è passata dopo la correzione. Il bookmark reale, ACL, approvazione AdS, servizio e recapito alla VM restano da collaudare; D7 e WindTre 89/90 aperti. La rete non cambia finché non cambia la copertura reale.
 
 ## Verifica del servizio del pilota, 27/10/2026
 

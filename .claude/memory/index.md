@@ -1,5 +1,9 @@
 # Snapshot di sincronizzazione
 
+## Bookmark Windows nel runtime previsto, 28/10/2026
+
+Collettore `55c2ddb` pubblicato dall'utente, albero pulito alla ripresa. La prova negativa ha trovato un falso verde del preflight: `DB` fuori dal runtime passava. Il diff corrente lo rifiuta e documenta il confine; il test era rosso prima e verde dopo. Nessun servizio o pilota reale modificato. ACL, elenco AdS approvato, Security reale, replay e VM restano gate; D7 e WindTre 89/90 aperti. Rete invariata perché non cambia la copertura.
+
 ## Controllo del servizio Windows candidato, 27/10/2026
 
 Collettore `f2c73f6` pubblicato dall'utente e pulito alla ripresa. Il diff corrente aggiunge al bundle un controllo di sola lettura del servizio `fluent-bit`: verifica LocalSystem, avvio automatico e corrispondenza di binario e configurazione fra registrazione e processo attivo. Trentotto prove Windows mirate e Ruff passano con CIM sintetico; una mutazione che elimina il confronto della riga di comando del processo rende rossa la prova pertinente e il sorgente è stato ripristinato. Nessun servizio del pilota è stato installato o interrogato. ACL, Security reale, bookmark, VM, coda e allarme restano aperti, così come D7 e WindTre 89/90. Nessun cambio di copertura da propagare alla rete.

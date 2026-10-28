@@ -150,3 +150,24 @@ def test_tls_verificato_in_entrambi_gli_output(tmp_path, params_text):
     assert result.returncode == 3, result.stdout + result.stderr
     assert "phase=configuration" in result.stdout
     assert not probe.exists()
+
+
+def test_bookmark_fuori_runtime_viene_rifiutato(tmp_path, params_text):
+    bundle, _ = bundle_for(tmp_path, params_text)
+    exe = fake_fluent_bit(tmp_path)
+    probe = tmp_path / "seen.txt"
+    config = bundle / "fluent-bit.conf"
+    original = config.read_text(encoding="utf-8")
+    original_db = f"{(tmp_path / 'runtime').as_posix()}/winevtlog.sqlite"
+    for new_db in (
+        f"{(tmp_path / 'unprotected').as_posix()}/winevtlog.sqlite",
+        f"{(tmp_path / 'runtime').as_posix()}/../runtime/winevtlog.sqlite",
+    ):
+        broken = original.replace(original_db, new_db)
+        assert broken != original
+        config.write_text(broken, encoding="utf-8")
+
+        result = preflight(bundle, exe, probe)
+        assert result.returncode == 3, result.stdout + result.stderr
+        assert "phase=configuration" in result.stdout
+        assert not probe.exists()

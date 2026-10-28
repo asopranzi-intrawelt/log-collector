@@ -6,10 +6,14 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: f2c73f64f6b6f9d87fdc452e617967ad5afc75dd
+last-verified-commit: 55c2ddb6903dc89e75cc7777a1f46c3421674588
 ---
 
 # Test di sviluppo
+
+## Percorso dei bookmark Windows, 28/10/2026
+
+La prova modifica soltanto il `DB` del bundle sintetico e mantiene invariato il resto. Prima della correzione il preflight terminava `static_ok` e il test era rosso; dopo la guardia su runtime e nome del file, rifiuta in `phase=configuration` prima del dry run. Nessun database o evento reale è stato aperto.
 
 ## Stato del servizio Windows, 27/10/2026
 

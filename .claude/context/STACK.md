@@ -8,10 +8,14 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: f2c73f64f6b6f9d87fdc452e617967ad5afc75dd
+last-verified-commit: 55c2ddb6903dc89e75cc7777a1f46c3421674588
 ---
 
 # Stack applicativo
+
+## Bookmark del pilota Windows, 28/10/2026
+
+Il controllo del servizio è pubblicato in `55c2ddb`. Il diff corrente estende il preflight: il percorso `DB` di `winevtlog` deve avere lo stesso runtime di `storage.path`, con nomi di file e directory attesi. Un bookmark su un percorso diverso non riceve più `static_ok`; nessuna macchina pilota è stata modificata.
 
 ## Controllo del servizio Windows candidato, 27/10/2026
 

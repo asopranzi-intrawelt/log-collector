@@ -6,10 +6,14 @@ covers-paths:
   - bin/**
   - config/**
   - pilot/monitoring-hub/**
-last-verified-commit: f2c73f64f6b6f9d87fdc452e617967ad5afc75dd
+last-verified-commit: 55c2ddb6903dc89e75cc7777a1f46c3421674588
 ---
 
 # Design e sicurezza applicativa
+
+## Confine del bookmark Windows, 28/10/2026
+
+Il preflight confronta `DB` e `storage.path` solo dopo averne letto esattamente una voce ciascuno; normalizza i separatori, richiede la relazione `runtime/winevtlog.sqlite` e `runtime/storage` e rifiuta segmenti `..` e doppi separatori nel bookmark. Il test ha mostrato che il vecchio controllo dava `static_ok` per un database fuori runtime. Il path non è stampato nell'errore. I permessi reali e il replay restano prove distinte.
 
 ## Confine del controllo servizio Windows, 27/10/2026
 

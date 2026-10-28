@@ -1,5 +1,13 @@
 # Work-log
 
+## 2026-10-28 - Bookmark Windows vincolato al runtime
+
+Ripresa su `55c2ddb`, pubblicato e coincidente con `origin/main`. Prima di pianificare la registrazione del servizio è stato provato il caso `DB` di `winevtlog` spostato fuori dalla directory di `storage.path`: il preflight precedente restituiva `static_ok`. Il nuovo controllo richiede la coppia `runtime/winevtlog.sqlite` e `runtime/storage`, senza segmenti di risalita; lo stesso test passa e rifiuta la configurazione in `phase=configuration`. La documentazione ufficiale di `winevtlog` conferma che `DB` conserva gli offset. Il test non apre Security o il database reale.
+
+Restano ACL della configurazione e del runtime, elenco e nomina AdS, installazione del servizio, replay del bookmark e consegna alla VM. Ventidue prove Windows mirate, Ruff e schede rigorose passano; `chiudi -SoloControlli` termina con «Controlli verdi» e stage vuoto. Nessuna sorgente nuova o modifica ISO nella rete. Aggiornati preflight, prova, studio, handoff, cinque schede, indice, work-log e note private; Git e deploy rimangono manuali dell'utente.
+
+**Template:** nessuna.
+
 ## 2026-10-27 - Controllo del servizio Windows effettivo
 
 Ripresa su `f2c73f6`, pubblicato dall'utente e allineato al remoto. Due ipotesi sul binario Fluent Bit 5.1.3 sono state misurate con una configurazione sintetica: avviato fuori dalla cartella del bundle, ha trovato il Lua relativo; `--dry-run` ha respinto Lua mancante e Lua con sintassi errata. Nessuna modifica è stata fatta per quelle ipotesi escluse. Il bundle ora comprende `ads-windows-service-state.ps1`: interroga con CIM il servizio `fluent-bit` e il PID che esso dichiara, confronta il comando registrato e quello del processo con binario e `fluent-bit.conf` del preflight, richiede LocalSystem, avvio automatico e stato Running. Il rapporto usa solo stati e motivi fissi; codici 0, 2 e 3 separano corrispondenza, requisito incompleto e lettura impossibile. Nessun servizio reale è stato interrogato o installato.

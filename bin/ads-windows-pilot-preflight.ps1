@@ -70,12 +70,21 @@ try {
         }
     }
     $storage = @(Get-Values $content 'storage.path' 1)
+    $bookmarks = @(Get-Values $content 'DB' 1)
     $channels = @(Get-Values $content 'Channels' 1)
     $scripts = @(Get-Values $content 'Script' 1)
     if ($content -match '(?im)^[ \t]*storage\.total_limit_size[ \t]+') {
         throw 'limite di coda con possibile scarto'
     }
     if ($storage[0] -notmatch '^[A-Za-z]:[\\/]') { throw 'storage.path non assoluto' }
+    $storagePath = $storage[0].Replace('\', '/')
+    $bookmarkPath = $bookmarks[0].Replace('\', '/')
+    if ($storagePath -notmatch '/storage$' -or
+        $bookmarkPath -ne ($storagePath.Substring(0, $storagePath.Length - 8) +
+            '/winevtlog.sqlite') -or
+        $bookmarkPath -match '(^|/)\.\.?(?:/|$)' -or $bookmarkPath.Contains('//')) {
+        throw 'bookmark fuori runtime'
+    }
     if ($channels[0] -ne 'Security' -or $scripts[0] -ne 'ads.lua') {
         throw 'input o filtro inatteso'
     }

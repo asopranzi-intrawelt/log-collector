@@ -5,10 +5,14 @@ generated-date: 2026-09-30
 covers-paths:
   - config/**
   - docs/handoff-sviluppo-collettore.md
-last-verified-commit: f2c73f64f6b6f9d87fdc452e617967ad5afc75dd
+last-verified-commit: 55c2ddb6903dc89e75cc7777a1f46c3421674588
 ---
 
 # Deployment
+
+## Percorso di stato del pilota Windows, 28/10/2026
+
+Prima della registrazione del servizio, il preflight candidato ora conferma che database `winevtlog.sqlite` e cartella `storage` siano nello stesso runtime. Questa è una guardia sul file di configurazione, non sui permessi effettivi: il runtime e il bundle dovranno ancora essere collocati con ACL ristrette e misurati sul pilota. Nessuna registrazione o avvio è stato eseguito.
 
 ## Servizio del pilota ancora da installare, 27/10/2026
 
