@@ -30,6 +30,28 @@ def test_legge_il_file_di_esempio_versionato():
     assert set(p) == {"proxmox", "rete", "collettore", "sorgenti", "ads", "integrita", "api"}
 
 
+def test_load_accetta_bom_utf8_solo_all_inizio_del_file(tmp_path, params_text):
+    path = tmp_path / "parametri.yaml"
+    path.write_bytes(b"\xef\xbb\xbf" + params_text.encode("utf-8"))
+    p = adsparams.load(path)
+    assert p["ads"]["elenco_approvato"] == []
+    assert p["proxmox"]["bridge"] == "vmbr0"
+    path.write_bytes(b"a:\n" + b"\xef\xbb\xbf" + b"  b: 1\n")
+    with pytest.raises(adsparams.ParamsError, match="riga 2: struttura non riconosciuta"):
+        adsparams.load(path)
+
+
+@pytest.mark.parametrize(
+    "testo",
+    ["a:\n  b: 'PRIVATE-SECRET'\n", "a:\n   b: PRIVATE-SECRET\n"],
+)
+def test_errore_di_sintassi_non_ripete_il_contenuto_privato(testo):
+    with pytest.raises(adsparams.ParamsError) as exc:
+        adsparams.parse(testo)
+    assert "riga 2:" in str(exc.value)
+    assert "PRIVATE-SECRET" not in str(exc.value)
+
+
 def test_require_rifiuta_il_valore_vuoto(params_text):
     p = adsparams.parse(params_text)
     with pytest.raises(adsparams.ParamsError, match="integrita.tsa_url: valore vuoto"):

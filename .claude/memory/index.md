@@ -1,5 +1,9 @@
 # Snapshot di sincronizzazione
 
+## Parametri del bundle Windows, 28/10/2026
+
+L'utente ha pubblicato `240c478`; alla ripresa l'albero era pulito. Il BOM UTF-8 iniziale bloccava la lettura della copia privata di `config/parametri.yaml`; il lettore ora lo accetta. Due prove rosse hanno inoltre mostrato che gli errori YAML riportavano valori privati fittizi: ora conservano solo il numero di riga. La copia locale si legge, ma ha zero voci in `ads.elenco_approvato`; il renderer si arresta senza creare un bundle. Quarantuno prove mirate e Ruff passano. Nessun host o servizio modificato; D7 e WindTre 89/90 restano aperti e la copertura di rete non cambia.
+
 ## Bookmark Windows nel runtime previsto, 28/10/2026
 
 Collettore `55c2ddb` pubblicato dall'utente, albero pulito alla ripresa. La prova negativa ha trovato un falso verde del preflight: `DB` fuori dal runtime passava. Il diff corrente lo rifiuta e documenta il confine; il test era rosso prima e verde dopo. Nessun servizio o pilota reale modificato. ACL, elenco AdS approvato, Security reale, replay e VM restano gate; D7 e WindTre 89/90 aperti. Rete invariata perché non cambia la copertura.

@@ -5,10 +5,14 @@ generated-date: 2026-09-30
 covers-paths:
   - config/**
   - docs/handoff-sviluppo-collettore.md
-last-verified-commit: 55c2ddb6903dc89e75cc7777a1f46c3421674588
+last-verified-commit: 240c4786ae33ecbaeaa7006f8d2f4b9bc541e2eb
 ---
 
 # Deployment
+
+## Gate dei parametri Windows, 28/10/2026
+
+La copia privata di `config/parametri.yaml` è leggibile dopo l'accettazione del BOM iniziale, ma non contiene alcuna voce in `ads.elenco_approvato`. La prova locale del renderer si arresta senza creare il bundle. Installazione e ACL del servizio restano successive all'elenco approvato e alla prova sul pilota; non è stato modificato alcun host.
 
 ## Percorso di stato del pilota Windows, 28/10/2026
 

@@ -9,11 +9,15 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 55c2ddb6903dc89e75cc7777a1f46c3421674588
+last-verified-commit: 240c4786ae33ecbaeaa7006f8d2f4b9bc541e2eb
 stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai punti 3 e 7; eventi iLO tecnici separati con ritenzione 90 giorni attiva; catena locale provata in WSL, non installata; D7 bloccato da nomina ed elenco AdS
 ---
 
 # Lavoro in corso
+
+## Lettura dei parametri del pilota, 28/10/2026
+
+Dopo la pubblicazione di `240c478`, il renderer reale si fermava sul BOM UTF-8 iniziale di `config/parametri.yaml`. Il lettore ora lo accetta e gli errori YAML non riportano la riga privata. La copia locale passa il parsing ma `ads.elenco_approvato` ha zero voci: il renderer rifiuta il bundle senza creare la destinazione. Servono nomina ed elenco approvato prima del pilota Windows; servizio, ACL, Security, replay e recapito alla VM restano da collaudare. Nessuna copertura di rete cambia.
 
 ## Bookmark confinato nel runtime Windows, 28/10/2026
 

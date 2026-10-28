@@ -46,7 +46,7 @@ Scadenza indicata dall'utente: 20/12/2026 per le evidenze del questionario clien
 
 | Pendenza | Evidenza disponibile | Riscontro necessario | Effetto finché manca |
 |---|---|---|---|
-| Direzione: nomina ed elenco AdS | Perimetro AdS nello studio; approvazione non acquisita | Atto di nomina ed elenco approvato con data/versione | Filtri Windows, QNAP e M365 e D7 non finalizzabili |
+| Direzione: nomina ed elenco AdS | Perimetro AdS nello studio; la copia locale dei parametri si legge ma ha zero voci approvate al 28/10 | Atto di nomina ed elenco approvato con data/versione | Bundle Windows reale, filtri QNAP/M365 e D7 non finalizzabili |
 | Consulente privacy: estensione Windows | Pilota tecnico distinto dall'estensione | Parere sul perimetro e sui dati da conservare | Estensione Windows sospesa |
 | Direzione/fornitori: TSA, relay e custodia indipendente | Catena e opzioni progettate, non installate | Scelta TSA, relay SMTP e custode/supporto immutabile con titolarità e accessi | Marca temporale, avvisi alla Direzione e copia indipendente non collaudabili |
 | Seeweb: log e percorso di rete | Screenshot del ticket del 20/10 e domanda successiva screenshot_103 sul server di destinazione; l'utente riferisce di aver inviato il chiarimento il 23/10, senza ricevuta nel progetto | Conferma che la VM Debian riceve via tunnel terminato sui firewall, categorie e campioni minimizzati GUI/SSH/cambi e PF/IPsec, sorgente IPv4, selettori IPsec, NAT, volume, retention e comportamento al fermo VPN | Nessun flusso Seeweb reale o classificazione AdS degli accessi |

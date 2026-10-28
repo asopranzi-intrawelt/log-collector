@@ -1,5 +1,13 @@
 # Work-log
 
+## 2026-10-28 - Lettura sicura dei parametri Windows
+
+Ripresa su `240c478`, pubblicato dall'utente, con albero pulito. Una prova su fixture con BOM UTF-8 iniziale ha riprodotto l'errore di parsing del file privato locale; `adsparams.load` ora usa `utf-8-sig`. Due prove con valori fittizi hanno poi riprodotto la divulgazione del testo in un errore YAML: il parser mantiene il numero di riga e omette il contenuto. Le tre prove sono verdi dopo le correzioni; parser e renderer totalizzano 41 prove verdi, Ruff e `git diff --check` passano.
+
+La copia privata reale è stata letta senza stampare valori: schema valido e zero voci nell'elenco AdS. Il renderer invocato con i parametri locali ha respinto l'elenco vuoto con uscita 1 e non ha creato la destinazione. È un gate documentato, non una prova del pilota. `verifica-schede.py --rigoroso` e `chiudi -SoloControlli` terminano senza difetti e con «Controlli verdi»; stage vuoto. Nessun host o servizio toccato, né modifica di copertura in `D:/network-design`. Aggiornati parser, prove, studio, handoff, cinque schede, indice, work-log e note private; Git e deploy restano manuali dell'utente. D7 e WindTre 89/90 aperti.
+
+**Template:** nessuna.
+
 ## 2026-10-28 - Bookmark Windows vincolato al runtime
 
 Ripresa su `55c2ddb`, pubblicato e coincidente con `origin/main`. Prima di pianificare la registrazione del servizio è stato provato il caso `DB` di `winevtlog` spostato fuori dalla directory di `storage.path`: il preflight precedente restituiva `static_ok`. Il nuovo controllo richiede la coppia `runtime/winevtlog.sqlite` e `runtime/storage`, senza segmenti di risalita; lo stesso test passa e rifiuta la configurazione in `phase=configuration`. La documentazione ufficiale di `winevtlog` conferma che `DB` conserva gli offset. Il test non apre Security o il database reale.

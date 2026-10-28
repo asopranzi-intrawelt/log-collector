@@ -6,10 +6,14 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 55c2ddb6903dc89e75cc7777a1f46c3421674588
+last-verified-commit: 240c4786ae33ecbaeaa7006f8d2f4b9bc541e2eb
 ---
 
 # Test di sviluppo
+
+## Parametri del pilota, 28/10/2026
+
+La prova con fixture e BOM iniziale falliva prima della correzione e ora passa. Due casi con valore fittizio privato hanno mostrato che l'errore di sintassi lo ripeteva; dopo la correzione riportano solo il numero di riga. Quarantuno prove mirate su parser e renderer passano. La copia privata reale è stata letta senza stampare valori: lista AdS a zero voci e renderer bloccato prima della creazione della destinazione.
 
 ## Percorso dei bookmark Windows, 28/10/2026
 

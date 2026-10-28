@@ -8,10 +8,14 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 55c2ddb6903dc89e75cc7777a1f46c3421674588
+last-verified-commit: 240c4786ae33ecbaeaa7006f8d2f4b9bc541e2eb
 ---
 
 # Stack applicativo
+
+## Parametri locali del bundle, 28/10/2026
+
+Il lettore YAML ristretto accetta un BOM UTF-8 soltanto all'inizio del file. La copia privata locale ora viene letta, ma `ads.elenco_approvato` contiene zero voci: il renderer rifiuta il bundle reale prima di creare la destinazione. Gli errori di sintassi indicano la riga senza ripetere il valore privato.
 
 ## Bookmark del pilota Windows, 28/10/2026
 

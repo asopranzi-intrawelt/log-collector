@@ -46,7 +46,7 @@ def _scalar(text: str, lineno: int) -> str:
             raise ParamsError(f"riga {lineno}: apici o escape dentro una stringa non gestiti")
         return inner
     if text.startswith(("'", "{", "&", "*", "|", ">")):
-        raise ParamsError(f"riga {lineno}: sintassi YAML non gestita: {text!r}")
+        raise ParamsError(f"riga {lineno}: sintassi YAML non gestita")
     return text
 
 
@@ -101,14 +101,14 @@ def parse(text: str) -> Params:
                 raise ParamsError(f"riga {lineno}: voce di lista sotto un valore scalare")
             current.append(_scalar(m.group(1), lineno))
             continue
-        raise ParamsError(f"riga {lineno}: struttura non riconosciuta: {raw.strip()!r}")
+        raise ParamsError(f"riga {lineno}: struttura non riconosciuta")
     return params
 
 
 def load(path: str | Path) -> Params:
     """Legge il file dei parametri da disco."""
     try:
-        text = Path(path).read_text(encoding="utf-8")
+        text = Path(path).read_text(encoding="utf-8-sig")
     except FileNotFoundError:
         raise ParamsError(
             f"{path}: file assente; copiarlo da config/parametri.example.yaml e compilarlo"

@@ -6,10 +6,14 @@ covers-paths:
   - bin/**
   - config/**
   - pilot/monitoring-hub/**
-last-verified-commit: 55c2ddb6903dc89e75cc7777a1f46c3421674588
+last-verified-commit: 240c4786ae33ecbaeaa7006f8d2f4b9bc541e2eb
 ---
 
 # Design e sicurezza applicativa
+
+## Diagnostica dei parametri privati, 28/10/2026
+
+Il parser mantiene il numero di riga negli errori di sintassi e non vi include più la riga o il valore non riconosciuto. Un BOM UTF-8 è tollerato solo all'inizio della lettura da file; restano rifiutate strutture YAML fuori dal sottoinsieme previsto. La lista AdS vuota non è convertita in un filtro permissivo.
 
 ## Confine del bookmark Windows, 28/10/2026
 
