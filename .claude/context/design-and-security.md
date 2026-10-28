@@ -6,10 +6,14 @@ covers-paths:
   - bin/**
   - config/**
   - pilot/monitoring-hub/**
-last-verified-commit: 68b696c7c11c1152b02748165c7487c2a1dff014
+last-verified-commit: 05137cd920e98ed1c629a7832615f2d22cb9c476
 ---
 
 # Design e sicurezza applicativa
+
+## Stato della quarantena vuota, 28/10/2026
+
+Una radice `ads-unclassified` esistente e vuota produce stato sano: l'assenza di mittenti ignoti è l'esito atteso. Radice mancante e filesystem almeno all'80% producono avviso, misura del filesystem fallita produce errore; i wrapper Seeweb e heartbeat fissano invece il vuoto come avviso. Il motore conserva i controlli su nomi, link e durata obbligatoria. Questo è un criterio interno di monitoraggio, provato su file costruiti in Debian; non dimostra la capienza o la consegna dell'allarme della VM.
 
 ## Confine opt-in della variante strict, 28/10/2026
 

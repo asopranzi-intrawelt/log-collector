@@ -5,10 +5,14 @@ generated-date: 2026-09-30
 covers-paths:
   - config/**
   - docs/handoff-sviluppo-collettore.md
-last-verified-commit: 68b696c7c11c1152b02748165c7487c2a1dff014
+last-verified-commit: 05137cd920e98ed1c629a7832615f2d22cb9c476
 ---
 
 # Deployment
+
+## Unità candidate della quarantena, 28/10/2026
+
+Per una futura installazione servono `ads-unclassified-retain.sh` e `ads-technical-retain.sh` in `/opt/ads/bin/`, più `ads-unclassified-retain@.service/.timer` e `ads-unclassified-health.service/.timer` a 0644. `systemd-analyze verify` passa su copie Debian. Il timer di ritenzione richiede l'istanza dei giorni approvati; quello di salute fa solo `--inspect`. Nessuna unità è installata. La soglia attuale dell'80% è sul filesystem intero e produce solo stato locale: prima dell'attivazione servono quota o volume isolato, prova del recapito dell'allarme e misura del costo orario sulla VM.
 
 ## Gate della variante strict, 28/10/2026
 

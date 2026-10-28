@@ -1,5 +1,9 @@
 # Snapshot di sincronizzazione
 
+## Quarantena dei mittenti ignoti: ritenzione candidata, 28/10/2026
+
+Il collettore `05137cd` è pubblicato. Il nuovo diff aggiunge al motore tecnico un criterio distinto per l'archivio vuoto, il wrapper della quarantena e unità separate per scadenza e ispezione oraria. Tre prove POSIX Debian, mutazione discriminante e `systemd-analyze verify` passano; la rete registra il gate nel proprio worktree. Nessuna unità è installata. Restano inventario VM autorizzato, durata approvata, quota o volume isolato, misura del costo e allarme consegnato. ISO-30 e Cliente-1 89/90 aperti; Git e deploy manuali.
+
 ## Ricevitore Syslog strict candidato e archivio VM non leggibile, 28/10/2026
 
 Collettore `7f412d2` e rete `98f270b` pubblicati dall'utente. La sonda SSH di sola lettura ha raggiunto la VM, ma l'account non ha aperto `/srv/ads/`: nessun mittente reale misurato. Il renderer prepara una modalità opt-in che separa sorgenti AdS censite, Seeweb, iLO, accessi locali e mittenti ignoti; non è installata e richiede censimento autorizzato, politica/capienza/allarme della quarantena. La rete registra il gate, con ISO-30 e Cliente-1 89/90 in corso. Il controllo delle identità del template ora confronta copie equivalenti CRLF/LF senza falso avviso; una differenza reale continua a produrlo. I cinque accenti segnalati dal controllo nelle nuove fonti del template e del progetto sono corretti. Git e deploy restano manuali.

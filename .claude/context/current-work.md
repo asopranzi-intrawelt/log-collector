@@ -9,11 +9,15 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 68b696c7c11c1152b02748165c7487c2a1dff014
+last-verified-commit: 05137cd920e98ed1c629a7832615f2d22cb9c476
 stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai punti 3 e 7; eventi iLO tecnici separati con ritenzione 90 giorni attiva; catena locale provata in WSL, non installata; D7 bloccato da nomina ed elenco AdS
 ---
 
 # Lavoro in corso
+
+## Quarantena Syslog candidata, 28/10/2026
+
+Il commit `05137cd` della variante strict è pubblicato e il collettore era pulito alla ripresa. Nel nuovo diff sono preparati ispezione oraria e ritenzione con giorni espliciti del deposito dei mittenti ignoti. I tre test POSIX in Debian e la verifica delle quattro unità systemd passano; nessun servizio è installato. Il filtro strict resta spento: mancano lettura autorizzata dell'archivio VM, fonti silenziose, durata approvata, limite fisico di capienza, costo della scansione e allarme recapitato. La rete registra gli stessi gate senza chiudere ISO-30 o Cliente-1 89/90.
 
 ## Ricevitore strict candidato e accesso VM negato, 28/10/2026
 

@@ -6,10 +6,14 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 68b696c7c11c1152b02748165c7487c2a1dff014
+last-verified-commit: 05137cd920e98ed1c629a7832615f2d22cb9c476
 ---
 
 # Test di sviluppo
+
+## Ritenzione della quarantena, 28/10/2026
+
+`test_unclassified_retain.sh`, `test_seeweb_technical_retain.sh` e `test_heartbeat_rejected_retain.sh` passano in container Debian con semantica POSIX dei link; Git Bash Windows non è una prova affidabile per questi link. Il nuovo test copre vuoto sano, radice mancante, giorni obbligatori, confine di scadenza, isolamento AdS/Seeweb, soglia 80% e misura del filesystem fallita. Una mutazione del flag vuoto nel wrapper rende rossa la prova. `systemd-analyze verify` delle quattro unità installate a 0644 in un container temporaneo passa senza avvisi. Non sono testati sulla VM durata, volume, carico o recapito dell'allarme.
 
 ## Variante strict del ricevitore, 28/10/2026
 

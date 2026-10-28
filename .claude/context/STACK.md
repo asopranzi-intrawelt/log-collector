@@ -8,10 +8,14 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 68b696c7c11c1152b02748165c7487c2a1dff014
+last-verified-commit: 05137cd920e98ed1c629a7832615f2d22cb9c476
 ---
 
 # Stack applicativo
+
+## Deposito tecnico dei mittenti ignoti, 28/10/2026
+
+`ads-unclassified-retain.sh` è un wrapper del motore `ads-technical-retain.sh`: ispeziona e, solo con giorni espliciti, scade i log giornalieri del deposito `ads-unclassified`. Le unità candidate separano ritenzione alle 03:25 e ispezione oraria. Il deposito vuoto è sano; i wrapper Seeweb e heartbeat mantengono vuoto come avviso. Nessuna unità è installata.
 
 ## Variante strict del ricevitore, 28/10/2026
 
