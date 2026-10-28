@@ -6,10 +6,14 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 240c4786ae33ecbaeaa7006f8d2f4b9bc541e2eb
+last-verified-commit: ab4b24b861a7585c036bfde50665346ebcb0858a
 ---
 
 # Test di sviluppo
+
+## Manifest precedente nella verifica di una data, 28/10/2026
+
+La prova WSL crea due giorni regolari, sposta il primo manifest fuori albero, lascia un link al suo posto e invoca `ads-verify.sh --date` sul secondo. Prima della guardia il comando usciva 0 e la prova falliva; dopo esce 1 sul link. Ripristinato il manifest regolare, la stessa verifica torna verde. Non sono stati toccati manifest della VM.
 
 ## Parametri del pilota, 28/10/2026
 

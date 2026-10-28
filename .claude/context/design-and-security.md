@@ -6,10 +6,14 @@ covers-paths:
   - bin/**
   - config/**
   - pilot/monitoring-hub/**
-last-verified-commit: 240c4786ae33ecbaeaa7006f8d2f4b9bc541e2eb
+last-verified-commit: ab4b24b861a7585c036bfde50665346ebcb0858a
 ---
 
 # Design e sicurezza applicativa
+
+## Confine del manifest precedente, 28/10/2026
+
+Nel controllo di una data, il file precedente viene rifiutato se è un link simbolico, anche quando punta a un file leggibile: il solo `-f` di Bash segue il collegamento. Un predecessore presente ma non regolare fallisce prima dell'hash. Il controllo completo e l'ancoraggio indipendente restano gate distinti.
 
 ## Diagnostica dei parametri privati, 28/10/2026
 

@@ -9,11 +9,15 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 240c4786ae33ecbaeaa7006f8d2f4b9bc541e2eb
+last-verified-commit: ab4b24b861a7585c036bfde50665346ebcb0858a
 stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai punti 3 e 7; eventi iLO tecnici separati con ritenzione 90 giorni attiva; catena locale provata in WSL, non installata; D7 bloccato da nomina ed elenco AdS
 ---
 
 # Lavoro in corso
+
+## Manifest precedente nella verifica mirata, 28/10/2026
+
+L'utente ha pubblicato `ab4b24b` e l'albero era pulito. Una prova WSL ha mostrato che `ads-verify.sh --date` seguiva un link al manifest precedente spostato fuori albero e usciva con successo. Il verificatore ora rifiuta il link e un predecessore non regolare; la prova è tornata verde. Il timer notturno resta non installato: prima servono D7, volume rappresentativo, misura del costo della verifica e scelte TSA/WORM. La copertura di rete non cambia.
 
 ## Lettura dei parametri del pilota, 28/10/2026
 

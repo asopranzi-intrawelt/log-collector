@@ -5,10 +5,14 @@ generated-date: 2026-09-30
 covers-paths:
   - config/**
   - docs/handoff-sviluppo-collettore.md
-last-verified-commit: 240c4786ae33ecbaeaa7006f8d2f4b9bc541e2eb
+last-verified-commit: ab4b24b861a7585c036bfde50665346ebcb0858a
 ---
 
 # Deployment
+
+## Verifica dei manifest prima del timer, 28/10/2026
+
+Il verificatore candidato rifiuta ora anche un manifest precedente simbolico nella modalità `--date`. La prova è locale in WSL; non sostituisce permessi, mount, misura dei volumi e prova della catena sulla VM. Nessuna unità notturna è stata installata o avviata.
 
 ## Gate dei parametri Windows, 28/10/2026
 

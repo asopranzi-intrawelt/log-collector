@@ -34,7 +34,9 @@ verify_day() {
     local -a lines=()
     local -A seen=()
     [[ -f $manifest && ! -L $manifest ]] || die "manifest assente o simbolico: $day"
-    if [[ -f $previous ]]; then
+    [[ ! -L $previous ]] || die "manifest precedente simbolico: $previous_day"
+    if [[ -e $previous ]]; then
+        [[ -f $previous ]] || die "manifest precedente non regolare: $previous_day"
         expected=$(hash_file "$previous")
     else
         expected=GENESIS

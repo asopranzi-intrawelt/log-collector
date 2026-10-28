@@ -86,6 +86,15 @@ printf '2026-10-07T10:00:00Z source-a login ok\n' >"$ADS_LOG_ROOT/source-a/2026-
 ADS_TODAY=2026-10-08 bash "$project_dir/bin/ads-nightly.sh"
 bash "$project_dir/bin/ads-verify.sh"
 
+# Una verifica mirata non deve seguire un manifest precedente spostato fuori albero.
+mv -- "$ADS_STATE_ROOT/manifests/manifest-2026-10-06.txt" "$scratch/manifest-precedente"
+ln -s -- "$scratch/manifest-precedente" "$ADS_STATE_ROOT/manifests/manifest-2026-10-06.txt"
+expect_failure bash "$project_dir/bin/ads-verify.sh" --date 2026-10-07
+grep -Fq 'manifest precedente simbolico' "$scratch/output"
+rm -- "$ADS_STATE_ROOT/manifests/manifest-2026-10-06.txt"
+mv -- "$scratch/manifest-precedente" "$ADS_STATE_ROOT/manifests/manifest-2026-10-06.txt"
+bash "$project_dir/bin/ads-verify.sh" --date 2026-10-07
+
 # Un solo riavvio del timer deve recuperare tutti i giorni saltati nella finestra locale.
 printf '2026-10-08T10:00:00Z source-a login ok\n' >"$ADS_LOG_ROOT/source-a/2026-10-08.log"
 printf '2026-10-09T10:00:00Z source-b login ok\n' >"$ADS_LOG_ROOT/source-b/2026-10-09.log"
@@ -164,4 +173,4 @@ grep -Fq 'oltre la finestra locale di 213' "$scratch/output"
 # Anche alterare il manifest precedente deve spezzare il legame del giorno seguente.
 printf 'x' >>"$ADS_STATE_ROOT/manifests/manifest-2026-10-06.txt"
 expect_failure bash "$project_dir/bin/ads-verify.sh"
-printf 'test-nightly: OK (recupero, 213 giorni, ora legale, idempotenza, alterazioni, link simbolici)\n'
+printf 'test-nightly: OK (recupero, 213 giorni, ora legale, idempotenza, alterazioni, link simbolici e manifest precedente)\n'

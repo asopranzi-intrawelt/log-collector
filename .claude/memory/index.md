@@ -1,5 +1,9 @@
 # Snapshot di sincronizzazione
 
+## Manifest precedente della catena AdS, 28/10/2026
+
+L'utente ha pubblicato `ab4b24b`, albero pulito alla ripresa. La modalità `ads-verify.sh --date` seguiva un link simbolico al manifest precedente: la prova WSL era rossa perché il comando usciva 0. Ora rifiuta il link e un predecessore non regolare; l'intera suite della catena torna verde. La documentazione distingue verifica mirata e storica. Nessun timer installato o flusso nuovo; D7, TSA/WORM e WindTre 89/90 restano aperti. Rete invariata.
+
 ## Parametri del bundle Windows, 28/10/2026
 
 L'utente ha pubblicato `240c478`; alla ripresa l'albero era pulito. Il BOM UTF-8 iniziale bloccava la lettura della copia privata di `config/parametri.yaml`; il lettore ora lo accetta. Due prove rosse hanno inoltre mostrato che gli errori YAML riportavano valori privati fittizi: ora conservano solo il numero di riga. La copia locale si legge, ma ha zero voci in `ads.elenco_approvato`; il renderer si arresta senza creare un bundle. Quarantuno prove mirate e Ruff passano. Nessun host o servizio modificato; D7 e WindTre 89/90 restano aperti e la copertura di rete non cambia.

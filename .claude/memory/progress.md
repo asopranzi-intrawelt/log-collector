@@ -1,5 +1,13 @@
 # Work-log
 
+## 2026-10-28 - Manifest precedente della verifica mirata
+
+Ripresa su `ab4b24b`, pubblicato dall'utente, con worktree pulito. Dopo aver escluso il pilota Windows per elenco AdS ancora vuoto, è stato verificato il confine di `ads-verify.sh --date`. La prova WSL sposta il manifest del primo giorno fuori albero e lascia un link valido al suo posto: il comando precedente usciva 0, perché il test Bash `-f` segue i link. Il verificatore ora rifiuta il link prima di calcolarne l'hash e rifiuta un predecessore presente ma non regolare. La prova con il link fallisce come previsto e torna verde dopo il ripristino del manifest regolare; l'intera suite `tests/test-nightly.sh` è verde. Fonte per la semantica di `-f` e `-L`: manuale GNU Bash, collegato nel runbook.
+
+La correzione è locale, senza installazione del timer o letture sulla VM. `verifica-schede.py --rigoroso`, `git diff --check` e `chiudi -SoloControlli` sono verdi; l'ultimo termina con «Controlli verdi» e lo stage è vuoto. `shellcheck` non è disponibile nella distribuzione WSL usata; la suite Bash esercita gli script modificati. La misura della durata della verifica su dati rappresentativi e le scelte TSA/WORM restano gate per l'esercizio. Aggiornati verificatore, test, runbook, handoff, cinque schede, indice, work-log e note private. Nessun cambio di copertura da riportare in `D:/network-design`; Git e deploy restano manuali dell'utente. D7 e WindTre 89/90 aperti.
+
+**Template:** nessuna.
+
 ## 2026-10-28 - Lettura sicura dei parametri Windows
 
 Ripresa su `240c478`, pubblicato dall'utente, con albero pulito. Una prova su fixture con BOM UTF-8 iniziale ha riprodotto l'errore di parsing del file privato locale; `adsparams.load` ora usa `utf-8-sig`. Due prove con valori fittizi hanno poi riprodotto la divulgazione del testo in un errore YAML: il parser mantiene il numero di riga e omette il contenuto. Le tre prove sono verdi dopo le correzioni; parser e renderer totalizzano 41 prove verdi, Ruff e `git diff --check` passano.

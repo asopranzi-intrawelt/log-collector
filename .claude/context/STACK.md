@@ -8,10 +8,14 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 240c4786ae33ecbaeaa7006f8d2f4b9bc541e2eb
+last-verified-commit: ab4b24b861a7585c036bfde50665346ebcb0858a
 ---
 
 # Stack applicativo
+
+## Verifica mirata della catena, 28/10/2026
+
+`ads-verify.sh --date` controlla il manifest richiesto e l'hash del precedente. Ora rifiuta un predecessore simbolico anche se il suo bersaglio è un file regolare; la verifica senza `--date` resta il controllo dell'intera storia.
 
 ## Parametri locali del bundle, 28/10/2026
 
