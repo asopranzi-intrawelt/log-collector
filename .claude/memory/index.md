@@ -1,5 +1,9 @@
 # Snapshot di sincronizzazione
 
+## Misura ripetibile della verifica AdS, 28/10/2026
+
+L'utente ha pubblicato `7cae2da`, con worktree pulito. Il nuovo `ads-measure-verify.py` esegue la verifica storica su Linux e restituisce JSON minimizzato con durata, CPU, massimo RSS del singolo figlio, operazioni a blocchi e dimensione del campione. La suite WSL con tre archivi sintetici prova esito positivo, errore di integrità e campione mutato senza esporre contenuti. Nessuna misura della VM o attivazione del timer: D7, TSA/WORM e WindTre 89/90 aperti; rete invariata.
+
 ## Manifest precedente della catena AdS, 28/10/2026
 
 L'utente ha pubblicato `ab4b24b`, albero pulito alla ripresa. La modalità `ads-verify.sh --date` seguiva un link simbolico al manifest precedente: la prova WSL era rossa perché il comando usciva 0. Ora rifiuta il link e un predecessore non regolare; l'intera suite della catena torna verde. La documentazione distingue verifica mirata e storica. Nessun timer installato o flusso nuovo; D7, TSA/WORM e WindTre 89/90 restano aperti. Rete invariata.

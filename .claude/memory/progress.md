@@ -1,5 +1,13 @@
 # Work-log
 
+## 2026-10-28 - Misuratore della verifica integrale AdS
+
+Ripresa su `7cae2da`, pubblicato dall'utente, con worktree pulito. Prima di scrivere lo strumento, la ricerca nel catalogo del template non ha trovato una capacità per misurare il costo di questa catena; il registro operativo candidato è una convenzione documentale diversa, non un misuratore. Il nuovo `bin/ads-measure-verify.py`, solo Linux e senza dipendenze esterne, esegue `ads-verify.sh` senza riportarne stdout o stderr, misura tempo monotono e risorse dei figli terminati, conta manifest, archivi e originali con metadati e invalida il risultato se questi cambiano durante l'esecuzione. Un codice 0 richiede verifica integra e campione stabile; 2 indica verifica fallita o campione mutato; 3 misura impossibile. Il rapporto omette host, percorsi e sorgenti. Le fonti Python e Linux per contatori e limiti sono nel runbook.
+
+La suite WSL su due giorni e tre archivi fittizi verifica i contatori del campione, un originale alterato e un verificatore sostitutivo che cambia il campione ed emette un marcatore privato: gli ultimi due casi non diventano `ok`, il marcatore non appare nel JSON. Ruff, schede rigorose e `chiudi -SoloControlli` sono verdi; il controllo globale termina con «Controlli verdi» e stage vuoto. Il test non misura la durata o il carico sulla VM reale; prima del timer servono dati rappresentativi, più esecuzioni con carico osservato, D7 e decisioni TSA/WORM. Aggiornati misuratore, prova, runbook, handoff, cinque schede, indice, work-log e note private. Nessuna nuova sorgente né stato ISO da propagare a `D:/network-design`; Git e deploy restano manuali dell'utente. WindTre 89/90 aperti.
+
+**Template:** nessuna.
+
 ## 2026-10-28 - Manifest precedente della verifica mirata
 
 Ripresa su `ab4b24b`, pubblicato dall'utente, con worktree pulito. Dopo aver escluso il pilota Windows per elenco AdS ancora vuoto, è stato verificato il confine di `ads-verify.sh --date`. La prova WSL sposta il manifest del primo giorno fuori albero e lascia un link valido al suo posto: il comando precedente usciva 0, perché il test Bash `-f` segue i link. Il verificatore ora rifiuta il link prima di calcolarne l'hash e rifiuta un predecessore presente ma non regolare. La prova con il link fallisce come previsto e torna verde dopo il ripristino del manifest regolare; l'intera suite `tests/test-nightly.sh` è verde. Fonte per la semantica di `-f` e `-L`: manuale GNU Bash, collegato nel runbook.

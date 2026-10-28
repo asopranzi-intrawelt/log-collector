@@ -5,10 +5,14 @@ generated-date: 2026-09-30
 covers-paths:
   - config/**
   - docs/handoff-sviluppo-collettore.md
-last-verified-commit: ab4b24b861a7585c036bfde50665346ebcb0858a
+last-verified-commit: 7cae2da6a8140f7faa05571b0349b7827b819e68
 ---
 
 # Deployment
+
+## Benchmark prima del timer, 28/10/2026
+
+Il misuratore Linux va collocato accanto a `ads-verify.sh` ed eseguito con l'account che leggerà gli archivi. Il JSON minimizzato può alimentare il dossier privato di collaudo, ma serve ancora una misura su dati e carico rappresentativi della VM. Nessuna unità notturna è stata installata o attivata.
 
 ## Verifica dei manifest prima del timer, 28/10/2026
 

@@ -6,10 +6,14 @@ covers-paths:
   - bin/**
   - config/**
   - pilot/monitoring-hub/**
-last-verified-commit: ab4b24b861a7585c036bfde50665346ebcb0858a
+last-verified-commit: 7cae2da6a8140f7faa05571b0349b7827b819e68
 ---
 
 # Design e sicurezza applicativa
+
+## Rapporto della verifica storica, 28/10/2026
+
+Il misuratore sopprime stdout e stderr del verificatore perché un errore può contenere il nome della sorgente. Confronta prima e dopo impronte dei metadati dei file per invalidare un campione mutato; non è una protezione contro tutte le scritture concorrenti. Il rapporto non contiene hostname, percorsi o nomi di sorgenti e non equivale a prova di custodia indipendente.
 
 ## Confine del manifest precedente, 28/10/2026
 

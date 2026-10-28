@@ -8,10 +8,14 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: ab4b24b861a7585c036bfde50665346ebcb0858a
+last-verified-commit: 7cae2da6a8140f7faa05571b0349b7827b819e68
 ---
 
 # Stack applicativo
+
+## Misura della verifica storica, 28/10/2026
+
+`ads-measure-verify.py` esegue il verificatore completo su Linux e riporta soltanto esito, durata, CPU, massimo RSS del singolo figlio, operazioni a blocchi e dimensione del campione. Non modifica i log né attiva il timer; l'esito locale non misura il carico sulla VM.
 
 ## Verifica mirata della catena, 28/10/2026
 

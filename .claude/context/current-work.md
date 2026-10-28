@@ -9,11 +9,15 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: ab4b24b861a7585c036bfde50665346ebcb0858a
+last-verified-commit: 7cae2da6a8140f7faa05571b0349b7827b819e68
 stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai punti 3 e 7; eventi iLO tecnici separati con ritenzione 90 giorni attiva; catena locale provata in WSL, non installata; D7 bloccato da nomina ed elenco AdS
 ---
 
 # Lavoro in corso
+
+## Campione per il costo della catena, 28/10/2026
+
+Dopo `7cae2da`, worktree pulito, è stato preparato un misuratore di sola lettura della verifica storica. Il test WSL su tre archivi fittizi distingue successo, archivio alterato e campione modificato durante la misura, senza riportare contenuti. Sul Debian reale restano da misurare più esecuzioni su volume rappresentativo con carico osservato; il timer non è installato. D7, TSA/WORM e WindTre 89/90 restano aperti, elenco AdS ancora vuoto. Nessun cambiamento di copertura nella rete.
 
 ## Manifest precedente nella verifica mirata, 28/10/2026
 

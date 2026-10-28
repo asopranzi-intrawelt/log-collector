@@ -6,10 +6,14 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: ab4b24b861a7585c036bfde50665346ebcb0858a
+last-verified-commit: 7cae2da6a8140f7faa05571b0349b7827b819e68
 ---
 
 # Test di sviluppo
+
+## Misura della catena locale, 28/10/2026
+
+La suite `tests/test-nightly.sh` invoca il nuovo misuratore sui due giorni sintetici già chiusi: verifica esito, due manifest, tre archivi e tre originali. Dopo una modifica a un byte dell'originale, richiede `verification_failed`; un verificatore fittizio che modifica il campione durante l'esecuzione richiede `dataset_changed` e non fa passare un marcatore privato nell'output. La suite WSL passa. Nessuna prestazione della VM è deducibile da questi dati.
 
 ## Manifest precedente nella verifica di una data, 28/10/2026
 

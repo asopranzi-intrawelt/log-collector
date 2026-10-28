@@ -72,6 +72,8 @@ grep -Fq 'log di origine diverso' "$scratch/output" || {
     printf 'ERRORE: il fallimento non dipende dal byte alterato\n' >&2
     exit 1
 }
+expect_failure python3 "$project_dir/bin/ads-measure-verify.py" --log-root "$ADS_LOG_ROOT" --state-root "$ADS_STATE_ROOT"
+python3 -c 'import json,sys; d=json.load(open(sys.argv[1],encoding="utf-8")); assert d["status"] == "verification_failed"' "$scratch/output"
 grep -Fq 'gzip -dc -- "$archive" | cmp -s - "$raw"' "$project_dir/bin/ads-verify.sh"
 sed '/gzip -dc -- "\$archive" | cmp -s - "\$raw"/d' "$project_dir/bin/ads-verify.sh" >"$scratch/ads-verify-mutant.sh"
 if grep -Fq 'gzip -dc -- "$archive" | cmp -s - "$raw"' "$scratch/ads-verify-mutant.sh"; then
@@ -85,6 +87,9 @@ bash "$project_dir/bin/ads-verify.sh"
 printf '2026-10-07T10:00:00Z source-a login ok\n' >"$ADS_LOG_ROOT/source-a/2026-10-07.log"
 ADS_TODAY=2026-10-08 bash "$project_dir/bin/ads-nightly.sh"
 bash "$project_dir/bin/ads-verify.sh"
+python3 "$project_dir/bin/ads-measure-verify.py" --log-root "$ADS_LOG_ROOT" --state-root "$ADS_STATE_ROOT" >"$scratch/measure.json"
+python3 -c 'import json,sys; d=json.load(open(sys.argv[1],encoding="utf-8")); assert d["status"] == "ok" and d["manifests"] == 2 and d["archives"] == 3 and d["originals"] == 3 and d["elapsed_seconds"] >= 0' "$scratch/measure.json"
+[[ $(grep -Ec 'source-a|source-b|login' "$scratch/measure.json") -eq 0 ]]
 
 # Una verifica mirata non deve seguire un manifest precedente spostato fuori albero.
 mv -- "$ADS_STATE_ROOT/manifests/manifest-2026-10-06.txt" "$scratch/manifest-precedente"
@@ -173,4 +178,11 @@ grep -Fq 'oltre la finestra locale di 213' "$scratch/output"
 # Anche alterare il manifest precedente deve spezzare il legame del giorno seguente.
 printf 'x' >>"$ADS_STATE_ROOT/manifests/manifest-2026-10-06.txt"
 expect_failure bash "$project_dir/bin/ads-verify.sh"
+
+# Il rapporto non può essere valido se il campione cambia durante la misura.
+mkdir -p -- "$scratch/measure-case"
+cp -- "$project_dir/bin/ads-measure-verify.py" "$scratch/measure-case/ads-measure-verify.py"
+printf '%s\n' '#!/usr/bin/env bash' 'printf "private-marker" >&2' 'printf x >>"$ADS_LOG_ROOT/source-a/2026-10-07.log"' >"$scratch/measure-case/ads-verify.sh"
+expect_failure python3 "$scratch/measure-case/ads-measure-verify.py" --log-root "$ADS_LOG_ROOT" --state-root "$ADS_STATE_ROOT"
+python3 -c 'import json,sys; d=json.load(open(sys.argv[1],encoding="utf-8")); assert d["status"] == "dataset_changed" and "private-marker" not in open(sys.argv[1],encoding="utf-8").read()' "$scratch/output"
 printf 'test-nightly: OK (recupero, 213 giorni, ora legale, idempotenza, alterazioni, link simbolici e manifest precedente)\n'
