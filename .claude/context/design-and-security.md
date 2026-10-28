@@ -6,10 +6,18 @@ covers-paths:
   - bin/**
   - config/**
   - pilot/monitoring-hub/**
-last-verified-commit: 7cae2da6a8140f7faa05571b0349b7827b819e68
+last-verified-commit: 87ed83a5a0f6f6cfdf669808363c66e86f0f5826
 ---
 
 # Design e sicurezza applicativa
+
+## Confine dei mittenti non censiti, 28/10/2026
+
+Nel template attuale nftables accetta UDP 514 dalla LAN e il ramo finale di rsyslog scrive in `/srv/ads/` anche mittenti che non hanno un filtro esplicito. Il preflight segnala questa lacuna usando solo conteggi delle directory immediate, rifiutando link, nomi inattesi, duplicati fra categorie e indirizzi invalidi nei parametri; Seeweb nell'archivio AdS è sempre anomalia. Non legge i log e non sostituisce il filtro: la misura delle directory da sola non prova identità, completezza o classificazione degli eventi.
+
+## Confine Seeweb e diagnosi della misura, 28/10/2026
+
+Il solo IP sorgente nel tunnel non autentica il mittente. Finché l'IPv4 non è noto, il filtro e l'isolamento non sono attivabili in modo mirato; l'inoltro resta sospeso. Nel misuratore un errore di verifica e una mutazione del campione possono coesistere e devono risultare entrambi, senza riportare i dettagli potenzialmente sensibili del verificatore.
 
 ## Rapporto della verifica storica, 28/10/2026
 

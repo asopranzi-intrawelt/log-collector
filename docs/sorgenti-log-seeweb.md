@@ -1,5 +1,9 @@
 # Sorgenti Seeweb e stato della raccolta
 
+## Conferma del percorso privato, letta il 28/10/2026
+
+Nello screenshot_269 il supporto conferma che l'inoltro Syslog può passare nel tunnel IPsec esistente senza esposizione Internet, verso la VM Debian sulla porta UDP 514. Dichiarano che il traffico verso la VM sarà escluso dal NAT e che prima dell'attivazione verificheranno l'IPv4 sorgente effettivo dell'OPNsense. Per una prova prevedono eventi di accesso GUI e SSH, con utente e IP di origine quando la release li rende disponibili. Non hanno ancora comunicato l'IPv4 sorgente osservato, campioni nativi, categorie esatte, retention, buffering durante un fermo VPN o esito di ricezione. Il parametro locale `sorgenti.seeweb_opnsense` ha zero voci; la candidata rsyslog/nftables non è installata sulla VM. L'utente riferisce di aver inviato il 28/10 la risposta che consente la sola verifica preliminare del percorso e chiede di attendere il nostro via prima dell'inoltro. Il testo effettivamente inviato e la ricevuta non sono disponibili qui. Nessun evento Seeweb è attestato come raccolto; l'aggiornamento OPNsense resta separato e non autorizzato.
+
 ## Domanda del supporto sul tunnel, 23/10/2026
 
 Il supporto chiede se il server destinatario dei log sia quello su cui è configurato IPsec. Il chiarimento formulato specifica che i firewall terminano il tunnel e che il Debian del collettore, nella LAN di sede, riceve Syslog attraverso quel percorso; non è configurato come endpoint VPN. Destinazione UDP 514 privata, IP sorgente e selettori da verificare con Seeweb prima di abilitare il ricevitore. L'utente riferisce di aver inviato la risposta il 23/10, senza ricevuta disponibile qui. Nessun evento reale è stato ricevuto; si attende il provider. Dettaglio nel [dossier firewall](firewall-seeweb-opnsense.md).

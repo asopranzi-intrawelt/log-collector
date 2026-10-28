@@ -73,7 +73,7 @@ grep -Fq 'log di origine diverso' "$scratch/output" || {
     exit 1
 }
 expect_failure python3 "$project_dir/bin/ads-measure-verify.py" --log-root "$ADS_LOG_ROOT" --state-root "$ADS_STATE_ROOT"
-python3 -c 'import json,sys; d=json.load(open(sys.argv[1],encoding="utf-8")); assert d["status"] == "verification_failed"' "$scratch/output"
+python3 -c 'import json,sys; output=open(sys.argv[1],encoding="utf-8").read(); d=json.loads(output); assert d["status"] == "verification_failed" and "source-a" not in output' "$scratch/output"
 grep -Fq 'gzip -dc -- "$archive" | cmp -s - "$raw"' "$project_dir/bin/ads-verify.sh"
 sed '/gzip -dc -- "\$archive" | cmp -s - "\$raw"/d' "$project_dir/bin/ads-verify.sh" >"$scratch/ads-verify-mutant.sh"
 if grep -Fq 'gzip -dc -- "$archive" | cmp -s - "$raw"' "$scratch/ads-verify-mutant.sh"; then
@@ -185,4 +185,7 @@ cp -- "$project_dir/bin/ads-measure-verify.py" "$scratch/measure-case/ads-measur
 printf '%s\n' '#!/usr/bin/env bash' 'printf "private-marker" >&2' 'printf x >>"$ADS_LOG_ROOT/source-a/2026-10-07.log"' >"$scratch/measure-case/ads-verify.sh"
 expect_failure python3 "$scratch/measure-case/ads-measure-verify.py" --log-root "$ADS_LOG_ROOT" --state-root "$ADS_STATE_ROOT"
 python3 -c 'import json,sys; d=json.load(open(sys.argv[1],encoding="utf-8")); assert d["status"] == "dataset_changed" and "private-marker" not in open(sys.argv[1],encoding="utf-8").read()' "$scratch/output"
+printf '%s\n' '#!/usr/bin/env bash' 'printf x >>"$ADS_LOG_ROOT/source-a/2026-10-07.log"' 'exit 1' >"$scratch/measure-case/ads-verify.sh"
+expect_failure python3 "$scratch/measure-case/ads-measure-verify.py" --log-root "$ADS_LOG_ROOT" --state-root "$ADS_STATE_ROOT"
+python3 -c 'import json,sys; d=json.load(open(sys.argv[1],encoding="utf-8")); assert d["status"] == "verification_failed_and_dataset_changed"' "$scratch/output"
 printf 'test-nightly: OK (recupero, 213 giorni, ora legale, idempotenza, alterazioni, link simbolici e manifest precedente)\n'

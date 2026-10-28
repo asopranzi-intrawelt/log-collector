@@ -9,11 +9,19 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 7cae2da6a8140f7faa05571b0349b7827b819e68
+last-verified-commit: 87ed83a5a0f6f6cfdf669808363c66e86f0f5826
 stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai punti 3 e 7; eventi iLO tecnici separati con ritenzione 90 giorni attiva; catena locale provata in WSL, non installata; D7 bloccato da nomina ed elenco AdS
 ---
 
 # Lavoro in corso
+
+## Risposta Seeweb inviata e inventario mittenti candidato, 28/10/2026
+
+L'utente riferisce di aver inviato a Seeweb la risposta che autorizza la sola verifica preliminare dell'IPv4 sorgente e della rotta; testo effettivo e ricevuta non sono disponibili qui. Restano attesi IP osservato ed esito del provider, senza inoltro attivo. La revisione del ruleset ha trovato un ramo finale che scrive in AdS anche messaggi LAN non censiti. I parametri privati letti il 28/10 riportano una sola iLO tra le sorgenti Syslog; non provano l'assenza delle altre. Un nuovo preflight di sola lettura conta i mittenti presenti, ma non è stato eseguito sulla VM. Il prossimo passo è riconciliare con il proprietario i mittenti osservati e quelli silenziosi prima di proporre un filtro chiuso; nessuna configurazione ricevente è stata cambiata. D7, TSA/WORM ed elenco AdS restano aperti.
+
+## Risposta Seeweb e misura AdS, 28/10/2026
+
+Seeweb conferma Syslog nel tunnel IPsec esistente, senza esposizione Internet e senza NAT. Verificherà l'IP sorgente effettivo e attende il via; non ha ancora fornito quell'IP. La bozza autorizza la sola verifica preliminare, riservando l'attivazione a dopo la configurazione del ricevitore. I due dossier puliti della rete sono stati allineati senza toccare la lavorazione parallela del sito. Un test ha mostrato che il misuratore riportava soltanto la modifica del campione quando anche la verifica falliva; ora riporta entrambi gli esiti. Nessun flusso o timer attivato. D7, TSA/WORM, elenco AdS e WindTre 89/90 restano aperti.
 
 ## Campione per il costo della catena, 28/10/2026
 

@@ -6,10 +6,18 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 7cae2da6a8140f7faa05571b0349b7827b819e68
+last-verified-commit: 87ed83a5a0f6f6cfdf669808363c66e86f0f5826
 ---
 
 # Test di sviluppo
+
+## Preflight dei mittenti AdS, 28/10/2026
+
+`tests/test_source_inventory.py` ha 14 prove verdi: indirizzi censiti e locali, sconosciuti, Seeweb nell'archivio AdS, voci inattese, root assente o collegata, duplicati/IPv4 invalidi e lettura negata. Una mutazione che ignorava gli sconosciuti ha fatto fallire la prova mirata; il codice è stato ripristinato con SHA verificato. Ruff passa. Una prova Linux su `/tmp` ha esercitato il ramo con descriptor e `O_NOFOLLOW`; non ha letto `/srv/ads` della VM. Il test su fixture non misura il flusso reale.
+
+## Doppio difetto nella misura AdS, 28/10/2026
+
+La prova WSL rende il verificatore non riuscito mentre cambia il campione e richiede `verification_failed_and_dataset_changed` con codice 2. Prima della correzione il test era rosso perché il JSON indicava solo `dataset_changed`; dopo è verde. Un altro caso verifica che il rapporto di errore non includa il nome della sorgente. Non è un test con dati o carico della VM.
 
 ## Misura della catena locale, 28/10/2026
 

@@ -8,10 +8,18 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 7cae2da6a8140f7faa05571b0349b7827b819e68
+last-verified-commit: 87ed83a5a0f6f6cfdf669808363c66e86f0f5826
 ---
 
 # Stack applicativo
+
+## Inventario dei mittenti AdS, 28/10/2026
+
+`bin/ads-source-inventory.py` legge solo le directory immediate dell'archivio AdS e confronta i nomi IPv4 con le sorgenti dei parametri privati. Restituisce una riga JSON di conteggi, senza indirizzi o contenuto dei log. È un preflight candidato per riconciliare l'inventario prima di rendere esplicito il ramo finale del ricevitore rsyslog; il filtro non cambia in questo diff.
+
+## Riscontro Seeweb e misura storica, 28/10/2026
+
+Il ricevitore Seeweb resta candidato: la sorgente privata non è configurata e non vi è inoltro reale. Il misuratore distingue ora fallimento della verifica, campione cambiato e compresenza dei due difetti nel campo `status`.
 
 ## Misura della verifica storica, 28/10/2026
 

@@ -5,10 +5,18 @@ generated-date: 2026-09-30
 covers-paths:
   - config/**
   - docs/handoff-sviluppo-collettore.md
-last-verified-commit: 7cae2da6a8140f7faa05571b0349b7827b819e68
+last-verified-commit: 87ed83a5a0f6f6cfdf669808363c66e86f0f5826
 ---
 
 # Deployment
+
+## Preflight inventario prima del nuovo filtro, 28/10/2026
+
+Il comando candidato `ads-source-inventory.py` richiede la copia privata dei parametri e accesso di lettura alle directory immediate di `/srv/ads/`; non apre file di log. Non è installato né eseguito sulla VM. Un risultato locale `ok` non certifica sorgenti silenziose o flussi futuri. Prima di cambiare il catch-all del servizio occorrono inventario reale, proprietari, confronto con i parametri e smoke test per ogni sorgente attiva; l'eventuale esecuzione sulla VM segue l'autorizzazione per comando prevista dal progetto.
+
+## Gate di attivazione Seeweb, 28/10/2026
+
+Il supporto può verificare IP sorgente e rotta del tunnel. Il via all'inoltro segue la comunicazione dell'IP e l'installazione del ricevitore filtrato per la sola sorgente. Il percorso confermato dal provider non prova ancora ricezione, isolamento o persistenza sulla VM; nessun servizio è stato modificato in questo giro.
 
 ## Benchmark prima del timer, 28/10/2026
 

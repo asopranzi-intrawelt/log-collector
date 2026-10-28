@@ -83,9 +83,10 @@ def measure(log_root: Path, state_root: Path) -> tuple[dict[str, object], int]:
     usage_after = resource.getrusage(resource.RUSAGE_CHILDREN)
     after, fingerprint_after = _snapshot(log_root, state_root)
     stable = fingerprint == fingerprint_after and before == after
-    status = "ok" if result.returncode == 0 and stable else (
-        "dataset_changed" if not stable else "verification_failed"
-    )
+    if result.returncode != 0:
+        status = "verification_failed_and_dataset_changed" if not stable else "verification_failed"
+    else:
+        status = "ok" if stable else "dataset_changed"
     report: dict[str, object] = {
         "status": status,
         "elapsed_seconds": round(elapsed, 3),

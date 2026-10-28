@@ -1,5 +1,13 @@
 # Snapshot di sincronizzazione
 
+## Risposta Seeweb inviata e preflight mittenti, 28/10/2026
+
+L'utente riferisce di aver inviato il seguito a Seeweb; testo e ricevuta non sono disponibili. Si attende l'IPv4 sorgente e l'esito della verifica del tunnel, senza attivare l'inoltro. Il ricevitore corrente ha un catch-all LAN verso l'archivio AdS, mentre i parametri privati censiscono solo una iLO fra le sorgenti Syslog: restringerlo subito rischierebbe di perdere fonti attive. Il nuovo preflight conta i mittenti AdS senza leggere log o mostrare IP; 14 prove e mutazione mirata passano, ma manca la misura sulla VM. I due dossier Seeweb della rete registrano l'invio riferito dall'utente; i file del sito parallelo restano intatti. Nessun host, servizio o filtro modificato. D7, TSA/WORM, elenco AdS e WindTre 89/90 aperti.
+
+## Riscontro Seeweb e doppio esito della misura, 28/10/2026
+
+L'utente ha pubblicato il misuratore AdS in `87ed83a` e ha fornito screenshot_269. Seeweb conferma il tunnel IPsec senza NAT verso il ricevitore privato, ma deve ancora comunicare l'IP sorgente. La risposta pronta consente la sola verifica preliminare e rinvia l'inoltro finché il ricevitore non sarà configurato. Due dossier Seeweb puliti della rete sono stati aggiornati; i file paralleli del sito sono rimasti intatti. Il misuratore ora distingue l'errore simultaneo di verifica e mutazione del campione, con prova rossa prima e verde dopo. Nessuna ricezione reale, misura VM o timer attivo. D7, TSA/WORM, elenco AdS e WindTre 89/90 aperti.
+
 ## Misura ripetibile della verifica AdS, 28/10/2026
 
 L'utente ha pubblicato `7cae2da`, con worktree pulito. Il nuovo `ads-measure-verify.py` esegue la verifica storica su Linux e restituisce JSON minimizzato con durata, CPU, massimo RSS del singolo figlio, operazioni a blocchi e dimensione del campione. La suite WSL con tre archivi sintetici prova esito positivo, errore di integrità e campione mutato senza esporre contenuti. Nessuna misura della VM o attivazione del timer: D7, TSA/WORM e WindTre 89/90 aperti; rete invariata.
