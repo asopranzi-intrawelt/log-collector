@@ -484,8 +484,13 @@ def autotest():
     totale = len(casi_iban) + len(casi_carta) + 3
     # esclusione per decisione: toglie solo la categoria dichiarata, sotto il solo prefisso
     importo_fittizio = chr(0x20AC) + "10"
+    # Anche il nome di prova si compone a tempo di esecuzione, come l'importo qui sopra:
+    # scritto per intero in questo file, che e' tracciato, lo strumento trova se stesso,
+    # perche' ESCLUSIONI_PREDEFINITE copre il solo prefisso .claude/templates/ e non
+    # arriva alla copia istanziata sotto tools/.
+    nome_fittizio = "Mario" + " " + "Rossi"
     finto = {"IMPORTO": [("vendor/x.md", 1, importo_fittizio, "", "tracciato"), ("docs/y.md", 1, importo_fittizio, "", "tracciato")],
-             "NOME PROPRIO": [("vendor/x.md", 2, "Mario Rossi", "", "tracciato")]}
+             "NOME PROPRIO": [("vendor/x.md", 2, nome_fittizio, "", "tracciato")]}
     pat_esc = {"percorsi_esclusi_per_decisione": [{"prefisso": "vendor/", "categorie": ["IMPORTO"], "motivo": "prova"}]}
     resto = escludi_per_decisione(pat_esc, finto)
     totale += 1
