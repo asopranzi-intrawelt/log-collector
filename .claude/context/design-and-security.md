@@ -6,7 +6,7 @@ covers-paths:
   - bin/**
   - config/**
   - pilot/monitoring-hub/**
-last-verified-commit: dfc284b73df13a8d90e0596a951f624f33f9de1e
+last-verified-commit: 78b286496c7729d86c7d64f20465c76f1543a9e7
 ---
 
 # Design e sicurezza applicativa
@@ -17,7 +17,7 @@ La guardia del pilot confronta l'intero ruleset attivo con un baseline canonico 
 
 ## Guardie dell'applicazione Seeweb, 29/10/2026
 
-Il manifesto privato lega con SHA-256 entrambi i file live e i candidati. L'applicatore rifiuta un IP di destinazione non assegnato alla VM, tabelle nftables aggiuntive, un mittente assente o duplicato nei candidati, drift dei file e backup alterati. Il blocco di processo impedisce due applicazioni dello stesso strumento in parallelo; non blocca altri gestori di nftables o rsyslog. Il lock sotto `/run/lock` non segue link simbolici e richiede file regolare di root, 0600 e con un solo collegamento, evitando modifiche ai permessi del bersaglio di un link preesistente. Il ritorno rifiuta un live diverso dal candidato. Non sono state osservate le regole attive complete della VM in questa prova e nessun servizio è stato cambiato.
+Il manifesto privato lega con SHA-256 entrambi i file live e i candidati. L'applicatore rifiuta un IP di destinazione non assegnato alla VM, tabelle nftables aggiuntive, un mittente assente o duplicato nei candidati, drift dei file e backup alterati. Il blocco di processo impedisce due applicazioni dello stesso strumento in parallelo; non blocca altri gestori di nftables o rsyslog. Il lock sotto `/run/lock` non segue link simbolici e richiede file regolare di root, 0600 e con un solo collegamento, evitando modifiche ai permessi del bersaglio di un link preesistente. Bundle e backup richiedono directory di root 0700 e file di root 0600 a singolo link: i soli hash non proteggono un manifesto che un altro utente può riscrivere. Il ritorno rifiuta un live diverso dal candidato. Non sono state osservate le regole attive complete della VM in questa prova e nessun servizio è stato cambiato.
 
 ## Configurazione mirata e limiti della prova Seeweb, 29/10/2026
 

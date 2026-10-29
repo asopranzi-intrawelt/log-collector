@@ -24,7 +24,7 @@ class PilotApplyTests(unittest.TestCase):
         self.addCleanup(self.temporary.cleanup)
         self.root = pathlib.Path(self.temporary.name)
         self.bundle = self.root / "bundle"
-        self.bundle.mkdir()
+        self.bundle.mkdir(mode=0o700)
         self.targets = {
             "candidate-10-ads.conf": self.root / "10-ads.conf",
             "candidate-nftables.conf": self.root / "nftables.conf",
@@ -53,6 +53,8 @@ class PilotApplyTests(unittest.TestCase):
             },
         }
         (self.bundle / "manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+        for item in self.bundle.iterdir():
+            item.chmod(0o600)
         self.calls: list[tuple[str, ...]] = []
         self.destination_patch = patch.object(MODULE, "check_local_destination")
         self.tables_patch = patch.object(MODULE, "check_nft_tables")
@@ -84,6 +86,22 @@ class PilotApplyTests(unittest.TestCase):
         (self.bundle / "candidate-nftables.conf").write_bytes(b"alterato\n")
         with patch.object(MODULE, "run", side_effect=self.fake_run):
             with self.assertRaisesRegex(MODULE.PilotError, "impronta candidata diversa"):
+                MODULE.check(self.bundle, self.targets)
+        self.assertEqual(self.calls, [])
+        self.assert_old()
+
+    def test_check_rifiuta_bundle_scrivibile_da_altri(self) -> None:
+        self.bundle.chmod(0o777)
+        with patch.object(MODULE, "run", side_effect=self.fake_run):
+            with self.assertRaisesRegex(MODULE.PilotError, "bundle non protetto"):
+                MODULE.check(self.bundle, self.targets)
+        self.assertEqual(self.calls, [])
+        self.assert_old()
+
+    def test_check_rifiuta_manifesto_scrivibile_da_altri(self) -> None:
+        (self.bundle / "manifest.json").chmod(0o666)
+        with patch.object(MODULE, "run", side_effect=self.fake_run):
+            with self.assertRaisesRegex(MODULE.PilotError, "manifesto non protetto"):
                 MODULE.check(self.bundle, self.targets)
         self.assertEqual(self.calls, [])
         self.assert_old()
@@ -120,6 +138,15 @@ class PilotApplyTests(unittest.TestCase):
             MODULE.rollback(self.root / "backups", backup.name, self.targets)
         self.assert_old()
         self.assertTrue((backup / "metadata.json").is_file())
+
+    def test_rollback_rifiuta_backup_scrivibile_da_altri(self) -> None:
+        with patch.object(MODULE, "run", side_effect=self.fake_run):
+            backup = MODULE.apply(self.bundle, self.targets, self.root / "backups")
+        backup.chmod(0o777)
+        with self.assertRaisesRegex(MODULE.PilotError, "backup non protetto"):
+            MODULE.rollback(self.root / "backups", backup.name, self.targets)
+        for name, target in self.targets.items():
+            self.assertEqual(target.read_bytes(), self.new[name])
 
     def test_rollback_rifiuta_live_successivamente_alterato(self) -> None:
         with patch.object(MODULE, "run", side_effect=self.fake_run):

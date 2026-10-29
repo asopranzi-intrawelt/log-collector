@@ -1,5 +1,17 @@
 # Snapshot di sincronizzazione
 
+## Canon iR-ADV C5840 raggiungibile da remoto, 29/10/2026
+
+L'utente conferma il modello iR-ADV C5840 e mostra Canon Remote Operation Viewer 2.4, screenshot_173 SHA-256 `A35E7165BB7DE50FFB082CC64AE8AE718352F3622936966D35ADB13E1A0EA99B`. Matricola e indirizzo restano privati. Il pannello remoto consente una verifica iniziale senza visita, ma non attesta audit attivo, export o TLS. La guida Canon della serie C5800 documenta log di autenticazione e gestione, CSV e Syslog; leggere menu e campione reali prima di integrare. ReadMeter su VM100 resta candidato, non installato; ISO-30 non cambia.
+
+## MyOffice e sorgente Canon, 29/10/2026
+
+MyOffice nello screenshot_170, SHA-256 `5F1D6C7C78A623C9F6F0F4EAAEEC4A15DCAE98AB488F73F1AEFE463EBDE99143`, indica un host Windows acceso per ReadMeter e non può fornire i log richiesti. L'utente sceglie VM100 Windows Server 2022 come candidata. La VM è multiservizio e il firewall risulta spento: requisiti e impatto vanno chiariti prima dell'installazione. Il modello Canon iR-ADV C5840 è confermato; firmware e audit attivo restano da verificare. `D:/network-design` è aggiornato con topologia, mappa e ISO-30 in corso. Ricognizione del pannello in sola lettura subito, integrazione dopo il gate Seeweb; nessun nuovo flusso.
+
+## Bundle Seeweb protetto, 29/10/2026
+
+Dopo il `chiudi` dell'utente il collettore è a `78b2864`. L'utente riferisce di avere risposto a Seeweb; testo e ricevuta non sono nel progetto. Tre prove inizialmente rosse hanno portato l'applicatore a rifiutare directory e file del bundle o del backup non custoditi da root. Ventuno prove WSL root e Ruff passano. L'archivio privato dei quattro file è stato rigenerato e verificato, SHA-256 `3cac4199df8fb2c7944cb803fa05446d3663ce4c37057cfb3a70ecdcf374002c`; nessun trasferimento o deploy. Restano `--check` root sulla VM, applicazione manuale e prova Syslog reale, separati dall'upgrade OPNsense.
+
 ## Seeweb 26.7.7 e VM del collettore, 29/10/2026
 
 Lo screenshot_135 del provider, SHA-256 `42967B6F4F40E57EE092618DA1283A8FAD3D9E83BC9EE2D7F792DD5911E951F7`, chiarisce release 26.7.7, snapshot hypervisor, backup completo e attività prevista entro due ore con disservizio durante i riavvii. VPN da verificare e test dei servizi a nostro carico; console, backup ripristinabile, soglia di rollback e finestra sono ancora da concordare. Il bundle del collettore conserva le due impronte live rilette via SSH; root sulla VM è ancora necessario per il ruleset. Sonda SSH: servizi attivi, UDP 514 in ascolto, filesystem `/srv/ads` 1% e `/var/log` 44%, senza prova di ricezione Seeweb. Il lock dell'applicatore è protetto e 18 prove WSL root passano, compresa la mutazione discriminante. Archivio privato con quattro file verificato, non trasferito. Nessun deploy o evento Seeweb reale. ISO-27/30 e Cliente-1 89/90 in corso.

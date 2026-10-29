@@ -5,10 +5,14 @@ generated-date: 2026-09-30
 covers-paths:
   - config/**
   - docs/handoff-sviluppo-collettore.md
-last-verified-commit: dfc284b73df13a8d90e0596a951f624f33f9de1e
+last-verified-commit: 78b286496c7729d86c7d64f20465c76f1543a9e7
 ---
 
 # Deployment
+
+## Pacchetto e custodia del pilot Seeweb, 29/10/2026
+
+Dopo il `chiudi` dell'utente a `78b2864`, il bundle privato è stato rigenerato con la guardia su directory e file del pacchetto e del backup. L'archivio operativo ora ha SHA-256 `3cac4199df8fb2c7944cb803fa05446d3663ce4c37057cfb3a70ecdcf374002c`; quello precedente è conservato separatamente. Il runbook del componente 2 espone trasferimento con host key obbligatoria, confronto dell'impronta, estrazione nella directory di root 0700 e `--check`. Nessun trasferimento è stato eseguito. L'utente riferisce di avere risposto a Seeweb; il testo inviato non è stato acquisito.
 
 ## Preflight privilegiato Seeweb, 29/10/2026
 

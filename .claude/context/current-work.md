@@ -9,11 +9,23 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: dfc284b73df13a8d90e0596a951f624f33f9de1e
+last-verified-commit: 78b286496c7729d86c7d64f20465c76f1543a9e7
 stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai punti 3 e 7; eventi iLO tecnici separati con ritenzione 90 giorni attiva; catena locale provata in WSL, non installata; D7 bloccato da nomina ed elenco AdS
 ---
 
 # Lavoro in corso
+
+## Modello Canon confermato e pannello remoto, 29/10/2026
+
+L'utente identifica la Canon del Piano 1 come iR-ADV C5840 e mostra Canon Remote Operation Viewer 2.4 connesso, screenshot_173. Indirizzo e matricola sono nel livello privato. Il viewer prova l'accesso remoto al pannello, non la raccolta dei log. La guida ufficiale della serie C5800 è ora pertinente al modello; firmware, menu Audit Log/Syslog, TLS, campione e ritenzione restano da leggere sul dispositivo. L'URL web indicato è HTTP: controllare il percorso cifrato prima di usarvi credenziali amministrative. Ricognizione in sola lettura subito; integrazione dopo il gate Seeweb e un campione reale. Nessun flusso Canon è attivo.
+
+## Risposta MyOffice e audit Canon, 29/10/2026
+
+Lo screenshot_170, conservato privatamente, dice che MyOffice preferisce un host Windows acceso durante la giornata per ReadMeter 7 e non può fornire i log richiesti. L'utente sceglie VM100 Windows Server 2022 come candidata, senza avere installato l'agente. VM100 è multiservizio, ospita la rilevazione presenze e ha firewall Windows disattivato secondo il censimento di rete: prima della finestra con il fornitore servono privilegi, comunicazioni, dati, impatto e ritorno. La documentazione Canon per la serie C5800 descrive audit di login e gestione, CSV e Syslog nativi; il modello iR-ADV C5840 è confermato, mentre firmware e funzioni attive sono ancora da verificare. La ricognizione del pannello può iniziare subito in sola lettura; l'integrazione viene dopo il gate Seeweb sulla VM e un campione reale. Nessun flusso Canon è in esercizio.
+
+## Bundle Seeweb protetto dopo la chiusura, 29/10/2026
+
+L'utente ha fatto `chiudi`: collettore `78b2864`, worktree inizialmente pulito, e riferisce di aver risposto a Seeweb senza allegare testo o ricevuta. Tre prove nuove hanno mostrato che l'applicatore accettava bundle o backup scrivibili da altri; erano rosse sul codice pubblicato. Ora il preflight richiede directory di root 0700 e file di root 0600 a singolo link. Ventuno prove WSL root e Ruff passano. L'archivio operativo privato è stato rigenerato e verificato con nuova impronta; il precedente resta archiviato. Nessun trasferimento o applicazione sulla VM. Il prossimo gate è `--check` come root sulla VM, poi applicazione manuale del solo ricevitore e test UDP concordato; l'upgrade OPNsense ha piano e finestra distinti.
 
 ## Chiarimento Seeweb, VM e lock del pilot, 29/10/2026
 

@@ -6,10 +6,14 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: dfc284b73df13a8d90e0596a951f624f33f9de1e
+last-verified-commit: 78b286496c7729d86c7d64f20465c76f1543a9e7
 ---
 
 # Test di sviluppo
+
+## Proprietà del bundle e del backup Seeweb, 29/10/2026
+
+Tre prove WSL root erano rosse: directory del bundle 0777, manifesto 0666 e backup 0777 erano accettati. Dopo la guardia su tipo, proprietario, modalità e numero di link le stesse prove e l'intera suite di 21 test sono verdi; Ruff passa. Il pacchetto privato con il codice aggiornato è ripetibile e contiene quattro file regolari con proprietà e modalità previste. La prova non sostituisce `--check` root sulla VM né attesta un evento Seeweb ricevuto.
 
 ## Impronta del ruleset del pilot Seeweb, 29/10/2026
 

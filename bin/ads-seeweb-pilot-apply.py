@@ -101,6 +101,33 @@ def regular_file(path: pathlib.Path) -> os.stat_result:
     return info
 
 
+def private_directory(path: pathlib.Path, label: str) -> None:
+    try:
+        info = path.lstat()
+    except FileNotFoundError as exc:
+        raise PilotError(f"{label} assente") from exc
+    if (
+        not stat.S_ISDIR(info.st_mode)
+        or info.st_uid != 0
+        or stat.S_IMODE(info.st_mode) != 0o700
+    ):
+        raise PilotError(f"{label} non protetto")
+
+
+def private_file(path: pathlib.Path, label: str) -> None:
+    try:
+        info = path.lstat()
+    except FileNotFoundError as exc:
+        raise PilotError(f"{label} assente") from exc
+    if (
+        not stat.S_ISREG(info.st_mode)
+        or info.st_uid != 0
+        or info.st_nlink != 1
+        or stat.S_IMODE(info.st_mode) != 0o600
+    ):
+        raise PilotError(f"{label} non protetto")
+
+
 def open_lock(path: pathlib.Path):
     try:
         fd = os.open(path, os.O_RDWR | os.O_CREAT | os.O_NOFOLLOW | os.O_CLOEXEC, 0o600)
@@ -122,7 +149,8 @@ def open_lock(path: pathlib.Path):
 
 
 def load_bundle(bundle: pathlib.Path, targets: dict[str, pathlib.Path]) -> dict:
-    regular_file(bundle / "manifest.json")
+    private_directory(bundle, "bundle")
+    private_file(bundle / "manifest.json", "manifesto")
     manifest = json.loads((bundle / "manifest.json").read_text(encoding="utf-8"))
     if set(manifest.get("files", {})) != set(targets):
         raise PilotError("manifesto: insieme dei file inatteso")
@@ -135,7 +163,7 @@ def load_bundle(bundle: pathlib.Path, targets: dict[str, pathlib.Path]) -> dict:
         entry = manifest["files"][name]
         if set(entry) != {"sha256", "live_sha256"}:
             raise PilotError(f"manifesto incompleto: {name}")
-        regular_file(bundle / name)
+        private_file(bundle / name, f"candidato {name}")
         regular_file(target)
         if digest((bundle / name).read_bytes()) != entry["sha256"]:
             raise PilotError(f"impronta candidata diversa: {name}")
@@ -182,15 +210,12 @@ def replace_file(path: pathlib.Path, data: bytes, info: os.stat_result) -> None:
 def backup_current(
     targets: dict[str, pathlib.Path], root: pathlib.Path, manifest: dict
 ) -> tuple[pathlib.Path, dict]:
-    if root.exists() and (root.is_symlink() or not root.is_dir()):
-        raise PilotError("directory backup non valida")
     root.mkdir(mode=0o700, parents=True, exist_ok=True)
-    if root.stat().st_uid != 0:
-        raise PilotError("directory backup non di root")
-    os.chmod(root, 0o700)
+    private_directory(root, "directory backup")
     stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%S%fZ")
     backup = root / stamp
     backup.mkdir(mode=0o700)
+    private_directory(backup, "backup")
     originals = {}
     for name, target in targets.items():
         info = regular_file(target)
@@ -245,7 +270,7 @@ def apply(
                 raise PilotError(f"live cambiato durante il pilot: {target.name}")
             if service == "nftables":
                 check_nft_ruleset(manifest["nft_active_baseline_sha256"])
-            regular_file(bundle / name)
+            private_file(bundle / name, f"candidato {name}")
             candidate = (bundle / name).read_bytes()
             if digest(candidate) != manifest["files"][name]["sha256"]:
                 raise PilotError(f"candidato cambiato durante il pilot: {name}")
@@ -285,11 +310,11 @@ def rollback(
 ) -> pathlib.Path:
     if not re.fullmatch(r"\d{8}T\d{12}Z", backup_id):
         raise PilotError("identificativo backup non valido")
+    private_directory(backup_root, "directory backup")
     backup = backup_root / backup_id
-    if backup.is_symlink() or not backup.is_dir() or backup.stat().st_uid != 0:
-        raise PilotError("backup assente o non protetto")
-    regular_file(backup / "manifest.json")
-    regular_file(backup / "metadata.json")
+    private_directory(backup, "backup")
+    private_file(backup / "manifest.json", "manifesto backup")
+    private_file(backup / "metadata.json", "metadata backup")
     manifest = json.loads((backup / "manifest.json").read_text(encoding="utf-8"))
     metadata = json.loads((backup / "metadata.json").read_text(encoding="utf-8"))
     if set(manifest.get("files", {})) != set(targets) or set(metadata) != set(targets):
@@ -300,7 +325,7 @@ def rollback(
     for name, target in targets.items():
         info = regular_file(target)
         current = target.read_bytes()
-        regular_file(backup / name)
+        private_file(backup / name, f"file backup {name}")
         baseline = (backup / name).read_bytes()
         expected = manifest["files"][name]
         fields = metadata[name]
