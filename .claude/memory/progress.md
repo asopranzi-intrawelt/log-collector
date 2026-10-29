@@ -1,5 +1,11 @@
 # Work-log
 
+## 2026-10-29 - Bundle Seeweb mirato al baseline reale della VM
+
+L'utente ha pubblicato `4b06339` e riferisce di aver risposto a Seeweb, senza ricevuta o testo effettivo disponibili. La VM è stata letta via SSH senza modifiche: rsyslog e nftables attivi, `/srv/ads` ext4 con `nodev,nosuid,noexec`, timer nightly, silence e salute quarantena inattivi. Le impronte dei file installati non coincidono con il render completo senza Seeweb perché quest'ultimo include anche il filtro heartbeat Windows e il nome dell'ingresso TLS. Creato nel livello privato un bundle del solo test Seeweb, preparato soltanto dopo verifica delle due impronte live: aggiunge una regola UDP e un ramo rsyslog verso l'archivio tecnico. `nft -c`, `rsyslogd -N1`, invio UDP da loopback distinto, file `root:root` 0640/0750 e assenza nel deposito AdS passano in Debian 13; mutando l'IP atteso il file tecnico manca e la prova fallisce. Il primo `nft -c` senza NET_ADMIN non era una verifica valida ed è stato ripetuto nel container isolato con tale capacità. Nessun deploy, nessun log reale Seeweb e nessun Git di scrittura. Aggiornati runbook, dossier Seeweb, handoff, cinque schede, indice, work-log e bundle privato. La rete è congelata da questo filone finché l'altra sessione riconcilia il commit unico; ISO-30 e Cliente-1 89/90 restano aperti.
+
+**Template:** nessuna.
+
 ## 2026-10-29 - Seeweb verifica IPsec; MyOffice e PBX censiti
 
 Letti gli screenshot_82 e 80 dalla cartella Screenpresso e le tre pagine della lettera Albalog. Seeweb comunica l'IP sorgente OPNsense e riferisce la cattura di pacchetti cifrati nel tunnel verso la VM: protocollo/porta della cattura e ricezione Syslog non sono dimostrati. Il parametro privato contiene ora il solo mittente confermato; il render locale di nftables e rsyslog tecnico passa, senza installazione. L'utente conferma che MyOffice gestisce una Canon, distinta dall'altra multifunzione; ha chiesto dove risiederà ReadMeter 7 e se inoltra registri. La lettera descrive SNMP dei consumabili e HTTPS verso SatWeb Portal, non audit amministrativo. Il PBX cloud Vianova UCC richiede campioni ed export dei login amministrativi e dei cambi. Aggiornati dossier, handoff, matrice, cinque schede, indice e work-log; rete allineata con timeline. Nessun Git o deploy dell'agente, ISO-30 e Cliente-1 89/90 in corso.

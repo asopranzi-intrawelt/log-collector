@@ -6,10 +6,14 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 05137cd920e98ed1c629a7832615f2d22cb9c476
+last-verified-commit: 4b06339da3f1f8ea3703f825d93951aad82b15e9
 ---
 
 # Test di sviluppo
+
+## Prova del bundle Seeweb derivato dalla VM, 29/10/2026
+
+I due file live sono stati letti via SSH con host key obbligatoria e impronte SHA-256 verificate. `prepare.py` ha generato solo il ramo rsyslog tecnico e la regola nftables del mittente Seeweb. Nel container Debian 13, con `NET_ADMIN` soltanto per `nft -c`, entrambe le sintassi passano; un UDP da un secondo loopback produce il file tecnico `root:root` 0640 nella cartella 0750 e nessun file AdS. Una mutazione del confronto IP nella copia del container lascia assente il file tecnico e rende rossa la prova. La prima corsa senza `NET_ADMIN` non ha esercitato nftables ed è stata scartata. Non sono state provate ricezione via VPN, log reali, rotazione o capienza sulla VM.
 
 ## Render privato Seeweb, 29/10/2026
 

@@ -9,11 +9,15 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 05137cd920e98ed1c629a7832615f2d22cb9c476
+last-verified-commit: 4b06339da3f1f8ea3703f825d93951aad82b15e9
 stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai punti 3 e 7; eventi iLO tecnici separati con ritenzione 90 giorni attiva; catena locale provata in WSL, non installata; D7 bloccato da nomina ed elenco AdS
 ---
 
 # Lavoro in corso
+
+## Risposta Seeweb inviata e bundle di prova, 29/10/2026
+
+L'utente riferisce di aver risposto al ticket Seeweb, senza testo o ricevuta disponibili qui. Sul collettore VM rsyslog e nftables sono attivi, mentre i timer nightly, silence e salute quarantena sono inattivi; `/srv/ads` resta ext4 montato `rw,nosuid,nodev,noexec`. Le due configurazioni live differiscono dal render completo anche per heartbeat: un bundle privato con hash guard prepara soltanto la sorgente Seeweb. Sintassi Debian, smistamento UDP nel deposito tecnico e permessi passano; mutando l'IP atteso la prova fallisce. Nessun file installato, nessun evento reale Seeweb ricevuto. La rete rimane affidata alla sua sessione per il commit unico e non viene più scritta da questo filone.
 
 ## Seeweb, MyOffice e PBX cloud, 29/10/2026
 

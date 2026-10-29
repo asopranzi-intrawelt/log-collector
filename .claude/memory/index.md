@@ -1,5 +1,9 @@
 # Snapshot di sincronizzazione
 
+## Bundle Seeweb dal baseline VM, 29/10/2026
+
+Collettore `4b06339` pubblicato e pulito alla ripresa. L'utente riferisce risposta Seeweb inviata. Lettura SSH conferma rsyslog/nftables attivi, timer AdS inattivi e mount ext4; il render completo differisce dal live anche per heartbeat. Bundle privato con doppio hash guard prepara solo Seeweb: sintassi e ricezione UDP sintetica nel deposito tecnico passano in Debian; mutazione dell'IP rende rossa la prova. Nessun deploy né evento Seeweb reale. La rete è in mano alla sua sessione per il commit unico; questo filone non vi scrive più.
+
 ## Riscontro Seeweb, MyOffice e PBX, 29/10/2026
 
 Letti gli screenshot_82 e 80 dalla cartella Screenpresso e la lettera Albalog. Seeweb conferma mittente e percorso cifrato, ma non prova Syslog. Parametro privato aggiornato e render locale verde; niente deploy. MyOffice gestisce una Canon; ReadMeter 7 è telemetria e la risposta alla mail è attesa. Audit del PBX Vianova UCC da ricognire. Dossier del collettore e della rete aggiornati; ISO-30 e Cliente-1 89/90 restano aperti. Git e deploy manuali.

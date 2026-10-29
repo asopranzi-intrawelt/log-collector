@@ -8,10 +8,14 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 05137cd920e98ed1c629a7832615f2d22cb9c476
+last-verified-commit: 4b06339da3f1f8ea3703f825d93951aad82b15e9
 ---
 
 # Stack applicativo
+
+## Bundle mirato Seeweb dal baseline installato, 29/10/2026
+
+Il bundle privato del primo test deriva dai file rsyslog e nftables letti in sola lettura sulla VM, con SHA-256 verificati prima di generare due candidati. Il render completo aggiungerebbe anche la logica heartbeat Windows non installata: questo bundle inserisce soltanto il ramo tecnico Seeweb e la regola UDP del suo IP. Nessun componente della VM è stato cambiato; il renderer completo resta la fonte per l'allineamento successivo.
 
 ## Riscontro Seeweb e sorgenti MyOffice, 29/10/2026
 

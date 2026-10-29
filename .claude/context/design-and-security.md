@@ -6,10 +6,14 @@ covers-paths:
   - bin/**
   - config/**
   - pilot/monitoring-hub/**
-last-verified-commit: 05137cd920e98ed1c629a7832615f2d22cb9c476
+last-verified-commit: 4b06339da3f1f8ea3703f825d93951aad82b15e9
 ---
 
 # Design e sicurezza applicativa
+
+## Configurazione mirata e limiti della prova Seeweb, 29/10/2026
+
+La regola firewall del bundle ammette solo l'IPv4 sorgente riferito dal provider su UDP 514, e il ramo rsyslog mette tutti i suoi messaggi nel deposito tecnico `root:root`, fuori da AdS. La prova container con sorgente loopback esercita realmente l'indirizzo di provenienza; mutandone il confronto il file tecnico manca. IP e tunnel non autenticano da soli il dispositivo, né la prova sintetica dimostra consegna, formato o affidabilità degli eventi Seeweb reali. Il bundle resta privato e non installato.
 
 ## Confini dei flussi MyOffice e Seeweb, 29/10/2026
 

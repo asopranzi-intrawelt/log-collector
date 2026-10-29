@@ -5,10 +5,14 @@ generated-date: 2026-09-30
 covers-paths:
   - config/**
   - docs/handoff-sviluppo-collettore.md
-last-verified-commit: 05137cd920e98ed1c629a7832615f2d22cb9c476
+last-verified-commit: 4b06339da3f1f8ea3703f825d93951aad82b15e9
 ---
 
 # Deployment
+
+## Gate del primo test Seeweb, 29/10/2026
+
+Il bundle privato `_notes/lavoro-corrente/seeweb-pilot-20261029/` è generato dai due file della VM solo se entrambi hanno ancora le impronte osservate. La prova Debian ne verifica sintassi, ramo UDP e permessi; non è un deploy. L'applicazione manuale richiede un nuovo confronto SHA sulla VM, copie di sicurezza, convalida dei file candidati, rollback e verifica locale prima di chiedere l'inoltro al provider. Il render completo attiverebbe anche il filtro heartbeat Windows candidato e non va usato per questo test circoscritto.
 
 ## Ricevitore Seeweb dopo la verifica IPsec, 29/10/2026
 
