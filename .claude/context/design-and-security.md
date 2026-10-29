@@ -6,18 +6,18 @@ covers-paths:
   - bin/**
   - config/**
   - pilot/monitoring-hub/**
-last-verified-commit: 00a94551d44dce55f8741ba961942ff0d974a7c9
+last-verified-commit: dfc284b73df13a8d90e0596a951f624f33f9de1e
 ---
 
 # Design e sicurezza applicativa
 
 ## Drift delle regole e ritorno OPNsense, 29/10/2026
 
-La guardia del pilot confronta l'intero ruleset attivo con un baseline canonico costruito dallo stesso file nftables osservato: una regola aggiunta o alterata blocca l'applicazione invece di essere cancellata dal `flush ruleset` del candidato. È una prova locale in Debian 13; una differenza nel formato JSON sulla VM può fermare prudentemente il pilot e richiede un confronto, mai la disattivazione della guardia. Per l'appliance Seeweb osservata su UFS, gli snapshot interni OPNsense documentati richiedono ZFS: il tipo di snapshot proposto dal provider va confermato come livello hypervisor. Gli upgrade maggiori sono offline e necessitano di console indipendente.
+La guardia del pilot confronta l'intero ruleset attivo con un baseline canonico costruito dallo stesso file nftables osservato: una regola aggiunta o alterata blocca l'applicazione invece di essere cancellata dal `flush ruleset` del candidato. È una prova locale in Debian 13; una differenza nel formato JSON sulla VM può fermare prudentemente il pilot e richiede un confronto, mai la disattivazione della guardia. Per l'appliance Seeweb osservata su UFS, gli snapshot interni OPNsense documentati richiedono ZFS; Seeweb ha ora chiarito che prevede uno snapshot hypervisor e backup completo per il target 26.7.7. Gli upgrade maggiori sono offline e necessitano di console indipendente, ancora da confermare nel piano operativo.
 
 ## Guardie dell'applicazione Seeweb, 29/10/2026
 
-Il manifesto privato lega con SHA-256 entrambi i file live e i candidati. L'applicatore rifiuta un IP di destinazione non assegnato alla VM, tabelle nftables aggiuntive, un mittente assente o duplicato nei candidati, drift dei file e backup alterati. Il blocco di processo impedisce due applicazioni dello stesso strumento in parallelo; non blocca altri gestori di nftables o rsyslog. Il ritorno rifiuta un live diverso dal candidato. Non sono state osservate le regole attive complete della VM in questa prova e nessun servizio è stato cambiato.
+Il manifesto privato lega con SHA-256 entrambi i file live e i candidati. L'applicatore rifiuta un IP di destinazione non assegnato alla VM, tabelle nftables aggiuntive, un mittente assente o duplicato nei candidati, drift dei file e backup alterati. Il blocco di processo impedisce due applicazioni dello stesso strumento in parallelo; non blocca altri gestori di nftables o rsyslog. Il lock sotto `/run/lock` non segue link simbolici e richiede file regolare di root, 0600 e con un solo collegamento, evitando modifiche ai permessi del bersaglio di un link preesistente. Il ritorno rifiuta un live diverso dal candidato. Non sono state osservate le regole attive complete della VM in questa prova e nessun servizio è stato cambiato.
 
 ## Configurazione mirata e limiti della prova Seeweb, 29/10/2026
 

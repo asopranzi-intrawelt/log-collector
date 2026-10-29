@@ -5,7 +5,7 @@ generated-date: 2026-09-30
 covers-paths:
   - config/**
   - docs/handoff-sviluppo-collettore.md
-last-verified-commit: 00a94551d44dce55f8741ba961942ff0d974a7c9
+last-verified-commit: dfc284b73df13a8d90e0596a951f624f33f9de1e
 ---
 
 # Deployment
@@ -13,6 +13,10 @@ last-verified-commit: 00a94551d44dce55f8741ba961942ff0d974a7c9
 ## Preflight privilegiato Seeweb, 29/10/2026
 
 La lettura remota del ruleset nftables con l'account ordinario fallisce per `CAP_NET_ADMIN` mancante e `sudo -n` richiede password; nessuna regola attiva è stata letta. La VM dispone della libreria standard Python 3 richiesta dall'applicatore. Nel container Debian 13 il baseline nftables caricato produce la stessa impronta che il manifesto privato vincola: il controllo completo sulla VM potrà essere eseguito solo manualmente come root. Il test UDP di Seeweb si concorda dopo il ricevitore e richiede una cattura limitata. L'upgrade OPNsense ha un'autorizzazione distinta.
+
+Il 29/10 il bundle è stato rigenerato senza differenze dopo una nuova lettura SSH delle due impronte live; il controllo del ruleset resta negato all'account ordinario e `sudo -n` chiede ancora password. Un archivio privato ripetibile contiene solo script, manifesto e due candidati, con contenuto e SHA-256 verificati prima del trasferimento manuale. Seeweb ha indicato 26.7.7 come target dell'upgrade separato, snapshot hypervisor e backup completo; finestra, console, rollback e prova congiunta VPN/servizi sono ancora da concordare.
+
+Una seconda sonda SSH di sola lettura conferma destinatario assegnato alla VM, `rsyslog` e `nftables` attivi, UDP 514 in ascolto e occupazione dei filesystem `/srv/ads` 1%, `/var/log` 44%. Il primo parser della porta ha letto la colonna peer di `ss` e ha dato un falso negativo; è stato corretto e ripetuto. La sonda non controlla il percorso IPsec, la regola nftables attiva o un evento reale.
 
 ## Applicazione manuale e ritorno del pilot Seeweb, 29/10/2026
 

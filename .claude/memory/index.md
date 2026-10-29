@@ -1,5 +1,9 @@
 # Snapshot di sincronizzazione
 
+## Seeweb 26.7.7 e VM del collettore, 29/10/2026
+
+Lo screenshot_135 del provider, SHA-256 `42967B6F4F40E57EE092618DA1283A8FAD3D9E83BC9EE2D7F792DD5911E951F7`, chiarisce release 26.7.7, snapshot hypervisor, backup completo e attività prevista entro due ore con disservizio durante i riavvii. VPN da verificare e test dei servizi a nostro carico; console, backup ripristinabile, soglia di rollback e finestra sono ancora da concordare. Il bundle del collettore conserva le due impronte live rilette via SSH; root sulla VM è ancora necessario per il ruleset. Sonda SSH: servizi attivi, UDP 514 in ascolto, filesystem `/srv/ads` 1% e `/var/log` 44%, senza prova di ricezione Seeweb. Il lock dell'applicatore è protetto e 18 prove WSL root passano, compresa la mutazione discriminante. Archivio privato con quattro file verificato, non trasferito. Nessun deploy o evento Seeweb reale. ISO-27/30 e Cliente-1 89/90 in corso.
+
 ## Nuovo ticket Seeweb e ruleset attivo, 29/10/2026
 
 Collettore `00a9455` pubblicato dall'utente e pulito alla ripresa. La risposta Seeweb del 29/10 offre test UDP concordato e upgrade OPNsense gratuito in undici passaggi; screenshot privato SHA-256 `BE29240FBCCCD033FC6DAEABF4C418FEA3F4E861D2431F48D60DFD59CF302DCD`, distinto dall'omonimo del 23/10. Il pilot ora confronta il ruleset nftables attivo con il baseline simulato; 16 prove locali passano, nessun deploy. La VM ha Python 3 completo ma l'account SSH non ha `CAP_NET_ADMIN`; preflight root manuale aperto. Rete aggiornata con dossier, memoria, timeline e ISO-27/30 in corso; il commit unico della rete resta alla sua sessione. D7, TSA/WORM, AdS e Cliente-1 89/90 aperti.

@@ -101,6 +101,26 @@ def regular_file(path: pathlib.Path) -> os.stat_result:
     return info
 
 
+def open_lock(path: pathlib.Path):
+    try:
+        fd = os.open(path, os.O_RDWR | os.O_CREAT | os.O_NOFOLLOW | os.O_CLOEXEC, 0o600)
+    except OSError as exc:
+        raise PilotError("lock non apribile in sicurezza") from exc
+    try:
+        info = os.fstat(fd)
+        if (
+            not stat.S_ISREG(info.st_mode)
+            or info.st_uid != 0
+            or info.st_nlink != 1
+            or stat.S_IMODE(info.st_mode) != 0o600
+        ):
+            raise PilotError("lock non protetto")
+        return os.fdopen(fd, "r+")
+    except BaseException:
+        os.close(fd)
+        raise
+
+
 def load_bundle(bundle: pathlib.Path, targets: dict[str, pathlib.Path]) -> dict:
     regular_file(bundle / "manifest.json")
     manifest = json.loads((bundle / "manifest.json").read_text(encoding="utf-8"))
@@ -351,8 +371,7 @@ def main() -> int:
 
     signal.signal(signal.SIGTERM, stop)
     signal.signal(signal.SIGINT, stop)
-    with LOCK.open("a+") as lock:
-        os.chmod(LOCK, 0o600)
+    with open_lock(LOCK) as lock:
         fcntl.flock(lock.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
         if args.rollback:
             backup = rollback(BACKUP_ROOT, args.rollback, FILES)

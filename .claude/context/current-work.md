@@ -9,15 +9,15 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 00a94551d44dce55f8741ba961942ff0d974a7c9
+last-verified-commit: dfc284b73df13a8d90e0596a951f624f33f9de1e
 stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai punti 3 e 7; eventi iLO tecnici separati con ritenzione 90 giorni attiva; catena locale provata in WSL, non installata; D7 bloccato da nomina ed elenco AdS
 ---
 
 # Lavoro in corso
 
-## Nuova risposta Seeweb e controllo del firewall attivo, 29/10/2026
+## Chiarimento Seeweb, VM e lock del pilot, 29/10/2026
 
-L'utente ha pubblicato `00a9455` e fornito una nuova schermata del ticket. Il provider propone prova UDP concordata con cattura sulla VM e offre gratuitamente undici passaggi OPNsense in una sessione con fino a due ore di disservizio previsto; non è un'autorizzazione operativa. Il pilot del collettore ora lega anche il ruleset nftables attivo al baseline in Debian 13 e si ferma sul drift. Sedici prove WSL, Ruff e simulazione nftables passano; Python 3 completo è presente sulla VM, ma l'account SSH non ha permessi per leggere le regole attive. Nessun deploy o evento Seeweb reale. Prima del test: `--check` root sulla VM, applicazione manuale, poi cattura limitata e pochi eventi concordati. Prima dell'upgrade: versione finale, snapshot hypervisor su appliance UFS, backup esterno, console, rollback e verifiche VPN/servizi. La nuova risposta è stata propagata a `D:/network-design`, dove ISO-27/30 restano in corso; quel worktree contiene molti file paralleli e non va versionato da questo filone.
+L'utente ha pubblicato `dfc284b` e riferisce di aver inviato il messaggio a Seeweb. Il nuovo screenshot_135 indica target OPNsense 26.7.7, snapshot hypervisor, backup completo e attività prevista entro due ore; il disservizio è durante i riavvii. Il provider segnala la VPN come rischio e affida a noi la verifica dei servizi. Finestra, console, backup ripristinabile, soglia di rollback e prova congiunta sono ancora da concordare. Le due impronte live del bundle Seeweb sulla VM sono state riconfermate via SSH; l'account ordinario non può leggere il ruleset nftables e `sudo -n` richiede password. La sonda di sola lettura vede servizi attivi, UDP 514 in ascolto e filesystem `/srv/ads` 1%, `/var/log` 44%, senza provare la ricezione Seeweb. Il lock dell'applicatore è ora protetto da link simbolici e hard link. Diciotto prove WSL root passano e la mutazione del lock rende rossa la prova; un archivio privato con i quattro file del pilot è pronto e verificato, ma non trasferito. Nessun evento Seeweb reale è arrivato. Il test UDP ha una finestra separata, dopo `--check` root, applicazione e verifica manuale del ricevitore. ISO-27/30 e Cliente-1 89/90 restano in corso.
 
 ## Pilot Seeweb pronto per l'applicazione manuale, 29/10/2026
 

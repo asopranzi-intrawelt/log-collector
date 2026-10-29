@@ -6,14 +6,16 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 00a94551d44dce55f8741ba961942ff0d974a7c9
+last-verified-commit: dfc284b73df13a8d90e0596a951f624f33f9de1e
 ---
 
 # Test di sviluppo
 
 ## Impronta del ruleset del pilot Seeweb, 29/10/2026
 
-Sedici prove WSL come root passano: le nuove verificano che il controllo iniziale chiami la guardia sul ruleset, che il confronto ignori versione e handle ma rilevi una regola diversa, e che un drift prima del caricamento nftables faccia ripristinare rsyslog. Ruff passa. In un container Debian 13 con `NET_ADMIN`, il file nftables baseline è stato caricato e la funzione reale dell'applicatore ha prodotto l'impronta del manifesto privato. Il primo tentativo con `python3-minimal` falliva per libreria standard incompleta; con `python3` completo il confronto passa. Sulla VM è stata verificata in sola lettura la disponibilità della libreria; il ruleset attivo non è stato letto per permessi.
+Le 18 prove WSL come root passano: verificano la guardia sul ruleset, il drift prima del caricamento nftables e il rifiuto di un lock simbolico senza cambiare i permessi del bersaglio; un lock regolare di root passa. La prova del link era rossa col codice precedente, verde dopo la correzione e torna rossa reintroducendo il difetto in una copia temporanea. L'esecuzione come utente ordinario fallisce nei casi di backup perché l'applicatore richiede root: non è un errore del percorso root. In un container Debian 13 con `NET_ADMIN`, il file nftables baseline è stato caricato e la funzione reale dell'applicatore ha prodotto l'impronta del manifesto privato. Sulla VM la libreria Python è disponibile ma il ruleset attivo non è stato letto per permessi.
+
+La sonda VM legge solo indirizzi locali, stato dei servizi, socket UDP e occupazione dei filesystem. La prima versione cercava `:514` nella colonna peer di `ss` e ha dato un falso negativo; quella corretta legge la colonna locale e ha trovato il listener, senza usare il contenuto dei log. Il dato resta una misura dell'ascolto locale, non di consegna dal tunnel.
 
 ## Applicatore del pilot Seeweb, 29/10/2026
 

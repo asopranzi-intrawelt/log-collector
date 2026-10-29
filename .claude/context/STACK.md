@@ -8,7 +8,7 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 00a94551d44dce55f8741ba961942ff0d974a7c9
+last-verified-commit: dfc284b73df13a8d90e0596a951f624f33f9de1e
 ---
 
 # Stack applicativo
@@ -20,6 +20,8 @@ Il manifesto privato del pilot conserva ora anche l'impronta canonica del rulese
 ## Applicatore manuale del pilot Seeweb, 29/10/2026
 
 `bin/ads-seeweb-pilot-apply.py` consuma il manifesto e i due candidati privati; i target sono fissati a rsyslog e nftables della VM. Il controllo verifica file, servizio, indirizzo locale e tabella firewall attiva; l'applicazione conserva i baseline e riavvia solo rsyslog prima di caricare nftables. Il ripristino è disponibile con l'ID del backup. Nessun file del bundle né lo script è installato sulla VM.
+
+Il lock del processo viene aperto senza seguire link e accettato solo se appartiene a root, è regolare, non ha hard link ed è 0600. Il bundle conserva le impronte dei due file live confermate di nuovo via SSH il 29/10; la lettura del ruleset attivo e l'applicazione richiedono ancora root sulla VM.
 
 ## Bundle mirato Seeweb dal baseline installato, 29/10/2026
 

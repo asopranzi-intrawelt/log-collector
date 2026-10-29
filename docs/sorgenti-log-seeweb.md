@@ -1,5 +1,9 @@
 # Sorgenti Seeweb e stato della raccolta
 
+## Aggiornamento appliance separato dal test Syslog, 29/10/2026
+
+Seeweb ha chiarito la proposta di upgrade a 26.7.7 nello screenshot_135, SHA-256 `42967B6F4F40E57EE092618DA1283A8FAD3D9E83BC9EE2D7F792DD5911E951F7`: snapshot sull'hypervisor, backup completo della configurazione, attività prevista entro due ore e disservizi durante i riavvii. Il provider indica la VPN come punto da verificare e non prevede cambi Firewall/NAT. La sonda SSH del 29/10 trova `rsyslog` e `nftables` attivi e UDP 514 in ascolto, ma questo non abilita l'inoltro Syslog: il ricevitore mirato sulla VM resta da installare, il ruleset attivo richiede un controllo root e non è arrivato alcun evento Seeweb reale. Le verifiche dell'upgrade e la breve prova UDP hanno finestre e criteri di esito separati; il [dossier firewall](firewall-seeweb-opnsense.md) registra il piano ancora da concordare.
+
 ## Test UDP concordabile, 29/10/2026
 
 Seeweb propone un test UDP a orario concordato dopo il nostro via, con `tcpdump` attivo sulla VM destinataria e confronto dei risultati. Il supporto non dichiara ancora di aver configurato il target Syslog o di aver ricevuto un nostro via; nessun pacchetto UDP 514 o evento GUI/SSH reale è attestato sul collettore. L'applicatore del primo pilot ora controlla anche l'impronta del ruleset nftables attivo contro il baseline derivato in Debian 13; l'account SSH ordinario non può leggere quel ruleset per mancanza di `CAP_NET_ADMIN` e `sudo -n` chiede una password. La VM ha Python 3 con la libreria standard necessaria, verificata in sola lettura. Il controllo privilegiato, l'installazione e la cattura limitata restano azioni manuali da completare prima di dare l'orario al provider. L'aggiornamento gratuito dell'appliance proposto nello stesso ticket è documentato nel [dossier firewall](firewall-seeweb-opnsense.md), separato dalla prova dei log.

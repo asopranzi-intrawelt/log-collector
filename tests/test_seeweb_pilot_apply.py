@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import importlib.util
 import json
+import os
 import pathlib
 import tempfile
 import unittest
@@ -241,6 +242,34 @@ class PilotApplyTests(unittest.TestCase):
         with patch.object(MODULE.subprocess, "run", return_value=response):
             with self.assertRaisesRegex(MODULE.PilotError, "ruleset nftables attivo diverso"):
                 MODULE.check_nft_ruleset("0" * 64)
+
+    def test_lock_simbolico_rifiutato_senza_cambiare_il_bersaglio(self) -> None:
+        victim = self.root / "victim"
+        victim.write_text("contenuto intatto\n", encoding="utf-8")
+        victim.chmod(0o644)
+        lock = self.root / "lock"
+        lock.symlink_to(victim)
+        with (
+            patch.object(MODULE, "LOCK", lock),
+            patch.object(MODULE.os, "geteuid", return_value=0),
+            patch.object(MODULE, "check", return_value={}),
+            patch.object(MODULE.sys, "argv", ["pilot", "--bundle", str(self.bundle), "--check"]),
+        ):
+            with self.assertRaisesRegex(MODULE.PilotError, "lock"):
+                MODULE.main()
+        self.assertEqual(victim.stat().st_mode & 0o777, 0o644)
+        self.assertEqual(victim.read_text(encoding="utf-8"), "contenuto intatto\n")
+
+    @unittest.skipUnless(os.geteuid() == 0, "il pilot richiede root")
+    def test_lock_regolare_root_consente_il_controllo(self) -> None:
+        lock = self.root / "lock"
+        with (
+            patch.object(MODULE, "LOCK", lock),
+            patch.object(MODULE, "check", return_value={}),
+            patch.object(MODULE.sys, "argv", ["pilot", "--bundle", str(self.bundle), "--check"]),
+        ):
+            self.assertEqual(MODULE.main(), 0)
+        self.assertEqual(lock.stat().st_mode & 0o777, 0o600)
 
 
 if __name__ == "__main__":
