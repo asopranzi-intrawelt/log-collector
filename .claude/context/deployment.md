@@ -5,10 +5,14 @@ generated-date: 2026-09-30
 covers-paths:
   - config/**
   - docs/handoff-sviluppo-collettore.md
-last-verified-commit: 4b06339da3f1f8ea3703f825d93951aad82b15e9
+last-verified-commit: 38655aae010c3a35439b01b453eaaf3a586cf9ea
 ---
 
 # Deployment
+
+## Applicazione manuale e ritorno del pilot Seeweb, 29/10/2026
+
+Il nuovo applicatore accetta `--check`, `--apply` e `--rollback <ID_BACKUP>` dalla VM come root. Mantiene copie originali con impronte e metadati dei permessi in `/var/backups/ads-seeweb-pilot/`; un errore durante l'installazione tenta il ripristino automatico. Tredici prove su file temporanei coprono anche il ritorno dopo errori di servizio e firewall; nessuna di esse è un deploy. Trasferimento, controllo finale della VM e via al solo campione Seeweb restano manuali, nell'ordine del runbook del componente 2.
 
 ## Gate del primo test Seeweb, 29/10/2026
 

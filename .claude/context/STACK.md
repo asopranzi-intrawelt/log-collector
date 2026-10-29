@@ -8,10 +8,14 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 4b06339da3f1f8ea3703f825d93951aad82b15e9
+last-verified-commit: 38655aae010c3a35439b01b453eaaf3a586cf9ea
 ---
 
 # Stack applicativo
+
+## Applicatore manuale del pilot Seeweb, 29/10/2026
+
+`bin/ads-seeweb-pilot-apply.py` consuma il manifesto e i due candidati privati; i target sono fissati a rsyslog e nftables della VM. Il controllo verifica file, servizio, indirizzo locale e tabella firewall attiva; l'applicazione conserva i baseline e riavvia solo rsyslog prima di caricare nftables. Il ripristino è disponibile con l'ID del backup. Nessun file del bundle né lo script è installato sulla VM.
 
 ## Bundle mirato Seeweb dal baseline installato, 29/10/2026
 

@@ -6,10 +6,14 @@ covers-paths:
   - bin/**
   - config/**
   - pilot/monitoring-hub/**
-last-verified-commit: 4b06339da3f1f8ea3703f825d93951aad82b15e9
+last-verified-commit: 38655aae010c3a35439b01b453eaaf3a586cf9ea
 ---
 
 # Design e sicurezza applicativa
+
+## Guardie dell'applicazione Seeweb, 29/10/2026
+
+Il manifesto privato lega con SHA-256 entrambi i file live e i candidati. L'applicatore rifiuta un IP di destinazione non assegnato alla VM, tabelle nftables aggiuntive, un mittente assente o duplicato nei candidati, drift dei file e backup alterati. Il blocco di processo impedisce due applicazioni dello stesso strumento in parallelo; non blocca altri gestori di nftables o rsyslog. Il ritorno rifiuta un live diverso dal candidato. Non sono state osservate le regole attive complete della VM in questa prova e nessun servizio è stato cambiato.
 
 ## Configurazione mirata e limiti della prova Seeweb, 29/10/2026
 

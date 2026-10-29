@@ -1,5 +1,9 @@
 # Snapshot di sincronizzazione
 
+## Applicatore manuale Seeweb, 29/10/2026
+
+L'utente ha pubblicato `38655aa`; il collettore era pulito. Il nuovo applicatore usa il bundle privato già preparato dal baseline VM e offre controllo, installazione con copie di sicurezza e rollback manuale. Tredici prove WSL e sintassi Debian passano, nessun deploy. Rete in carico alla sua sessione; il collettore non vi scrive. Restano campione Seeweb reale, D7, custodia TSA/WORM, elenco AdS e Cliente-1 89/90.
+
 ## Bundle Seeweb dal baseline VM, 29/10/2026
 
 Collettore `4b06339` pubblicato e pulito alla ripresa. L'utente riferisce risposta Seeweb inviata. Lettura SSH conferma rsyslog/nftables attivi, timer AdS inattivi e mount ext4; il render completo differisce dal live anche per heartbeat. Bundle privato con doppio hash guard prepara solo Seeweb: sintassi e ricezione UDP sintetica nel deposito tecnico passano in Debian; mutazione dell'IP rende rossa la prova. Nessun deploy né evento Seeweb reale. La rete è in mano alla sua sessione per il commit unico; questo filone non vi scrive più.

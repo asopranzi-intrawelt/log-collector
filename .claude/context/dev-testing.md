@@ -6,10 +6,14 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 4b06339da3f1f8ea3703f825d93951aad82b15e9
+last-verified-commit: 38655aae010c3a35439b01b453eaaf3a586cf9ea
 ---
 
 # Test di sviluppo
+
+## Applicatore del pilot Seeweb, 29/10/2026
+
+Tredici prove WSL come root usano file temporanei e servizi simulati: impronte corrette e alterate, mittente assente, destinazione non locale, tabelle firewall estranee, applicazione, backup, ripristino e recupero dopo guasti di rsyslog e nftables. Ruff passa. Nel container Debian 13, con `NET_ADMIN`, la candidata passa anche `rsyslogd -N1 -f` come file principale e il pacchetto UDP sintetico arriva solo nel deposito tecnico. La prova non esercita il trasferimento alla VM, i permessi reali dell'operatore, il tunnel, i log Seeweb né una modifica reale del firewall.
 
 ## Prova del bundle Seeweb derivato dalla VM, 29/10/2026
 

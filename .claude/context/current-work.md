@@ -9,11 +9,15 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 4b06339da3f1f8ea3703f825d93951aad82b15e9
+last-verified-commit: 38655aae010c3a35439b01b453eaaf3a586cf9ea
 stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai punti 3 e 7; eventi iLO tecnici separati con ritenzione 90 giorni attiva; catena locale provata in WSL, non installata; D7 bloccato da nomina ed elenco AdS
 ---
 
 # Lavoro in corso
+
+## Pilot Seeweb pronto per l'applicazione manuale, 29/10/2026
+
+L'utente ha pubblicato `38655aa` e il worktree era pulito alla ripresa. Il bundle privato è ancora derivato dalle due impronte live del 29/10; l'applicatore ora impone controllo delle impronte, indirizzo locale, singola tabella firewall, backup e ripristino. Tredici prove WSL e la sintassi reale in Debian 13 passano. Non è stato trasferito sulla VM né applicato. Prima di dare il via a Seeweb: controllo manuale del ruleset attivo, `--check` sulla VM, applicazione manuale, verifica di un campione GUI/SSH nel deposito tecnico e decisione su conservazione e allarme. Il filone del collettore continua a non scrivere in `D:/network-design` mentre la sua sessione riconcilia il commit unico.
 
 ## Risposta Seeweb inviata e bundle di prova, 29/10/2026
 
