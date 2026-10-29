@@ -10,6 +10,10 @@ last-verified-commit: 05137cd920e98ed1c629a7832615f2d22cb9c476
 
 # Deployment
 
+## Ricevitore Seeweb dopo la verifica IPsec, 29/10/2026
+
+Il sorgente IP del firewall cloud è confermato nel livello privato e il render locale genera una sola regola UDP 514 e il ramo tecnico dedicato. Questo non equivale a installazione: sulla VM la candidata non è attiva. Prima del via a Seeweb occorrono applicazione e verifica del ricevitore, test di un pacchetto Syslog dal tunnel, riscontro del file tecnico e dei campi degli eventi GUI/SSH, senza inoltro generale.
+
 ## Unità candidate della quarantena, 28/10/2026
 
 Per una futura installazione servono `ads-unclassified-retain.sh` e `ads-technical-retain.sh` in `/opt/ads/bin/`, più `ads-unclassified-retain@.service/.timer` e `ads-unclassified-health.service/.timer` a 0644. `systemd-analyze verify` passa su copie Debian. Il timer di ritenzione richiede l'istanza dei giorni approvati; quello di salute fa solo `--inspect`. Nessuna unità è installata. La soglia attuale dell'80% è sul filesystem intero e produce solo stato locale: prima dell'attivazione servono quota o volume isolato, prova del recapito dell'allarme e misura del costo orario sulla VM.

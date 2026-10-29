@@ -13,6 +13,10 @@ last-verified-commit: 05137cd920e98ed1c629a7832615f2d22cb9c476
 
 # Stack applicativo
 
+## Riscontro Seeweb e sorgenti MyOffice, 29/10/2026
+
+Il parametro privato `sorgenti.seeweb_opnsense` contiene ora il solo IPv4 sorgente comunicato da Seeweb. Il render ordinario di prova produce la regola nftables e il deposito rsyslog tecnico attesi; la VM conserva la configurazione precedente. La Canon MyOffice e il PBX cloud Vianova UCC sono fonti candidate di audit amministrativo distinte: ReadMeter 7 descrive telemetria consumabili, non il trasporto dei loro accessi.
+
 ## Deposito tecnico dei mittenti ignoti, 28/10/2026
 
 `ads-unclassified-retain.sh` è un wrapper del motore `ads-technical-retain.sh`: ispeziona e, solo con giorni espliciti, scade i log giornalieri del deposito `ads-unclassified`. Le unità candidate separano ritenzione alle 03:25 e ispezione oraria. Il deposito vuoto è sano; i wrapper Seeweb e heartbeat mantengono vuoto come avviso. Nessuna unità è installata.

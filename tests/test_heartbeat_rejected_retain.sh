@@ -24,6 +24,13 @@ code=$?
 set -e
 [[ $code -eq 2 && $out == *"ads-heartbeat-rejected-retain status=warning result=no-root"* ]] || { printf 'missing root not reported\n' >&2; exit 1; }
 
+mkdir -p -- "$scratch/empty"
+set +e
+out=$(ADS_TECH_EMPTY_OK=1 ADS_HEARTBEAT_REJECTED_ROOT="$scratch/empty" ADS_TODAY=2026-10-08 bash "$script" --inspect 2>&1)
+code=$?
+set -e
+[[ $code -eq 2 && $out == *"ads-heartbeat-rejected-retain status=warning mode=inspect sources=0 files=0"* ]] || { printf 'heartbeat accepted ambient empty-ok setting\n' >&2; exit 1; }
+
 set +e
 out=$(ADS_HEARTBEAT_REJECTED_ROOT="$root" ADS_TODAY=2026-10-08 bash "$script" --inspect 2>&1)
 code=$?

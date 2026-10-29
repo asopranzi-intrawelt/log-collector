@@ -1,0 +1,10 @@
+[Unit]
+Description=Misura oraria dell'archivio dei mittenti Syslog non censiti
+
+[Timer]
+OnCalendar=hourly
+Persistent=true
+Unit=ads-unclassified-health.service
+
+[Install]
+WantedBy=timers.target

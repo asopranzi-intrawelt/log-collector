@@ -11,6 +11,10 @@ last-verified-commit: 05137cd920e98ed1c629a7832615f2d22cb9c476
 
 # Test di sviluppo
 
+## Render privato Seeweb, 29/10/2026
+
+Dopo aver registrato il mittente OPNsense comunicato dal supporto, `ads-render.py` sui parametri privati ha prodotto in una directory temporanea la regola nftables e il ramo rsyslog verso il deposito tecnico Seeweb. Le asserzioni sul singolo IP e sul percorso tecnico passano fuori dalla sandbox Windows, che nega l'accesso alle directory temporanee appena create. La prova non esercita la VM, il tunnel con Syslog né un evento GUI/SSH reale. I tre test POSIX della ritenzione e `systemd-analyze verify` erano già passati in Debian; le unità restano candidate.
+
 ## Ritenzione della quarantena, 28/10/2026
 
 `test_unclassified_retain.sh`, `test_seeweb_technical_retain.sh` e `test_heartbeat_rejected_retain.sh` passano in container Debian con semantica POSIX dei link; Git Bash Windows non è una prova affidabile per questi link. Il nuovo test copre vuoto sano, radice mancante, giorni obbligatori, confine di scadenza, isolamento AdS/Seeweb, soglia 80% e misura del filesystem fallita. Una mutazione del flag vuoto nel wrapper rende rossa la prova. `systemd-analyze verify` delle quattro unità installate a 0644 in un container temporaneo passa senza avvisi. Non sono testati sulla VM durata, volume, carico o recapito dell'allarme.

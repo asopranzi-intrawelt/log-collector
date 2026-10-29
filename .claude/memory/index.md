@@ -1,5 +1,9 @@
 # Snapshot di sincronizzazione
 
+## Riscontro Seeweb, MyOffice e PBX, 29/10/2026
+
+Letti gli screenshot_82 e 80 dalla cartella Screenpresso e la lettera Albalog. Seeweb conferma mittente e percorso cifrato, ma non prova Syslog. Parametro privato aggiornato e render locale verde; niente deploy. MyOffice gestisce una Canon; ReadMeter 7 è telemetria e la risposta alla mail è attesa. Audit del PBX Vianova UCC da ricognire. Dossier del collettore e della rete aggiornati; ISO-30 e Cliente-1 89/90 restano aperti. Git e deploy manuali.
+
 ## Quarantena dei mittenti ignoti: ritenzione candidata, 28/10/2026
 
 Il collettore `05137cd` è pubblicato. Il nuovo diff aggiunge al motore tecnico un criterio distinto per l'archivio vuoto, il wrapper della quarantena e unità separate per scadenza e ispezione oraria. Tre prove POSIX Debian, mutazione discriminante e `systemd-analyze verify` passano; la rete registra il gate nel proprio worktree. Nessuna unità è installata. Restano inventario VM autorizzato, durata approvata, quota o volume isolato, misura del costo e allarme consegnato. ISO-30 e Cliente-1 89/90 aperti; Git e deploy manuali.

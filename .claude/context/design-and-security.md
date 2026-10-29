@@ -11,6 +11,10 @@ last-verified-commit: 05137cd920e98ed1c629a7832615f2d22cb9c476
 
 # Design e sicurezza applicativa
 
+## Confini dei flussi MyOffice e Seeweb, 29/10/2026
+
+La cattura di pacchetti cifrati dichiarata da Seeweb prova il percorso IPsec osservato, non l'autenticazione del mittente o la ricezione di Syslog. Il parametro privato limita il candidato a un IP; nessun evento è classificato AdS prima di campioni reali. La lettera Albalog su ReadMeter 7 elenca telemetria della Canon e dati del PC agente, senza un audit dei login della stampante. Gli accessi al PBX cloud, gli eventi di servizio e i dati di chiamata richiedono valutazioni e flussi separati.
+
 ## Stato della quarantena vuota, 28/10/2026
 
 Una radice `ads-unclassified` esistente e vuota produce stato sano: l'assenza di mittenti ignoti è l'esito atteso. Radice mancante e filesystem almeno all'80% producono avviso, misura del filesystem fallita produce errore; i wrapper Seeweb e heartbeat fissano invece il vuoto come avviso. Il motore conserva i controlli su nomi, link e durata obbligatoria. Questo è un criterio interno di monitoraggio, provato su file costruiti in Debian; non dimostra la capienza o la consegna dell'allarme della VM.

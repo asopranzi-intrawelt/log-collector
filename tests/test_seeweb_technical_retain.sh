@@ -29,6 +29,11 @@ out=$(ADS_SEEWEB_TECH_ROOT="$scratch/empty" ADS_TODAY=2026-10-08 bash "$script" 
 code=$?
 set -e
 [[ $code -eq 2 && $out == *"status=warning mode=inspect sources=1 files=0"* ]]
+set +e
+out=$(ADS_TECH_EMPTY_OK=1 ADS_SEEWEB_TECH_ROOT="$scratch/empty" ADS_TODAY=2026-10-08 bash "$script" --inspect 2>&1)
+code=$?
+set -e
+[[ $code -eq 2 && $out == *"status=warning mode=inspect sources=1 files=0"* ]] || { printf 'Seeweb accepted ambient empty-ok setting\n' >&2; exit 1; }
 
 out=$(ADS_SEEWEB_TECH_ROOT="$root" ADS_TODAY=2026-10-08 bash "$script" --inspect 2>&1)
 [[ $out == *"mode=inspect sources=1 files=4 bytes=17"* && $out == *"oldest=2026-07-10 newest=2026-10-08"* ]]

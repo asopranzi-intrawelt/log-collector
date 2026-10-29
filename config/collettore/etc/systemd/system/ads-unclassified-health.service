@@ -1,0 +1,13 @@
+[Unit]
+Description=Misura locale dell'archivio dei mittenti Syslog non censiti
+Documentation=file:/opt/ads/bin/ads-unclassified-retain.sh
+
+[Service]
+Type=oneshot
+User=root
+Group=root
+ExecStart=/usr/bin/bash /opt/ads/bin/ads-unclassified-retain.sh --inspect
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true

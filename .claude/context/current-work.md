@@ -15,6 +15,10 @@ stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai p
 
 # Lavoro in corso
 
+## Seeweb, MyOffice e PBX cloud, 29/10/2026
+
+Seeweb ha comunicato il mittente OPNsense e riferito una cattura di pacchetti cifrati nel tunnel verso la VM. Il parametro privato è aggiornato e il render locale passa; mancano installazione mirata e prova Syslog con eventi reali. La risposta pronta chiede di tenere spento il target fino al via. MyOffice gestisce la sola Canon del Piano 1: la mail dell'utente chiede date corrette e dettagli su ReadMeter 7, che la lettera descrive come telemetria SNMP su un PC; non prova log AdS. Il PBX cloud Vianova UCC richiede ricognizione di login amministrativi, modifiche ed export. Nessun nuovo flusso è in esercizio.
+
 ## Quarantena Syslog candidata, 28/10/2026
 
 Il commit `05137cd` della variante strict è pubblicato e il collettore era pulito alla ripresa. Nel nuovo diff sono preparati ispezione oraria e ritenzione con giorni espliciti del deposito dei mittenti ignoti. I tre test POSIX in Debian e la verifica delle quattro unità systemd passano; nessun servizio è installato. Il filtro strict resta spento: mancano lettura autorizzata dell'archivio VM, fonti silenziose, durata approvata, limite fisico di capienza, costo della scansione e allarme recapitato. La rete registra gli stessi gate senza chiudere ISO-30 o Cliente-1 89/90.

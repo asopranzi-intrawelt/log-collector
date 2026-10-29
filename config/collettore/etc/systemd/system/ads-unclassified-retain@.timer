@@ -1,0 +1,10 @@
+[Unit]
+Description=Controllo giornaliero della ritenzione Syslog non censita (%i giorni)
+
+[Timer]
+OnCalendar=*-*-* 03:25:00
+Persistent=true
+Unit=ads-unclassified-retain@%i.service
+
+[Install]
+WantedBy=timers.target

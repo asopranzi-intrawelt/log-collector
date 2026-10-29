@@ -8,11 +8,13 @@ readonly ROOT=${ADS_TECH_ROOT:?ADS_TECH_ROOT obbligatoria}
 readonly LABEL=${ADS_TECH_LABEL:-ads-technical-retain}
 readonly TODAY=${ADS_TODAY:-$(date +%F)}
 readonly WARN_PCT=80
+readonly EMPTY_OK=${ADS_TECH_EMPTY_OK:-0}
 
 status() { printf '%s %s\n' "$LABEL" "$*" >&2; }
 die() { status "status=error $*"; exit 1; }
 
 [[ $LABEL =~ ^[a-z0-9-]+$ ]] || die 'etichetta non valida'
+[[ $EMPTY_OK == 0 || $EMPTY_OK == 1 ]] || die 'politica archivio vuoto non valida'
 
 mode=${1:-}
 days=
@@ -96,11 +98,11 @@ elif [[ $mode == --apply ]]; then
     newest=$kept_newest
 fi
 
-read -r available_kib usage_pct < <(df -Pk -- "$ROOT" | awk 'NR == 2 {gsub(/%/, "", $5); print $4, $5}')
+read -r available_kib usage_pct < <(df -Pk -- "$ROOT" | awk 'NR == 2 {gsub(/%/, "", $5); print $4, $5}') || die 'utilizzo filesystem non leggibile'
 [[ $available_kib =~ ^[0-9]+$ && $usage_pct =~ ^[0-9]+$ ]] || die 'utilizzo filesystem non leggibile'
 
 result=ok
 exit_code=0
-if ((files == 0 || usage_pct >= WARN_PCT)); then result=warning; exit_code=2; fi
+if (((files == 0 && EMPTY_OK == 0) || usage_pct >= WARN_PCT)); then result=warning; exit_code=2; fi
 status "status=$result mode=${mode#--} sources=$sources files=$files bytes=$bytes oldest=${oldest:-none} newest=${newest:-none} available_kib=$available_kib filesystem_used_pct=$usage_pct cutoff=${cutoff:-none} expired=${#expired[@]} expired_bytes=$expired_bytes"
 exit "$exit_code"

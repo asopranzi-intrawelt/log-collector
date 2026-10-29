@@ -1,0 +1,14 @@
+[Unit]
+Description=Scadenza dei log dei mittenti Syslog non censiti dopo %i giorni
+Documentation=file:/opt/ads/bin/ads-unclassified-retain.sh
+
+[Service]
+Type=oneshot
+User=root
+Group=root
+ExecStart=/usr/bin/bash /opt/ads/bin/ads-unclassified-retain.sh --apply --days %i
+NoNewPrivileges=true
+ProtectSystem=strict
+ReadWritePaths=-/var/log/ads-unclassified
+ProtectHome=true
+PrivateTmp=true
