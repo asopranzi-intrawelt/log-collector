@@ -1,5 +1,9 @@
 # Sorgenti Seeweb e stato della raccolta
 
+## Test UDP concordabile, 29/10/2026
+
+Seeweb propone un test UDP a orario concordato dopo il nostro via, con `tcpdump` attivo sulla VM destinataria e confronto dei risultati. Il supporto non dichiara ancora di aver configurato il target Syslog o di aver ricevuto un nostro via; nessun pacchetto UDP 514 o evento GUI/SSH reale è attestato sul collettore. L'applicatore del primo pilot ora controlla anche l'impronta del ruleset nftables attivo contro il baseline derivato in Debian 13; l'account SSH ordinario non può leggere quel ruleset per mancanza di `CAP_NET_ADMIN` e `sudo -n` chiede una password. La VM ha Python 3 con la libreria standard necessaria, verificata in sola lettura. Il controllo privilegiato, l'installazione e la cattura limitata restano azioni manuali da completare prima di dare l'orario al provider. L'aggiornamento gratuito dell'appliance proposto nello stesso ticket è documentato nel [dossier firewall](firewall-seeweb-opnsense.md), separato dalla prova dei log.
+
 ## Verifica IPsec completata dal supporto, 29/10/2026
 
 Nello screenshot_82 Seeweb comunica l'IPv4 sorgente osservato dell'OPNsense, conferma che la destinazione privata del collettore è compresa nei selettori IPsec attivi e riferisce di aver visto i pacchetti transitare cifrati sull'interfaccia IPsec. I due indirizzi reali restano nel livello privato. È una prova del percorso, non della consegna Syslog: il supporto non identifica protocollo, porta o contenuto dei pacchetti della verifica. `sorgenti.seeweb_opnsense` contiene ora un solo IP nei parametri privati; il ricevitore mirato non è installato e nessun evento Seeweb è stato ricevuto. L'utente riferisce di aver risposto al ticket il 29/10; testo inviato e ricevuta non sono qui disponibili. Il seguito operativo attende un via esplicito per pochi accessi GUI/SSH controllati, senza inviare indiscriminatamente log di traffico. L'aggiornamento OPNsense resta separato.

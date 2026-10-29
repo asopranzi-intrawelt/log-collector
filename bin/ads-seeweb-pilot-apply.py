@@ -69,6 +69,31 @@ def check_nft_tables() -> None:
         raise PilotError("tabelle nftables diverse dal baseline del pilota")
 
 
+def nft_ruleset_digest(raw: bytes) -> str:
+    listing = json.loads(raw)
+    rows = listing.get("nftables")
+    if not isinstance(rows, list):
+        raise PilotError("ruleset nftables non interpretabile")
+    canonical = []
+    for row in rows:
+        if "metainfo" in row:
+            continue
+        item = json.loads(json.dumps(row))
+        if "rule" in item:
+            item["rule"].pop("handle", None)
+        canonical.append(item)
+    payload = json.dumps(canonical, sort_keys=True, separators=(",", ":")).encode()
+    return digest(payload)
+
+
+def check_nft_ruleset(expected: str) -> None:
+    result = subprocess.run(("nft", "-j", "list", "ruleset"), capture_output=True)
+    if result.returncode:
+        raise PilotError("ruleset nftables attivo non leggibile")
+    if nft_ruleset_digest(result.stdout) != expected:
+        raise PilotError("ruleset nftables attivo diverso dal baseline")
+
+
 def regular_file(path: pathlib.Path) -> os.stat_result:
     info = path.lstat()
     if not stat.S_ISREG(info.st_mode):
@@ -81,6 +106,9 @@ def load_bundle(bundle: pathlib.Path, targets: dict[str, pathlib.Path]) -> dict:
     manifest = json.loads((bundle / "manifest.json").read_text(encoding="utf-8"))
     if set(manifest.get("files", {})) != set(targets):
         raise PilotError("manifesto: insieme dei file inatteso")
+    active_hash = manifest.get("nft_active_baseline_sha256")
+    if not isinstance(active_hash, str) or not re.fullmatch(r"[0-9a-f]{64}", active_hash):
+        raise PilotError("manifesto: impronta del ruleset attivo mancante")
     ipaddress.IPv4Address(manifest["source"])
     ipaddress.IPv4Address(manifest["destination"])
     for name, target in targets.items():
@@ -102,6 +130,7 @@ def check(bundle: pathlib.Path, targets: dict[str, pathlib.Path]) -> dict:
     manifest = load_bundle(bundle, targets)
     check_local_destination(manifest["destination"])
     check_nft_tables()
+    check_nft_ruleset(manifest["nft_active_baseline_sha256"])
     run("nft", "-c", "-f", str(bundle / "candidate-nftables.conf"))
     run("rsyslogd", "-N1", "-f", str(bundle / "candidate-10-ads.conf"))
     run("systemctl", "is-active", "--quiet", "rsyslog")
@@ -194,6 +223,8 @@ def apply(
             target = targets[name]
             if digest(target.read_bytes()) != manifest["files"][name]["live_sha256"]:
                 raise PilotError(f"live cambiato durante il pilot: {target.name}")
+            if service == "nftables":
+                check_nft_ruleset(manifest["nft_active_baseline_sha256"])
             regular_file(bundle / name)
             candidate = (bundle / name).read_bytes()
             if digest(candidate) != manifest["files"][name]["sha256"]:

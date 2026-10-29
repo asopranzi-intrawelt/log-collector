@@ -42,6 +42,7 @@ class PilotApplyTests(unittest.TestCase):
         manifest = {
             "source": "127.0.0.2",
             "destination": "127.0.0.1",
+            "nft_active_baseline_sha256": "0" * 64,
             "files": {
                 name: {
                     "sha256": hashlib.sha256(self.new[name]).hexdigest(),
@@ -54,10 +55,13 @@ class PilotApplyTests(unittest.TestCase):
         self.calls: list[tuple[str, ...]] = []
         self.destination_patch = patch.object(MODULE, "check_local_destination")
         self.tables_patch = patch.object(MODULE, "check_nft_tables")
+        self.ruleset_patch = patch.object(MODULE, "check_nft_ruleset")
         self.destination_patch.start()
         self.tables_patch.start()
+        self.ruleset_mock = self.ruleset_patch.start()
         self.addCleanup(self.destination_patch.stop)
         self.addCleanup(self.tables_patch.stop)
+        self.addCleanup(self.ruleset_patch.stop)
 
     def fake_run(self, *command: str) -> None:
         self.calls.append(command)
@@ -69,6 +73,7 @@ class PilotApplyTests(unittest.TestCase):
     def test_check_verifica_due_impronte_e_sintassi(self) -> None:
         with patch.object(MODULE, "run", side_effect=self.fake_run):
             MODULE.check(self.bundle, self.targets)
+        self.ruleset_mock.assert_called_once_with("0" * 64)
         self.assertEqual(
             [call[0] for call in self.calls], ["nft", "rsyslogd", "systemctl", "systemctl"]
         )
@@ -184,6 +189,14 @@ class PilotApplyTests(unittest.TestCase):
                 MODULE.apply(self.bundle, self.targets, self.root / "backups")
         self.assert_old()
 
+    def test_apply_ripristina_rsyslog_se_cambia_il_ruleset_attivo(self) -> None:
+        self.ruleset_mock.side_effect = [None, MODULE.PilotError("drift ruleset simulato")]
+        with patch.object(MODULE, "run", side_effect=self.fake_run):
+            with self.assertRaisesRegex(MODULE.PilotError, "ripristino eseguito"):
+                MODULE.apply(self.bundle, self.targets, self.root / "backups")
+        self.assert_old()
+        self.assertEqual(self.ruleset_mock.call_count, 2)
+
     def test_destinazione_deve_essere_assegnata_alla_vm(self) -> None:
         self.destination_patch.stop()
         response = SimpleNamespace(returncode=0, stdout=b'[{"addr_info": []}]')
@@ -201,6 +214,33 @@ class PilotApplyTests(unittest.TestCase):
         with patch.object(MODULE.subprocess, "run", return_value=response):
             with self.assertRaisesRegex(MODULE.PilotError, "tabelle nftables diverse"):
                 MODULE.check_nft_tables()
+
+    def test_impronta_ruleset_ignora_handle_ma_rileva_regola_diversa(self) -> None:
+        first = {"nftables": [
+            {"metainfo": {"version": "a"}},
+            {"table": {"family": "inet", "name": "filter"}},
+            {"rule": {"family": "inet", "table": "filter", "chain": "input",
+                      "handle": 3, "expr": [{"accept": None}]}},
+        ]}
+        second = json.loads(json.dumps(first))
+        second["nftables"][0]["metainfo"]["version"] = "b"
+        second["nftables"][2]["rule"]["handle"] = 99
+        self.assertEqual(
+            MODULE.nft_ruleset_digest(json.dumps(first).encode()),
+            MODULE.nft_ruleset_digest(json.dumps(second).encode()),
+        )
+        second["nftables"][2]["rule"]["expr"] = [{"drop": None}]
+        self.assertNotEqual(
+            MODULE.nft_ruleset_digest(json.dumps(first).encode()),
+            MODULE.nft_ruleset_digest(json.dumps(second).encode()),
+        )
+
+    def test_ruleset_attivo_diverso_ferma_il_pilota(self) -> None:
+        self.ruleset_patch.stop()
+        response = SimpleNamespace(returncode=0, stdout=b'{"nftables": []}')
+        with patch.object(MODULE.subprocess, "run", return_value=response):
+            with self.assertRaisesRegex(MODULE.PilotError, "ruleset nftables attivo diverso"):
+                MODULE.check_nft_ruleset("0" * 64)
 
 
 if __name__ == "__main__":

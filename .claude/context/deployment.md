@@ -5,10 +5,14 @@ generated-date: 2026-09-30
 covers-paths:
   - config/**
   - docs/handoff-sviluppo-collettore.md
-last-verified-commit: 38655aae010c3a35439b01b453eaaf3a586cf9ea
+last-verified-commit: 00a94551d44dce55f8741ba961942ff0d974a7c9
 ---
 
 # Deployment
+
+## Preflight privilegiato Seeweb, 29/10/2026
+
+La lettura remota del ruleset nftables con l'account ordinario fallisce per `CAP_NET_ADMIN` mancante e `sudo -n` richiede password; nessuna regola attiva è stata letta. La VM dispone della libreria standard Python 3 richiesta dall'applicatore. Nel container Debian 13 il baseline nftables caricato produce la stessa impronta che il manifesto privato vincola: il controllo completo sulla VM potrà essere eseguito solo manualmente come root. Il test UDP di Seeweb si concorda dopo il ricevitore e richiede una cattura limitata. L'upgrade OPNsense ha un'autorizzazione distinta.
 
 ## Applicazione manuale e ritorno del pilot Seeweb, 29/10/2026
 

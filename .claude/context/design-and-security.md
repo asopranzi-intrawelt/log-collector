@@ -6,10 +6,14 @@ covers-paths:
   - bin/**
   - config/**
   - pilot/monitoring-hub/**
-last-verified-commit: 38655aae010c3a35439b01b453eaaf3a586cf9ea
+last-verified-commit: 00a94551d44dce55f8741ba961942ff0d974a7c9
 ---
 
 # Design e sicurezza applicativa
+
+## Drift delle regole e ritorno OPNsense, 29/10/2026
+
+La guardia del pilot confronta l'intero ruleset attivo con un baseline canonico costruito dallo stesso file nftables osservato: una regola aggiunta o alterata blocca l'applicazione invece di essere cancellata dal `flush ruleset` del candidato. È una prova locale in Debian 13; una differenza nel formato JSON sulla VM può fermare prudentemente il pilot e richiede un confronto, mai la disattivazione della guardia. Per l'appliance Seeweb osservata su UFS, gli snapshot interni OPNsense documentati richiedono ZFS: il tipo di snapshot proposto dal provider va confermato come livello hypervisor. Gli upgrade maggiori sono offline e necessitano di console indipendente.
 
 ## Guardie dell'applicazione Seeweb, 29/10/2026
 

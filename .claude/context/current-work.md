@@ -9,11 +9,15 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 38655aae010c3a35439b01b453eaaf3a586cf9ea
+last-verified-commit: 00a94551d44dce55f8741ba961942ff0d974a7c9
 stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai punti 3 e 7; eventi iLO tecnici separati con ritenzione 90 giorni attiva; catena locale provata in WSL, non installata; D7 bloccato da nomina ed elenco AdS
 ---
 
 # Lavoro in corso
+
+## Nuova risposta Seeweb e controllo del firewall attivo, 29/10/2026
+
+L'utente ha pubblicato `00a9455` e fornito una nuova schermata del ticket. Il provider propone prova UDP concordata con cattura sulla VM e offre gratuitamente undici passaggi OPNsense in una sessione con fino a due ore di disservizio previsto; non è un'autorizzazione operativa. Il pilot del collettore ora lega anche il ruleset nftables attivo al baseline in Debian 13 e si ferma sul drift. Sedici prove WSL, Ruff e simulazione nftables passano; Python 3 completo è presente sulla VM, ma l'account SSH non ha permessi per leggere le regole attive. Nessun deploy o evento Seeweb reale. Prima del test: `--check` root sulla VM, applicazione manuale, poi cattura limitata e pochi eventi concordati. Prima dell'upgrade: versione finale, snapshot hypervisor su appliance UFS, backup esterno, console, rollback e verifiche VPN/servizi. La nuova risposta è stata propagata a `D:/network-design`, dove ISO-27/30 restano in corso; quel worktree contiene molti file paralleli e non va versionato da questo filone.
 
 ## Pilot Seeweb pronto per l'applicazione manuale, 29/10/2026
 

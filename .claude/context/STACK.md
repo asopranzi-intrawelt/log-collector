@@ -8,10 +8,14 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 38655aae010c3a35439b01b453eaaf3a586cf9ea
+last-verified-commit: 00a94551d44dce55f8741ba961942ff0d974a7c9
 ---
 
 # Stack applicativo
+
+## Ruleset attivo e nuovo ticket Seeweb, 29/10/2026
+
+Il manifesto privato del pilot conserva ora anche l'impronta canonica del ruleset nftables generato dal baseline in Debian 13. `ads-seeweb-pilot-apply.py` confronta le regole attive come JSON, senza metadati e handle, al controllo iniziale e appena prima della sostituzione del firewall. L'account SSH ordinario non può leggerle; il controllo richiede root sulla VM. Seeweb offre una prova UDP concordata e, come filone separato, un upgrade OPNsense gratuito in undici passaggi.
 
 ## Applicatore manuale del pilot Seeweb, 29/10/2026
 

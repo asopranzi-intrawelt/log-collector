@@ -1,5 +1,9 @@
 # Snapshot di sincronizzazione
 
+## Nuovo ticket Seeweb e ruleset attivo, 29/10/2026
+
+Collettore `00a9455` pubblicato dall'utente e pulito alla ripresa. La risposta Seeweb del 29/10 offre test UDP concordato e upgrade OPNsense gratuito in undici passaggi; screenshot privato SHA-256 `BE29240FBCCCD033FC6DAEABF4C418FEA3F4E861D2431F48D60DFD59CF302DCD`, distinto dall'omonimo del 23/10. Il pilot ora confronta il ruleset nftables attivo con il baseline simulato; 16 prove locali passano, nessun deploy. La VM ha Python 3 completo ma l'account SSH non ha `CAP_NET_ADMIN`; preflight root manuale aperto. Rete aggiornata con dossier, memoria, timeline e ISO-27/30 in corso; il commit unico della rete resta alla sua sessione. D7, TSA/WORM, AdS e Cliente-1 89/90 aperti.
+
 ## Applicatore manuale Seeweb, 29/10/2026
 
 L'utente ha pubblicato `38655aa`; il collettore era pulito. Il nuovo applicatore usa il bundle privato già preparato dal baseline VM e offre controllo, installazione con copie di sicurezza e rollback manuale. Tredici prove WSL e sintassi Debian passano, nessun deploy. Rete in carico alla sua sessione; il collettore non vi scrive. Restano campione Seeweb reale, D7, custodia TSA/WORM, elenco AdS e Cliente-1 89/90.

@@ -6,10 +6,14 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 38655aae010c3a35439b01b453eaaf3a586cf9ea
+last-verified-commit: 00a94551d44dce55f8741ba961942ff0d974a7c9
 ---
 
 # Test di sviluppo
+
+## Impronta del ruleset del pilot Seeweb, 29/10/2026
+
+Sedici prove WSL come root passano: le nuove verificano che il controllo iniziale chiami la guardia sul ruleset, che il confronto ignori versione e handle ma rilevi una regola diversa, e che un drift prima del caricamento nftables faccia ripristinare rsyslog. Ruff passa. In un container Debian 13 con `NET_ADMIN`, il file nftables baseline è stato caricato e la funzione reale dell'applicatore ha prodotto l'impronta del manifesto privato. Il primo tentativo con `python3-minimal` falliva per libreria standard incompleta; con `python3` completo il confronto passa. Sulla VM è stata verificata in sola lettura la disponibilità della libreria; il ruleset attivo non è stato letto per permessi.
 
 ## Applicatore del pilot Seeweb, 29/10/2026
 
