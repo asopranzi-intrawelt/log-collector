@@ -79,8 +79,9 @@ def nft_ruleset_digest(raw: bytes) -> str:
         if "metainfo" in row:
             continue
         item = json.loads(json.dumps(row))
-        if "rule" in item:
-            item["rule"].pop("handle", None)
+        for kind in ("table", "chain", "rule"):
+            if kind in item:
+                item[kind].pop("handle", None)
         canonical.append(item)
     payload = json.dumps(canonical, sort_keys=True, separators=(",", ":")).encode()
     return digest(payload)

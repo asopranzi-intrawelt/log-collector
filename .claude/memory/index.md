@@ -1,5 +1,9 @@
 # Snapshot di sincronizzazione
 
+## Preflight Seeweb sulla VM, 30/10/2026
+
+Il primo `--check` era stato fermato solo dall'handle kernel della tabella nftables. Il bundle corretto, SHA-256 `85561c963111e0ad24614aebc87dbd8387924ecea3aeda8eea29869d0a34bfc0`, è stato trasferito e controllato come root sulla VM il 30/10: «Pilota Seeweb pronto; nessuna modifica». I 21 test del pilota e la riproduzione Debian 13 passano. `--apply`, ricezione reale e presa in carico degli eventi restano da verificare; ISO-30 e Cliente-1 89/90 aperti.
+
 ## Canon iR-ADV C5840 raggiungibile da remoto, 29/10/2026
 
 L'utente conferma il modello iR-ADV C5840 e mostra Canon Remote Operation Viewer 2.4, screenshot_173 SHA-256 `A35E7165BB7DE50FFB082CC64AE8AE718352F3622936966D35ADB13E1A0EA99B`. Matricola e indirizzo restano privati. Il pannello remoto consente una verifica iniziale senza visita, ma non attesta audit attivo, export o TLS. La guida Canon della serie C5800 documenta log di autenticazione e gestione, CSV e Syslog; leggere menu e campione reali prima di integrare. ReadMeter su VM100 resta candidato, non installato; ISO-30 non cambia.

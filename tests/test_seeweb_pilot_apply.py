@@ -246,18 +246,29 @@ class PilotApplyTests(unittest.TestCase):
     def test_impronta_ruleset_ignora_handle_ma_rileva_regola_diversa(self) -> None:
         first = {"nftables": [
             {"metainfo": {"version": "a"}},
-            {"table": {"family": "inet", "name": "filter"}},
+            {"table": {"family": "inet", "name": "filter", "handle": 2}},
+            {"chain": {"family": "inet", "table": "filter", "name": "input",
+                       "handle": 5, "type": "filter", "hook": "input", "prio": 0,
+                       "policy": "drop"}},
             {"rule": {"family": "inet", "table": "filter", "chain": "input",
                       "handle": 3, "expr": [{"accept": None}]}},
         ]}
         second = json.loads(json.dumps(first))
         second["nftables"][0]["metainfo"]["version"] = "b"
-        second["nftables"][2]["rule"]["handle"] = 99
+        second["nftables"][1]["table"]["handle"] = 4
+        second["nftables"][2]["chain"]["handle"] = 90
+        second["nftables"][3]["rule"]["handle"] = 99
         self.assertEqual(
             MODULE.nft_ruleset_digest(json.dumps(first).encode()),
             MODULE.nft_ruleset_digest(json.dumps(second).encode()),
         )
-        second["nftables"][2]["rule"]["expr"] = [{"drop": None}]
+        second["nftables"][2]["chain"]["policy"] = "accept"
+        self.assertNotEqual(
+            MODULE.nft_ruleset_digest(json.dumps(first).encode()),
+            MODULE.nft_ruleset_digest(json.dumps(second).encode()),
+        )
+        second["nftables"][2]["chain"]["policy"] = "drop"
+        second["nftables"][3]["rule"]["expr"] = [{"drop": None}]
         self.assertNotEqual(
             MODULE.nft_ruleset_digest(json.dumps(first).encode()),
             MODULE.nft_ruleset_digest(json.dumps(second).encode()),

@@ -15,6 +15,14 @@ stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai p
 
 # Lavoro in corso
 
+## Comandi operativi dalla postazione Windows
+
+L'utente richiede comandi eseguibili da PowerShell sulla propria postazione in una sola riga, con SSH lanciato da lì; non fornire blocchi da eseguire dentro una shell remota se non richiesti. La prima diagnostica Seeweb confezionata come `ssh ... sudo python3 -c` è fallita nel parsing di Bash per le virgolette di OpenSSH su Windows, prima di eseguire Python. Il prossimo controllo usa uno script privato copiato con SCP, verificato per SHA-256, installato in una directory root e poi eseguito via SSH, tutto in una riga PowerShell. Non cambia il firewall.
+
+## Preflight Seeweb passato sulla VM, 30/10/2026
+
+L'utente ha trasferito il bundle corretto, SHA-256 `85561c963111e0ad24614aebc87dbd8387924ecea3aeda8eea29869d0a34bfc0`, nella directory root distinta `/root/ads-seeweb-pilot-v2` ed eseguito `--check` con esito «Pilota Seeweb pronto; nessuna modifica». Il controllo ha superato hash dei file live e candidati, indirizzo locale, tabelle e ruleset nftables, sintassi e servizi. Il primo bundle resta conservato, non applicato. Prossimo gate: `--apply` manuale del bundle v2, con backup automatico e verifica immediata di servizi, regole e file tecnici; poi prova UDP limitata con Seeweb. Nessun evento Seeweb reale è ancora ricevuto e ISO-30 resta in corso.
+
 ## Modello Canon confermato e pannello remoto, 29/10/2026
 
 L'utente identifica la Canon del Piano 1 come iR-ADV C5840 e mostra Canon Remote Operation Viewer 2.4 connesso, screenshot_173. Indirizzo e matricola sono nel livello privato. Il viewer prova l'accesso remoto al pannello, non la raccolta dei log. La guida ufficiale della serie C5800 è ora pertinente al modello; firmware, menu Audit Log/Syslog, TLS, campione e ritenzione restano da leggere sul dispositivo. L'URL web indicato è HTTP: controllare il percorso cifrato prima di usarvi credenziali amministrative. Ricognizione in sola lettura subito; integrazione dopo il gate Seeweb e un campione reale. Nessun flusso Canon è attivo.
