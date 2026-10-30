@@ -11,6 +11,10 @@ last-verified-commit: 78b286496c7729d86c7d64f20465c76f1543a9e7
 
 # Test di sviluppo
 
+## Misura del campione Seeweb, 30/10/2026
+
+`bin/ads-seeweb-pilot-evidence.py` conta le righe del mittente nel deposito tecnico e in AdS entro una finestra di massimo due ore, senza stampare IP o payload. Dodici prove Linux verificano evento ricevuto, assenza, contaminazione AdS, riga malformata, link simbolico, FIFO, limite del file e date locali; la suite del pilot passa 33/33. Nel container Debian 13, dopo un UDP sintetico realmente ricevuto da rsyslog, il verificatore ha restituito un evento tecnico e zero AdS. La prova misura il formato e l'instradamento locale, non il tunnel Seeweb né la categoria amministrativa del messaggio.
+
 ## Proprietà del bundle e del backup Seeweb, 29/10/2026
 
 Tre prove WSL root erano rosse: directory del bundle 0777, manifesto 0666 e backup 0777 erano accettati. Dopo la guardia su tipo, proprietario, modalità e numero di link le stesse prove e l'intera suite di 21 test sono verdi; Ruff passa. Il pacchetto privato con il codice aggiornato è ripetibile e contiene quattro file regolari con proprietà e modalità previste. La prova non sostituisce `--check` root sulla VM né attesta un evento Seeweb ricevuto.

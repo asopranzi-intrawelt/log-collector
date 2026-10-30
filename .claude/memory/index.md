@@ -1,8 +1,12 @@
 # Snapshot di sincronizzazione
 
-## Preflight Seeweb sulla VM, 30/10/2026
+## Campione Seeweb ancora atteso, 30/10/2026
 
-Il primo `--check` era stato fermato solo dall'handle kernel della tabella nftables. Il bundle corretto, SHA-256 `85561c963111e0ad24614aebc87dbd8387924ecea3aeda8eea29869d0a34bfc0`, è stato trasferito e controllato come root sulla VM il 30/10: «Pilota Seeweb pronto; nessuna modifica». I 21 test del pilota e la riproduzione Debian 13 passano. `--apply`, ricezione reale e presa in carico degli eventi restano da verificare; ISO-30 e Cliente-1 89/90 aperti.
+Il chiarimento sulla finestra dopo le 19:00 risulta inviato dall'utente. Postcheck locale `SEEWEB_POSTCHECK_OK`; nessun evento reale. Preparato un verificatore di sola lettura del deposito tecnico e AdS con dodici prove Linux e integrazione rsyslog Debian 13; la prova del provider e il confronto dei campioni restano aperti. Il riepilogo delle pendenze nella rete è ancora da riconciliare dalla sua sessione, che ha già modifiche parallele. ISO-30 e Cliente-1 89/90 non chiusi.
+
+## Ricevitore Seeweb verificato, 30/10/2026
+
+L'utente ha applicato il bundle v2; il postcheck indipendente è interamente verde (`SEEWEB_POSTCHECK_OK`): file live, backup, servizi, sintassi rsyslog, regola nftables e UDP 514. Backup ID nel livello privato. Non è ancora arrivato un evento Seeweb reale: piccolo test UDP concordabile, inoltro continuo non autorizzato. Screenshot_206 privato SHA-256 `D113B90BF28BE35F8F09998B45659549066830DC48E448F0AC59665BCA8B34EE`: snapshot hypervisor a caldo e copia del backup confermati, disponibilità feriale del provider 09:00-18:00; l'utente chiede upgrade dopo le 19:00. Disponibilità e costo fuori orario aperti. ISO-27/30 e Cliente-1 89/90 in corso.
 
 ## Canon iR-ADV C5840 raggiungibile da remoto, 29/10/2026
 

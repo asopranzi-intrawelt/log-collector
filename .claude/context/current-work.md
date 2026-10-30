@@ -15,13 +15,17 @@ stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai p
 
 # Lavoro in corso
 
+## Prova reale Seeweb da concordare, 30/10/2026
+
+L'utente riferisce di aver inviato il chiarimento a Seeweb sulla finestra dell'upgrade dopo le 19:00. Il ricevitore locale ha superato `SEEWEB_POSTCHECK_OK`; nessun evento reale è ancora arrivato. Preparato `bin/ads-seeweb-pilot-evidence.py` per misurare dopo il test concordato le righe nel deposito tecnico e l'eventuale contaminazione AdS, senza esporre messaggi o indirizzi. Dodici prove Linux e un UDP sintetico attraversato da rsyslog in Debian 13 sono verdi. Il test del provider, una cattura limitata e la lettura di campioni nativi restano necessari prima di dichiarare la raccolta funzionante; ISO-30 resta in corso. Il riepilogo `D:/network-design/docs/stato/pendenze-aperte.md` mantiene lo stato Seeweb pre-applicazione ed è già in modifica per un filone parallelo: riconciliarlo dalla sessione di rete prima del suo commit.
+
 ## Comandi operativi dalla postazione Windows
 
-L'utente richiede comandi eseguibili da PowerShell sulla propria postazione in una sola riga, con SSH lanciato da lì; non fornire blocchi da eseguire dentro una shell remota se non richiesti. La prima diagnostica Seeweb confezionata come `ssh ... sudo python3 -c` è fallita nel parsing di Bash per le virgolette di OpenSSH su Windows, prima di eseguire Python. Il prossimo controllo usa uno script privato copiato con SCP, verificato per SHA-256, installato in una directory root e poi eseguito via SSH, tutto in una riga PowerShell. Non cambia il firewall.
+I comandi operativi per la VM devono essere una singola riga PowerShell Windows che avvia SSH dalla postazione; usare `-tt` se serve `sudo` interattivo. Il primo comando con Python inline fallì per la quotatura fra OpenSSH e Bash: per prove complesse si trasferisce uno script verificato per SHA-256. Commit, push e deploy sono manuali dell'utente.
 
-## Preflight Seeweb passato sulla VM, 30/10/2026
+## Pilot Seeweb verificato sulla VM, 30/10/2026
 
-L'utente ha trasferito il bundle corretto, SHA-256 `85561c963111e0ad24614aebc87dbd8387924ecea3aeda8eea29869d0a34bfc0`, nella directory root distinta `/root/ads-seeweb-pilot-v2` ed eseguito `--check` con esito «Pilota Seeweb pronto; nessuna modifica». Il controllo ha superato hash dei file live e candidati, indirizzo locale, tabelle e ruleset nftables, sintassi e servizi. Il primo bundle resta conservato, non applicato. Prossimo gate: `--apply` manuale del bundle v2, con backup automatico e verifica immediata di servizi, regole e file tecnici; poi prova UDP limitata con Seeweb. Nessun evento Seeweb reale è ancora ricevuto e ISO-30 resta in corso.
+L'utente ha eseguito `--apply` del bundle v2; backup privato creato. Il postcheck indipendente sulla VM ha dato `SEEWEB_POSTCHECK_OK`: hash dei due file live e delle due copie di backup corretti, `rsyslog` e `nftables` attivi, validazione rsyslog completa, regola per la sola sorgente Seeweb nel ruleset attivo e listener UDP 514 presente. Questo prova il ricevitore locale, non l'arrivo del traffico attraverso IPsec né la classificazione di eventi reali. Si può concordare con Seeweb un test limitato con pochi eventi GUI/SSH e confronto dei tempi, senza attivare inoltro continuo o log di traffico. ISO-30 resta in corso. Per l'upgrade OPNsense lo screenshot_206 conferma snapshot hypervisor a caldo, copia del backup disponibile e assistenza feriale 09:00-18:00; l'utente preferisce una finestra dopo le 19:00. Disponibilità fuori orario e costo da confermare prima di fissare la data; upgrade e test Syslog hanno finestre distinte.
 
 ## Modello Canon confermato e pannello remoto, 29/10/2026
 

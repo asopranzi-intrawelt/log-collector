@@ -1,8 +1,16 @@
 # Sorgenti Seeweb e stato della raccolta
 
+## Prova reale ancora attesa, 30/10/2026
+
+L'utente riferisce di aver inviato il chiarimento sulla finestra serale dell'upgrade. Il ricevitore sulla VM supera il postcheck locale, ma non è ancora dimostrata la consegna dal tunnel. Il verificatore `bin/ads-seeweb-pilot-evidence.py` è pronto per il test limitato: conta le righe del mittente nel deposito tecnico e in AdS entro l'intervallo concordato, senza stampare IP o messaggi. Un `observed` richiede eventi tecnici, zero AdS e nessuna riga malformata; resta indispensabile confrontare con Seeweb invio, cattura e contenuto dei pochi campioni GUI/SSH. Dodici prove Linux e un passaggio reale in rsyslog Debian 13 usano solo eventi sintetici. Nessun inoltro continuo è autorizzato da questa preparazione.
+
+## Ricevitore locale verificato, prova reale da concordare, 30/10/2026
+
+Il bundle v2 è stato applicato dall'utente sulla VM e ha creato un backup privato. Il postcheck indipendente ha verificato hash dei file live e del backup, servizi `rsyslog`/`nftables` attivi, sintassi rsyslog, regola nftables per il solo mittente confermato e listener UDP 514 (`SEEWEB_POSTCHECK_OK`). Non è ancora dimostrata la consegna dal tunnel IPsec o la classificazione di un evento reale. Il prossimo passo è concordare con Seeweb una prova breve con pochi accessi GUI/SSH controllati, confrontando invio, cattura limitata e righe nel deposito tecnico; controllare anche l'assenza del mittente nell'archivio AdS. La prova non autorizza inoltro continuo o log di traffico. L'upgrade OPNsense resta separato e, su preferenza dell'utente, da fissare dopo le 19:00 solo se il provider conferma disponibilità e costi.
+
 ## Aggiornamento appliance separato dal test Syslog, 29/10/2026
 
-Seeweb ha chiarito la proposta di upgrade a 26.7.7 nello screenshot_135, SHA-256 `42967B6F4F40E57EE092618DA1283A8FAD3D9E83BC9EE2D7F792DD5911E951F7`: snapshot sull'hypervisor, backup completo della configurazione, attività prevista entro due ore e disservizi durante i riavvii. Il provider indica la VPN come punto da verificare e non prevede cambi Firewall/NAT. La sonda SSH del 29/10 trova `rsyslog` e `nftables` attivi e UDP 514 in ascolto, ma questo non abilita l'inoltro Syslog: il ricevitore mirato sulla VM resta da installare, il ruleset attivo richiede un controllo root e non è arrivato alcun evento Seeweb reale. Le verifiche dell'upgrade e la breve prova UDP hanno finestre e criteri di esito separati; il [dossier firewall](firewall-seeweb-opnsense.md) registra il piano ancora da concordare.
+Seeweb ha chiarito la proposta di upgrade a 26.7.7 nello screenshot_135, SHA-256 `42967B6F4F40E57EE092618DA1283A8FAD3D9E83BC9EE2D7F792DD5911E951F7`: snapshot sull'hypervisor, backup completo della configurazione, attività prevista entro due ore e disservizi durante i riavvii. Il provider indica la VPN come punto da verificare e non prevede cambi Firewall/NAT. La sonda SSH del 29/10 trovò `rsyslog` e `nftables` attivi e UDP 514 in ascolto; il 30/10 il ricevitore mirato è stato applicato e controllato con privilegi root. Non è arrivato alcun evento Seeweb reale. Le verifiche dell'upgrade e la breve prova UDP hanno finestre e criteri di esito separati; il [dossier firewall](firewall-seeweb-opnsense.md) registra il piano ancora da concordare.
 
 ## Test UDP concordabile, 29/10/2026
 
