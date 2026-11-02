@@ -14,12 +14,48 @@ from pathlib import Path
 TECHNICAL_ROOT = Path("/var/log/ads-seeweb-technical")
 ADS_ROOT = Path("/srv/ads")
 MAX_FILE_BYTES = 64 * 1024 * 1024
+MAX_MANIFEST_BYTES = 16 * 1024
 DIRECTORY_FLAGS = os.O_RDONLY | getattr(os, "O_DIRECTORY", 0) | getattr(os, "O_NOFOLLOW", 0)
 FILE_FLAGS = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_NONBLOCK", 0)
 
 
 class MeasurementError(Exception):
     pass
+
+
+def file_version(info: os.stat_result) -> tuple[int, int, int, int, int]:
+    return (
+        info.st_dev, info.st_ino, info.st_size,
+        info.st_mtime_ns, info.st_ctime_ns,
+    )
+
+
+def manifest_source(manifest: Path) -> str:
+    descriptor = os.open(manifest, FILE_FLAGS)
+    try:
+        before = os.fstat(descriptor)
+        if not stat.S_ISREG(before.st_mode) or before.st_nlink != 1:
+            raise MeasurementError("manifesto non regolare")
+        if before.st_size > MAX_MANIFEST_BYTES:
+            raise MeasurementError("manifesto oltre il limite di misura")
+        chunks = []
+        total = 0
+        while total <= MAX_MANIFEST_BYTES:
+            chunk = os.read(descriptor, MAX_MANIFEST_BYTES + 1 - total)
+            if not chunk:
+                break
+            chunks.append(chunk)
+            total += len(chunk)
+        if total > MAX_MANIFEST_BYTES:
+            raise MeasurementError("manifesto cresciuto oltre il limite di misura")
+        if file_version(os.fstat(descriptor)) != file_version(before):
+            raise MeasurementError("manifesto cambiato durante la misura")
+        manifest_data = json.loads(b"".join(chunks).decode("utf-8"))
+        if not isinstance(manifest_data, dict) or not isinstance(manifest_data.get("source"), str):
+            raise MeasurementError("sorgente del manifesto non valida")
+        return str(ipaddress.IPv4Address(manifest_data["source"]))
+    finally:
+        os.close(descriptor)
 
 
 def interval(start_raw: str, end_raw: str) -> tuple[datetime, datetime, tuple[str, ...]]:
@@ -92,6 +128,8 @@ def count_day(
                     events += 1
                     first = received if first is None else min(first, received)
                     last = received if last is None else max(last, received)
+            if file_version(os.fstat(stream.fileno())) != file_version(info):
+                raise MeasurementError("file cambiato durante la misura")
         return events, malformed, first, last, True
     finally:
         if descriptor >= 0:
@@ -135,10 +173,7 @@ def measure(
 ) -> dict[str, object]:
     if os.name != "posix":
         raise MeasurementError("richiede Linux")
-    info = manifest.lstat()
-    if not stat.S_ISREG(info.st_mode) or info.st_nlink != 1:
-        raise MeasurementError("manifesto non regolare")
-    source = str(ipaddress.IPv4Address(json.loads(manifest.read_text(encoding="utf-8"))["source"]))
+    source = manifest_source(manifest)
     start, end, dates = interval(start_raw, end_raw)
     technical = measure_root(technical_root, source, dates, start, end)
     ads = measure_root(ads_root, source, dates, start, end)

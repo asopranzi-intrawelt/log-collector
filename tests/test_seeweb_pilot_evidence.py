@@ -97,6 +97,78 @@ class EvidenceTests(unittest.TestCase):
         with self.assertRaises(MODULE.MeasurementError):
             self.report()
 
+    def test_manifesto_oltre_limite_non_viene_letto(self) -> None:
+        self.manifest.write_text(
+            json.dumps({"source": SOURCE}) + " " * MODULE.MAX_MANIFEST_BYTES,
+            encoding="utf-8",
+        )
+        with self.assertRaises(MODULE.MeasurementError):
+            self.report()
+
+    def test_manifesto_simbolico_non_viene_seguito(self) -> None:
+        outside = self.root / "outside.json"
+        outside.write_text(json.dumps({"source": SOURCE}), encoding="utf-8")
+        self.manifest.unlink()
+        self.manifest.symlink_to(outside)
+        with self.assertRaises(OSError):
+            self.report()
+
+    def test_manifesto_con_struttura_errata_restituisce_errore_misura(self) -> None:
+        self.manifest.write_text("[]", encoding="utf-8")
+        with patch.object(MODULE, "print") as output:
+            code = MODULE.main([
+                "--manifest", str(self.manifest), "--start", START, "--end", END,
+            ])
+        self.assertEqual(code, 3)
+        self.assertEqual(json.loads(output.call_args.args[0]), {"status": "measurement_failed"})
+
+    def test_manifesto_cambiato_durante_la_lettura_fallisce(self) -> None:
+        read_original = os.read
+        changed = False
+
+        def read_and_change(descriptor: int, size: int) -> bytes:
+            nonlocal changed
+            chunk = read_original(descriptor, size)
+            if chunk and not changed:
+                with self.manifest.open("ab") as stream:
+                    stream.write(b" ")
+                changed = True
+            return chunk
+
+        with patch.object(MODULE.os, "read", side_effect=read_and_change):
+            with self.assertRaises(MODULE.MeasurementError):
+                self.report()
+        self.assertTrue(changed)
+
+    def test_log_cambiato_durante_la_misura_fallisce(self) -> None:
+        self.write_log(self.technical, [
+            f"2026-10-30T19:02:00+01:00 {SOURCE} ora host evento\n",
+        ])
+        file = self.technical / SOURCE / "2026-10-30.log"
+        source_dir = os.open(file.parent, os.O_RDONLY | os.O_DIRECTORY)
+        fstat_original = os.fstat
+        calls = 0
+
+        def stat_and_change(descriptor: int):
+            nonlocal calls
+            calls += 1
+            if calls == 2:
+                with file.open("ab") as stream:
+                    stream.write(b"2026-10-30T19:03:00+01:00 pending\n")
+            return fstat_original(descriptor)
+
+        try:
+            with patch.object(MODULE.os, "fstat", side_effect=stat_and_change):
+                with self.assertRaises(MODULE.MeasurementError):
+                    MODULE.count_day(
+                        source_dir, "2026-10-30", SOURCE,
+                        MODULE.datetime.fromisoformat(START),
+                        MODULE.datetime.fromisoformat(END),
+                    )
+        finally:
+            os.close(source_dir)
+        self.assertEqual(calls, 2)
+
     def test_file_cresciuto_dopo_lo_stat_fallisce_la_misura(self) -> None:
         self.write_log(self.technical, [
             f"2026-10-30T19:02:00+01:00 {SOURCE} ora host evento\n",

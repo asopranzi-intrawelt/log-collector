@@ -15,6 +15,10 @@ stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai p
 
 # Lavoro in corso
 
+## Pilot Seeweb: misura stabile prima della prova reale, 02/11/2026
+
+L'utente riferisce di aver inviato il riscontro al ticket Seeweb e di aver concluso `chiudi` nel collettore: `main` è `067f62c`, albero pulito alla ripresa. Il verificatore del campione ora apre il manifesto senza seguire link, lo limita a 16 KiB e rifiuta cambi durante la lettura; applica lo stesso controllo di stabilità ai log tecnici e AdS e rifiuta una struttura JSON errata. Diciassette prove Linux passano, comprese mutazioni del manifesto e del log. Il codice aggiornato resta locale, da versionare e trasferire manualmente prima del test. Il ricevitore sulla VM è verificato solo localmente; il test UDP reale con Seeweb e la classificazione dei campioni GUI/SSH sono ancora aperti. La rete conserva lavoro parallelo in corso; nessun nuovo fatto topologico deriva da questa guardia.
+
 ## Seeweb: campione funzionale dalla sede, 02/11/2026
 
 L'utente ha concluso `chiudi` nei due progetti: collettore `ec93140`, rete `d8abd6a`, alberi puliti all'avvio. Screenshot_247 mostra il server GroupShare disponibile in Trados Studio, screenshot_248 la dashboard web aperta e screenshot_249 la condivisione cloud mappata dalla postazione LAN. L'utente riferisce uso delle TM server, backup delle TM verso NAS-INTRA3 funzionante e accesso RDP alla VM cloud. Sono prove positive dei percorsi indicati, non del funzionamento di ogni servizio o del completamento dell'upgrade. Il backup TM non sostituisce la conferma del backup OPNsense. Preparare a Seeweb un riscontro circoscritto e chiedere release corrente, passaggi residui, controllo provider di VPN/rotte/NAT, snapshot e backup della configurazione, finestra serale e costo. Test Syslog UDP ancora separato e non eseguito.

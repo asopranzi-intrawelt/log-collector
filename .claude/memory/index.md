@@ -1,5 +1,9 @@
 # Snapshot di sincronizzazione
 
+## Seeweb: ticket inviato e verificatore stabilizzato, 02/11/2026
+
+L'utente riferisce di avere inviato il riscontro a Seeweb e completato `chiudi` del collettore; `main` è `067f62c` e l'albero era pulito alla ripresa. Il verificatore di sola lettura ferma la misura se manifesto o log cambiano mentre li legge, rifiuta link simbolici e struttura JSON errata, e impone 16 KiB al manifesto e 64 MiB a ogni log. Diciassette prove Linux passano. Questo prepara il confronto del campione senza attestare traffico Syslog reale via IPsec; il test concordato e i campioni GUI/SSH restano aperti. La rete ha modifiche parallele, senza nuovo fatto topologico da registrare per questa guardia.
+
 ## Seeweb: verifica dalla sede, 02/11/2026
 
 Collettore `ec93140` e rete `d8abd6a` chiusi dall'utente e puliti alla ripresa. Screenshot_247/248/249, copie e SHA-256 nel dossier privato, attestano server Trados disponibile, dashboard GroupShare aperta e condivisione cloud navigabile dalla postazione LAN. Uso delle TM, backup verso NAS-INTRA3 e RDP sono riferiti dall'operatore. Campione funzionale positivo e circoscritto, senza misura complessiva del tunnel o attestazione di release finale. Backup TM distinto da backup OPNsense. Risposta a Seeweb aggiornata; Syslog reale e ISO-30 restano aperti.
