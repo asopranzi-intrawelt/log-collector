@@ -1,5 +1,9 @@
 # Snapshot di sincronizzazione
 
+## Checkpoint Seeweb versionato e schede riallineate, 02/11/2026
+
+Il `chiudi` dell'utente ha pubblicato `35c6cb9` sul ramo `main`; l'albero era pulito alla ripresa. Le cinque schede tecniche coperte dal codice Seeweb erano rimaste ancorate a `78b2864`; controllo del delta e riallineamento mirato al nuovo commit hanno corretto lo stato del pilot applicato e del misuratore ancora non distribuito. Ripetuto su Debian 13 il test integrato con UDP sintetico: un evento tecnico, zero AdS, `PILOT_TEST_OK`. Il ticket risulta inviato secondo l'utente, senza ricevuta riletta. In `D:/network-design` permane lavoro parallelo: aggiornare lì il riferimento operativo a 17 prove dopo la chiusura di quell'albero. Test Syslog reale, campioni GUI/SSH e release finale OPNsense ancora aperti.
+
 ## Seeweb: ticket inviato e verificatore stabilizzato, 02/11/2026
 
 L'utente riferisce di avere inviato il riscontro a Seeweb e completato `chiudi` del collettore; `main` è `067f62c` e l'albero era pulito alla ripresa. Il verificatore di sola lettura ferma la misura se manifesto o log cambiano mentre li legge, rifiuta link simbolici e struttura JSON errata, e impone 16 KiB al manifesto e 64 MiB a ogni log. Diciassette prove Linux passano. Questo prepara il confronto del campione senza attestare traffico Syslog reale via IPsec; il test concordato e i campioni GUI/SSH restano aperti. La rete ha modifiche parallele, senza nuovo fatto topologico da registrare per questa guardia.

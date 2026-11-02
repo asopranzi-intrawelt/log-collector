@@ -8,10 +8,14 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 78b286496c7729d86c7d64f20465c76f1543a9e7
+last-verified-commit: 35c6cb9
 ---
 
 # Stack applicativo
+
+## Pilot Seeweb in esercizio locale e misuratore candidato, 02/11/2026
+
+Il bundle v2 è stato applicato manualmente alla VM il 30/10: rsyslog e nftables hanno superato il postcheck locale `SEEWEB_POSTCHECK_OK`. Il ricevitore instrada il solo mittente Seeweb al deposito tecnico; nessun evento reale dal tunnel è stato ancora verificato. `bin/ads-seeweb-pilot-evidence.py` è pronto nel repository, non sulla VM: misura una finestra massima di due ore, senza mostrare IP o payload, e fallisce se manifesto o log cambiano durante la lettura. Diciassette prove Linux passano. Il test UDP concordato e i campioni GUI/SSH restano il prossimo gate.
 
 ## Ruleset attivo e nuovo ticket Seeweb, 29/10/2026
 

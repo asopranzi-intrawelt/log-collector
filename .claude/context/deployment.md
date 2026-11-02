@@ -5,10 +5,14 @@ generated-date: 2026-09-30
 covers-paths:
   - config/**
   - docs/handoff-sviluppo-collettore.md
-last-verified-commit: 78b286496c7729d86c7d64f20465c76f1543a9e7
+last-verified-commit: 35c6cb9
 ---
 
 # Deployment
+
+## Stato operativo Seeweb dopo il pilot, 02/11/2026
+
+L'utente ha trasferito il bundle v2 nella directory root della VM e ha eseguito `--check`, `--apply` e il postcheck indipendente il 30/10; `SEEWEB_POSTCHECK_OK` comprende impronte, backup, servizi, regola e listener UDP. Il verificatore del campione introdotto dopo il pilot resta nel repository: va trasferito con impronta verificata prima della finestra di test. Nessun evento Syslog reale è stato misurato, quindi il test concordato con Seeweb e la lettura dei campioni GUI/SSH sono ancora gate operativi. Il ticket di seguito risulta inviato dall'utente il 02/11; testo effettivo e ricevuta non sono stati riletti.
 
 ## Pacchetto e custodia del pilot Seeweb, 29/10/2026
 

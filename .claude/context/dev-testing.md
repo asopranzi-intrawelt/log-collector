@@ -6,14 +6,14 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 78b286496c7729d86c7d64f20465c76f1543a9e7
+last-verified-commit: 35c6cb9
 ---
 
 # Test di sviluppo
 
 ## Misura del campione Seeweb, 02/11/2026
 
-`bin/ads-seeweb-pilot-evidence.py` conta le righe del mittente nel deposito tecnico e in AdS entro una finestra di massimo due ore, senza stampare IP o payload. Diciassette prove Linux verificano evento ricevuto, assenza, contaminazione AdS, riga malformata, link simbolici, FIFO, limiti di dimensione, struttura del manifesto, manifesto e log modificati durante la lettura e date locali. Il manifesto è limitato a 16 KiB e ogni log a 64 MiB; una mutazione durante la misura produce `measurement_failed`. Nel container Debian 13, dopo un UDP sintetico realmente ricevuto da rsyslog, il verificatore ha restituito un evento tecnico e zero AdS. La prova misura il formato e l'instradamento locale, non il tunnel Seeweb né la categoria amministrativa del messaggio.
+`bin/ads-seeweb-pilot-evidence.py` conta le righe del mittente nel deposito tecnico e in AdS entro una finestra di massimo due ore, senza stampare IP o payload. Diciassette prove Linux verificano evento ricevuto, assenza, contaminazione AdS, riga malformata, link simbolici, FIFO, limiti di dimensione, struttura del manifesto, manifesto e log modificati durante la lettura e date locali. Il manifesto è limitato a 16 KiB e ogni log a 64 MiB; una mutazione durante la misura produce `measurement_failed`. Ripetuto il 02/11 sul commit `35c6cb9`, il test nel container Debian 13 ha consegnato un UDP sintetico a rsyslog: il verificatore ha restituito un evento tecnico, zero AdS e `PILOT_TEST_OK`. La prova misura il formato e l'instradamento locale, non il tunnel Seeweb né la categoria amministrativa del messaggio.
 
 ## Proprietà del bundle e del backup Seeweb, 29/10/2026
 

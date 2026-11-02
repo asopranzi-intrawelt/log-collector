@@ -6,10 +6,14 @@ covers-paths:
   - bin/**
   - config/**
   - pilot/monitoring-hub/**
-last-verified-commit: 78b286496c7729d86c7d64f20465c76f1543a9e7
+last-verified-commit: 35c6cb9
 ---
 
 # Design e sicurezza applicativa
+
+## Confine della prova Seeweb dopo l'applicazione, 02/11/2026
+
+Il pilot v2 è attivo sulla VM e il postcheck locale del 30/10 è verde. La guardia root ha confrontato il ruleset attivo con il baseline prima dell'applicazione; il postcheck ha verificato regola, listener e servizi. Questo non prova alcun datagramma proveniente da Seeweb. Il verificatore del campione rifiuta link simbolici, manifesto non valido o oltre 16 KiB e file modificati durante la lettura; il suo `observed` prova solo la presenza di righe tecniche nel periodo, da confrontare con cattura e campioni nativi del provider. Nessun evento Seeweb è classificato AdS senza quel confronto.
 
 ## Drift delle regole e ritorno OPNsense, 29/10/2026
 

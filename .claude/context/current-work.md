@@ -9,11 +9,15 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 78b286496c7729d86c7d64f20465c76f1543a9e7
+last-verified-commit: 35c6cb9
 stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai punti 3 e 7; eventi iLO tecnici separati con ritenzione 90 giorni attiva; catena locale provata in WSL, non installata; D7 bloccato da nomina ed elenco AdS
 ---
 
 # Lavoro in corso
+
+## Ripresa dopo il checkpoint Seeweb, 02/11/2026
+
+L'utente ha eseguito `chiudi`: il collettore è a `35c6cb9` e l'albero era pulito alla ripresa. Il ticket di seguito risulta inviato dall'utente, senza copia del testo effettivo o ricevuta. Il misuratore stabilizzato è ora versionato, ma non trasferito sulla VM; la prova reale UDP e i campioni GUI/SSH restano aperti. Il progetto rete ha modifiche parallele ancora non chiuse: il riferimento operativo al ticket e al conteggio di 17 prove va allineato quando il suo albero è libero, preservando le voci storiche del 30/10.
 
 ## Pilot Seeweb: misura stabile prima della prova reale, 02/11/2026
 
