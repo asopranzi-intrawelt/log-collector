@@ -6,7 +6,7 @@ covers-paths:
   - bin/**
   - config/**
   - pilot/monitoring-hub/**
-last-verified-commit: 571b0f6
+last-verified-commit: 2ca9bfd
 ---
 
 # Design e sicurezza applicativa
@@ -49,7 +49,7 @@ Il renderer strict rifiuta IPv4 invalidi, duplicati fra categorie e la lista AdS
 
 ## Confine dei mittenti non censiti, 28/10/2026
 
-Nel template attuale nftables accetta UDP 514 dalla LAN e il ramo finale di rsyslog scrive in `/srv/ads/` anche mittenti che non hanno un filtro esplicito. Il preflight segnala questa lacuna usando solo conteggi delle directory immediate, rifiutando link, nomi inattesi, duplicati fra categorie e indirizzi invalidi nei parametri; Seeweb nell'archivio AdS è sempre anomalia. Non legge i log e non sostituisce il filtro: la misura delle directory da sola non prova identità, completezza o classificazione degli eventi.
+Nel template attuale nftables accetta UDP 514 dalla LAN e il ramo finale di rsyslog scrive in `/srv/ads/` anche mittenti che non hanno un filtro esplicito. Il preflight usa solo conteggi delle directory immediate, segnala gli IP AdS configurati ma assenti, e rifiuta link, nomi inattesi, duplicati fra categorie e indirizzi invalidi nei parametri; Seeweb nell'archivio AdS è sempre anomalia. `configured_missing` impone riconciliazione, non attribuisce un guasto: la sorgente può essere silenziosa o inattiva. Il comando non legge i log e non sostituisce il filtro; la misura delle directory da sola non prova identità, completezza o classificazione degli eventi.
 
 ## Confine Seeweb e diagnosi della misura, 28/10/2026
 

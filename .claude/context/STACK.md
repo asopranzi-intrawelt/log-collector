@@ -8,7 +8,7 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 571b0f6
+last-verified-commit: 2ca9bfd
 ---
 
 # Stack applicativo
@@ -53,7 +53,7 @@ Il parametro privato `sorgenti.seeweb_opnsense` contiene ora il solo IPv4 sorgen
 
 ## Inventario dei mittenti AdS, 28/10/2026
 
-`bin/ads-source-inventory.py` legge solo le directory immediate dell'archivio AdS e confronta i nomi IPv4 con le sorgenti dei parametri privati. Restituisce una riga JSON di conteggi, senza indirizzi o contenuto dei log. È un preflight candidato per riconciliare l'inventario prima di rendere esplicito il ramo finale del ricevitore rsyslog; il filtro non cambia in questo diff.
+`bin/ads-source-inventory.py` legge solo le directory immediate dell'archivio AdS e confronta i nomi IPv4 con le sorgenti dei parametri privati. Restituisce una riga JSON di conteggi, compreso `configured_missing` per gli IP configurati senza directory osservata, senza indirizzi o contenuto dei log. Se manca una sorgente configurata l'esito è `needs_reconciliation`, anche quando è presente `localhost`. È un preflight candidato prima di rendere esplicito il ramo finale del ricevitore rsyslog; il filtro non cambia in questo diff.
 
 ## Riscontro Seeweb e misura storica, 28/10/2026
 

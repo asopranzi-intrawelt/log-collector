@@ -63,6 +63,7 @@ def _empty(status: str) -> dict[str, str | int]:
         "status": status,
         "local": 0,
         "configured": 0,
+        "configured_missing": 0,
         "unknown": 0,
         "seeweb_in_ads": 0,
         "unexpected_entries": 0,
@@ -75,6 +76,7 @@ def _classify(
     seeweb: set[ipaddress.IPv4Address],
 ) -> dict[str, str | int]:
     report = _empty("needs_reconciliation")
+    observed_configured: set[ipaddress.IPv4Address] = set()
     for entry in entries:
         if entry.is_symlink() or not entry.is_dir(follow_symlinks=False):
             report["unexpected_entries"] += 1
@@ -90,10 +92,13 @@ def _classify(
             report["seeweb_in_ads"] += 1
         elif address in configured:
             report["configured"] += 1
+            observed_configured.add(address)
         else:
             report["unknown"] += 1
+    report["configured_missing"] = len(configured - observed_configured)
     if (report["local"] or report["configured"]) and not any(
-        report[key] for key in ("unknown", "seeweb_in_ads", "unexpected_entries")
+        report[key]
+        for key in ("configured_missing", "unknown", "seeweb_in_ads", "unexpected_entries")
     ):
         report["status"] = "ok"
     return report

@@ -1,5 +1,9 @@
 # Snapshot di sincronizzazione
 
+## Inventario AdS senza falso verde sulle sorgenti silenziose, 02/11/2026
+
+Dopo il `chiudi` dell'utente, `main` è `2ca9bfd`. Il preflight segnala ora `configured_missing` e restituisce `needs_reconciliation` quando un IP AdS configurato non ha directory osservata, anche se `localhost` è presente. Il test mirato era rosso sul codice precedente; 15 prove Python e una sonda POSIX passano. Schede riallineate al commit della misura; l'archivio reale della VM non è stato letto e il filtro strict resta candidato. La rete contiene modifiche parallele non riconciliate.
+
 ## Campione della catena più sensibile alle riscritture, 02/11/2026
 
 Il `chiudi` dell'utente ha pubblicato `571b0f6`. Il misuratore ora confronta anche `ctime`: in WSL rileva una riscrittura di uguale lunghezza con `mtime` ripristinato; togliendo il nuovo campo, il test fallisce sul falso verde. Cinque schede riallineate al commit del lock, runbook e handoff aggiornati. La misura su volume reale e l'installazione del timer restano aperte; `network-design` è occupato dal lavoro parallelo.

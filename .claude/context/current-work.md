@@ -9,11 +9,15 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 571b0f6
+last-verified-commit: 2ca9bfd
 stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai punti 3 e 7; eventi iLO tecnici separati con ritenzione 90 giorni attiva; catena locale provata in WSL, non installata; D7 bloccato da nomina ed elenco AdS
 ---
 
 # Lavoro in corso
+
+## Sorgenti configurate ma non osservate, 02/11/2026
+
+Dopo `chiudi`, `main` è `2ca9bfd` e l'albero era pulito. Il preflight dei mittenti poteva dare `ok` con la sola directory locale e una sorgente AdS configurata senza directory. Ora conta `configured_missing` e richiede riconciliazione; la prova mirata era rossa prima e 15 prove passano dopo. La sonda POSIX esercita il ramo Linux senza pytest. L'archivio reale della VM resta non letto per i permessi dell'account usato il 28/10: la mancanza di directory non prova un guasto e il filtro strict non va ancora installato. La rete ha lavoro parallelo su file condivisi.
 
 ## Campione stabile per misurare la catena, 02/11/2026
 

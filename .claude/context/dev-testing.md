@@ -6,7 +6,7 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 571b0f6
+last-verified-commit: 2ca9bfd
 ---
 
 # Test di sviluppo
@@ -55,7 +55,7 @@ Dopo aver registrato il mittente OPNsense comunicato dal supporto, `ads-render.p
 
 ## Preflight dei mittenti AdS, 28/10/2026
 
-`tests/test_source_inventory.py` ha 14 prove verdi: indirizzi censiti e locali, sconosciuti, Seeweb nell'archivio AdS, voci inattese, root assente o collegata, duplicati/IPv4 invalidi e lettura negata. Una mutazione che ignorava gli sconosciuti ha fatto fallire la prova mirata; il codice è stato ripristinato con SHA verificato. Ruff passa. Una prova Linux su `/tmp` ha esercitato il ramo con descriptor e `O_NOFOLLOW`; non ha letto `/srv/ads` della VM. Il test su fixture non misura il flusso reale.
+`tests/test_source_inventory.py` ha 15 prove verdi: indirizzi censiti e locali, configurati ma assenti, sconosciuti, Seeweb nell'archivio AdS, voci inattese, root assente o collegata, duplicati/IPv4 invalidi e lettura negata. Il nuovo caso con `localhost`, una fonte censita presente e una assente era rosso sul vecchio codice (`ok`), verde con `configured_missing=1` e `needs_reconciliation`. Ruff passa. Una sonda Python standard in WSL su `/tmp` ha esercitato il ramo POSIX con descriptor e `O_NOFOLLOW`; pytest non era installato in WSL. Nessuna prova ha letto `/srv/ads` della VM o misurato il flusso reale.
 
 ## Doppio difetto nella misura AdS, 28/10/2026
 

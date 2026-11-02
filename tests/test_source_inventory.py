@@ -59,6 +59,7 @@ def test_known_sources_and_local_are_only_clean_state(tmp_path: Path) -> None:
         "status": "ok",
         "local": 1,
         "configured": 2,
+        "configured_missing": 0,
         "unknown": 0,
         "seeweb_in_ads": 0,
         "unexpected_entries": 0,
@@ -84,6 +85,7 @@ def test_unknown_and_seeweb_are_anomalies_even_if_seeweb_is_configured(tmp_path:
         "status": "needs_reconciliation",
         "local": 0,
         "configured": 1,
+        "configured_missing": 1,
         "unknown": 1,
         "seeweb_in_ads": 1,
         "unexpected_entries": 2,
@@ -121,7 +123,27 @@ def test_empty_archive_is_not_a_success(tmp_path: Path) -> None:
     code, report, _, stderr = run(parameters(tmp_path), archive)
     assert code == 2
     assert report["status"] == "needs_reconciliation"
-    assert sum(value for value in report.values() if isinstance(value, int)) == 0
+    assert report["configured_missing"] == 2
+    assert all(
+        report[field] == 0
+        for field in ("local", "configured", "unknown", "seeweb_in_ads", "unexpected_entries")
+    )
+    assert stderr == ""
+
+
+def test_configured_source_absent_needs_reconciliation(tmp_path: Path) -> None:
+    archive = tmp_path / "ads"
+    archive.mkdir()
+    (archive / "127.0.0.1").mkdir()
+    (archive / "192.0.2.10").mkdir()
+
+    code, report, output, stderr = run(parameters(tmp_path), archive)
+
+    assert code == 2
+    assert report["status"] == "needs_reconciliation"
+    assert report["configured"] == 1
+    assert report["configured_missing"] == 1
+    assert "192.0.2.20" not in output
     assert stderr == ""
 
 

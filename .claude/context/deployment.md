@@ -5,7 +5,7 @@ generated-date: 2026-09-30
 covers-paths:
   - config/**
   - docs/handoff-sviluppo-collettore.md
-last-verified-commit: 571b0f6
+last-verified-commit: 2ca9bfd
 ---
 
 # Deployment
@@ -52,7 +52,7 @@ Il rendering strict non viene installato: con i parametri privati attuali manca 
 
 ## Preflight inventario prima del nuovo filtro, 28/10/2026
 
-Il comando candidato `ads-source-inventory.py` richiede la copia privata dei parametri e accesso di lettura alle directory immediate di `/srv/ads/`; non apre file di log. Non è installato sulla VM. Una sonda SSH equivalente di sola lettura è stata tentata il 28/10, ma l'accesso all'archivio è stato negato all'account usato. Un risultato locale `ok` non certifica sorgenti silenziose o flussi futuri. Prima di cambiare il catch-all del servizio occorrono inventario reale, proprietari, confronto con i parametri e smoke test per ogni sorgente attiva.
+Il comando candidato `ads-source-inventory.py` richiede la copia privata dei parametri e accesso di lettura alle directory immediate di `/srv/ads/`; non apre file di log. Non è installato sulla VM. Una sonda SSH equivalente di sola lettura è stata tentata il 28/10, ma l'accesso all'archivio è stato negato all'account usato. Ora un IP AdS configurato senza directory produce `needs_reconciliation`; questo non certifica che la sorgente sia guasta, e un futuro `ok` non certifica i flussi successivi. Prima di cambiare il catch-all del servizio occorrono inventario reale, proprietari, confronto con i parametri e smoke test per ogni sorgente attiva.
 
 ## Gate di attivazione Seeweb, 28/10/2026
 
