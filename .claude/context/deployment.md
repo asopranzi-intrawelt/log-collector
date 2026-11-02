@@ -5,10 +5,14 @@ generated-date: 2026-09-30
 covers-paths:
   - config/**
   - docs/handoff-sviluppo-collettore.md
-last-verified-commit: a2e58a5
+last-verified-commit: 11bed4e
 ---
 
 # Deployment
+
+## Inventario prima del filtro strict, 02/11/2026
+
+Il preflight aggiornato è locale al repository e non è stato trasferito sulla VM. La sonda manuale del 02/11 ha confermato il mount, le voci immediate come directory e `lost+found` vuota; prima dell'uso operativo ricontrollare il mount e poi eseguire il classificatore con i parametri privati. Per arrivare a `ok` occorre ancora riconciliare i sei nomi di rete non configurati; anche `ok` da solo non autorizza l'installazione del filtro strict.
 
 ## Precondizione del misuratore Seeweb, 02/11/2026
 

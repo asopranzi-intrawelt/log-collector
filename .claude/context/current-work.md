@@ -9,11 +9,15 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: a2e58a5
+last-verified-commit: 11bed4e
 stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai punti 3 e 7; eventi iLO tecnici separati con ritenzione 90 giorni attiva; catena locale provata in WSL, non installata; D7 bloccato da nomina ed elenco AdS
 ---
 
 # Lavoro in corso
+
+## Censimento AdS: mount e voce di filesystem, 02/11/2026
+
+L'utente ha chiuso `11bed4e`; albero pulito alla ripresa. Il preflight locale del censimento poteva considerare una directory sottostante al mount e conteggiava `lost+found` come mittente inatteso permanente. Ora richiede il mount sulla radice live e tratta `lost+found` come voce separata solo se reale e vuota. Ventuno prove su Windows e 21 in Debian 13 passano; la versione precedente è caduta sui casi mirati. Una seconda sonda manuale ha confermato che le voci immediate erano directory e `lost+found` era vuota, senza leggere i log. La mappa privata della rete associa i sei IPv4 fuori dai parametri AdS a quattro NAS, Proxmox e firewall LAN; attività recente e classificazione restano aperte, quindi strict non si distribuisce. La rete conserva modifiche parallele e richiede il relativo allineamento.
 
 ## Inventario VM ricevuto e misura Seeweb resa prudente, 02/11/2026
 

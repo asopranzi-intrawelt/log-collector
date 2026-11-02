@@ -8,10 +8,14 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: a2e58a5
+last-verified-commit: 11bed4e
 ---
 
 # Stack applicativo
+
+## Preflight del volume AdS, 02/11/2026
+
+`ads-source-inventory.py` ora richiede un mount per la radice passata alla CLI; le directory temporanee delle prove richiedono un'opzione esplicita che non vale per `/srv/ads`. Il campo `filesystem_entries` distingue `lost+found` vuota dalle sorgenti. Una voce piena, simbolica o non directory resta inattesa. La seconda sonda manuale ha confermato che le voci immediate sulla VM erano directory e `lost+found` vuota. Il classificatore è nel repository e non è stato eseguito sulla VM; i sei nomi di rete non configurati restano da riconciliare.
 
 ## Inventario reale e misura Seeweb, 02/11/2026
 

@@ -29,6 +29,7 @@ CONFIGURED_KEYS = (
     "windows_pilota",
 )
 LOCAL = ipaddress.IPv4Address("127.0.0.1")
+LIVE_ADS_ROOT = Path("/srv/ads")
 
 
 class QuietParser(argparse.ArgumentParser):
@@ -67,17 +68,42 @@ def _empty(status: str) -> dict[str, str | int]:
         "unknown": 0,
         "seeweb_in_ads": 0,
         "unexpected_entries": 0,
+        "filesystem_entries": 0,
     }
+
+
+def _empty_lost_found(entry: os.DirEntry[str], root_fd: int | None) -> bool:
+    if entry.is_symlink() or not entry.is_dir(follow_symlinks=False):
+        return False
+    if root_fd is None:
+        with os.scandir(entry.path) as children:
+            return next(children, None) is None
+    flags = os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW
+    descriptor = os.open(entry.name, flags, dir_fd=root_fd)
+    try:
+        with os.scandir(descriptor) as children:
+            return next(children, None) is None
+    finally:
+        os.close(descriptor)
 
 
 def _classify(
     entries: os.ScandirIterator[str],
     configured: set[ipaddress.IPv4Address],
     seeweb: set[ipaddress.IPv4Address],
+    root_fd: int | None = None,
 ) -> dict[str, str | int]:
     report = _empty("needs_reconciliation")
     observed_configured: set[ipaddress.IPv4Address] = set()
     for entry in entries:
+        if entry.name == "lost+found":
+            field = (
+                "filesystem_entries"
+                if _empty_lost_found(entry, root_fd)
+                else "unexpected_entries"
+            )
+            report[field] += 1
+            continue
         if entry.is_symlink() or not entry.is_dir(follow_symlinks=False):
             report["unexpected_entries"] += 1
             continue
@@ -116,7 +142,7 @@ def scan(
         fd = os.open(root, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
         try:
             with os.scandir(fd) as entries:
-                return _classify(entries, configured, seeweb)
+                return _classify(entries, configured, seeweb, fd)
         finally:
             os.close(fd)
     with os.scandir(root) as entries:
@@ -127,9 +153,15 @@ def main(argv: list[str] | None = None) -> int:
     parser = QuietParser(description=__doc__)
     parser.add_argument("--parametri", required=True, type=Path)
     parser.add_argument("--ads-root", required=True, type=Path)
+    parser.add_argument("--allow-unmounted-fixture", action="store_true", help=argparse.SUPPRESS)
     try:
         options = parser.parse_args(argv)
         configured, seeweb = _addresses(adsparams.load(options.parametri))
+        if not options.ads_root.is_mount() and (
+            not options.allow_unmounted_fixture
+            or options.ads_root.resolve() == LIVE_ADS_ROOT.resolve()
+        ):
+            raise ValueError("archivio AdS non montato")
         report = scan(options.ads_root, configured, seeweb)
     except (OSError, UnicodeError, adsparams.ParamsError, ValueError):
         report = _empty("measurement_failed")

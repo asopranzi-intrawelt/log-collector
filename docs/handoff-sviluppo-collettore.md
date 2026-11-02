@@ -1,5 +1,9 @@
 # Handoff di sviluppo - Collettore log AdS su Proxmox
 
+Seconda verifica sulla VM il 02/11: `TYPES_CHECKED` conferma che le voci immediate allora presenti erano directory e che `lost+found` era una directory reale e vuota. La mappa privata della rete associa i sei nomi IP fuori dai parametri AdS a quattro NAS, al nodo Proxmox e al firewall LAN. Sono identità documentali, non una nuova classificazione approvata degli eventi: restano da verificare attività recente, campioni e proprietari prima del filtro strict.
+
+Checkpoint del 02/11: il preflight dei mittenti richiede ora il mount della radice esaminata. Tratta `lost+found` come voce di filesystem solo quando è una directory reale e vuota; se contiene file o è un link, segnala una voce inattesa. Sono 21 le prove su Windows e 21 quelle nel container Debian 13, ma il nuovo preflight non è stato eseguito sulla VM. I sei nomi di rete non presenti nei parametri privati restano da attribuire e classificare prima del filtro strict.
+
 Checkpoint del 02/11: sulla VM `/srv/ads` è montato e l'operatore ne ha elencato nove voci immediate: sette nomi IPv4 di rete, uno locale e `lost+found`. Solo un IPv4 di rete è presente nei parametri AdS privati correnti; gli altri sei richiedono identificazione e decisione sulla rilevanza AdS prima del filtro strict. La lettura non prova il tipo delle voci né la presenza di eventi. Il misuratore del campione Seeweb ora restituisce `measurement_failed` se il volume AdS non è montato, evitando un falso zero di contaminazione; il suo codice aggiornato resta da distribuire manualmente prima del test reale.
 
 Checkpoint del 02/11: la misura della verifica integrale confronta anche `ctime` dei file prima e dopo. Una prova WSL di riscrittura di uguale lunghezza con `mtime` ripristinato ora produce `dataset_changed`; senza il campo il test cade sul falso verde. Durata e carico della catena restano da misurare sulla VM con dati rappresentativi prima di installare il timer.

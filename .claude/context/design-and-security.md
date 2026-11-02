@@ -6,14 +6,18 @@ covers-paths:
   - bin/**
   - config/**
   - pilot/monitoring-hub/**
-last-verified-commit: a2e58a5
+last-verified-commit: 11bed4e
 ---
 
 # Design e sicurezza applicativa
 
+## Confine del censimento AdS, 02/11/2026
+
+La CLI rifiuta una radice non montata con `measurement_failed`; l'eccezione esplicita per fixture non si applica alla radice live risolta. `lost+found` è separata dai mittenti solo se directory reale e vuota, e su Linux viene aperta senza seguire link. Questa lettura non attribuisce identità ai mittenti né esamina il contenuto dei log. Un eventuale cambio del mount dopo il controllo resta fuori dalla garanzia del preflight.
+
 ## Guardie sulla misura del pilot Seeweb, 02/11/2026
 
-La misura non può concludere «zero contaminazioni AdS» se la radice è assente; la CLI richiede inoltre che `/srv/ads` sia un mount. La verifica del mount precede l'apertura e non è atomica rispetto a una modifica successiva del filesystem. Il comando reale dell'operatore ne ha confermato il mount ma ha elencato solo nomi: gli altri sei IPv4 di rete rispetto ai parametri privati non diventano sorgenti AdS per semplice presenza nell'archivio.
+La misura non può concludere «zero contaminazioni AdS» se la radice è assente; la CLI richiede inoltre che `/srv/ads` sia un mount. La verifica del mount precede l'apertura e non è atomica rispetto a una modifica successiva del filesystem. L'operatore ha confermato mount, tipi delle voci immediate e `lost+found` vuota; gli altri sei IPv4 di rete rispetto ai parametri privati non diventano sorgenti AdS per semplice presenza nell'archivio.
 
 ## Stabilità del campione della catena, 02/11/2026
 

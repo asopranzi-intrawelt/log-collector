@@ -1,5 +1,9 @@
 # Snapshot di sincronizzazione
 
+## Preflight AdS sul mount e su lost+found, 02/11/2026
+
+Dopo il `chiudi` `11bed4e`, il preflight richiede un mount per la radice live e conta separatamente `lost+found` soltanto se è una directory reale e vuota. Una voce piena o simbolica resta inattesa. Ventuno test Windows e 21 Debian 13 passano; il codice è solo locale. La seconda sonda manuale `TYPES_CHECKED` ha confermato le voci immediate come directory e `lost+found` vuota. La ricostruzione locale con i parametri privati dà `needs_reconciliation` (codice 2), un configurato e sei sconosciuti. La mappa privata della rete associa i sei nomi a quattro NAS, Proxmox e firewall LAN, senza provare attività corrente o approvare la classificazione. Il filtro strict resta fermo; network-design ha lavoro parallelo da preservare.
+
 ## Mount AdS verificato e misura Seeweb senza falso zero, 02/11/2026
 
 L'operatore ha confermato il mount `/srv/ads` e ne ha elencato nove voci immediate: sette IPv4 di rete, uno locale e `lost+found`. La lettura non ha verificato i tipi o i contenuti. Una sola voce di rete coincide con i parametri AdS privati correnti; le altre sei richiedono identificazione e classificazione, quindi il filtro strict resta candidato. La misura Seeweb fallisce se la radice AdS manca e la CLI richiede il mount: la prova era rossa sul vecchio comportamento, ora 20 test Linux e l'integrazione Debian 13 passano. Nessun evento Seeweb reale misurato e nessuna modifica alla VM in questo giro. La documentazione di rete va riconciliata dopo il lavoro parallelo.

@@ -34,7 +34,10 @@ def parameters(
 
 def run(params: Path, ads_root: Path) -> tuple[int, dict[str, int | str], str, str]:
     result = subprocess.run(
-        [sys.executable, str(SCRIPT), "--parametri", str(params), "--ads-root", str(ads_root)],
+        [
+            sys.executable, str(SCRIPT), "--parametri", str(params), "--ads-root", str(ads_root),
+            "--allow-unmounted-fixture",
+        ],
         capture_output=True,
         text=True,
         check=False,
@@ -63,6 +66,7 @@ def test_known_sources_and_local_are_only_clean_state(tmp_path: Path) -> None:
         "unknown": 0,
         "seeweb_in_ads": 0,
         "unexpected_entries": 0,
+        "filesystem_entries": 0,
     }
     assert "PRIVATE_PAYLOAD" not in output
     assert "192.0.2" not in output
@@ -89,6 +93,7 @@ def test_unknown_and_seeweb_are_anomalies_even_if_seeweb_is_configured(tmp_path:
         "unknown": 1,
         "seeweb_in_ads": 1,
         "unexpected_entries": 2,
+        "filesystem_entries": 0,
     }
     for sensitive in ("192.0.2", "198.51", "not-an-ip", "stray.txt", "PRIVATE_PAYLOAD"):
         assert sensitive not in output
@@ -129,6 +134,94 @@ def test_empty_archive_is_not_a_success(tmp_path: Path) -> None:
         for field in ("local", "configured", "unknown", "seeweb_in_ads", "unexpected_entries")
     )
     assert stderr == ""
+
+
+def test_empty_lost_found_is_reported_without_blocking_inventory(tmp_path: Path) -> None:
+    archive = tmp_path / "ads"
+    archive.mkdir()
+    for name in ("127.0.0.1", "192.0.2.10", "192.0.2.20", "lost+found"):
+        (archive / name).mkdir()
+    code, report, output, stderr = run(parameters(tmp_path), archive)
+    assert code == 0
+    assert report["status"] == "ok"
+    assert report["filesystem_entries"] == 1
+    assert report["unexpected_entries"] == 0
+    assert "lost+found" not in output + stderr
+
+
+def test_nonempty_lost_found_requires_reconciliation(tmp_path: Path) -> None:
+    archive = tmp_path / "ads"
+    archive.mkdir()
+    for name in ("127.0.0.1", "192.0.2.10", "192.0.2.20"):
+        (archive / name).mkdir()
+    recovered = archive / "lost+found"
+    recovered.mkdir()
+    (recovered / "PRIVATE_PAYLOAD").write_text("data", encoding="utf-8")
+    code, report, output, stderr = run(parameters(tmp_path), archive)
+    assert code == 2
+    assert report["status"] == "needs_reconciliation"
+    assert report["filesystem_entries"] == 0
+    assert report["unexpected_entries"] == 1
+    assert "PRIVATE_PAYLOAD" not in output + stderr
+
+
+def test_lost_found_symlink_is_not_ignored(tmp_path: Path) -> None:
+    archive = tmp_path / "ads"
+    archive.mkdir()
+    for name in ("127.0.0.1", "192.0.2.10", "192.0.2.20"):
+        (archive / name).mkdir()
+    outside = tmp_path / "outside"
+    outside.mkdir()
+    try:
+        (archive / "lost+found").symlink_to(outside, target_is_directory=True)
+    except OSError as exc:
+        pytest.skip(f"Symlink non disponibile: {type(exc).__name__}")
+    code, report, output, stderr = run(parameters(tmp_path), archive)
+    assert code == 2
+    assert report["unexpected_entries"] == 1
+    assert report["filesystem_entries"] == 0
+    assert "lost+found" not in output + stderr
+
+
+@pytest.mark.parametrize("mounted", [False, True])
+def test_live_archive_mount_gate(tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+                                 capsys: pytest.CaptureFixture[str], mounted: bool) -> None:
+    spec = importlib.util.spec_from_file_location("ads_source_inventory", SCRIPT)
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    archive = tmp_path / "ads"
+    archive.mkdir()
+    for name in ("127.0.0.1", "192.0.2.10", "192.0.2.20"):
+        (archive / name).mkdir()
+    monkeypatch.setattr(Path, "is_mount", lambda self: mounted)
+    code = module.main(["--parametri", str(parameters(tmp_path)), "--ads-root", str(archive)])
+    out = capsys.readouterr()
+    assert code == (0 if mounted else 3)
+    assert json.loads(out.out)["status"] == ("ok" if mounted else "measurement_failed")
+    assert out.err == ""
+
+
+def test_fixture_option_cannot_bypass_live_archive_mount_gate(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    spec = importlib.util.spec_from_file_location("ads_source_inventory", SCRIPT)
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    archive = tmp_path / "ads"
+    archive.mkdir()
+    (archive / "127.0.0.1").mkdir()
+    monkeypatch.setattr(module, "LIVE_ADS_ROOT", archive)
+    monkeypatch.setattr(Path, "is_mount", lambda self: False)
+    code = module.main([
+        "--parametri", str(parameters(tmp_path)), "--ads-root", str(archive),
+        "--allow-unmounted-fixture",
+    ])
+    out = capsys.readouterr()
+    assert code == 3
+    assert json.loads(out.out)["status"] == "measurement_failed"
+    assert out.err == ""
 
 
 def test_configured_source_absent_needs_reconciliation(tmp_path: Path) -> None:
@@ -222,7 +315,10 @@ def test_unreadable_archive_fails_measurement(
         raise PermissionError("PRIVATE_PATH")
 
     monkeypatch.setattr(module.os, "scandir", denied)
-    code = module.main(["--parametri", str(params), "--ads-root", str(archive)])
+    code = module.main([
+        "--parametri", str(params), "--ads-root", str(archive),
+        "--allow-unmounted-fixture",
+    ])
     out = capsys.readouterr()
     assert code == 3
     assert json.loads(out.out)["status"] == "measurement_failed"

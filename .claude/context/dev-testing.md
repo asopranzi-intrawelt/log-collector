@@ -6,14 +6,20 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: a2e58a5
+last-verified-commit: 11bed4e
 ---
 
 # Test di sviluppo
 
+## Inventario del volume AdS, 02/11/2026
+
+Ricostruzione locale dai nove nomi osservati e dai parametri privati correnti: codice 2, `configured=1`, `unknown=6`, `local=1`, `filesystem_entries=1`, nessuna sorgente configurata mancante o voce inattesa. La fixture è stata eliminata dopo la prova. Questa è una verifica del calcolo, non un'esecuzione del classificatore sulla VM.
+
+I nuovi casi riproducono due falsi esiti del preflight: directory live non montata ma contenente nomi attesi e `lost+found` vuota contata come anomalia. La versione precedente falliva cinque asserzioni della suite estesa; dopo la correzione passano 21 casi su Windows e 21 nel container Debian 13. La prova POSIX apre `lost+found` con `O_NOFOLLOW` e verifica che link e contenuto non siano ignorati. La suite usa nomi costruiti e non misura il volume della VM.
+
 ## Assenza dell'archivio AdS durante la misura Seeweb, 02/11/2026
 
-Con un evento tecnico sintetico, la versione precedente del misuratore restituiva `observed` e zero AdS quando mancava la radice AdS. La nuova prova era rossa; la correzione richiede la radice e la CLI richiede che sia montata. Venti prove Linux passano. Due test CLI preesistenti sono stati adattati perché raggiungano ancora il parsing e l'errore di lettura dopo la nuova guardia. In Debian 13 il test integrato con mount temporaneo passa `PILOT_TEST_OK`: un UDP sintetico tecnico e zero AdS. L'inventario della VM è una lettura di nomi, non una prova del tipo o del contenuto delle voci.
+Con un evento tecnico sintetico, la versione precedente del misuratore restituiva `observed` e zero AdS quando mancava la radice AdS. La nuova prova era rossa; la correzione richiede la radice e la CLI richiede che sia montata. Venti prove Linux passano. Due test CLI preesistenti sono stati adattati perché raggiungano ancora il parsing e l'errore di lettura dopo la nuova guardia. In Debian 13 il test integrato con mount temporaneo passa `PILOT_TEST_OK`: un UDP sintetico tecnico e zero AdS. La prima sonda sulla VM aveva letto solo nomi; la seconda ha verificato i tipi delle voci immediate e `lost+found` vuota, senza leggere log.
 
 ## Misura AdS con mtime ripristinato, 02/11/2026
 
