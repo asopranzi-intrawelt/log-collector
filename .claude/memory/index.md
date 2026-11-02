@@ -1,5 +1,9 @@
 # Snapshot di sincronizzazione
 
+## Upgrade Seeweb parziale, 02/11/2026
+
+Il richiedente propone l'upgrade OPNsense dopo le 19:00; il provider riferisce nello screenshot_239 un intervento iniziato ma incompleto, con altri salti previsti nella settimana successiva. Ora effettiva, release intermedia e verifica VPN/servizi non sono comunicate. Snapshot e backup sono promessi nei messaggi precedenti, non provati dallo screenshot nuovo. Richiesti stato tecnico e collaudo congiunto prima del seguito; ISO-27, M31b e SWB-001 in corso. Il ricevitore Syslog del collettore è verificato localmente, ma la prova reale UDP e ISO-30 restano aperte.
+
 ## Campione Seeweb ancora atteso, 30/10/2026
 
 Il chiarimento sulla finestra dopo le 19:00 risulta inviato dall'utente. Postcheck locale `SEEWEB_POSTCHECK_OK`; nessun evento reale. Preparato un verificatore di sola lettura del deposito tecnico e AdS con dodici prove Linux e integrazione rsyslog Debian 13; la prova del provider e il confronto dei campioni restano aperti. Il riepilogo delle pendenze nella rete è ancora da riconciliare dalla sua sessione, che ha già modifiche parallele. ISO-30 e Cliente-1 89/90 non chiusi.

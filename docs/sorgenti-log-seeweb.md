@@ -1,5 +1,9 @@
 # Sorgenti Seeweb e stato della raccolta
 
+## Upgrade OPNsense parziale: prova Syslog ancora aperta, 02/11/2026
+
+Nel ticket il richiedente propone l'upgrade dopo le 19:00; Seeweb riferisce nello screenshot_239 di avere iniziato l'aggiornamento e di dover completare alcuni salti di versione in una finestra successiva. Non comunica l'ora dei passaggi, la release corrente né un campione Syslog. Il ricevitore del collettore resta verificato localmente al 30/10; non è dimostrato che sia arrivato un evento reale via IPsec. Concordare la breve prova UDP 514 separatamente dal prossimo upgrade, dopo avere verificato la stabilità di VPN e servizi, e ripeterne la lettura dei campi sulla release finale. ISO-30 e la classificazione AdS degli eventi Seeweb restano aperte.
+
 ## Prova reale ancora attesa, 30/10/2026
 
 L'utente riferisce di aver inviato il chiarimento sulla finestra serale dell'upgrade. Il ricevitore sulla VM supera il postcheck locale, ma non è ancora dimostrata la consegna dal tunnel. Il verificatore `bin/ads-seeweb-pilot-evidence.py` è pronto per il test limitato: conta le righe del mittente nel deposito tecnico e in AdS entro l'intervallo concordato, senza stampare IP o messaggi. Un `observed` richiede eventi tecnici, zero AdS e nessuna riga malformata; resta indispensabile confrontare con Seeweb invio, cattura e contenuto dei pochi campioni GUI/SSH. Dodici prove Linux e un passaggio reale in rsyslog Debian 13 usano solo eventi sintetici. Nessun inoltro continuo è autorizzato da questa preparazione.

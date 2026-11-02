@@ -15,9 +15,13 @@ stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai p
 
 # Lavoro in corso
 
+## Seeweb: upgrade parziale riferito dal provider, 02/11/2026
+
+Lo screenshot_239 mostra la proposta del richiedente per l'upgrade OPNsense dopo le 19:00; Seeweb risponde che procede e rinvia alcuni salti di versione alla settimana successiva, invitando il cliente a verificare i servizi. Ora effettiva, release attuale, passaggi eseguiti, backup/snapshot e funzionamento di VPN e applicazioni non sono documentati: non dichiarare l'upgrade concluso. Prima di un nuovo salto servono stato dal provider e verifica congiunta dal lato cloud e dalla sede. Il receiver Syslog resta quello verificato localmente il 30/10; la prova UDP reale e il controllo dei campi sulla release finale restano distinti. Dossier, M31b, pendenze, timeline e ISO-27/30 sono allineati in `D:/network-design`; la roadmap e le copie private coincidono.
+
 ## Prova reale Seeweb da concordare, 30/10/2026
 
-L'utente riferisce di aver inviato il chiarimento a Seeweb sulla finestra dell'upgrade dopo le 19:00. Il ricevitore locale ha superato `SEEWEB_POSTCHECK_OK`; nessun evento reale è ancora arrivato. Preparato `bin/ads-seeweb-pilot-evidence.py` per misurare dopo il test concordato le righe nel deposito tecnico e l'eventuale contaminazione AdS, senza esporre messaggi o indirizzi. Dodici prove Linux e un UDP sintetico attraversato da rsyslog in Debian 13 sono verdi. Il test del provider, una cattura limitata e la lettura di campioni nativi restano necessari prima di dichiarare la raccolta funzionante; ISO-30 resta in corso. Il riepilogo `D:/network-design/docs/stato/pendenze-aperte.md` mantiene lo stato Seeweb pre-applicazione ed è già in modifica per un filone parallelo: riconciliarlo dalla sessione di rete prima del suo commit.
+L'utente riferisce di aver inviato il chiarimento a Seeweb sulla finestra dell'upgrade dopo le 19:00. Il ricevitore locale ha superato `SEEWEB_POSTCHECK_OK`; nessun evento reale è ancora arrivato. Preparato `bin/ads-seeweb-pilot-evidence.py` per misurare dopo il test concordato le righe nel deposito tecnico e l'eventuale contaminazione AdS, senza esporre messaggi o indirizzi. Dodici prove Linux e un UDP sintetico attraversato da rsyslog in Debian 13 sono verdi. Il test del provider, una cattura limitata e la lettura di campioni nativi restano necessari prima di dichiarare la raccolta funzionante; ISO-30 resta in corso. Al 30/10 il riepilogo `D:/network-design/docs/stato/pendenze-aperte.md` manteneva uno stato pre-applicazione; la riconciliazione è stata preparata il 02/11 insieme all'aggiornamento del ticket.
 
 ## Comandi operativi dalla postazione Windows
 
