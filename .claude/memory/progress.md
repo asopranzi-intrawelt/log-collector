@@ -1,5 +1,9 @@
 # Work-log
 
+## 2026-11-02 - Lock del job notturno sulla directory di stato
+
+Dopo `chiudi` dell'utente, verificato `main` `814f7ec` e albero pulito. In `ads-nightly.sh` l'apertura `>` di `nightly.lock` precedeva `flock` e poteva troncare un bersaglio simbolico. Sostituita con apertura in lettura della directory di stato e `flock` sul descrittore; due prove WSL verificano bersaglio intatto e esclusione con lock concorrente. Una copia temporanea con il vecchio codice fa fallire il caso del bersaglio. Aggiornati script, test, runbook, handoff, schede, indice e ripresa privata. Nessun deploy o Git di scrittura dall'agente. Il timer non è installato e la prova su dati reali resta aperta. **Template:** nessuna.
+
 ## 2026-11-02 - Chiusura del misuratore e riallineamento delle schede
 
 L'utente ha concluso `chiudi` sul collettore: `main` `35c6cb9`, albero pulito. `verifica-schede.py` ha individuato cinque schede con file coperti cambiati dopo l'ancora `78b2864`, senza difetti di percorso. Rilette le sezioni Seeweb contro applicatore, misuratore e runbook: aggiunto lo stato corrente del ricevitore applicato e del misuratore non distribuito in STACK, design-and-security, deployment e current-work; dev-testing già descriveva le 17 prove. Portate le cinque ancore a `35c6cb9`, conservando la cronologia delle sezioni precedenti. Ripetuto in Docker Debian 13 il test con il codice versionato: UDP sintetico ricevuto da rsyslog, un evento tecnico, zero AdS, `PILOT_TEST_OK`. Il ticket inviato è una dichiarazione dell'utente, non una ricevuta letta. Il test reale del tunnel resta aperto; `D:/network-design` ha file condivisi ancora modificati dal filone parallelo. Aggiornati runbook, contesto, indice e ripresa privata. **Template:** nessuna.

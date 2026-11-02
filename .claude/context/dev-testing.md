@@ -11,6 +11,10 @@ last-verified-commit: 35c6cb9
 
 # Test di sviluppo
 
+## Lock del job notturno, 02/11/2026
+
+`tests/test-nightly.sh` in WSL controlla che il bersaglio di `nightly.lock` simbolico mantenga i propri byte dopo il job e che un lock tenuto da un altro processo sulla directory di stato impedisca un nuovo manifest. L'intera suite passa; reintroducendo il vecchio `exec 9>` in una copia temporanea, il caso del bersaglio diventa rosso. Questo prova la semantica locale di `flock`, non la concorrenza con writer che ignorano il lock né i permessi della VM.
+
 ## Misura del campione Seeweb, 02/11/2026
 
 `bin/ads-seeweb-pilot-evidence.py` conta le righe del mittente nel deposito tecnico e in AdS entro una finestra di massimo due ore, senza stampare IP o payload. Diciassette prove Linux verificano evento ricevuto, assenza, contaminazione AdS, riga malformata, link simbolici, FIFO, limiti di dimensione, struttura del manifesto, manifesto e log modificati durante la lettura e date locali. Il manifesto è limitato a 16 KiB e ogni log a 64 MiB; una mutazione durante la misura produce `measurement_failed`. Ripetuto il 02/11 sul commit `35c6cb9`, il test nel container Debian 13 ha consegnato un UDP sintetico a rsyslog: il verificatore ha restituito un evento tecnico, zero AdS e `PILOT_TEST_OK`. La prova misura il formato e l'instradamento locale, non il tunnel Seeweb né la categoria amministrativa del messaggio.

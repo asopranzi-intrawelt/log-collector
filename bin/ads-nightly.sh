@@ -54,7 +54,8 @@ for directory in "$STATE_ROOT" "$ARCHIVE_ROOT" "$MANIFEST_ROOT"; do
     [[ ! -L $directory ]] || die 'directory di stato simbolica'
 done
 mkdir -p -- "$ARCHIVE_ROOT" "$MANIFEST_ROOT"
-exec 9>"$STATE_ROOT/nightly.lock"
+# Il lock sulla directory non apre né tronca un file controllabile nello stato.
+exec 9<"$STATE_ROOT"
 flock -n 9 || die 'un altro job notturno e in corso'
 
 shopt -s nullglob

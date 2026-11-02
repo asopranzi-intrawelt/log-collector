@@ -11,6 +11,10 @@ last-verified-commit: 35c6cb9
 
 # Design e sicurezza applicativa
 
+## Integrità del lock notturno, 02/11/2026
+
+Il vecchio `exec 9>` su `nightly.lock` seguiva un link simbolico e troncava il bersaglio prima di `flock`. Il job ora acquisisce `flock` sul descrittore della directory di stato aperta in sola lettura. La directory è controllata prima dell'apertura; un attore capace di sostituirla in concorrenza non è escluso dalla sola guardia applicativa. Il servizio non è installato sulla VM.
+
 ## Confine della prova Seeweb dopo l'applicazione, 02/11/2026
 
 Il pilot v2 è attivo sulla VM e il postcheck locale del 30/10 è verde. La guardia root ha confrontato il ruleset attivo con il baseline prima dell'applicazione; il postcheck ha verificato regola, listener e servizi. Questo non prova alcun datagramma proveniente da Seeweb. Il verificatore del campione rifiuta link simbolici, manifesto non valido o oltre 16 KiB e file modificati durante la lettura; il suo `observed` prova solo la presenza di righe tecniche nel periodo, da confrontare con cattura e campioni nativi del provider. Nessun evento Seeweb è classificato AdS senza quel confronto.

@@ -13,6 +13,10 @@ last-verified-commit: 35c6cb9
 
 # Stack applicativo
 
+## Lock del candidato notturno, 02/11/2026
+
+`ads-nightly.sh` usa `flock` sul descrittore di lettura della directory di stato. Non crea né apre in scrittura un file di lock controllabile nello stato. La catena resta solo nel repository e nelle prove WSL; servizio e timer non sono installati sulla VM.
+
 ## Pilot Seeweb in esercizio locale e misuratore candidato, 02/11/2026
 
 Il bundle v2 è stato applicato manualmente alla VM il 30/10: rsyslog e nftables hanno superato il postcheck locale `SEEWEB_POSTCHECK_OK`. Il ricevitore instrada il solo mittente Seeweb al deposito tecnico; nessun evento reale dal tunnel è stato ancora verificato. `bin/ads-seeweb-pilot-evidence.py` è pronto nel repository, non sulla VM: misura una finestra massima di due ore, senza mostrare IP o payload, e fallisce se manifesto o log cambiano durante la lettura. Diciassette prove Linux passano. Il test UDP concordato e i campioni GUI/SSH restano il prossimo gate.

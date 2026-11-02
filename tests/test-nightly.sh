@@ -61,6 +61,36 @@ grep -Fq 'radice dei log non montata' "$scratch/output" || {
     [[ ! -e $scratch/outside/2026-10-06.log.gz ]]
 )
 
+# Un vecchio nome di lock simbolico non deve troncare il suo bersaglio.
+(
+    export ADS_LOG_ROOT=$scratch/lock-link-logs
+    export ADS_STATE_ROOT=$scratch/lock-link-state
+    mkdir -p -- "$ADS_LOG_ROOT/source-a" "$ADS_STATE_ROOT"
+    printf 'prova del bersaglio\n' >"$scratch/lock-target"
+    ln -s -- "$scratch/lock-target" "$ADS_STATE_ROOT/nightly.lock"
+    printf 'access\n' >"$ADS_LOG_ROOT/source-a/2026-10-06.log"
+    ADS_TODAY=2026-10-07 bash "$project_dir/bin/ads-nightly.sh"
+    [[ $(cat "$scratch/lock-target") == 'prova del bersaglio' ]] || {
+        printf 'ERRORE: il lock ha troncato il bersaglio simbolico\n' >&2
+        exit 1
+    }
+    [[ -f $ADS_STATE_ROOT/manifests/manifest-2026-10-06.txt ]]
+)
+
+# Un secondo processo deve fallire mentre la directory di stato è bloccata.
+(
+    export ADS_LOG_ROOT=$scratch/lock-busy-logs
+    export ADS_STATE_ROOT=$scratch/lock-busy-state
+    mkdir -p -- "$ADS_LOG_ROOT/source-a" "$ADS_STATE_ROOT"
+    printf 'access\n' >"$ADS_LOG_ROOT/source-a/2026-10-06.log"
+    exec 8<"$ADS_STATE_ROOT"
+    flock -x 8
+    expect_failure env ADS_TODAY=2026-10-07 bash "$project_dir/bin/ads-nightly.sh"
+    grep -Fq 'un altro job notturno e in corso' "$scratch/output"
+    [[ ! -e $ADS_STATE_ROOT/manifests/manifest-2026-10-06.txt ]]
+    flock -u 8
+)
+
 ADS_TODAY=2026-10-07 bash "$project_dir/bin/ads-nightly.sh"
 bash "$project_dir/bin/ads-verify.sh"
 ADS_TODAY=2026-10-07 bash "$project_dir/bin/ads-nightly.sh"

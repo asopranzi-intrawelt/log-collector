@@ -15,6 +15,10 @@ stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai p
 
 # Lavoro in corso
 
+## Lock del job notturno, 02/11/2026
+
+Dopo il `chiudi` dell'utente, `main` è `814f7ec`. Il codice versionato apriva `nightly.lock` con `>`, troncando il bersaglio di un eventuale link prima di acquisire `flock`. La correzione locale blocca il descrittore della directory di stato aperta in lettura. La suite WSL passa, mentre la copia con il vecchio codice fallisce sul caso mirato; il job non è installato sulla VM. La prova UDP reale Seeweb, il carico della catena su dati rappresentativi e D7 restano aperti. `D:/network-design` contiene lavoro parallelo: allineare lì i riferimenti Seeweb quando l'albero sarà libero, senza toccare il lavoro sul sito.
+
 ## Ripresa dopo il checkpoint Seeweb, 02/11/2026
 
 L'utente ha eseguito `chiudi`: il collettore è a `35c6cb9` e l'albero era pulito alla ripresa. Il ticket di seguito risulta inviato dall'utente, senza copia del testo effettivo o ricevuta. Il misuratore stabilizzato è ora versionato, ma non trasferito sulla VM; la prova reale UDP e i campioni GUI/SSH restano aperti. Il progetto rete ha modifiche parallele ancora non chiuse: il riferimento operativo al ticket e al conteggio di 17 prove va allineato quando il suo albero è libero, preservando le voci storiche del 30/10.

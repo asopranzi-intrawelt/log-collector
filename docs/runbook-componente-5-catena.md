@@ -1,5 +1,9 @@
 # Componente 5 - Catena locale dei log giornalieri
 
+## Lock del job candidato, 02/11/2026
+
+`ads-nightly.sh` apre in sola lettura la directory di stato e applica `flock` al suo descrittore. Non apre più `nightly.lock` in scrittura: un link simbolico con quel nome non può quindi troncare un file prima dell'acquisizione del lock. La prova WSL controlla sia il bersaglio del link sia l'esclusione con un altro processo; la copia del vecchio codice fallisce sulla troncatura. Il job e il timer restano candidati, non installati sulla VM. La guardia non copre la sostituzione concorrente della directory da parte di un processo con permessi di scrittura sul suo genitore.
+
 ## Controllo di silenzio candidato, 26/10/2026
 
 `bin/ads-silence.py` legge una politica JSON privata con `version=2` e una voce `id`/`signal`/`active_from` per sorgente. `active_from` è il primo giorno dal quale la sorgente approvata deve dare un segnale: i giorni precedenti non sono marcati come verificati. I segnali ammessi sono `daily_event`, che cerca un file non vuoto `/srv/ads/<id>/<giorno>.log`, e `daily_heartbeat`, che cerca `/var/lib/ads/heartbeats/<id>/<giorno>.heartbeat`. Il [modello senza indirizzi reali](../config/silence-policy.example.json) mostra il formato; non è una lista di sorgenti approvate e non va installato come configurazione di esercizio. La versione 1 è rifiutata: un'eventuale politica privata precedente va migrata con la data approvata, senza attribuire retroattivamente copertura. Una politica mancante o vuota, con sorgenti o chiavi JSON duplicate, con ID o date non validi, oppure senza sorgenti attive fallisce. Il controllo distingue `observed`, `no_events`, `heartbeat_missing`, `read_error` e `unsafe_path`; l'uscita è 0 solo con tutti i segnali osservati, 2 per allarme e 3 per politica invalida. Con `--require-log-mount` anche `/srv/ads` non montato dà 3 e `log_mount_missing`.

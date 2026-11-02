@@ -1,5 +1,9 @@
 # Snapshot di sincronizzazione
 
+## Lock notturno senza troncatura, 02/11/2026
+
+Su `main` `814f7ec`, corretta localmente l'apertura del lock del job notturno: `flock` usa la directory di stato in sola lettura. La suite WSL verifica bersaglio simbolico intatto e mutua esclusione; la copia del vecchio codice fallisce sulla troncatura. Documentazione tecnica e prove aggiornate. Servizio non installato, misura reale e D7 aperti; rete con lavoro parallelo ancora da riconciliare.
+
 ## Checkpoint Seeweb versionato e schede riallineate, 02/11/2026
 
 Il `chiudi` dell'utente ha pubblicato `35c6cb9` sul ramo `main`; l'albero era pulito alla ripresa. Le cinque schede tecniche coperte dal codice Seeweb erano rimaste ancorate a `78b2864`; controllo del delta e riallineamento mirato al nuovo commit hanno corretto lo stato del pilot applicato e del misuratore ancora non distribuito. Ripetuto su Debian 13 il test integrato con UDP sintetico: un evento tecnico, zero AdS, `PILOT_TEST_OK`. Il ticket risulta inviato secondo l'utente, senza ricevuta riletta. In `D:/network-design` permane lavoro parallelo: aggiornare lì il riferimento operativo a 17 prove dopo la chiusura di quell'albero. Test Syslog reale, campioni GUI/SSH e release finale OPNsense ancora aperti.

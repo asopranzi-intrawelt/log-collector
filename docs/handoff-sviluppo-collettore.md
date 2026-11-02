@@ -1,5 +1,7 @@
 # Handoff di sviluppo - Collettore log AdS su Proxmox
 
+Checkpoint del 02/11: il job notturno usa `flock` sulla directory di stato aperta in sola lettura. La prova WSL conferma che un vecchio `nightly.lock` simbolico non tronca il suo bersaglio e che due job non entrano insieme. La catena non è installata sulla VM; misura del carico reale, politica degli originali, TSA/WORM e D7 restano prerequisiti di esercizio.
+
 Riferimento funzionale: `studio-collettore-ads.md`. Questo file dice **come e in che ordine** costruire. Legenda: **[V]** verificato su fonte · **[Non verificato]** da confermare durante lo sviluppo · **[Inferenza]** dedotto.
 
 ---
