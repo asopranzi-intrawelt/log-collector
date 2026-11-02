@@ -1,5 +1,9 @@
 # Sorgenti Seeweb e stato della raccolta
 
+## Applicazioni raggiungibili, consegna Syslog ancora da provare, 02/11/2026
+
+Trados Studio, dashboard GroupShare e condivisione cloud risultano raggiungibili dalla postazione LAN nelle schermate 247-249; l'operatore riferisce anche backup TM verso NAS-INTRA3 funzionante e accesso RDP alla VM cloud. Questo campione funzionale sostiene la continuità dei percorsi provati durante l'upgrade OPNsense parziale. Non comprende un datagramma Syslog reale, una cattura sul tunnel o la prova degli altri servizi; il ricevitore locale resta verificato soltanto al postcheck del 30/10. La prova UDP concordata e la rilettura dei campi GUI/SSH sulla release finale sono ancora necessarie.
+
 ## Upgrade OPNsense parziale: prova Syslog ancora aperta, 02/11/2026
 
 Nel ticket il richiedente propone l'upgrade dopo le 19:00; Seeweb riferisce nello screenshot_239 di avere iniziato l'aggiornamento e di dover completare alcuni salti di versione in una finestra successiva. Non comunica l'ora dei passaggi, la release corrente né un campione Syslog. Il ricevitore del collettore resta verificato localmente al 30/10; non è dimostrato che sia arrivato un evento reale via IPsec. Concordare la breve prova UDP 514 separatamente dal prossimo upgrade, dopo avere verificato la stabilità di VPN e servizi, e ripeterne la lettura dei campi sulla release finale. ISO-30 e la classificazione AdS degli eventi Seeweb restano aperte.

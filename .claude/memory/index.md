@@ -1,5 +1,9 @@
 # Snapshot di sincronizzazione
 
+## Seeweb: verifica dalla sede, 02/11/2026
+
+Collettore `ec93140` e rete `d8abd6a` chiusi dall'utente e puliti alla ripresa. Screenshot_247/248/249, copie e SHA-256 nel dossier privato, attestano server Trados disponibile, dashboard GroupShare aperta e condivisione cloud navigabile dalla postazione LAN. Uso delle TM, backup verso NAS-INTRA3 e RDP sono riferiti dall'operatore. Campione funzionale positivo e circoscritto, senza misura complessiva del tunnel o attestazione di release finale. Backup TM distinto da backup OPNsense. Risposta a Seeweb aggiornata; Syslog reale e ISO-30 restano aperti.
+
 ## Upgrade Seeweb parziale, 02/11/2026
 
 Il richiedente propone l'upgrade OPNsense dopo le 19:00; il provider riferisce nello screenshot_239 un intervento iniziato ma incompleto, con altri salti previsti nella settimana successiva. Ora effettiva, release intermedia e verifica VPN/servizi non sono comunicate. Snapshot e backup sono promessi nei messaggi precedenti, non provati dallo screenshot nuovo. Richiesti stato tecnico e collaudo congiunto prima del seguito; ISO-27, M31b e SWB-001 in corso. Il ricevitore Syslog del collettore è verificato localmente, ma la prova reale UDP e ISO-30 restano aperte.

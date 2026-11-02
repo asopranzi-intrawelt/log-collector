@@ -15,6 +15,10 @@ stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai p
 
 # Lavoro in corso
 
+## Seeweb: campione funzionale dalla sede, 02/11/2026
+
+L'utente ha concluso `chiudi` nei due progetti: collettore `ec93140`, rete `d8abd6a`, alberi puliti all'avvio. Screenshot_247 mostra il server GroupShare disponibile in Trados Studio, screenshot_248 la dashboard web aperta e screenshot_249 la condivisione cloud mappata dalla postazione LAN. L'utente riferisce uso delle TM server, backup delle TM verso NAS-INTRA3 funzionante e accesso RDP alla VM cloud. Sono prove positive dei percorsi indicati, non del funzionamento di ogni servizio o del completamento dell'upgrade. Il backup TM non sostituisce la conferma del backup OPNsense. Preparare a Seeweb un riscontro circoscritto e chiedere release corrente, passaggi residui, controllo provider di VPN/rotte/NAT, snapshot e backup della configurazione, finestra serale e costo. Test Syslog UDP ancora separato e non eseguito.
+
 ## Seeweb: upgrade parziale riferito dal provider, 02/11/2026
 
 Lo screenshot_239 mostra la proposta del richiedente per l'upgrade OPNsense dopo le 19:00; Seeweb risponde che procede e rinvia alcuni salti di versione alla settimana successiva, invitando il cliente a verificare i servizi. Ora effettiva, release attuale, passaggi eseguiti, backup/snapshot e funzionamento di VPN e applicazioni non sono documentati: non dichiarare l'upgrade concluso. Prima di un nuovo salto servono stato dal provider e verifica congiunta dal lato cloud e dalla sede. Il receiver Syslog resta quello verificato localmente il 30/10; la prova UDP reale e il controllo dei campi sulla release finale restano distinti. Dossier, M31b, pendenze, timeline e ISO-27/30 sono allineati in `D:/network-design`; la roadmap e le copie private coincidono.
