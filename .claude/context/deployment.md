@@ -5,10 +5,14 @@ generated-date: 2026-09-30
 covers-paths:
   - config/**
   - docs/handoff-sviluppo-collettore.md
-last-verified-commit: 2ca9bfd
+last-verified-commit: a2e58a5
 ---
 
 # Deployment
+
+## Precondizione del misuratore Seeweb, 02/11/2026
+
+Il codice del misuratore aggiornato è soltanto nel repository: prima del campione reale va versionato e trasferito dall'operatore con impronta verificata. La CLI rifiuta `/srv/ads` non montato con `measurement_failed`, senza modificare il ricevitore Seeweb già applicato. Il mount sulla VM è stato confermato dall'operatore il 02/11; il suo stato va ricontrollato nella finestra del test. Gli altri sei nomi di rete non censiti nei parametri AdS richiedono una riconciliazione prima di distribuire il filtro strict.
 
 ## Catena candidata dopo il lock, 02/11/2026
 

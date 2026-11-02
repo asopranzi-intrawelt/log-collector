@@ -9,11 +9,15 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 2ca9bfd
+last-verified-commit: a2e58a5
 stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai punti 3 e 7; eventi iLO tecnici separati con ritenzione 90 giorni attiva; catena locale provata in WSL, non installata; D7 bloccato da nomina ed elenco AdS
 ---
 
 # Lavoro in corso
+
+## Inventario VM ricevuto e misura Seeweb resa prudente, 02/11/2026
+
+Dopo `chiudi`, `main` è `a2e58a5` e l'albero era pulito. Il comando SSH eseguito dall'operatore conferma `/srv/ads` montato e nove voci immediate: sette IPv4 di rete, un loopback e `lost+found`. Il comando non ha verificato tipi o log. Un solo IPv4 di rete coincide con i parametri AdS privati, sei vanno identificati e classificati con i proprietari; strict resta fermo. Il misuratore Seeweb ora fallisce se il mount AdS è assente invece di riportare contaminazione zero. Il test locale e quello Debian 13 sono verdi; nessuna modifica alla VM, campione reale Seeweb ancora atteso. La rete ha un albero parallelo occupato e richiede allineamento documentale.
 
 ## Sorgenti configurate ma non osservate, 02/11/2026
 

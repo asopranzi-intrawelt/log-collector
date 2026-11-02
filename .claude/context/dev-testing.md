@@ -6,10 +6,14 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 2ca9bfd
+last-verified-commit: a2e58a5
 ---
 
 # Test di sviluppo
+
+## Assenza dell'archivio AdS durante la misura Seeweb, 02/11/2026
+
+Con un evento tecnico sintetico, la versione precedente del misuratore restituiva `observed` e zero AdS quando mancava la radice AdS. La nuova prova era rossa; la correzione richiede la radice e la CLI richiede che sia montata. Venti prove Linux passano. Due test CLI preesistenti sono stati adattati perché raggiungano ancora il parsing e l'errore di lettura dopo la nuova guardia. In Debian 13 il test integrato con mount temporaneo passa `PILOT_TEST_OK`: un UDP sintetico tecnico e zero AdS. L'inventario della VM è una lettura di nomi, non una prova del tipo o del contenuto delle voci.
 
 ## Misura AdS con mtime ripristinato, 02/11/2026
 

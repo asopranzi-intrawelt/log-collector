@@ -8,10 +8,14 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 2ca9bfd
+last-verified-commit: a2e58a5
 ---
 
 # Stack applicativo
+
+## Inventario reale e misura Seeweb, 02/11/2026
+
+La VM ha `/srv/ads` montato; il comando dell'operatore ne mostra sette nomi IPv4 di rete, uno locale e `lost+found`, senza leggere tipo o contenuti. Solo una delle sette sorgenti di rete coincide con i parametri AdS correnti. Il misuratore Seeweb candidato richiede il mount AdS e fallisce se manca la radice, così non scambia un archivio indisponibile con zero contaminazioni. Nessun evento Syslog reale di Seeweb è ancora attestato.
 
 ## Misura della catena su un campione stabile, 02/11/2026
 

@@ -28,6 +28,7 @@ class EvidenceTests(unittest.TestCase):
         self.root = pathlib.Path(self.temp.name)
         self.technical = self.root / "technical"
         self.ads = self.root / "ads"
+        self.ads.mkdir()
         self.manifest = self.root / "manifest.json"
         self.manifest.write_text(json.dumps({"source": SOURCE}), encoding="utf-8")
 
@@ -55,6 +56,39 @@ class EvidenceTests(unittest.TestCase):
 
     def test_assenza_non_diventa_prova_di_consegna(self) -> None:
         self.assertEqual(self.report()["status"], "not_observed")
+
+    def test_archivio_ads_assente_non_prova_assenza_di_contaminazione(self) -> None:
+        self.write_log(self.technical, [
+            f"2026-10-30T19:01:00+01:00 {SOURCE} ora host GUI login\n",
+        ])
+        self.ads.rmdir()
+        with self.assertRaises(MODULE.MeasurementError):
+            self.report()
+
+    def test_cli_rifiuta_archivio_ads_non_montato(self) -> None:
+        self.write_log(self.technical, [
+            f"2026-10-30T19:01:00+01:00 {SOURCE} ora host GUI login\n",
+        ])
+        with patch.object(MODULE, "ADS_ROOT", self.ads), patch.object(
+            MODULE, "measure", return_value={"status": "observed"}
+        ) as measure, patch.object(MODULE, "print") as output:
+            code = MODULE.main([
+                "--manifest", str(self.manifest), "--start", START, "--end", END,
+            ])
+        self.assertEqual(code, 3)
+        self.assertEqual(json.loads(output.call_args.args[0]), {"status": "measurement_failed"})
+        measure.assert_not_called()
+
+    def test_cli_prosegue_con_archivio_ads_montato(self) -> None:
+        with patch.object(pathlib.Path, "is_mount", return_value=True), patch.object(
+            MODULE, "measure", return_value={"status": "observed"}
+        ) as measure, patch.object(MODULE, "print") as output:
+            code = MODULE.main([
+                "--manifest", str(self.manifest), "--start", START, "--end", END,
+            ])
+        self.assertEqual(code, 0)
+        self.assertEqual(json.loads(output.call_args.args[0]), {"status": "observed"})
+        measure.assert_called_once()
 
     def test_riga_nell_archivio_ads_ferma_l_accettazione(self) -> None:
         line = f"2026-10-30T19:02:00+01:00 {SOURCE} ora host GUI login\n"
@@ -115,7 +149,9 @@ class EvidenceTests(unittest.TestCase):
 
     def test_manifesto_con_struttura_errata_restituisce_errore_misura(self) -> None:
         self.manifest.write_text("[]", encoding="utf-8")
-        with patch.object(MODULE, "print") as output:
+        with patch.object(pathlib.Path, "is_mount", return_value=True), patch.object(
+            MODULE, "print"
+        ) as output:
             code = MODULE.main([
                 "--manifest", str(self.manifest), "--start", START, "--end", END,
             ])
@@ -225,13 +261,16 @@ class EvidenceTests(unittest.TestCase):
         self.assertEqual(dates, ("2026-10-30",))
 
     def test_errori_di_lettura_non_diventano_assenza(self) -> None:
-        with patch.object(MODULE, "measure", side_effect=PermissionError("privato")):
+        with patch.object(pathlib.Path, "is_mount", return_value=True), patch.object(
+            MODULE, "measure", side_effect=PermissionError("privato")
+        ) as measure:
             with patch.object(MODULE, "print") as output:
                 code = MODULE.main([
                     "--manifest", str(self.manifest), "--start", START, "--end", END,
                 ])
         self.assertEqual(code, 3)
         self.assertEqual(json.loads(output.call_args.args[0]), {"status": "measurement_failed"})
+        measure.assert_called_once()
 
 
 if __name__ == "__main__":

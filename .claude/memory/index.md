@@ -1,5 +1,9 @@
 # Snapshot di sincronizzazione
 
+## Mount AdS verificato e misura Seeweb senza falso zero, 02/11/2026
+
+L'operatore ha confermato il mount `/srv/ads` e ne ha elencato nove voci immediate: sette IPv4 di rete, uno locale e `lost+found`. La lettura non ha verificato i tipi o i contenuti. Una sola voce di rete coincide con i parametri AdS privati correnti; le altre sei richiedono identificazione e classificazione, quindi il filtro strict resta candidato. La misura Seeweb fallisce se la radice AdS manca e la CLI richiede il mount: la prova era rossa sul vecchio comportamento, ora 20 test Linux e l'integrazione Debian 13 passano. Nessun evento Seeweb reale misurato e nessuna modifica alla VM in questo giro. La documentazione di rete va riconciliata dopo il lavoro parallelo.
+
 ## Inventario AdS senza falso verde sulle sorgenti silenziose, 02/11/2026
 
 Dopo il `chiudi` dell'utente, `main` è `2ca9bfd`. Il preflight segnala ora `configured_missing` e restituisce `needs_reconciliation` quando un IP AdS configurato non ha directory osservata, anche se `localhost` è presente. Il test mirato era rosso sul codice precedente; 15 prove Python e una sonda POSIX passano. Schede riallineate al commit della misura; l'archivio reale della VM non è stato letto e il filtro strict resta candidato. La rete contiene modifiche parallele non riconciliate.

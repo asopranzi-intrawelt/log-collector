@@ -137,10 +137,13 @@ def count_day(
 
 
 def measure_root(
-    root: Path, source: str, dates: tuple[str, ...], start: datetime, end: datetime
+    root: Path, source: str, dates: tuple[str, ...], start: datetime, end: datetime,
+    required: bool = False,
 ) -> tuple[int, int, datetime | None, datetime | None, bool]:
     base = open_directory(root)
     if base is None:
+        if required:
+            raise MeasurementError("archivio AdS assente")
         return 0, 0, None, None, False
     try:
         source_dir = open_directory(source, base)
@@ -176,7 +179,7 @@ def measure(
     source = manifest_source(manifest)
     start, end, dates = interval(start_raw, end_raw)
     technical = measure_root(technical_root, source, dates, start, end)
-    ads = measure_root(ads_root, source, dates, start, end)
+    ads = measure_root(ads_root, source, dates, start, end, required=True)
     status = (
         "needs_review" if technical[1] or ads[1] or ads[0]
         else "observed" if technical[0]
@@ -201,6 +204,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--end", required=True)
     options = parser.parse_args(argv)
     try:
+        if not ADS_ROOT.is_mount():
+            raise MeasurementError("archivio AdS non montato")
         report = measure(options.manifest, options.start, options.end)
     except (OSError, ValueError, KeyError, json.JSONDecodeError, MeasurementError):
         report = {"status": "measurement_failed"}

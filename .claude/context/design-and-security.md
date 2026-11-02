@@ -6,10 +6,14 @@ covers-paths:
   - bin/**
   - config/**
   - pilot/monitoring-hub/**
-last-verified-commit: 2ca9bfd
+last-verified-commit: a2e58a5
 ---
 
 # Design e sicurezza applicativa
+
+## Guardie sulla misura del pilot Seeweb, 02/11/2026
+
+La misura non può concludere «zero contaminazioni AdS» se la radice è assente; la CLI richiede inoltre che `/srv/ads` sia un mount. La verifica del mount precede l'apertura e non è atomica rispetto a una modifica successiva del filesystem. Il comando reale dell'operatore ne ha confermato il mount ma ha elencato solo nomi: gli altri sei IPv4 di rete rispetto ai parametri privati non diventano sorgenti AdS per semplice presenza nell'archivio.
 
 ## Stabilità del campione della catena, 02/11/2026
 

@@ -1,5 +1,7 @@
 # Handoff di sviluppo - Collettore log AdS su Proxmox
 
+Checkpoint del 02/11: sulla VM `/srv/ads` è montato e l'operatore ne ha elencato nove voci immediate: sette nomi IPv4 di rete, uno locale e `lost+found`. Solo un IPv4 di rete è presente nei parametri AdS privati correnti; gli altri sei richiedono identificazione e decisione sulla rilevanza AdS prima del filtro strict. La lettura non prova il tipo delle voci né la presenza di eventi. Il misuratore del campione Seeweb ora restituisce `measurement_failed` se il volume AdS non è montato, evitando un falso zero di contaminazione; il suo codice aggiornato resta da distribuire manualmente prima del test reale.
+
 Checkpoint del 02/11: la misura della verifica integrale confronta anche `ctime` dei file prima e dopo. Una prova WSL di riscrittura di uguale lunghezza con `mtime` ripristinato ora produce `dataset_changed`; senza il campo il test cade sul falso verde. Durata e carico della catena restano da misurare sulla VM con dati rappresentativi prima di installare il timer.
 
 Checkpoint del 02/11: il job notturno usa `flock` sulla directory di stato aperta in sola lettura. La prova WSL conferma che un vecchio `nightly.lock` simbolico non tronca il suo bersaglio e che due job non entrano insieme. La catena non è installata sulla VM; misura del carico reale, politica degli originali, TSA/WORM e D7 restano prerequisiti di esercizio.
