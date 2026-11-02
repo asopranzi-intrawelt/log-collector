@@ -46,7 +46,9 @@ def _snapshot(log_root: Path, state_root: Path) -> tuple[dict[str, int], str]:
             counts["archive_bytes"] += info.st_size
         elif kind == "originals":
             counts["original_bytes"] += info.st_size
-        digest.update(f"{relative}\0{info.st_ino}\0{info.st_size}\0{info.st_mtime_ns}\n".encode())
+        digest.update(
+            f"{relative}\0{info.st_ino}\0{info.st_size}\0{info.st_mtime_ns}\0{info.st_ctime_ns}\n".encode()
+        )
 
     for item in _entries(state_root / "manifests"):
         if MANIFEST_NAME.fullmatch(item.name):

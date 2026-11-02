@@ -5,10 +5,14 @@ generated-date: 2026-09-30
 covers-paths:
   - config/**
   - docs/handoff-sviluppo-collettore.md
-last-verified-commit: 35c6cb9
+last-verified-commit: 571b0f6
 ---
 
 # Deployment
+
+## Catena candidata dopo il lock, 02/11/2026
+
+Il job versionato in `571b0f6` prende `flock` sulla directory di stato aperta in lettura e non usa più il file `nightly.lock` in scrittura. Servizio e timer non sono installati sulla VM. Prima della loro attivazione servono la misura della verifica integrale su dati rappresentativi e le decisioni su D7, originali e custodia indipendente.
 
 ## Stato operativo Seeweb dopo il pilot, 02/11/2026
 

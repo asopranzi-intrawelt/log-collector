@@ -8,10 +8,14 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 35c6cb9
+last-verified-commit: 571b0f6
 ---
 
 # Stack applicativo
+
+## Misura della catena su un campione stabile, 02/11/2026
+
+`ads-measure-verify.py` confronta anche `ctime` dei file del campione prima e dopo la verifica integrale. Una riscrittura della stessa lunghezza con `mtime` ripristinato produce `dataset_changed`; il rapporto non contiene nomi o contenuti. Questa è una misura candidata da eseguire su dati rappresentativi della VM, non ancora distribuita.
 
 ## Lock del candidato notturno, 02/11/2026
 

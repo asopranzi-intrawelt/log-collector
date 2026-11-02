@@ -1,5 +1,9 @@
 # Snapshot di sincronizzazione
 
+## Campione della catena più sensibile alle riscritture, 02/11/2026
+
+Il `chiudi` dell'utente ha pubblicato `571b0f6`. Il misuratore ora confronta anche `ctime`: in WSL rileva una riscrittura di uguale lunghezza con `mtime` ripristinato; togliendo il nuovo campo, il test fallisce sul falso verde. Cinque schede riallineate al commit del lock, runbook e handoff aggiornati. La misura su volume reale e l'installazione del timer restano aperte; `network-design` è occupato dal lavoro parallelo.
+
 ## Lock notturno senza troncatura, 02/11/2026
 
 Su `main` `814f7ec`, corretta localmente l'apertura del lock del job notturno: `flock` usa la directory di stato in sola lettura. La suite WSL verifica bersaglio simbolico intatto e mutua esclusione; la copia del vecchio codice fallisce sulla troncatura. Documentazione tecnica e prove aggiornate. Servizio non installato, misura reale e D7 aperti; rete con lavoro parallelo ancora da riconciliare.

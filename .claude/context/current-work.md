@@ -9,11 +9,15 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 35c6cb9
+last-verified-commit: 571b0f6
 stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai punti 3 e 7; eventi iLO tecnici separati con ritenzione 90 giorni attiva; catena locale provata in WSL, non installata; D7 bloccato da nomina ed elenco AdS
 ---
 
 # Lavoro in corso
+
+## Campione stabile per misurare la catena, 02/11/2026
+
+Dopo il `chiudi` dell'utente, `main` è `571b0f6` e l'albero era pulito. Il misuratore della verifica integrale poteva accettare una riscrittura di uguale lunghezza con `mtime` ripristinato. Il codice locale confronta anche `ctime`; la prova WSL era rossa senza quel campo e ora passa. La misura su dati rappresentativi della VM, l'installazione del job, D7 e TSA/WORM restano aperti. `D:/network-design` ha modifiche parallele; la riconciliazione Seeweb attende quell'albero libero.
 
 ## Lock del job notturno, 02/11/2026
 

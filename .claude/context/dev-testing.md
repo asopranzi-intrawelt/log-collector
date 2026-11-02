@@ -6,10 +6,14 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 35c6cb9
+last-verified-commit: 571b0f6
 ---
 
 # Test di sviluppo
+
+## Misura AdS con mtime ripristinato, 02/11/2026
+
+La prova WSL riscrive un log sintetico senza cambiarne la lunghezza e ripristina `mtime`, mantenendo diverso `ctime`. `ads-measure-verify.py` restituisce `dataset_changed`. Togliendo solo il confronto di `ctime` dal codice, la prova fallisce perché il comando restituisce invece `ok`: non dipende da un errore dello stub. La prova non misura durata e I/O sulla VM reale.
 
 ## Lock del job notturno, 02/11/2026
 

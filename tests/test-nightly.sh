@@ -218,4 +218,10 @@ python3 -c 'import json,sys; d=json.load(open(sys.argv[1],encoding="utf-8")); as
 printf '%s\n' '#!/usr/bin/env bash' 'printf x >>"$ADS_LOG_ROOT/source-a/2026-10-07.log"' 'exit 1' >"$scratch/measure-case/ads-verify.sh"
 expect_failure python3 "$scratch/measure-case/ads-measure-verify.py" --log-root "$ADS_LOG_ROOT" --state-root "$ADS_STATE_ROOT"
 python3 -c 'import json,sys; d=json.load(open(sys.argv[1],encoding="utf-8")); assert d["status"] == "verification_failed_and_dataset_changed"' "$scratch/output"
+
+# Una riscrittura della stessa lunghezza con mtime ripristinato cambia ctime.
+cp -p -- "$ADS_LOG_ROOT/source-a/2026-10-07.log" "$scratch/mtime-reference"
+printf '%s\n' '#!/usr/bin/env bash' 'raw=$ADS_LOG_ROOT/source-a/2026-10-07.log' 'before_ctime=$(stat -c %z "$raw")' 'printf X | dd of="$raw" bs=1 seek=0 count=1 conv=notrunc status=none' 'touch -r "$ADS_LOG_ROOT/../mtime-reference" "$raw"' '[[ $(stat -c %z "$raw") != "$before_ctime" ]] || exit 7' >"$scratch/measure-case/ads-verify.sh"
+expect_failure python3 "$scratch/measure-case/ads-measure-verify.py" --log-root "$ADS_LOG_ROOT" --state-root "$ADS_STATE_ROOT"
+python3 -c 'import json,sys; d=json.load(open(sys.argv[1],encoding="utf-8")); assert d["status"] == "dataset_changed", d["status"]' "$scratch/output"
 printf 'test-nightly: OK (recupero, 213 giorni, ora legale, idempotenza, alterazioni, link simbolici e manifest precedente)\n'

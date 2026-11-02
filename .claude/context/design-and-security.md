@@ -6,10 +6,14 @@ covers-paths:
   - bin/**
   - config/**
   - pilot/monitoring-hub/**
-last-verified-commit: 35c6cb9
+last-verified-commit: 571b0f6
 ---
 
 # Design e sicurezza applicativa
+
+## Stabilità del campione della catena, 02/11/2026
+
+Nel misuratore una riscrittura può conservare dimensione e `mtime`. Il confronto ora include anche `ctime`, che Linux aggiorna quando cambia il file. La prova con riscrittura di uguale lunghezza e ripristino di `mtime` era verde prima della correzione e ora segnala `dataset_changed`. Il confronto di metadati non è una fotografia atomica e non prova la prestazione sul volume reale.
 
 ## Integrità del lock notturno, 02/11/2026
 

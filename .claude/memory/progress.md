@@ -1,5 +1,9 @@
 # Work-log
 
+## 2026-11-02 - Il misuratore AdS rileva anche le riscritture con mtime ripristinato
+
+Dopo il `chiudi` dell'utente, verificati `main` `571b0f6` e albero pulito. Il fingerprint del campione usava inode, dimensione e `mtime`: una scrittura di uguale lunghezza con ripristino dell'ora di modifica poteva lasciare `status=ok`. Aggiunto `ctime`; il test WSL attraversa `bash ads-verify.sh` con uno stub di uguale forma, modifica il log e ripristina `mtime`. Il primo stub Python era errato perché il misuratore invoca Bash: la caduta risultava `verification_failed`, quindi è stato sostituito prima di contare la prova. Con lo stub Bash corretto la suite passa; rimosso temporaneamente solo il campo `ctime` dopo una copia SHA-256, la stessa prova cade perché il misuratore esce con `ok`; il file è stato ripristinato con hash identico. Aggiornati codice, test, runbook, handoff, schede, indice e ripresa privata. Nessuna misura sulla VM o operazione Git di scrittura dell'agente. **Template:** nessuna.
+
 ## 2026-11-02 - Lock del job notturno sulla directory di stato
 
 Dopo `chiudi` dell'utente, verificato `main` `814f7ec` e albero pulito. In `ads-nightly.sh` l'apertura `>` di `nightly.lock` precedeva `flock` e poteva troncare un bersaglio simbolico. Sostituita con apertura in lettura della directory di stato e `flock` sul descrittore; due prove WSL verificano bersaglio intatto e esclusione con lock concorrente. Una copia temporanea con il vecchio codice fa fallire il caso del bersaglio. Aggiornati script, test, runbook, handoff, schede, indice e ripresa privata. Nessun deploy o Git di scrittura dall'agente. Il timer non è installato e la prova su dati reali resta aperta. **Template:** nessuna.
