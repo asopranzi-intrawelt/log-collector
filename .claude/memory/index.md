@@ -1,5 +1,9 @@
 # Snapshot di sincronizzazione
 
+## Incroci QNAP misurati sul 03/11, 04/11/2026
+
+L’operatore ha eseguito il lettore con incroci sulla VM: 7.604 successi SMB e uno amministrativo su NAS-INTRA; 28 successi e 32 fallimenti SMB su INTRA3. Nei due NAS, i login marcati non sono senza contesto né sovrapposti. D7 e strict restano aperti: servono gli account AdS approvati e la decisione sui log SMB ordinari. Il NAS-INTRA sostitutivo è atteso il 06/11; ripetere la misura sul primo giorno completo.
+
 ## Controllo delle fonti collegate, 04/11/2026
 
 Il collettore sorveglia otto file della rete e quattro del verificatore QA; la rete sorveglia otto file del collettore e quattro QA. Il confronto è sul contenuto, segnala sorgenti assenti e rami errati e non esegue operazioni Git remote. Claude Code ha un gancio all'apertura; Codex esegue la procedura di `CLAUDE.md` letta tramite `AGENTS.md`. Stato privato in `_notes/.contesto-collegato-state.json`, aggiornato solo dopo aver letto le variazioni. Il corpus condiviso conserva il controllo già proprio di `network-design`.

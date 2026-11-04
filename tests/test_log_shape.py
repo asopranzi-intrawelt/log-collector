@@ -104,6 +104,39 @@ class LogShapeTests(unittest.TestCase):
         self.assertNotIn("secret-user", json.dumps(result))
         self.assertNotIn("secret-path", json.dumps(result))
 
+    def test_qnap_login_totals_are_split_by_admin_and_samba_context(self) -> None:
+        source = self.root / "127.0.0.2"
+        source.mkdir()
+        contents = "".join(
+            (
+                _line("conn log: Users: secret-admin, Connection type: HTTP, "
+                      "Accessed resources: Administration, Action: Login OK"),
+                _line("conn log: Users: secret-user, Connection type: SAMBA, "
+                      "Accessed resources: SharedFolder, Action: Login OK"),
+                _line("conn log: Users: secret-user, Connection type: SAMBA, "
+                      "Accessed resources: SharedFolder, Action: Login Fail"),
+                _line("conn log: Users: secret-other, Connection type: TELNET, "
+                      "Action: Login OK"),
+                _line("conn log: Users: secret-mixed, Connection type: SAMBA, "
+                      "Accessed resources: Administration, Action: Login OK"),
+                _line("event log: Category: General, Action: Login OK"),
+            )
+        )
+        (source / "2026-11-03.log").write_text(contents, encoding="utf-8")
+
+        report = shape.scan(self.root, DAY)["sources"][0]
+
+        self.assertEqual(report["markers"]["qnap_login_success"], 5)
+        self.assertEqual(report["correlations"]["qnap_admin_login_success"], 2)
+        self.assertEqual(report["correlations"]["qnap_smb_login_success"], 2)
+        self.assertEqual(report["correlations"]["qnap_smb_login_failure"], 1)
+        self.assertEqual(report["correlations"]["qnap_admin_login_failure"], 0)
+        self.assertEqual(report["correlations"]["qnap_login_without_context"], 1)
+        self.assertEqual(report["correlations"]["qnap_admin_smb_overlap"], 1)
+        self.assertNotIn("secret-admin", json.dumps(report))
+        self.assertNotIn("secret-user", json.dumps(report))
+        self.assertNotIn("secret-mixed", json.dumps(report))
+
     def test_no_daily_file_is_reported_as_no_data(self) -> None:
         (self.root / "127.0.0.2").mkdir()
 

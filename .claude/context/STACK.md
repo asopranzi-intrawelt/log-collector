@@ -8,10 +8,14 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: be63c2c
+last-verified-commit: 82d4ee7
 ---
 
 # Stack applicativo
+
+## Incroci QNAP misurati, 04/11/2026
+
+`bin/ads-log-shape.py` conserva i marcatori indipendenti e aggiunge incroci per risorsa amministrativa, SMB/SAMBA e azione di login sulle righe `conn log:`. Otto prove POSIX e una CLI su mount temporaneo passano. La versione corrente, ancora da versionare, è stata eseguita manualmente sulla VM sul 03/11: 7.604 successi SMB e uno amministrativo su NAS-INTRA; 28 successi e 32 fallimenti SMB su INTRA3. Gli incroci separano i login marcati per contesto in quel giorno, senza classificare account AdS.
 
 ## Ricognizione dei marcatori dei log, 04/11/2026
 

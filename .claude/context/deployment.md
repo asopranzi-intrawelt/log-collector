@@ -5,14 +5,14 @@ generated-date: 2026-09-30
 covers-paths:
   - config/**
   - docs/handoff-sviluppo-collettore.md
-last-verified-commit: be63c2c
+last-verified-commit: 82d4ee7
 ---
 
 # Deployment
 
 ## Misura privata dei marcatori, 04/11/2026
 
-L'operatore ha copiato `ads-log-shape.py` v1 e v2 con SHA-256 verificato, installando copie di proprietà root sulla VM e lanciandole manualmente sul giorno chiuso 03/11; unità e rsyslog non sono stati modificati. L'output JSON contiene IP reali e resta in `_notes/` o nell'output privato. `measured` significa lettura riuscita, non classificazione AdS approvata; `no_data` e `measurement_failed` richiedono indagine prima di usare i numeri. Per il NAS-INTRA sostitutivo atteso il 06/11, verificare sul nuovo apparato indirizzo, NTP, categorie e trasporto Syslog prima del confronto del primo giorno completo con la baseline; non riusare il filtro del vecchio NAS senza campione.
+L'operatore ha copiato `ads-log-shape.py` v1, v2 e la versione con incroci con SHA-256 verificato, installando copie di proprietà root sulla VM e lanciandole manualmente sul giorno chiuso 03/11; unità e rsyslog non sono stati modificati. L'output JSON contiene IP reali e resta in `_notes/` o nell'output privato. `measured` significa lettura riuscita, non classificazione AdS approvata; `no_data` e `measurement_failed` richiedono indagine prima di usare i numeri. Per il NAS-INTRA sostitutivo atteso il 06/11, verificare sul nuovo apparato indirizzo, NTP, categorie e trasporto Syslog prima del confronto del primo giorno completo con la baseline; non riusare il filtro del vecchio NAS senza campione.
 
 ## Inventario prima del filtro strict, 02/11/2026
 

@@ -6,10 +6,14 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: be63c2c
+last-verified-commit: 82d4ee7
 ---
 
 # Test di sviluppo
+
+## Incroci QNAP provati e misurati, 04/11/2026
+
+La prova verifica che un `Login OK` su `Administration` e uno su `SAMBA` producano due incroci distinti, che un fallimento SMB non diventi amministrativo e che una riga senza contesto resti visibile. Otto test POSIX e la prova CLI su mount temporaneo passano. L’esecuzione manuale sulla VM del 03/11 ha restituito `measured`, con 7.604 successi SMB e uno amministrativo su NAS-INTRA e 28 successi e 32 fallimenti SMB su INTRA3; non è una prova della completezza dei flussi.
 
 ## Marcatori dei log e prova di non vacuità, 04/11/2026
 

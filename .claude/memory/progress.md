@@ -1,5 +1,13 @@
 # Work-log
 
+## 2026-11-04 - Incroci QNAP misurati sul giorno chiuso 03/11
+
+L’operatore ha eseguito sulla VM la versione con incroci: sette file, 11.951 righe, 3.123.330 byte. NAS-INTRA: 7.604 login riusciti SMB e uno amministrativo. INTRA3: 28 successi e 32 fallimenti SMB. Sui due NAS non emergono login marcati senza contesto o con doppio contesto. Registrato il risultato in runbook, handoff, schede e ripresa privata; la misura non attribuisce account AdS né chiude D7 o strict. **Template:** nessuna.
+
+## 2026-11-04 - Incroci QNAP preparati per misurare il contesto dei login
+
+Ricevuti i due `chiudi` dell'utente: collettore `82d4ee7`, rete `163c900`, alberi puliti. Le baseline private delle fonti collegate sono state aggiornate dopo aver verificato che i file sorvegliati erano invariati; il worktree secondario della rete riguarda il lock `vzdump` e non è stato toccato. Esteso `ads-log-shape.py` con incroci QNAP per `Administration`, `SMB/SAMBA`, successo, fallimento, contesto assente e sovrapposizione. La nuova prova è caduta prima per un'asserzione errata del test, poi correttamente per l'assenza di `correlations`; dopo la correzione passano otto test POSIX, prova CLI su mount e Ruff. Aggiornati runbook, handoff e schede. Misura reale e classificazione AdS non ancora eseguite. **Template:** nessuna.
+
 ## 2026-11-04 - Fonti fra collettore, rete e QA sorvegliate all'apertura
 
 Preparati manifest nei due repository, verificatore locale con SHA-256, ganci `SessionStart` per Claude Code e istruzioni di ripresa per Codex. Cinque test isolati coprono cambio di contenuto a dimensione e mtime uguali, nuovo file di un glob, sorgente mancante, primo avviso del gancio senza stampa di contenuti e differenza Windows nel campo ctime. Corretto il falso allarme Windows: `stat(path)` e `fstat(fd)` differiscono sul campo ctime anche a file invariato; il controllo usa identità, dimensione e mtime prima e dopo la lettura. Tolte cinque copie NAS identiche e adiacenti nella documentazione di rete e rigenerata la timeline a 257 eventi. Nessun commit, push o deploy dell'agente. **Template:** nessuna.

@@ -41,6 +41,15 @@ MARKERS: dict[str, tuple[bytes, ...]] = {
     "host_auth_hint": (b"pvedaemon", b"sshd", b"/access/ticket"),
 }
 
+CORRELATIONS = (
+    "qnap_admin_login_success",
+    "qnap_admin_login_failure",
+    "qnap_smb_login_success",
+    "qnap_smb_login_failure",
+    "qnap_admin_smb_overlap",
+    "qnap_login_without_context",
+)
+
 
 def _empty_source(source: str) -> dict[str, object]:
     return {
@@ -50,6 +59,7 @@ def _empty_source(source: str) -> dict[str, object]:
         "lines": 0,
         "unmatched_lines": 0,
         "markers": {name: 0 for name in MARKERS},
+        "correlations": {name: 0 for name in CORRELATIONS},
     }
 
 
@@ -66,19 +76,38 @@ def _scan_file(source_fd: int, filename: str, report: dict[str, object]) -> None
             raise ValueError("file oltre il limite di misura")
         report["file_present"] = True
         markers = report["markers"]
+        correlations = report["correlations"]
         assert isinstance(markers, dict)
+        assert isinstance(correlations, dict)
         for line in stream:
             report["bytes"] += len(line)
             report["lines"] += 1
             if len(line) > MAX_LINE_BYTES or report["bytes"] > MAX_FILE_BYTES:
                 raise ValueError("riga o file oltre il limite di misura")
-            matched = False
+            found: set[str] = set()
             for name, forms in MARKERS.items():
                 if any(form in line for form in forms):
                     markers[name] += 1
-                    matched = True
-            if not matched:
+                    found.add(name)
+            if not found:
                 report["unmatched_lines"] += 1
+            if "qnap_connection_log" in found:
+                admin = "qnap_admin_resource" in found
+                smb = bool({"qnap_smb_connection", "qnap_samba_connection"} & found)
+                success = "qnap_login_success" in found
+                failure = "qnap_login_failure" in found
+                if admin and success:
+                    correlations["qnap_admin_login_success"] += 1
+                if admin and failure:
+                    correlations["qnap_admin_login_failure"] += 1
+                if smb and success:
+                    correlations["qnap_smb_login_success"] += 1
+                if smb and failure:
+                    correlations["qnap_smb_login_failure"] += 1
+                if admin and smb:
+                    correlations["qnap_admin_smb_overlap"] += 1
+                if (success or failure) and not (admin or smb):
+                    correlations["qnap_login_without_context"] += 1
         after = os.fstat(stream.fileno())
         def snapshot(value: os.stat_result) -> tuple[int, int, int, int, int]:
             return (

@@ -9,11 +9,15 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: be63c2c
+last-verified-commit: 82d4ee7
 stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai punti 3 e 7; eventi iLO tecnici separati con ritenzione 90 giorni attiva; catena locale provata in WSL, non installata; D7 bloccato da nomina ed elenco AdS
 ---
 
 # Lavoro in corso
+
+## Incrocio dei login QNAP misurato sul 03/11, 04/11/2026
+
+Il lettore candidato, con otto test POSIX, prova CLI su mount e Ruff verdi, è stato eseguito manualmente sulla VM sul giorno chiuso 03/11. NAS-INTRA: 7.604 login riusciti SMB e uno amministrativo, su 7.605 successi marcati. INTRA3: 28 successi e 32 fallimenti SMB. Nessun login marcato senza contesto o con doppio contesto sui due NAS. Sono incroci di stringhe, non classificazione AdS; D7, strict e lista approvata restano aperti. Cambio NAS atteso il 06/11: verificare continuità e misurare il primo giorno completo dopo l’installazione.
 
 ## Fonti collegate al riavvio delle sessioni, 04/11/2026
 
