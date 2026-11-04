@@ -1,5 +1,9 @@
 # Snapshot di sincronizzazione
 
+## Prima misura reale dei marcatori, 04/11/2026
+
+L'operatore ha eseguito `ads-log-shape.py` sul giorno chiuso 03/11: 11.951 righe e 3.123.330 byte in sette file. I NAS totalizzano 11.540 righe, di cui 11.507 senza i marcatori della prima versione. Il runbook NAS mostra le varianti `SAMBA` e `Login OK`, ora aggiunte al lettore per una seconda misura. La prima misura e la mappa degli IP sono nella ripresa privata. Nessuna classificazione AdS deriva dai conteggi; D7, strict e lista AdS approvata restano aperti.
+
 ## Lettore privato dei marcatori pronto, 04/11/2026
 
 `ads-log-shape.py` è pronto in repository per il giorno chiuso 03/11: conteggi QNAP/firewall/host e righe senza marcatori, senza messaggi o account. Sei prove POSIX, prova CLI su mount temporaneo e mutazione del marcatore SMB verdi; Ruff verde. Non è stato eseguito sulla VM. Il JSON con IP resta privato; campioni e proprietari sono ancora necessari per D7 e filtro strict.

@@ -69,9 +69,40 @@ class LogShapeTests(unittest.TestCase):
         self.assertEqual(report["markers"]["qnap_smb_connection"], 1)
         self.assertEqual(report["markers"]["qnap_login_success"], 1)
         self.assertEqual(report["markers"]["qnap_login_failure"], 1)
-        self.assertEqual(report["unmatched_lines"], 1)
+        self.assertEqual(report["markers"]["qnap_connection_log"], 2)
+        self.assertEqual(report["markers"]["qnap_event_log"], 2)
+        self.assertEqual(report["unmatched_lines"], 0)
         self.assertNotIn("<account>", json.dumps(result))
         self.assertNotIn("SharedFolder", json.dumps(result))
+
+    def test_legacy_qnap_forms_are_counted_without_exposing_account(self) -> None:
+        source = self.root / "127.0.0.2"
+        source.mkdir()
+        contents = "".join(
+            (
+                _line("conn log: Users: secret-user, Connection type: SAMBA, Action: Login OK"),
+                _line("conn log: Users: secret-user, Connection type: HTTP, "
+                      "Accessed resources: Administration, Action: Login Fail"),
+                _line("conn log: Users: secret-user, Connection type: SSH, Action: Read"),
+                _line("event log: Category: General, Content: secret-path"),
+            )
+        )
+        (source / "2026-11-03.log").write_text(contents, encoding="utf-8")
+
+        result = shape.scan(self.root, DAY)
+        report = result["sources"][0]
+
+        self.assertEqual(report["markers"]["qnap_connection_log"], 3)
+        self.assertEqual(report["markers"]["qnap_event_log"], 1)
+        self.assertEqual(report["markers"]["qnap_samba_connection"], 1)
+        self.assertEqual(report["markers"]["qnap_http_connection"], 1)
+        self.assertEqual(report["markers"]["qnap_ssh_connection"], 1)
+        self.assertEqual(report["markers"]["qnap_login_success"], 1)
+        self.assertEqual(report["markers"]["qnap_login_failure"], 1)
+        self.assertEqual(report["markers"]["qnap_read"], 1)
+        self.assertEqual(report["unmatched_lines"], 0)
+        self.assertNotIn("secret-user", json.dumps(result))
+        self.assertNotIn("secret-path", json.dumps(result))
 
     def test_no_daily_file_is_reported_as_no_data(self) -> None:
         (self.root / "127.0.0.2").mkdir()

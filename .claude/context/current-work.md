@@ -15,6 +15,10 @@ stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai p
 
 # Lavoro in corso
 
+## Misura NAS reale e secondo passaggio, 04/11/2026
+
+La prima esecuzione sulla VM del lettore del 03/11 ha dato `measured`: sette file, 11.951 righe e 3.123.330 byte. Nei quattro NAS 11.507 righe su 11.540 non incontrano i marcatori iniziali; il formato già documentato usa anche `SAMBA` e `Login OK`. Il lettore è stato ampliato e richiede una seconda misura sul medesimo giorno, senza stampare messaggi o account. I 32 indizi di login fallito su INTRA3 non hanno ancora causa attribuita. Nessuna classificazione AdS, D7 o filtro strict è stata approvata.
+
 ## Controllo dei marcatori pronto per prova reale, 04/11/2026
 
 Preparato `bin/ads-log-shape.py` per contare marcatori e righe non riconosciute in un giorno chiuso senza esporre messaggi o account. Sei prove POSIX in container senza rete, una prova CLI su mount temporaneo (`MOUNT_CLI_OK`) e la mutazione del marcatore SMB passano; Ruff è verde. Lo script non è stato trasferito alla VM: la forma dei messaggi del 03/11 e la quota SMB/admin sono ancora [Non verificato]. Il risultato guiderà i campioni minimizzati con i proprietari, non sostituirà l'elenco AdS approvato né autorizzerà D7 o filtro strict.

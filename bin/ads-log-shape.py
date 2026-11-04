@@ -25,11 +25,17 @@ FILE_FLAGS = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_NONBLOC
 # Stringhe osservate nei runbook dei quattro NAS, del firewall e di Proxmox.
 # I conteggi possono sovrapporsi; la quota senza marcatori va sempre letta.
 MARKERS: dict[str, tuple[bytes, ...]] = {
+    "qnap_connection_log": (b"conn log:",),
+    "qnap_event_log": (b"event log:",),
     "qnap_admin_resource": (b"Accessed resources: Administration",),
     "qnap_smb_connection": (b"Connection type: SMB",),
-    "qnap_login_success": (b"Action: Login Success",),
+    "qnap_samba_connection": (b"Connection type: SAMBA",),
+    "qnap_http_connection": (b"Connection type: HTTP",),
+    "qnap_ssh_connection": (b"Connection type: SSH",),
+    "qnap_login_success": (b"Action: Login Success", b"Action: Login OK"),
     "qnap_login_failure": (b"Action: Login Fail", b"Failed to log in via user account"),
     "qnap_logout": (b"Action: Logout",),
+    "qnap_read": (b"Action: Read",),
     "firewall_user_category": (b'cat="User"',),
     "firewall_system_category": (b'cat="System"',),
     "host_auth_hint": (b"pvedaemon", b"sshd", b"/access/ticket"),

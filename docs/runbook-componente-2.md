@@ -1,5 +1,11 @@
 # Runbook del componente 2: rsyslog ricevente e accessi al collettore
 
+## Misura del giorno chiuso 03/11/2026
+
+L'operatore ha trasferito `ads-log-shape.py` dopo la verifica SHA-256 e l'ha eseguito in sola lettura sul mount `/srv/ads`. Il risultato `measured` copre sette file giornalieri: 3.123.330 byte e 11.951 righe. I quattro NAS producono 11.540 righe; la versione iniziale del lettore riconosceva almeno un marcatore in 33 righe e ne lasciava 11.507 senza marcatore. Il runbook NAS documenta però le forme `SAMBA` e `Login OK`, assenti da quella versione: dal numero senza marcatore non si può stimare la quota di log non amministrativi. Su INTRA3 compaiono 32 indizi di login fallito, senza attribuzione ad account, servizio o incidente. Il firewall ha 34 righe `cat="User"` e 6 `cat="System"` su 56; Proxmox ha 321 righe con indizi di autenticazione su 344. La directory iLO non contiene il file del 03/11. Indirizzi e JSON integrale restano nella ripresa privata.
+
+Il lettore ora conta anche le forme NAS già osservate `conn log:`, `event log:`, `SAMBA`, `Login OK`, `HTTP`, `SSH` e `Read`; la seconda misura sullo stesso giorno resta da eseguire. I marcatori possono sovrapporsi: nessuno dei conteggi classifica un evento come accesso AdS né dimostra la completezza del flusso. Prima di D7 e del filtro strict servono campioni minimizzati per fonte, verifica con i proprietari e lista AdS approvata.
+
 > Procedura eseguita il 2026-10-01, con comandi ed esiti. Riferimenti: sezione 4 dello studio (configurazione rsyslog e formato `AdsLine`), sezione 2 punto 7 dell'handoff (accessi al collettore stesso). I segnaposto tra parentesi angolari rimandano a `config/parametri.yaml`, come nel runbook del componente 1.
 
 ## Che cosa fa

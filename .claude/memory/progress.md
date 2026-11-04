@@ -1,5 +1,9 @@
 # Work-log
 
+## 2026-11-04 - Prima misura reale e correzione dei marcatori NAS
+
+L'operatore ha verificato l'impronta dello script, l'ha installato root-owned sulla VM e ha ottenuto `measured` per il 03/11: 7 file, 11.951 righe, 3.123.330 byte. I quattro NAS generano 11.540 righe, 11.507 senza i marcatori iniziali. Il confronto con il runbook ha rivelato varianti già osservate (`SAMBA`, `Login OK`) escluse dalla prima versione; aggiunti marcatori di forma e una prova specifica. I 32 indizi di login fallito su INTRA3 non hanno attribuzione. Aggiornati runbook, handoff, matrice, contesto, indice e ripresa privata; resta la seconda misura reale, quindi D7 e filtro strict non avanzano. **Template:** nessuna.
+
 ## 2026-11-04 - Lettore dei marcatori AdS preparato
 
 Dai file recenti osservati è emerso il bisogno di distinguere i messaggi dei sei mittenti non configurati prima del filtro strict. Scritto `bin/ads-log-shape.py`: legge un giorno chiuso dal mount, conta marcatori letterali QNAP, firewall e host per sorgente e righe senza marcatori, non stampa messaggi o account e fallisce su file non sicuri o cambiati. Sei prove POSIX in container senza rete e una prova CLI su mount temporaneo passano (`MOUNT_CLI_OK`); sostituendo il marcatore SMB in una copia temporanea del codice la prova corrispondente cade (`MUTATION_DETECTED`). Ruff verde. Aggiornati runbook, handoff, schede, indice e ripresa; la VM non è stata modificata e il comportamento dei log attuali non è verificato. **Template:** nessuna.
