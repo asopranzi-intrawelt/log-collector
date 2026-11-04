@@ -15,6 +15,18 @@ stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai p
 
 # Lavoro in corso
 
+## Controllo dei marcatori pronto per prova reale, 04/11/2026
+
+Preparato `bin/ads-log-shape.py` per contare marcatori e righe non riconosciute in un giorno chiuso senza esporre messaggi o account. Sei prove POSIX in container senza rete, una prova CLI su mount temporaneo (`MOUNT_CLI_OK`) e la mutazione del marcatore SMB passano; Ruff è verde. Lo script non è stato trasferito alla VM: la forma dei messaggi del 03/11 e la quota SMB/admin sono ancora [Non verificato]. Il risultato guiderà i campioni minimizzati con i proprietari, non sostituirà l'elenco AdS approvato né autorizzerà D7 o filtro strict.
+
+## File giornalieri recenti nei sei mittenti non configurati, 04/11/2026
+
+La sonda SSH dell'operatore ha verificato il mount e ha elencato 21 file regolari con `mtime` nella finestra delle ultime 48 ore: sei directory di rete non presenti nei parametri AdS e la directory locale, tre file datati 02-04/11 per ciascuna. I file elencati sono `root:ads` `0640`; somma delle dimensioni 9.494.686 byte, che non è una misura di crescita nel periodo. La directory iLO vista il 02/11 non ha file nella selezione; non si deduce un guasto. Il contenuto non è stato letto e la classificazione AdS, D7 e filtro strict restano aperti. La rete richiede l'aggiornamento della stessa evidenza con attenzione al lavoro parallelo sul sito.
+
+## Riconciliazione dei mittenti e passaggio alla misura dei file, 04/11/2026
+
+Il `chiudi` dell'utente ha pubblicato `7e0f9a6` e il collettore era pulito alla ripresa. La verifica del 02/11 prova mount, nove directory immediate e `lost+found` vuota. La ricostruzione locale con i parametri privati conta sei mittenti di rete non configurati, identificati nella mappa privata come quattro NAS, Proxmox e firewall LAN; il classificatore non è stato eseguito sulla VM. Si prepara la lettura dei soli metadati dei file degli ultimi due giorni per vedere quali directory hanno scritture recenti. Nessuna classificazione AdS o attivazione strict è autorizzata da questi metadati. Nel frattempo il commit parallelo di rete `7892961`, già su `origin/main`, ha incluso integrazione, contesto, timeline e ISO-30; le correzioni del registro pendenze e del work-log restano nell'albero insieme al lavoro sul sito.
+
 ## Censimento AdS: mount e voce di filesystem, 02/11/2026
 
 L'utente ha chiuso `11bed4e`; albero pulito alla ripresa. Il preflight locale del censimento poteva considerare una directory sottostante al mount e conteggiava `lost+found` come mittente inatteso permanente. Ora richiede il mount sulla radice live e tratta `lost+found` come voce separata solo se reale e vuota. Ventuno prove su Windows e 21 in Debian 13 passano; la versione precedente è caduta sui casi mirati. Una seconda sonda manuale ha confermato che le voci immediate erano directory e `lost+found` era vuota, senza leggere i log. La mappa privata della rete associa i sei IPv4 fuori dai parametri AdS a quattro NAS, Proxmox e firewall LAN; attività recente e classificazione restano aperte, quindi strict non si distribuisce. La rete conserva modifiche parallele e richiede il relativo allineamento.

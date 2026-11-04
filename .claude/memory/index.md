@@ -1,5 +1,17 @@
 # Snapshot di sincronizzazione
 
+## Lettore privato dei marcatori pronto, 04/11/2026
+
+`ads-log-shape.py` è pronto in repository per il giorno chiuso 03/11: conteggi QNAP/firewall/host e righe senza marcatori, senza messaggi o account. Sei prove POSIX, prova CLI su mount temporaneo e mutazione del marcatore SMB verdi; Ruff verde. Non è stato eseguito sulla VM. Il JSON con IP resta privato; campioni e proprietari sono ancora necessari per D7 e filtro strict.
+
+## Sei mittenti non configurati con file recenti, 04/11/2026
+
+L'operatore ha eseguito la sonda in sola lettura: 21 file regolari con `mtime` nelle ultime 48 ore, tre in ognuna di sei directory di rete e tre nella directory locale. Tutti `root:ads` `0640`, somma dimensioni 9.494.686 byte; non è volume prodotto nel periodo. I sei mittenti di rete non sono nei parametri AdS, mentre iLO configurata non compare nella selezione temporale. Nessun contenuto è stato letto. D7, strict ed elenco AdS approvato restano aperti; seguono riconciliazione e campioni minimizzati.
+
+## Mittenti AdS: evidenza documentata e misura di recenza pronta, 04/11/2026
+
+Collettore pulito a `7e0f9a6` alla ripresa. Le due sonde dell'operatore del 02/11 attestano mount, nove directory immediate e `lost+found` vuota. Sei nomi di rete sono fuori dai parametri privati AdS; la mappa privata li associa a quattro NAS, Proxmox e firewall LAN. `needs_reconciliation` è il risultato di una fixture locale, non di una scansione del classificatore sulla VM. Il prossimo comando SSH leggerà solo metadati dei file recenti; D7, lista AdS approvata e filtro strict restano aperti. In `network-design` il commit parallelo `7892961` ha incluso integrazione, contesto, timeline e ISO-30; restano nell'albero le correzioni a pendenze e work-log con lavoro del sito.
+
 ## Preflight AdS sul mount e su lost+found, 02/11/2026
 
 Dopo il `chiudi` `11bed4e`, il preflight richiede un mount per la radice live e conta separatamente `lost+found` soltanto se è una directory reale e vuota. Una voce piena o simbolica resta inattesa. Ventuno test Windows e 21 Debian 13 passano; il codice è solo locale. La seconda sonda manuale `TYPES_CHECKED` ha confermato le voci immediate come directory e `lost+found` vuota. La ricostruzione locale con i parametri privati dà `needs_reconciliation` (codice 2), un configurato e sei sconosciuti. La mappa privata della rete associa i sei nomi a quattro NAS, Proxmox e firewall LAN, senza provare attività corrente o approvare la classificazione. Il filtro strict resta fermo; network-design ha lavoro parallelo da preservare.

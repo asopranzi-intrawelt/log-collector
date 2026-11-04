@@ -1,5 +1,19 @@
 # Work-log
 
+## 2026-11-04 - Lettore dei marcatori AdS preparato
+
+Dai file recenti osservati è emerso il bisogno di distinguere i messaggi dei sei mittenti non configurati prima del filtro strict. Scritto `bin/ads-log-shape.py`: legge un giorno chiuso dal mount, conta marcatori letterali QNAP, firewall e host per sorgente e righe senza marcatori, non stampa messaggi o account e fallisce su file non sicuri o cambiati. Sei prove POSIX in container senza rete e una prova CLI su mount temporaneo passano (`MOUNT_CLI_OK`); sostituendo il marcatore SMB in una copia temporanea del codice la prova corrispondente cade (`MUTATION_DETECTED`). Ruff verde. Aggiornati runbook, handoff, schede, indice e ripresa; la VM non è stata modificata e il comportamento dei log attuali non è verificato. **Template:** nessuna.
+
+## 2026-11-04 - Sonda dei file recenti sul collettore
+
+L'utente ha eseguito la riga SSH concordata con esito `RECENT_METADATA_OK`. Output: 21 file regolari modificati negli ultimi due giorni, tre per ciascuna di sei directory di rete e della directory locale, date dei nomi 02-04/11, tutti `root:ads` `0640`, somma dimensioni 9.494.686 byte. I sei mittenti di rete sono quelli non presenti nei parametri AdS; la directory iLO osservata il 02/11 non compare nel filtro temporale. La somma delle dimensioni non è crescita o tasso; non sono stati letti contenuti, quindi nessun evento è stato riclassificato. Aggiornati handoff, runbook, matrice, contesto, indice e ripresa privata; allineamento di `network-design` in corso. **Template:** nessuna.
+
+## 2026-11-04 - Passo successivo del censimento AdS
+
+Verificati `main` `7e0f9a6` e albero pulito; `network-design` ha un commit successivo e lavoro parallelo. Rettificata nell'handoff la pendenza che diceva ancora che `/srv/ads` non era apribile: l'operatore ha già provato mount e tipi delle nove directory il 02/11. Preparata nel runbook una sonda in sola lettura dei metadati dei file modificati nelle ultime 48 ore; non è stata eseguita sulla VM. La presenza di file recenti sarà distinta dalla natura amministrativa degli eventi. Aggiornati handoff, runbook, contesto e indice del collettore; nella rete, integrazione, contesto, indice, progressi, pendenze, timeline e ISO-30 `in_corso`, con SVG e copie ISO rigenerati e verificati. Restano la misura reale e il versionamento manuale; il lavoro parallelo della rete va preservato. **Template:** nessuna.
+
+Durante i controlli, una sessione parallela ha pubblicato `7892961` su `network-design/main` e `origin/main`. Il commit includeva le modifiche a integrazione, contesto, indice, timeline e ISO-30; non è stato eseguito da questa sessione. Le correzioni di pendenze e work-log della rete sono ancora nel diff non committato, assieme al filone del sito. Non eseguire `chiudi` indiscriminatamente sulla rete per la sola parte del collettore.
+
 ## 2026-11-02 - Il censimento AdS distingue il mount da una directory residua
 
 Su una fixture locale con i nove nomi osservati e i parametri privati correnti, il preflight ha restituito codice 2: `configured=1`, `configured_missing=0`, `unknown=6`, `local=1`, `filesystem_entries=1`, `seeweb_in_ads=0`, `unexpected_entries=0`. È un calcolo ricostruito, non una scansione della VM. Il primo tentativo del runner non ha interpretato le virgolette PowerShell; due directory temporanee successive hanno negato la creazione dei figli nel sandbox. Il runner eseguito fuori sandbox ha passato la prova; script e directory temporanee sono stati rimossi e ne è stata verificata l'assenza. Non è un errore del classificatore o della VM.

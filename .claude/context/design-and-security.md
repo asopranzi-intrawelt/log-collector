@@ -11,6 +11,10 @@ last-verified-commit: 11bed4e
 
 # Design e sicurezza applicativa
 
+## Confine del controllo dei marcatori, 04/11/2026
+
+Il nuovo lettore usa file descriptor POSIX con `O_NOFOLLOW`, rifiuta hard link, file non regolari, file oltre 64 MiB, righe oltre 64 KiB e mutazioni di dimensione, `mtime` o `ctime` durante la lettura. La CLI richiede un mount e non emette messaggi o account; emette però indirizzi sorgente, quindi il JSON va custodito nel livello privato. I marcatori sono stringhe letterali e possono sovrapporsi o mancare in messaggi validi; non sono un filtro di produzione né una base sufficiente per decidere D7. Il controllo del mount precede l'apertura e non è atomico rispetto a uno smontaggio successivo.
+
 ## Confine del censimento AdS, 02/11/2026
 
 La CLI rifiuta una radice non montata con `measurement_failed`; l'eccezione esplicita per fixture non si applica alla radice live risolta. `lost+found` è separata dai mittenti solo se directory reale e vuota, e su Linux viene aperta senza seguire link. Questa lettura non attribuisce identità ai mittenti né esamina il contenuto dei log. Un eventuale cambio del mount dopo il controllo resta fuori dalla garanzia del preflight.

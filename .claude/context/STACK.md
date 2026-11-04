@@ -13,6 +13,10 @@ last-verified-commit: 11bed4e
 
 # Stack applicativo
 
+## Ricognizione dei marcatori dei log, 04/11/2026
+
+`bin/ads-log-shape.py` legge il file di un giorno chiuso per ciascuna directory IPv4 immediata del mount AdS e conta solo marcatori letterali QNAP, firewall e host. Emette un JSON privato con IP, byte, righe, marcatori e righe senza marcatori, mai il testo dei messaggi. Il risultato `measured` non classifica gli accessi AdS: il confronto con campioni reali e proprietari resta necessario. Script e sei prove POSIX sono nel repository, non sulla VM.
+
 ## Preflight del volume AdS, 02/11/2026
 
 `ads-source-inventory.py` ora richiede un mount per la radice passata alla CLI; le directory temporanee delle prove richiedono un'opzione esplicita che non vale per `/srv/ads`. Il campo `filesystem_entries` distingue `lost+found` vuota dalle sorgenti. Una voce piena, simbolica o non directory resta inattesa. La seconda sonda manuale ha confermato che le voci immediate sulla VM erano directory e `lost+found` vuota. Il classificatore è nel repository e non è stato eseguito sulla VM; i sei nomi di rete non configurati restano da riconciliare.

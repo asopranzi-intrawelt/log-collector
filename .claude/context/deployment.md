@@ -10,6 +10,10 @@ last-verified-commit: 11bed4e
 
 # Deployment
 
+## Misura privata dei marcatori, 04/11/2026
+
+`ads-log-shape.py` è solo nel repository. Per la prima misura usare il file del 03/11, giorno chiuso, copiare lo script con SHA-256 verificato in una posizione di proprietà root e lanciarlo manualmente; non installare unità o modificare rsyslog. L'output JSON contiene IP reali e resta in `_notes/` o nell'output privato. `measured` significa lettura riuscita, non classificazione AdS approvata; `no_data` e `measurement_failed` richiedono indagine prima di usare i numeri.
+
 ## Inventario prima del filtro strict, 02/11/2026
 
 Il preflight aggiornato è locale al repository e non è stato trasferito sulla VM. La sonda manuale del 02/11 ha confermato il mount, le voci immediate come directory e `lost+found` vuota; prima dell'uso operativo ricontrollare il mount e poi eseguire il classificatore con i parametri privati. Per arrivare a `ok` occorre ancora riconciliare i sei nomi di rete non configurati; anche `ok` da solo non autorizza l'installazione del filtro strict.

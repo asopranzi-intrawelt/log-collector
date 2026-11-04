@@ -11,6 +11,10 @@ last-verified-commit: 11bed4e
 
 # Test di sviluppo
 
+## Marcatori dei log e prova di non vacuità, 04/11/2026
+
+Sei prove POSIX in container Python 3.13 senza rete distinguono un accesso QNAP alla risorsa `Administration` da una connessione SMB, contano le righe non riconosciute, rifiutano archivio non montato, file simbolico, `lost+found` piena e file modificato durante la lettura. La suite è verde; su una copia temporanea del codice il marcatore SMB è stato sostituito e la prova di separazione è caduta sul conteggio atteso (`MUTATION_DETECTED`). Una prova CLI distinta su un vero mount `tmpfs` passa `MOUNT_CLI_OK` e non emette il nome dell'account sintetico. I dati sono costruiti dai formati osservati nei runbook: solo la lettura reale della VM può misurare la loro frequenza attuale.
+
 ## Inventario del volume AdS, 02/11/2026
 
 Ricostruzione locale dai nove nomi osservati e dai parametri privati correnti: codice 2, `configured=1`, `unknown=6`, `local=1`, `filesystem_entries=1`, nessuna sorgente configurata mancante o voce inattesa. La fixture è stata eliminata dopo la prova. Questa è una verifica del calcolo, non un'esecuzione del classificatore sulla VM.
