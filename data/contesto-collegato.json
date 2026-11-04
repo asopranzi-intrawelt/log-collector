@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "sources": [
+    {
+      "name": "network-design",
+      "root": "D:/network-design",
+      "env": "ADS_NETWORK_DESIGN_ROOT",
+      "branch": "main",
+      "paths": [
+        ".claude/context/current-work.md",
+        ".claude/context/roadmap.md",
+        ".claude/memory/index.md",
+        "data/network-topology.json",
+        "data/iso27001-interventi.json",
+        "docs/osservabilita/log-collector-integrazione.md",
+        "docs/stato/pendenze-aperte.md",
+        "docs/infrastructure-timeline/2026-q4-segreti-e-collettore.md"
+      ]
+    },
+    {
+      "name": "intrawelt-qa-verifier",
+      "root": "D:/intrawelt-qa-verifier",
+      "env": "ADS_QA_VERIFIER_ROOT",
+      "branch": "staging",
+      "paths": [
+        ".claude/context/current-work.md",
+        ".claude/context/deployment.md",
+        "docs/stato-e-roadmap.md",
+        "KNOWLEDGE.md"
+      ]
+    }
+  ]
+}

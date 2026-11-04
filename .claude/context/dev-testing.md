@@ -6,14 +6,14 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 11bed4e
+last-verified-commit: be63c2c
 ---
 
 # Test di sviluppo
 
 ## Marcatori dei log e prova di non vacuità, 04/11/2026
 
-Sei prove POSIX in container Python 3.13 senza rete distinguono un accesso QNAP alla risorsa `Administration` da una connessione SMB, contano le righe non riconosciute, rifiutano archivio non montato, file simbolico, `lost+found` piena e file modificato durante la lettura. La suite è verde; su una copia temporanea del codice il marcatore SMB è stato sostituito e la prova di separazione è caduta sul conteggio atteso (`MUTATION_DETECTED`). Una prova CLI distinta su un vero mount `tmpfs` passa `MOUNT_CLI_OK` e non emette il nome dell'account sintetico. I dati sono costruiti dai formati osservati nei runbook: solo la lettura reale della VM può misurare la loro frequenza attuale.
+Sette prove POSIX in container Python 3.13 senza rete distinguono un accesso QNAP alla risorsa `Administration` da una connessione SMB e verificano le forme legacy `SAMBA`, `Login OK`, `HTTP`, `SSH`, `Read`, `conn log:` ed `event log:`; contano le righe non riconosciute e rifiutano archivio non montato, file simbolico, `lost+found` piena e file modificato durante la lettura. La suite è verde; su una copia temporanea del codice il marcatore SMB è stato sostituito e la prova di separazione è caduta sul conteggio atteso (`MUTATION_DETECTED`). Una prova CLI distinta su un vero mount `tmpfs` passa `MOUNT_CLI_OK` e non emette il nome dell'account sintetico. La misura reale v2 dell'operatore sul 03/11 conferma la frequenza dei marcatori in quel giorno, senza classificare gli eventi AdS.
 
 ## Inventario del volume AdS, 02/11/2026
 

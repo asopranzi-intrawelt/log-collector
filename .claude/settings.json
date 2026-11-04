@@ -29,6 +29,19 @@
       "Bash(docker push:*)"
     ]
   },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python D:/log-collector/tools/verifica-progetti-collegati.py --hook",
+            "timeout": 20
+          }
+        ]
+      }
+    ]
+  },
   "env": {
     "PROJECT_NAME": "log-collector",
     "PROJECT_PHASE": "init"

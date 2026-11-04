@@ -1,5 +1,17 @@
 # Work-log
 
+## 2026-11-04 - Fonti fra collettore, rete e QA sorvegliate all'apertura
+
+Preparati manifest nei due repository, verificatore locale con SHA-256, ganci `SessionStart` per Claude Code e istruzioni di ripresa per Codex. Cinque test isolati coprono cambio di contenuto a dimensione e mtime uguali, nuovo file di un glob, sorgente mancante, primo avviso del gancio senza stampa di contenuti e differenza Windows nel campo ctime. Corretto il falso allarme Windows: `stat(path)` e `fstat(fd)` differiscono sul campo ctime anche a file invariato; il controllo usa identità, dimensione e mtime prima e dopo la lettura. Tolte cinque copie NAS identiche e adiacenti nella documentazione di rete e rigenerata la timeline a 257 eventi. Nessun commit, push o deploy dell'agente. **Template:** nessuna.
+
+## 2026-11-04 - Schede tecniche riconciliate al lettore v2
+
+`verifica-schede.py` ha rilevato cinque schede oltre l'ancora `11bed4e`, senza difetti dei percorsi coperti. Letti codice e sezioni pertinenti; aggiornate affermazioni su script già eseguito, sette prove, output privato e limite dei prefissi QNAP; `STACK.md`, `deployment.md`, `design-and-security.md`, `dev-testing.md` e `current-work.md` ancorate al commit `be63c2c`. Il lavoro non committato resta fuori dalla verifica per commit. **Template:** nessuna.
+
+## 2026-11-04 - Seconda misura reale e piano di continuità NAS-INTRA
+
+L'utente ha completato `chiudi` del lettore v2 (`be63c2c`) e ha eseguito la seconda misura sulla VM. Il JSON riferisce sette file, 11.951 righe e 3.123.330 byte, pari ai totali v1; 11.540 righe NAS sono tutte coperte per forma da 11.435 `conn log:` e 105 `event log:`, con 11.434 marcatori `SAMBA`. La misura non classifica gli eventi AdS. Letta la roadmap aggiornata di `D:/network-design`: NAS-INTRA è in sostituzione con consegna attesa il 06/11, mentre la topologia descrive ancora correttamente il vecchio apparato. Aggiornati runbook NAS e ricevitore, handoff, matrice, contesto, indice e ripresa privata; segue il confronto dopo il passaggio, senza modificare filtri o servizi. **Template:** nessuna.
+
 ## 2026-11-04 - Prima misura reale e correzione dei marcatori NAS
 
 L'operatore ha verificato l'impronta dello script, l'ha installato root-owned sulla VM e ha ottenuto `measured` per il 03/11: 7 file, 11.951 righe, 3.123.330 byte. I quattro NAS generano 11.540 righe, 11.507 senza i marcatori iniziali. Il confronto con il runbook ha rivelato varianti già osservate (`SAMBA`, `Login OK`) escluse dalla prima versione; aggiunti marcatori di forma e una prova specifica. I 32 indizi di login fallito su INTRA3 non hanno attribuzione. Aggiornati runbook, handoff, matrice, contesto, indice e ripresa privata; resta la seconda misura reale, quindi D7 e filtro strict non avanzano. **Template:** nessuna.

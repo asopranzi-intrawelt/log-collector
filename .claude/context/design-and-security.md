@@ -6,14 +6,14 @@ covers-paths:
   - bin/**
   - config/**
   - pilot/monitoring-hub/**
-last-verified-commit: 11bed4e
+last-verified-commit: be63c2c
 ---
 
 # Design e sicurezza applicativa
 
 ## Confine del controllo dei marcatori, 04/11/2026
 
-Il nuovo lettore usa file descriptor POSIX con `O_NOFOLLOW`, rifiuta hard link, file non regolari, file oltre 64 MiB, righe oltre 64 KiB e mutazioni di dimensione, `mtime` o `ctime` durante la lettura. La CLI richiede un mount e non emette messaggi o account; emette però indirizzi sorgente, quindi il JSON va custodito nel livello privato. I marcatori sono stringhe letterali e possono sovrapporsi o mancare in messaggi validi; non sono un filtro di produzione né una base sufficiente per decidere D7. Il controllo del mount precede l'apertura e non è atomico rispetto a uno smontaggio successivo.
+Il lettore usa file descriptor POSIX con `O_NOFOLLOW`, rifiuta hard link, file non regolari, file oltre 64 MiB, righe oltre 64 KiB e mutazioni di dimensione, `mtime` o `ctime` durante la lettura. La CLI richiede un mount e non emette messaggi o account; emette però indirizzi sorgente, quindi il JSON va custodito nel livello privato. I marcatori sono stringhe letterali e possono sovrapporsi o mancare in messaggi validi; non sono un filtro di produzione né una base sufficiente per decidere D7. Lo zero delle righe NAS senza marcatori nella misura v2 del 03/11 prova soltanto la copertura dei prefissi QNAP noti, non l'appartenenza al perimetro AdS. Il controllo del mount precede l'apertura e non è atomico rispetto a uno smontaggio successivo.
 
 ## Confine del censimento AdS, 02/11/2026
 

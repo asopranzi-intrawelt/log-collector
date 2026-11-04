@@ -8,14 +8,14 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 11bed4e
+last-verified-commit: be63c2c
 ---
 
 # Stack applicativo
 
 ## Ricognizione dei marcatori dei log, 04/11/2026
 
-`bin/ads-log-shape.py` legge il file di un giorno chiuso per ciascuna directory IPv4 immediata del mount AdS e conta solo marcatori letterali QNAP, firewall e host. Emette un JSON privato con IP, byte, righe, marcatori e righe senza marcatori, mai il testo dei messaggi. Il risultato `measured` non classifica gli accessi AdS: il confronto con campioni reali e proprietari resta necessario. Script e sei prove POSIX sono nel repository, non sulla VM.
+`bin/ads-log-shape.py` legge il file di un giorno chiuso per ciascuna directory IPv4 immediata del mount AdS e conta solo marcatori letterali QNAP, firewall e host. Emette un JSON privato con IP, byte, righe, marcatori e righe senza marcatori, mai il testo dei messaggi. Il risultato `measured` non classifica gli accessi AdS: il confronto con campioni reali e proprietari resta necessario. Il lettore v2, con le varianti `SAMBA` e `Login OK`, è versionato in `be63c2c` ed è stato eseguito dall'operatore sulla VM il 04/11; sette prove POSIX sono verdi. La v2 riconosce un prefisso QNAP in tutte le 11.540 righe NAS del 03/11, senza attribuirne il ruolo.
 
 ## Preflight del volume AdS, 02/11/2026
 

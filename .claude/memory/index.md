@@ -1,5 +1,17 @@
 # Snapshot di sincronizzazione
 
+## Controllo delle fonti collegate, 04/11/2026
+
+Il collettore sorveglia otto file della rete e quattro del verificatore QA; la rete sorveglia otto file del collettore e quattro QA. Il confronto è sul contenuto, segnala sorgenti assenti e rami errati e non esegue operazioni Git remote. Claude Code ha un gancio all'apertura; Codex esegue la procedura di `CLAUDE.md` letta tramite `AGENTS.md`. Stato privato in `_notes/.contesto-collegato-state.json`, aggiornato solo dopo aver letto le variazioni. Il corpus condiviso conserva il controllo già proprio di `network-design`.
+
+## Schede tecniche verificate su `be63c2c`, 04/11/2026
+
+Le aree coperte da `STACK.md`, `deployment.md`, `design-and-security.md`, `dev-testing.md` e `current-work.md` sono state riconciliate sul codice del lettore v2 e del censimento del mount. Le cinque schede sono ancorate a `be63c2c`; il lavoro documentale corrente resta non committato. Il cambio NAS del 06/11 richiederà una nuova verifica del contesto di `D:/network-design` prima di modificare configurazione, topologia o filtri.
+
+## Seconda misura NAS e cambio pianificato, 04/11/2026
+
+Il lettore v2 versionato in `be63c2c` ha misurato sul giorno 03/11 gli stessi totali della v1 (7 file, 11.951 righe, 3.123.330 byte). Nei quattro NAS, 11.435 righe `conn log:` e 105 `event log:` coprono tutte le 11.540 righe per forma; 11.434 hanno `SAMBA`. Nessuna classificazione AdS discende da questo. `D:/network-design/.claude/context/roadmap.md` pianifica la sostituzione di NAS-INTRA venerdì 06/11; l'inventario va aggiornato dopo il montaggio, il collettore deve verificare continuità e nuova configurazione. D7, strict e lista AdS approvata aperti.
+
 ## Prima misura reale dei marcatori, 04/11/2026
 
 L'operatore ha eseguito `ads-log-shape.py` sul giorno chiuso 03/11: 11.951 righe e 3.123.330 byte in sette file. I NAS totalizzano 11.540 righe, di cui 11.507 senza i marcatori della prima versione. Il runbook NAS mostra le varianti `SAMBA` e `Login OK`, ora aggiunte al lettore per una seconda misura. La prima misura e la mappa degli IP sono nella ripresa privata. Nessuna classificazione AdS deriva dai conteggi; D7, strict e lista AdS approvata restano aperti.

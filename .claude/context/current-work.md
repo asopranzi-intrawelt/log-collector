@@ -9,11 +9,19 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 11bed4e
+last-verified-commit: be63c2c
 stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai punti 3 e 7; eventi iLO tecnici separati con ritenzione 90 giorni attiva; catena locale provata in WSL, non installata; D7 bloccato da nomina ed elenco AdS
 ---
 
 # Lavoro in corso
+
+## Fonti collegate al riavvio delle sessioni, 04/11/2026
+
+`data/contesto-collegato.json` dichiara le schede da sorvegliare in `D:/network-design` e `D:/intrawelt-qa-verifier`. `tools/verifica-progetti-collegati.py` confronta SHA-256, ramo e HEAD con una baseline privata in `_notes/`; il gancio `SessionStart` di Claude Code mostra i cambiamenti e la procedura in `CLAUDE.md` impone lo stesso controllo a Codex. La baseline si aggiorna con `--ack` solo dopo lettura e riconciliazione. La copia locale dei progetti è il perimetro del controllo: non effettua `fetch` né sostituisce il controllo del corpus documentale condiviso nella rete.
+
+## Seconda misura NAS e sostituzione in arrivo, 04/11/2026
+
+Il `chiudi` dell'utente ha pubblicato il lettore v2 (`be63c2c`). Sulla VM, il giorno chiuso 03/11 dà gli stessi totali della v1: 7 file, 11.951 righe, 3.123.330 byte. Le 11.540 righe NAS hanno tutte un prefisso `conn log:` o `event log:`; 11.434 contengono `SAMBA`. I prefissi non classificano accessi AdS. La roadmap aggiornata di `D:/network-design` attende venerdì 06/11 la sostituzione di NAS-INTRA. Prima del cambio conservare ultimo evento e identità del vecchio apparato; dopo, verificare formato, trasporto, ora, eventi amministrativi e continuità in archivio. Topologia solo dopo installazione. D7, strict e lista AdS approvata restano aperti.
 
 ## Misura NAS reale e secondo passaggio, 04/11/2026
 

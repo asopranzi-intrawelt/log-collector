@@ -1,5 +1,7 @@
 # Copertura degli accessi amministrativi dell'inventario di rete
 
+La seconda misura del giorno chiuso 03/11 riconosce la forma di tutte le 11.540 righe dei quattro NAS: 11.435 `conn log:` e 105 `event log:`, con 11.434 marcatori `SAMBA`. È copertura dei prefissi noti, non approvazione AdS degli eventi. NAS-INTRA sarà sostituito, con consegna attesa il 06/11 secondo la roadmap di `D:/network-design`; l'inventario cambia solo dopo l'installazione verificata. Il collaudo Syslog del nuovo NAS e il confronto con la baseline restano da eseguire.
+
 Misura del giorno chiuso 03/11: il lettore sul mount AdS ha contato 11.951 righe in sette file. Dei 11.540 messaggi dei quattro NAS, la prima versione del lettore non trovava marcatori in 11.507; i formati NAS già documentati rendono necessario ripetere la misura con i marcatori ampliati. Questo non modifica la classificazione dei nodi o la copertura AdS: i conteggi non distinguono ancora utenti, servizi e accessi amministrativi. Il dettaglio è nel runbook del componente 2.
 
 Sonda del 04/11: sei directory di rete e quella locale contengono file regolari modificati nella finestra delle ultime 48 ore; sono 21 file giornalieri in tutto. I sei mittenti di rete coincidono con quelli non configurati nei parametri AdS privati. La directory iLO vista il 02/11 non compare fra i file recenti; può essere semplicemente priva di accessi AdS nella finestra. Il riscontro riguarda metadati, non il contenuto dei messaggi o la copertura degli accessi. D7 e il filtro strict restano aperti.
