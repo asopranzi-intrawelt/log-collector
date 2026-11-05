@@ -1,5 +1,57 @@
 # Copertura degli accessi amministrativi dell'inventario di rete
 
+## Misure da portare all'incontro VA proposto per il 19/11/2026
+
+### Archivio osservato fino al 04/11/2026
+
+Il 05/11 l'operatore ha eseguito sulla VM il lettore dei soli metadati di `/srv/ads/`, con mount verificato e finestra dei sette giorni chiusi dal 29/10 al 04/11. L'output integrale, trascritto in JSON nel livello privato `_notes/lavoro-corrente/ads-archive-metadata-2026-11-04.json`, indica 23.184.988 byte di file giornalieri nella finestra. Sono dimensioni dei file conservati, non traffico di rete o conteggio degli eventi. La copia privata ha SHA-256 `22E6E66B80F9C8B67A439BCDD315F262A15ED6C31B3648A1D37CBD7750C72D2B`; l'impronta riguarda la trascrizione locale, non un file restituito dalla VM.
+
+| Sorgente | Primo file | Ultimo file | File fino al 04/11 | Giorni con file nella finestra | Byte nei sette giorni |
+|---|---|---|---:|---:|---:|
+| NAS-INTRA, prima della sostituzione | 02/10 | 04/11 | 34 | 7/7 | 15.026.510 |
+| NAS-INTRA3 | 06/10 | 04/11 | 30 | 7/7 | 7.482.539 |
+| Host Proxmox | 01/10 | 04/11 | 29 | 7/7 | 307.763 |
+| NAS-HERO | 02/10 | 04/11 | 34 | 7/7 | 206.889 |
+| Firewall LAN | 02/10 | 04/11 | 34 | 7/7 | 42.968 |
+| NAS-INTRA2 | 02/10 | 04/11 | 34 | 7/7 | 12.096 |
+| iLO | 07/10 | 08/10 | 2 | 0/7 | 0 |
+| Collettore locale | 01/10 | 04/11 | 15 | 5/7 | 106.223 |
+| **Totale finestra** | | | | | **23.184.988** |
+
+| Giorno chiuso | Byte conservati da tutte le sorgenti |
+|---|---:|
+| 29/10 | 3.752.619 |
+| 30/10 | 3.679.206 |
+| 31/10 | 2.094.685 |
+| 01/11 | 2.102.970 |
+| 02/11 | 3.811.484 |
+| 03/11 | 3.123.330 |
+| 04/11 | 4.620.694 |
+
+Sei sorgenti di rete hanno un file in ciascuno dei sette giorni; la directory iLO non ne ha e richiede un controllo del canale o della legittimità del silenzio. Le 34 date dal 02/10 al 04/11 sono continue per firewall e tre NAS; NAS-INTRA3 ha 30 date continue dal 06/10. L'host Proxmox ha 29 file su un intervallo di 35 giorni, il collettore locale 15 su 35; le date senza file vanno indagate prima di chiamarle perdite. Il primo file osservato nell'archivio è del 01/10, quindi la massima profondità documentata al 04/11 è un intervallo di 35 giorni. Questo **non** attesta una conservazione garantita di 35 giorni per tutte le sorgenti, la completezza degli eventi o il futuro obiettivo AdS di 213 giorni. La misura non include il deposito tecnico Seeweb né eventuali altri volumi.
+
+### Campione degli eventi del 03/11/2026
+
+La mail inviata a Onova il 05/11 chiede di presentarsi con numeri del collettore. La sola giornata chiusa 03/11, misurata sui file in `/srv/ads/`, dà questa fotografia. I byte sono dimensioni degli originali conservati, non byte di rete né media giornaliera; un file presente prova messaggi ricevuti in quella giornata, non completezza o identità AdS.
+
+| Sorgente | File 03/11 | Righe | Byte conservati |
+|---|---:|---:|---:|
+| NAS-INTRA, prima della sostituzione | 1 | 7.620 | 1.783.977 |
+| NAS-INTRA3 | 1 | 3.829 | 1.234.726 |
+| Host Proxmox | 1 | 344 | 57.462 |
+| NAS-HERO | 1 | 81 | 26.360 |
+| Firewall LAN | 1 | 56 | 15.488 |
+| NAS-INTRA2 | 1 | 10 | 3.624 |
+| Collettore locale | 1 | 11 | 1.693 |
+| iLO | 0 | 0 | 0 |
+| **Totale dei file presenti** | **7** | **11.951** | **3.123.330** |
+
+iLO ha consegnato eventi reali in altri giorni; zero file il 03/11 non dimostra che il canale sia guasto. Il ricevitore Seeweb è un deposito tecnico separato e non ha ancora un evento reale del fornitore. Il giorno misurato non rappresenta il ritmo abituale: NAS-INTRA è in sostituzione e il flusso NAS include molti accessi SMB ordinari, ancora da separare per D7. Non usare questi byte per dimensionare 213 giorni o per dichiarare copertura degli AdS.
+
+Il lettore `bin/ads-archive-metadata.py` legge **solo nomi e dimensioni** dei file giornalieri, richiede il mount di `/srv/ads` e un giorno finale già chiuso, rifiuta link e voci inattese. L'esecuzione del 05/11 ha usato `--through 2026-11-04 --days 7`. Per ogni sorgente produce primo e ultimo giorno con file, numero di file, intervallo di calendario, byte per giorno nella finestra e giorni senza file. Questi ultimi possono indicare silenzio legittimo: non sono automaticamente perdita. Un giorno completo dopo la sostituzione va confrontato separatamente con la baseline del vecchio NAS. La profondità osservata non è una prova della retention futura di 213 giorni, ancora da implementare per gli originali AdS; la ritenzione tecnica iLO di 90 giorni è un altro flusso. Registrare anche la configurazione e l'esito dei job di retention, se presenti, prima di riferire un periodo garantito.
+
+Le categorie **senza consegna AdS verificata** nella matrice seguente sono switch e AP Nebula, guest Windows e Linux oltre all'host, postazioni e loro applicazioni, multifunzione, UPS, apparati di impianto, apparati del provider e servizi cloud. Non equivale a dire che gli apparati non producano registri: per alcuni esiste un log locale o una API, ma nessun flusso al collettore è provato. L'elenco va riconciliato con la topologia aggiornata il giorno dell'incontro, in particolare dopo il cambio NAS e la verifica dell'AP esterno.
+
 La seconda misura del giorno chiuso 03/11 riconosce la forma di tutte le 11.540 righe dei quattro NAS: 11.435 `conn log:` e 105 `event log:`, con 11.434 marcatori `SAMBA`. È copertura dei prefissi noti, non approvazione AdS degli eventi. NAS-INTRA sarà sostituito, con consegna attesa il 06/11 secondo la roadmap di `D:/network-design`; l'inventario cambia solo dopo l'installazione verificata. Il collaudo Syslog del nuovo NAS e il confronto con la baseline restano da eseguire.
 
 Misura del giorno chiuso 03/11: il lettore sul mount AdS ha contato 11.951 righe in sette file. Dei 11.540 messaggi dei quattro NAS, la prima versione del lettore non trovava marcatori in 11.507; i formati NAS già documentati rendono necessario ripetere la misura con i marcatori ampliati. Questo non modifica la classificazione dei nodi o la copertura AdS: i conteggi non distinguono ancora utenti, servizi e accessi amministrativi. Il dettaglio è nel runbook del componente 2.

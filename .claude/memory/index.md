@@ -1,5 +1,17 @@
 # Snapshot di sincronizzazione
 
+## Misure per Onova, 05/11/2026
+
+Mail inviata dal referente e incontro del 19/11 proposto ma non confermato. La misura live dei metadati dal 29/10 al 04/11 conta 23.184.988 byte: sei sorgenti di rete con file 7/7 giorni, collettore locale 5/7, iLO 0/7. Primo file del deposito 01/10; 35 giorni sono la massima estensione osservata, non una retention garantita. Il JSON con indirizzi è privato, la matrice contiene la tabella pubblica e il campione eventi del 03/11. Categorie senza consegna distinte da apparati incapaci di generare log; ISO-30 aperto.
+
+## Preparativi del cambio NAS-INTRA, 05/11/2026
+
+README e sei screenshot dell'operatore conservati privatamente nella rete con copia verificata. Job Proxmox temporaneamente su NAS-HERO, archivi recenti visibili e un job QNAP HBS da ripristinare; spostati archivi storici e una cartella documentale. Prove di integrità e ripristino assenti; nuovo NAS non ancora installato. Fonte e limiti nel runbook NAS e nella NC-2026-01 di `D:/network-design`.
+
+## Comparatore NAS candidato, 05/11/2026
+
+Collettore `main` `f2dcaff` e rete `main` `3db3450` erano puliti dopo i due `chiudi`. Il nuovo comparatore locale legge report privati del lettore QNAP, verifica totali e giorni chiusi ai lati del cambio e mostra delta senza dichiarare un collaudo superato. Sei prove passano; la prova del giorno del cambio cade se si allenta il vincolo. Il JSON del 03/11 è ora acquisito e validato privatamente; per il confronto reale occorrono data e identità del NAS sostitutivo e un giorno completo successivo. D7, strict e ISO-30 restano aperti. La rete ha un worktree separato per `vzdump`, non toccato.
+
 ## Incroci QNAP misurati sul 03/11, 04/11/2026
 
 L’operatore ha eseguito il lettore con incroci sulla VM: 7.604 successi SMB e uno amministrativo su NAS-INTRA; 28 successi e 32 fallimenti SMB su INTRA3. Nei due NAS, i login marcati non sono senza contesto né sovrapposti. D7 e strict restano aperti: servono gli account AdS approvati e la decisione sui log SMB ordinari. Il NAS-INTRA sostitutivo è atteso il 06/11; ripetere la misura sul primo giorno completo.

@@ -6,10 +6,18 @@ covers-paths:
   - bin/**
   - config/**
   - pilot/monitoring-hub/**
-last-verified-commit: 82d4ee7
+last-verified-commit: f2dcaff
 ---
 
 # Design e sicurezza applicativa
+
+## Confine della misura di metadati, 05/11/2026
+
+`ads-archive-metadata.py` non legge contenuti, rifiuta radice simbolica, directory di sorgente simboliche, file non regolari, nomi inattesi e `lost+found` non vuota. I controlli di tipo e mount non sono atomici contro sostituzioni concorrenti del filesystem; il report richiede revisione. Gli indirizzi nel JSON restano nel livello privato. Primo e ultimo file osservati non dimostrano che tutti gli eventi siano arrivati o che i 213 giorni pianificati siano in esercizio.
+
+## Confine del comparatore NAS, 04/11/2026
+
+La CLI del confronto legge al massimo 1 MiB per report, valida date ISO, indirizzi IPv4, totali e conteggi non negativi e rifiuta sorgenti senza file utile. Non emette messaggi né account, ma restituisce gli IP delle due sorgenti: l'output resta privato. Anche `compared_requires_review` e zero avvisi non certificano l'identità dell'apparato, la completezza del flusso o il perimetro AdS. Il giorno della sostituzione e quello ancora aperto sono esclusi.
 
 ## Confine del controllo dei marcatori, 04/11/2026
 

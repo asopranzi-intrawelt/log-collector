@@ -1,5 +1,25 @@
 # Work-log
 
+## 2026-11-05 - Metadati live dell'archivio acquisiti
+
+L'operatore ha eseguito sulla VM `ads-archive-metadata.py` per sette giorni chiusi fino al 04/11. L'output riportato in chat, trascritto nel JSON privato con hash `22E6E66B80F9C8B67A439BCDD315F262A15ED6C31B3648A1D37CBD7750C72D2B`, conta 23.184.988 byte di file giornalieri. Sei sorgenti di rete hanno file ogni giorno della finestra; il collettore locale manca il 31/10 e il 01/11; iLO ha solo due file del 07-08/10 e nessuno nei sette giorni. Il primo file osservato è del 01/10 e l'ultimo del 04/11, ma non si certificano 35 giorni di retention continua per ogni sorgente, completezza AdS o 213 giorni garantiti. Aggiornati matrice, handoff, contesto e documenti della rete. **Template:** nessuna nuova lezione.
+
+## 2026-11-05 - Dossier di misura per il VA integrativo
+
+L'EML inviata a Onova il 05/11 propone il 19/11 in sede e richiede misure del collettore prima dell'incontro; il dettaglio e l'hash sono nella nota privata di `D:/network-design`. Preparata nella matrice la distribuzione reale del 03/11: sette file, 11.951 righe, 3.123.330 byte, con iLO senza file quel giorno e Seeweb tecnico senza campione reale. Un misuratore legge soltanto metadati dei file giornalieri, richiede mount sul percorso live e giorni chiusi; quattro prove mirate verdi, esecuzione sulla VM ancora attesa. Primo/ultimo file sono profondità osservata, non 213 giorni garantiti. Categorie senza consegna riconciliate con la matrice dei nodi. **Template:** catalogo interrogato, nessun pacchetto pertinente al misuratore specifico.
+
+## 2026-11-05 - Preparazione NAS-INTRA prima della sostituzione
+
+L'operatore ha consegnato un README e sei screenshot. I sette file sono stati copiati in `D:/network-design/_notes/backup/nas-intra-preparazione-20261105/` e confrontati con SHA-256 file per file. Lo screenshot Proxmox mostra i job abilitati su NAS-HERO; gli screenshot Explorer mostrano archivi recenti. Il README riferisce un job HBS ancora da ripristinare, cinque backup di VM non attive e un'immagine disco spostati sul deposito temporaneo, più una cartella documentale storica portata su OneDrive. Nessuna verifica di hash dei backup, apertura degli archivi o ripristino è nell'evidenza. Il nuovo NAS è previsto per il 06/11, non installato. Aggiornati runbook NAS, handoff, contesto e documenti della rete; D7 e strict invariati. **Template:** nessuna modifica richiesta.
+
+## 2026-11-05 - Baseline QNAP acquisita come JSON privato
+
+L’operatore ha eseguito il lettore v3 root-owned sulla VM per il giorno chiuso 03/11, ha copiato il JSON nel livello `_notes/` e ha riportato SHA-256 `0A5D7A1765D539D6F18AB900C965041A05F4AFB6AE6E8C46890D9D5B8866F102`. Verifica locale: impronta uguale, 4.991 byte, `measured`, sette file, 11.951 righe e 3.123.330 byte. Il comparatore candidato ha validato schema, totali e sorgente NAS-INTRA (`SCHEMA_OK`: 7.620 righe, un successo amministrativo e 7.604 successi SMB). Il file è ignorato da Git; nessun log grezzo o account è stato pubblicato. Resta il collaudo del NAS sostitutivo, non ancora installato. **Template:** nessuna.
+
+## 2026-11-05 - Comparatore NAS preparato per il passaggio
+
+Ricevuti i due `chiudi`: collettore `f2dcaff`, rete `3db3450`, alberi principali puliti alla ripresa. Il controllo delle fonti collegate segnalava soltanto il cambio degli HEAD; dopo la lettura le baseline private sono state aggiornate. Creato `bin/ads-log-shape-compare.py` per confrontare due report del lettore su giorni chiusi ai lati della sostituzione: verifica schema e totali, distingue file assente da zero, espone delta e avvisi senza produrre un verde di conformità. Sei prove unità e Ruff passano. Una mutazione del vincolo di data ha fatto cadere la prova del giorno parziale; ripristino verificato e suite nuovamente verde. Il primo test CLI su file temporanei è stato bloccato dal sandbox Windows; la prova usa ora report in memoria e le due directory temporanee vuote sono state rimosse dopo verifica del percorso. Aggiornati runbook, handoff e schede. Nessuna azione sulla VM o sul NAS. Nel frattempo è iniziato un allineamento template parallelo nei due repository, preservato. `chiudi -SoloControlli` del collettore è verde; nella rete i controlli tipografici falliscono su file del template non tracciati e sul worktree parallelo, mentre il diff limitato agli otto file NAS è pulito. **Template:** nessuna nuova lezione di questo intervento.
+
 ## 2026-11-04 - Incroci QNAP misurati sul giorno chiuso 03/11
 
 L’operatore ha eseguito sulla VM la versione con incroci: sette file, 11.951 righe, 3.123.330 byte. NAS-INTRA: 7.604 login riusciti SMB e uno amministrativo. INTRA3: 28 successi e 32 fallimenti SMB. Sui due NAS non emergono login marcati senza contesto o con doppio contesto. Registrato il risultato in runbook, handoff, schede e ripresa privata; la misura non attribuisce account AdS né chiude D7 o strict. **Template:** nessuna.

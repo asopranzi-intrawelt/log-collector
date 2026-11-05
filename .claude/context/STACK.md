@@ -8,14 +8,22 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 82d4ee7
+last-verified-commit: f2dcaff
 ---
 
 # Stack applicativo
 
+## Misura di profondità e volume AdS, 05/11/2026
+
+`bin/ads-archive-metadata.py` legge soltanto nomi e dimensioni dei file giornalieri sotto `/srv/ads`, senza aprire i log. Produce JSON per sorgente con primo e ultimo file, byte nella finestra e giorni senza file; non calcola una retention garantita. La finestra richiede un giorno finale chiuso. Serve al dossier dell'incontro VA proposto per il 19/11, insieme al lettore dei marcatori del 03/11 e alla matrice delle categorie senza consegna.
+
+## Confronto di due giorni NAS, 04/11/2026
+
+`bin/ads-log-shape-compare.py` legge due JSON privati del lettore, controlla totali e giorni interi ai lati della data di sostituzione e calcola delta per prefissi e incroci QNAP. Emette sempre `compared_requires_review` quando riesce: il codice non può verificare l'identità dell'apparato né sostituire i test amministrativi controllati. Non è stato eseguito con un report del NAS nuovo, ancora da installare.
+
 ## Incroci QNAP misurati, 04/11/2026
 
-`bin/ads-log-shape.py` conserva i marcatori indipendenti e aggiunge incroci per risorsa amministrativa, SMB/SAMBA e azione di login sulle righe `conn log:`. Otto prove POSIX e una CLI su mount temporaneo passano. La versione corrente, ancora da versionare, è stata eseguita manualmente sulla VM sul 03/11: 7.604 successi SMB e uno amministrativo su NAS-INTRA; 28 successi e 32 fallimenti SMB su INTRA3. Gli incroci separano i login marcati per contesto in quel giorno, senza classificare account AdS.
+`bin/ads-log-shape.py` conserva i marcatori indipendenti e aggiunge incroci per risorsa amministrativa, SMB/SAMBA e azione di login sulle righe `conn log:`. Otto prove POSIX e una CLI su mount temporaneo passano. La versione con incroci, versionata in `f2dcaff`, è stata eseguita manualmente sulla VM sul 03/11: 7.604 successi SMB e uno amministrativo su NAS-INTRA; 28 successi e 32 fallimenti SMB su INTRA3. Gli incroci separano i login marcati per contesto in quel giorno, senza classificare account AdS.
 
 ## Ricognizione dei marcatori dei log, 04/11/2026
 

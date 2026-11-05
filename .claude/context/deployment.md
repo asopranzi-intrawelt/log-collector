@@ -5,10 +5,18 @@ generated-date: 2026-09-30
 covers-paths:
   - config/**
   - docs/handoff-sviluppo-collettore.md
-last-verified-commit: 82d4ee7
+last-verified-commit: f2dcaff
 ---
 
 # Deployment
+
+## Misuratore di metadati per il dossier Onova, 05/11/2026
+
+Lo script nuovo è solo candidato nel repository, non installato sulla VM. Una copia temporanea verificata con SHA-256 può essere eseguita manualmente su `/srv/ads` con `sudo`, indicando un giorno chiuso; la CLI rifiuta il mount assente sul percorso live e non modifica file o servizi. Il JSON contiene indirizzi delle sorgenti e va conservato privatamente. Il dato del 03/11 è già disponibile, ma profondità e volumi su più giorni non sono ancora misurati.
+
+## Confronto NAS solo su report privati, 04/11/2026
+
+Il comparatore candidato gira localmente su due JSON già raccolti, senza connessione a NAS o VM. I file vanno tenuti in `_notes/`, ignorata da Git. Il report v3 del 03/11 è stato copiato il 05/11 in `_notes/` con impronta, data, totali e schema verificati; la copia remota nella home dell'operatore è stata creata con `umask 077`, ma i permessi effettivi non sono stati letti. Il nuovo report va prodotto su un giorno chiuso successivo alla data effettiva di sostituzione, con il medesimo lettore. Nessuna installazione o modifica di servizio è stata fatta in questo giro.
 
 ## Misura privata dei marcatori, 04/11/2026
 

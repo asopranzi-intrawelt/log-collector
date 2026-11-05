@@ -9,11 +9,23 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 82d4ee7
+last-verified-commit: f2dcaff
 stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai punti 3 e 7; eventi iLO tecnici separati con ritenzione 90 giorni attiva; catena locale provata in WSL, non installata; D7 bloccato da nomina ed elenco AdS
 ---
 
 # Lavoro in corso
+
+## Misure del collettore per l'incontro Onova, 05/11/2026
+
+La mail del 05/11, registrata privatamente in `D:/network-design`, propone il 19/11 e chiede sorgenti attive, volume giornaliero, profondità effettiva e categorie senza consegna. `docs/matrice-sorgenti-rete.md` riporta il campione del 03/11 (11.951 righe, 3.123.330 byte) e la misura live dei metadati dal 29/10 al 04/11: 23.184.988 byte conservati, sei sorgenti di rete con file ogni giorno, collettore locale 5/7 e iLO 0/7. Il primo file osservato è del 01/10, ma nessuna retention garantita di 213 giorni è attestata. Il JSON con indirizzi è privato in `_notes/lavoro-corrente/`; lo script ha quattro test mirati verdi. Seeweb tecnico non ha campione reale, D7 è aperto, NAS nuovo e M2 Onova ancora da collaudare o confermare.
+
+## Preparativi NAS-INTRA documentati nella rete, 05/11/2026
+
+Letti il README e sei screenshot consegnati dall'operatore; i sette originali sono copiati con hash coincidenti in `D:/network-design/_notes/backup/nas-intra-preparazione-20261105/`. Job Proxmox temporaneamente su NAS-HERO e archivi recenti visibili; un job QNAP HBS resta da ripristinare. Riferiti lo spostamento di cinque backup di VM non attive, di un'immagine disco di sviluppo e di una cartella storica. Le schermate non provano integrità, ripristino o completamento del job HBS. Il cambio dell'apparato è atteso il 06/11; identità, taglio e collaudo Syslog restano da acquisire. Dettaglio in `docs/runbook-componente-3-nas.md` e nella non conformità backup VM della rete.
+
+## Comparatore NAS prima del cambio, 04/11/2026
+
+Dopo i due `chiudi`, collettore `f2dcaff` e rete `3db3450` sono puliti. Il comparatore candidato legge due report privati di `ads-log-shape.py`, richiede un giorno chiuso prima e uno dopo la data effettiva del cambio e non trasforma i delta in un esito AdS. Sei prove pure passano; togliendo il vincolo sul giorno del cambio una prova cade, poi il file è stato ripristinato e la suite torna verde. Il report JSON originale del 03/11 è ora salvato privatamente e validato dal comparatore; mancano l'installazione del nuovo NAS e il primo giorno completo dopo il passaggio. Nessuna modifica sulla VM o sulla topologia.
 
 ## Incrocio dei login QNAP misurato sul 03/11, 04/11/2026
 

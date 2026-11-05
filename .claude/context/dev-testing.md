@@ -6,10 +6,18 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: 82d4ee7
+last-verified-commit: f2dcaff
 ---
 
 # Test di sviluppo
+
+## Prove del misuratore AdS, 05/11/2026
+
+Quattro test controllano byte e giorni senza file, rifiuto di un link al posto del log, mount mancante e giorno finale ancora aperto. Sulla macchina Windows sono passati fuori dalla sandbox, che impediva la pulizia delle directory temporanee: le quattro directory rimaste dal primo tentativo sono state rimosse dopo verifica del percorso. Ruff passa. Non è ancora una prova sulla VM, né una prova della retention a 213 giorni.
+
+## Prove del confronto NAS, 04/11/2026
+
+Sei prove usano lo schema prodotto da `ads-log-shape.py` e verificano delta, file assente, giorno di cambio non completo, giorno ancora aperto, avvisi di formato e rifiuto di totali incoerenti senza ristampare dati privati. Sostituendo temporaneamente `< cutover < after_day` con `<=` la prova del giorno parziale cade; il codice ripristinato supera di nuovo la suite. Il nuovo NAS non è stato misurato e nessun test sintetico dimostra continuità reale.
 
 ## Incroci QNAP provati e misurati, 04/11/2026
 
