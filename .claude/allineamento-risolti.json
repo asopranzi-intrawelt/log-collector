@@ -1,10 +1,14 @@
 {
   ".claude/templates/anonymization/tools/Test-Anonymization.py": {
-    "testa": "d66906f21aa26826ec6242b5a9f7c0a534b5b0f7",
-    "il": "2026-10-28"
+    "testa": "2a3c9b91bf25f7fce670fd1df0549ed740609c90",
+    "locale_sha256_lf": "8e3da96c7786ffec056800901e407b34956e2a6e0272e24798f8420fd09a81bc",
+    "il": "2026-11-05",
+    "motivo": "Delta pubblicato 3443d6c integrato e provato sui confini dei nomi; estensioni e cronaca locali conservate. La firma certifica il contenuto revisionato, non la parita di tutte le categorie."
   },
   "tools/Test-Anonymization.py": {
-    "testa": "d66906f21aa26826ec6242b5a9f7c0a534b5b0f7",
-    "il": "2026-10-28"
+    "testa": "2a3c9b91bf25f7fce670fd1df0549ed740609c90",
+    "locale_sha256_lf": "ed03828a9907839c725bfd903e641811af11e95ba18996fea8528510fb1c571a",
+    "il": "2026-11-05",
+    "motivo": "Delta pubblicato 3443d6c integrato e provato sui confini dei nomi; estensioni e cronaca locali conservate. La firma certifica il contenuto revisionato, non la parita di tutte le categorie."
   }
 }
