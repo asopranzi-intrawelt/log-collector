@@ -196,5 +196,20 @@ class LogShapeTests(unittest.TestCase):
         self.assertNotIn(str(self.root), output.getvalue())
 
 
+class LogShapeCliTests(unittest.TestCase):
+    def test_cli_refuses_open_day_before_scanning(self) -> None:
+        today = dt.date.today().isoformat()
+        output = io.StringIO()
+
+        with mock.patch.object(Path, "is_mount", return_value=True):
+            with mock.patch.object(shape, "scan", return_value={"status": "measured"}) as scan:
+                with contextlib.redirect_stdout(output):
+                    code = shape.main(["--ads-root", "/srv/ads", "--date", today])
+
+        self.assertEqual(code, 3)
+        self.assertEqual(json.loads(output.getvalue()), {"status": "measurement_failed"})
+        scan.assert_not_called()
+
+
 if __name__ == "__main__":
     unittest.main()

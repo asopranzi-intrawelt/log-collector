@@ -9,11 +9,15 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: c40aa35
+last-verified-commit: 0398479
 stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai punti 3 e 7; eventi iLO tecnici separati con ritenzione 90 giorni attiva; catena locale provata in WSL, non installata; D7 bloccato da nomina ed elenco AdS
 ---
 
 # Lavoro in corso
+
+## Report NAS prima del taglio, 05/11/2026
+
+Collettore `0398479` e rete `08cbc25` sono pubblicati e puliti. La versione candidata di `ads-log-shape.py` ora rifiuta il giorno corrente o futuro; la prova era rossa prima della correzione e verde dopo, e tutti i 15 casi NAS passano in WSL. Questa versione non è ancora sulla VM: prima del report del 05/11, da acquisire il 06/11 dopo la chiusura del giorno, servono trasferimento verificato e controllo di data e fuso del collettore. Il nuovo NAS e i suoi eventi amministrativi restano da collaudare; D7 e filtro strict restano fermi.
 
 ## Collaudo NAS e diagnosi iLO pronti, 05/11/2026
 

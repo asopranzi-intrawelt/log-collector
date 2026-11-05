@@ -6,10 +6,14 @@ covers-paths:
   - bin/**
   - config/**
   - pilot/monitoring-hub/**
-last-verified-commit: c40aa35
+last-verified-commit: 0398479
 ---
 
 # Design e sicurezza applicativa
+
+## Guardia contro i report parziali, 05/11/2026
+
+La CLI del lettore QNAP respinge il giorno locale corrente e le date future prima dell'apertura del mount. Questa scelta interna evita un report parziale dovuto alla lettura anticipata; dipende dall'orologio e dal fuso del sistema che esegue lo script e non attesta che tutti gli eventi del giorno chiuso siano arrivati. Il comparatore continua a richiedere il giorno successivo al taglio già chiuso.
 
 ## Confine della misura di metadati, 05/11/2026
 

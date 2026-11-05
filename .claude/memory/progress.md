@@ -1,5 +1,9 @@
 # Work-log
 
+## 2026-11-05 - Giorno aperto rifiutato dal lettore QNAP candidato
+
+Dopo i commit manuali `0398479` e `08cbc25` gli alberi sono puliti. Il controllo dei progetti collegati ha trovato HEAD nuovi ma contenuti sorvegliati invariati; letti il contesto della rete e l'HEAD QA, poi registrata la baseline privata. `ads-log-shape.py` accettava la data odierna e poteva produrre un report parziale per il confronto NAS. La nuova prova CLI era rossa prima (codice 0, scansione eseguita) e verde dopo (codice 3, scansione non chiamata); 15 prove passano in WSL. Aggiornati codice, test, runbook, matrice, cinque schede e indice. La copia VM resta precedente alla guardia, nessun host modificato. `date.today()` usa la data locale secondo la documentazione Python; data e fuso della VM richiedono verifica prima del trasferimento. **Template:** nessuna lezione nuova.
+
 ## 2026-11-05 - Metadati tecnici iLO misurati sulla VM
 
 L'operatore ha eseguito con `sudo` il lettore di soli metadati su `/var/log/ads-ilo-other` fino al 04/11. L'output trascritto nel JSON privato, SHA-256 `7CB42BDB6C748BE074FA3AAFBDBD63640BCD04F40A95619866DDE290A6EE209D`, conta 28 file dal 08/10 al 04/11, uno per data, e sette giorni su sette nella finestra 29/10-04/11 per 2.520 byte. La presenza dei file tecnici non valida la classificazione degli accessi Browser in AdS, che resta 0/7 nella stessa finestra; nessun contenuto è stato letto. Aggiornati runbook, matrice, handoff, contesto e rete; NAS e apparati invariati. **Template:** nessuna nuova lezione.

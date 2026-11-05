@@ -8,10 +8,14 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: c40aa35
+last-verified-commit: 0398479
 ---
 
 # Stack applicativo
+
+## Misura QNAP su giorno chiuso, 05/11/2026
+
+La CLI di `bin/ads-log-shape.py` rifiuta date uguali o successive alla data locale del sistema prima di aprire `/srv/ads`. `scan()` resta il lettore dei file e non assume che un report `measured` provi la completezza del flusso. La copia già trasferita sulla VM precede questa guardia.
 
 ## Misura di profondità e volume AdS, 05/11/2026
 

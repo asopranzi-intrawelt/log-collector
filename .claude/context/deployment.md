@@ -5,10 +5,14 @@ generated-date: 2026-09-30
 covers-paths:
   - config/**
   - docs/handoff-sviluppo-collettore.md
-last-verified-commit: c40aa35
+last-verified-commit: 0398479
 ---
 
 # Deployment
+
+## Lettore QNAP candidato per il taglio, 05/11/2026
+
+Il controllo del giorno chiuso è solo nel repository e nei test locali; le copie `ads-log-shape.py` già trasferite alla VM non sono state aggiornate. Il prossimo trasferimento richiede SHA-256 della nuova versione, percorso distinto e verifica della copia prima dell'esecuzione. Il lettore usa la data locale del sistema che lo esegue: verificare data e fuso della VM prima della misura del 05/11 e registrare l'output nel livello privato. Nessun servizio sulla VM è stato modificato.
 
 ## Misuratore di metadati per il dossier Onova, 05/11/2026
 

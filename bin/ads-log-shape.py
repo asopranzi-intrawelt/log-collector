@@ -174,8 +174,12 @@ def main(argv: list[str] | None = None) -> int:
     options = parser.parse_args(argv)
     try:
         day = dt.date.fromisoformat(options.date)
-        if day.isoformat() != options.date or not options.ads_root.is_mount():
-            raise ValueError("data o mount non valido")
+        if (
+            day.isoformat() != options.date
+            or day >= dt.date.today()
+            or not options.ads_root.is_mount()
+        ):
+            raise ValueError("data aperta o mount non valido")
         result = scan(options.ads_root, day)
     except (OSError, ValueError):
         result = {"status": "measurement_failed"}

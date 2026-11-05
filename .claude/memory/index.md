@@ -1,5 +1,9 @@
 # Snapshot di sincronizzazione
 
+## Report QNAP protetto dal giorno aperto, 05/11/2026
+
+L'utente ha pubblicato collettore `0398479` e rete `08cbc25`; entrambi coincidono con `origin/main` e gli alberi sono puliti. La verifica delle fonti collegate ha rilevato solo i nuovi HEAD, senza cambiamenti nei file sorvegliati di rete e QA; la baseline privata è stata aggiornata dopo la lettura. La CLI candidata del lettore QNAP ora rifiuta il giorno corrente e le date future. Il caso mirato era rosso sul codice precedente e verde dopo la correzione; 15 prove NAS passano in WSL. La nuova versione non è sulla VM. Prima del taglio del 06/11 servono data e fuso verificati, report del 05/11 e gate backup della NC-2026-01; dopo il taglio servono eventi controllati e il primo giorno intero del nuovo NAS. D7 e filtro strict restano aperti.
+
 ## Ripresa dopo i commit manuali, 05/11/2026
 
 Il collettore `main` `c40aa35` e la rete `main` `280e30f` coincidono con `origin/main`; restano modifiche non committate del template in entrambi gli alberi. Le cinque schede tecniche del collettore sono state rilette e ancorate a `c40aa35`; la scheda di deployment registra l'esecuzione live del misuratore. I runbook NAS e iLO precisano le prove del passaggio e la distinzione fra AdS e tecnico. La misura tecnica iLO ha 28 file dal 08/10 al 04/11 e 2.520 byte negli ultimi sette giorni, pur con AdS iLO 0/7: nessun silenzio completo del deposito tecnico nella finestra, login Browser recenti ancora da provare.

@@ -6,10 +6,14 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: c40aa35
+last-verified-commit: 0398479
 ---
 
 # Test di sviluppo
+
+## Giorno QNAP ancora aperto, 05/11/2026
+
+La prova CLI con mount simulato e scansione intercettata falliva sul codice precedente: restituiva `measured` per la data odierna. Dopo la guardia restituisce `measurement_failed` senza chiamare `scan()`. Su WSL i 15 casi di `test_log_shape.py` e `test_log_shape_compare.py` passano, compresi gli otto POSIX saltati su Windows. Ruff lint è verde; il format check segnala formattazioni preesistenti in entrambi i file, fuori dalle righe cambiate. Nessuna misura sulla VM con la nuova versione.
 
 ## Prove del misuratore AdS, 05/11/2026
 
