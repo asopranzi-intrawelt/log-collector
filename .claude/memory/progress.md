@@ -1,5 +1,13 @@
 # Work-log
 
+## 2026-11-05 - Metadati tecnici iLO misurati sulla VM
+
+L'operatore ha eseguito con `sudo` il lettore di soli metadati su `/var/log/ads-ilo-other` fino al 04/11. L'output trascritto nel JSON privato, SHA-256 `7CB42BDB6C748BE074FA3AAFBDBD63640BCD04F40A95619866DDE290A6EE209D`, conta 28 file dal 08/10 al 04/11, uno per data, e sette giorni su sette nella finestra 29/10-04/11 per 2.520 byte. La presenza dei file tecnici non valida la classificazione degli accessi Browser in AdS, che resta 0/7 nella stessa finestra; nessun contenuto è stato letto. Aggiornati runbook, matrice, handoff, contesto e rete; NAS e apparati invariati. **Template:** nessuna nuova lezione.
+
+## 2026-11-05 - Ripresa dopo i commit e preparazione del collaudo
+
+L'utente ha eseguito i comandi selettivi senza errori: HEAD locali e riferimenti `origin/main` coincidono su collettore `c40aa35` e rete `280e30f`. Il controllo di ripresa privato segnala il commit successivo alla vecchia impronta e il lavoro parallelo del template, preservato. Rilette le schede coperte dal codice e aggiornati i cinque `last-verified-commit` a `c40aa35`; corretto il deployment, che descriveva come ancora assente una misura live già acquisita. Il runbook NAS ora elenca le prove prima/dopo il taglio previsto il 06/11; il runbook iLO distingue AdS e deposito tecnico e attende la misura richiesta all'operatore. Il controllo completo del collettore è verde; quello della rete fallisce su limite delle istruzioni e correttori che attraversano file del template e del worktree parallelo, fuori dal perimetro NAS/iLO. Nessuna modifica a host o NAS. **Template:** nessuna nuova lezione.
+
 ## 2026-11-05 - Metadati live dell'archivio acquisiti
 
 L'operatore ha eseguito sulla VM `ads-archive-metadata.py` per sette giorni chiusi fino al 04/11. L'output riportato in chat, trascritto nel JSON privato con hash `22E6E66B80F9C8B67A439BCDD315F262A15ED6C31B3648A1D37CBD7750C72D2B`, conta 23.184.988 byte di file giornalieri. Sei sorgenti di rete hanno file ogni giorno della finestra; il collettore locale manca il 31/10 e il 01/11; iLO ha solo due file del 07-08/10 e nessuno nei sette giorni. Il primo file osservato è del 01/10 e l'ultimo del 04/11, ma non si certificano 35 giorni di retention continua per ogni sorgente, completezza AdS o 213 giorni garantiti. Aggiornati matrice, handoff, contesto e documenti della rete. **Template:** nessuna nuova lezione.

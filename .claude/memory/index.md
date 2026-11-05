@@ -1,5 +1,9 @@
 # Snapshot di sincronizzazione
 
+## Ripresa dopo i commit manuali, 05/11/2026
+
+Il collettore `main` `c40aa35` e la rete `main` `280e30f` coincidono con `origin/main`; restano modifiche non committate del template in entrambi gli alberi. Le cinque schede tecniche del collettore sono state rilette e ancorate a `c40aa35`; la scheda di deployment registra l'esecuzione live del misuratore. I runbook NAS e iLO precisano le prove del passaggio e la distinzione fra AdS e tecnico. La misura tecnica iLO ha 28 file dal 08/10 al 04/11 e 2.520 byte negli ultimi sette giorni, pur con AdS iLO 0/7: nessun silenzio completo del deposito tecnico nella finestra, login Browser recenti ancora da provare.
+
 ## Misure per Onova, 05/11/2026
 
 Mail inviata dal referente e incontro del 19/11 proposto ma non confermato. La misura live dei metadati dal 29/10 al 04/11 conta 23.184.988 byte: sei sorgenti di rete con file 7/7 giorni, collettore locale 5/7, iLO 0/7. Primo file del deposito 01/10; 35 giorni sono la massima estensione osservata, non una retention garantita. Il JSON con indirizzi è privato, la matrice contiene la tabella pubblica e il campione eventi del 03/11. Categorie senza consegna distinte da apparati incapaci di generare log; ISO-30 aperto.

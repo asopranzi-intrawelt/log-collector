@@ -1,5 +1,13 @@
 # Runbook del punto 3: i NAS QNAP come sorgente
 
+## Sequenza di collaudo per il cambio previsto il 06/11/2026
+
+Questa è la sequenza da eseguire quando l'operatore conferma il montaggio. Prima del taglio: acquisire identità del vecchio NAS, ora locale, indirizzo, ultimo file ricevuto e report di `ads-log-shape.py` su un giorno già chiuso, preferibilmente il 05/11 se disponibile. Il report del 03/11 già custodito privatamente resta il riferimento di riserva. Verificare nel progetto rete l'esito dei backup temporanei, lo spazio su NAS-HERO e la prova di ripristino prevista dalla NC-2026-01; i file visibili da Explorer non la sostituiscono.
+
+Al taglio registrare ora reale, identità hardware e indirizzo del nuovo NAS. Configurare NTP e invio Syslog secondo i valori approvati per i QNAP, poi produrre con un account di prova autorizzato un login amministrativo riuscito, uno fallito e un cambio di configurazione. Sul collettore verificare separatamente arrivo, sorgente, cinque campi `AdsLine`, ora dichiarata e categoria di ciascun evento; conservare i campioni minimizzati nel livello privato. Il fatto che il nuovo apparato riutilizzi l'indirizzo del vecchio non prova da sé continuità o identità.
+
+Sul primo giorno intero **successivo** al taglio, chiuso e senza sovrapposizione, acquisire un secondo report con lo stesso lettore e confrontarlo con `ads-log-shape-compare.py`, passando data reale del taglio e indirizzi effettivi. Il comparatore segnala differenze e lascia `compared_requires_review`; il collaudo passa solo dopo le prove controllate, la verifica dei backup e la decisione umana sul contenuto. Se manca il file giornaliero del nuovo NAS o un evento di prova, registrare il fallimento e non dichiarare il passaggio concluso. D7 e filtro strict restano subordinati all'elenco AdS approvato.
+
 ## Preparazione alla sostituzione di NAS-INTRA, 05/11/2026
 
 L'operatore riferisce che i job Proxmox sono stati ripuntati temporaneamente su NAS-HERO. Lo screenshot del pannello mostra dodici righe di pianificazione abilitate sulla destinazione temporanea, fra cui due esecuzioni per lo stesso guest; le schermate della cartella `dump` mostrano archivi recenti del 04 e 05/11. Questo documenta configurazione e presenza di file, non la riuscita di ogni job, la leggibilità degli archivi o una prova di ripristino. Resta inoltre un job QNAP Hybrid Backup Sync da ripristinare: il README privato ne riferisce la dipendenza da una credenziale disponibile all'operatore, ma la schermata allegata mostra solo una cartella e non permette di identificare o collaudare il job.

@@ -8,7 +8,7 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: f2dcaff
+last-verified-commit: c40aa35
 ---
 
 # Stack applicativo

@@ -9,11 +9,15 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: f2dcaff
+last-verified-commit: c40aa35
 stato: componenti 1 e 2 in esercizio; INTRA3 e iLO Remote Syslog collaudati ai punti 3 e 7; eventi iLO tecnici separati con ritenzione 90 giorni attiva; catena locale provata in WSL, non installata; D7 bloccato da nomina ed elenco AdS
 ---
 
 # Lavoro in corso
+
+## Collaudo NAS e diagnosi iLO pronti, 05/11/2026
+
+I due commit manuali sono ora `c40aa35` nel collettore e `280e30f` nella rete, entrambi al rispettivo `origin/main`. Il runbook NAS esplicita prove prima/dopo il taglio e il confronto del primo giorno intero del nuovo apparato; il runbook iLO separa il silenzio AdS dalla ricezione tecnica. La misura del deposito tecnico iLO fino al 04/11 trova 28 file giornalieri dal 08/10, presenti in tutti i sette giorni della finestra per 2.520 byte; il percorso AdS resta a zero file nella stessa finestra. Il flusso tecnico ha scritto in ogni giorno misurato, ma la ricezione recente dei login Browser richiede ancora un test controllato. La sostituzione del NAS è prevista per il 06/11 e resta da verificare; nessun apparato è stato modificato da questo giro. L'allineamento template parallelo rimane fuori dalla milestone.
 
 ## Misure del collettore per l'incontro Onova, 05/11/2026
 

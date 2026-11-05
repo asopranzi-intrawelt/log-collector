@@ -18,6 +18,8 @@ Il 05/11 l'operatore ha eseguito sulla VM il lettore dei soli metadati di `/srv/
 | Collettore locale | 01/10 | 04/11 | 15 | 5/7 | 106.223 |
 | **Totale finestra** | | | | | **23.184.988** |
 
+Il flusso **tecnico** iLO, separato da `/srv/ads/`, è stato misurato a parte il 05/11: `/var/log/ads-ilo-other/` contiene 28 file dal 08/10 al 04/11, uno per data, inclusi tutti i sette giorni della finestra 29/10-04/11; in questa finestra occupano 2.520 byte. Non sommare questi byte al totale AdS della tabella. Sono stati letti solo metadati: la presenza tecnica recente non prova la consegna dei login Browser nel percorso AdS. Output con indirizzo nel livello privato, SHA-256 della trascrizione `7CB42BDB6C748BE074FA3AAFBDBD63640BCD04F40A95619866DDE290A6EE209D`.
+
 | Giorno chiuso | Byte conservati da tutte le sorgenti |
 |---|---:|
 | 29/10 | 3.752.619 |
@@ -28,7 +30,7 @@ Il 05/11 l'operatore ha eseguito sulla VM il lettore dei soli metadati di `/srv/
 | 03/11 | 3.123.330 |
 | 04/11 | 4.620.694 |
 
-Sei sorgenti di rete hanno un file in ciascuno dei sette giorni; la directory iLO non ne ha e richiede un controllo del canale o della legittimità del silenzio. Le 34 date dal 02/10 al 04/11 sono continue per firewall e tre NAS; NAS-INTRA3 ha 30 date continue dal 06/10. L'host Proxmox ha 29 file su un intervallo di 35 giorni, il collettore locale 15 su 35; le date senza file vanno indagate prima di chiamarle perdite. Il primo file osservato nell'archivio è del 01/10, quindi la massima profondità documentata al 04/11 è un intervallo di 35 giorni. Questo **non** attesta una conservazione garantita di 35 giorni per tutte le sorgenti, la completezza degli eventi o il futuro obiettivo AdS di 213 giorni. La misura non include il deposito tecnico Seeweb né eventuali altri volumi.
+Sei sorgenti di rete hanno un file in ciascuno dei sette giorni; la directory iLO nel deposito AdS non ne ha e richiede un test dei login Browser prima di dedurre una perdita. Le 34 date dal 02/10 al 04/11 sono continue per firewall e tre NAS; NAS-INTRA3 ha 30 date continue dal 06/10. L'host Proxmox ha 29 file su un intervallo di 35 giorni, il collettore locale 15 su 35; le date senza file vanno indagate prima di chiamarle perdite. Il primo file osservato nell'archivio è del 01/10, quindi la massima profondità documentata al 04/11 è un intervallo di 35 giorni. Questo **non** attesta una conservazione garantita di 35 giorni per tutte le sorgenti, la completezza degli eventi o il futuro obiettivo AdS di 213 giorni. La misura non include il deposito tecnico Seeweb né eventuali altri volumi.
 
 ### Campione degli eventi del 03/11/2026
 

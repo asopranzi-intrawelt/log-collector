@@ -6,14 +6,14 @@ covers-paths:
   - tests/**
   - pilot/monitoring-hub/**
   - tools/read-seeweb-report.py
-last-verified-commit: f2dcaff
+last-verified-commit: c40aa35
 ---
 
 # Test di sviluppo
 
 ## Prove del misuratore AdS, 05/11/2026
 
-Quattro test controllano byte e giorni senza file, rifiuto di un link al posto del log, mount mancante e giorno finale ancora aperto. Sulla macchina Windows sono passati fuori dalla sandbox, che impediva la pulizia delle directory temporanee: le quattro directory rimaste dal primo tentativo sono state rimosse dopo verifica del percorso. Ruff passa. Non è ancora una prova sulla VM, né una prova della retention a 213 giorni.
+Quattro test controllano byte e giorni senza file, rifiuto di un link al posto del log, mount mancante e giorno finale ancora aperto. Sulla macchina Windows sono passati fuori dalla sandbox, che impediva la pulizia delle directory temporanee: le quattro directory rimaste dal primo tentativo sono state rimosse dopo verifica del percorso. Ruff passa. L'esecuzione manuale dello script sulla VM ha prodotto la misura reale dei metadati AdS e tecnici iLO fino al 04/11; né i test né queste misure attestano la retention futura o la classificazione dei login Browser recenti.
 
 ## Prove del confronto NAS, 04/11/2026
 

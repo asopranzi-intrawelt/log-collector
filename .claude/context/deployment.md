@@ -5,14 +5,14 @@ generated-date: 2026-09-30
 covers-paths:
   - config/**
   - docs/handoff-sviluppo-collettore.md
-last-verified-commit: f2dcaff
+last-verified-commit: c40aa35
 ---
 
 # Deployment
 
 ## Misuratore di metadati per il dossier Onova, 05/11/2026
 
-Lo script nuovo è solo candidato nel repository, non installato sulla VM. Una copia temporanea verificata con SHA-256 può essere eseguita manualmente su `/srv/ads` con `sudo`, indicando un giorno chiuso; la CLI rifiuta il mount assente sul percorso live e non modifica file o servizi. Il JSON contiene indirizzi delle sorgenti e va conservato privatamente. Il dato del 03/11 è già disponibile, ma profondità e volumi su più giorni non sono ancora misurati.
+Lo script è nel repository e una copia temporanea verificata con SHA-256 è stata eseguita manualmente sulla VM il 05/11, senza installazione permanente né modifica dei servizi. Ha letto `/srv/ads` con `sudo` fino al giorno chiuso 04/11 e restituito 23.184.988 byte di file in sette giorni, con primo file del deposito al 01/10. La CLI rifiuta il mount assente sul percorso live. Il JSON contiene indirizzi delle sorgenti ed è nel livello privato; questa profondità non certifica 213 giorni di retention futura. La stessa copia ha letto `/var/log/ads-ilo-other` e contato 28 file tecnici, uno per data dal 08/10 al 04/11, e 2.520 byte negli ultimi sette giorni chiusi; questo non dimostra la consegna dei login Browser al percorso AdS.
 
 ## Confronto NAS solo su report privati, 04/11/2026
 

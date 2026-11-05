@@ -1,5 +1,13 @@
 # Componente 4 - iLO 5: Remote Syslog e alternativa Redfish
 
+## Diagnosi del silenzio recente, 05/11/2026
+
+Il lettore dei metadati di `/srv/ads/` trova per iLO soltanto due file, del 07 e 08/10, e nessun file nei sette giorni chiusi 29/10-04/11. Gli accessi iLO sono eventi su richiesta: l'assenza del file AdS non dimostra da sola un guasto. Il flusso tecnico usa invece `/var/log/ads-ilo-other/<IP_ILO>/` ed è soggetto alla ritenzione locale di 90 giorni, distinta dall'obiettivo AdS di 213 giorni.
+
+Il 05/11 l'operatore ha eseguito il misuratore in sola lettura su `/var/log/ads-ilo-other/` fino al giorno chiuso 04/11. Il deposito tecnico ha 28 file giornalieri dal 08/10 al 04/11, uno per ciascuna data, e file in tutti i sette giorni 29/10-04/11: 2.520 byte complessivi, da 280 o 420 byte al giorno. L'output JSON con l'indirizzo della sorgente è trascritto in `_notes/lavoro-corrente/ads-ilo-technical-metadata-2026-11-04.json`, SHA-256 `7CB42BDB6C748BE074FA3AAFBDBD63640BCD04F40A95619866DDE290A6EE209D`; l'impronta è della trascrizione locale, non di un file scaricato dalla VM. Non è stato letto il contenuto degli eventi.
+
+La scrittura tecnica recente esclude il silenzio completo di questo deposito nella finestra misurata. Non prova che i login Browser vengano ancora consegnati e classificati nel percorso AdS, né verifica 90 giorni di conservazione futura. Se serve una prova puntuale del flusso dopo il cambio NAS, eseguire un solo test Syslog e un login Browser controllato, annotando gli orari e verificando separatamente i due percorsi sul collettore. Non generare test ripetuti o cambiare la configurazione durante il cambio NAS senza una finestra concordata.
+
 ## Stato
 
 Il codice del lettore IEL e le unità systemd sono preparati nel repository. La suite locale completa passa con 66 pytest il 2026-10-07; i file Python modificati passano `ruff check` e `ruff format --check`. Il controllo di anonimizzazione passa dopo aver distinto la chiave Redfish `Members@odata.nextLink` da un indirizzo email. Il collaudo punto 3 dell'handoff per iLO è **superato**: login web riusciti e un fallimento controllato sono stati ricevuti dal collettore con i cinque campi `AdsLine`. Dal 08/10 sono collaudati lo smistamento Browser/tecnico e la ritenzione tecnica di 90 giorni: timer attivo per le 03:00, primo service eseguito sotto systemd con `status=ok` e zero eliminati. La licenza osservata il 2026-10-07 è **iLO Advanced**; il lettore Redfish resta un'alternativa non installata.

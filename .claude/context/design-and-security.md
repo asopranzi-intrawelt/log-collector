@@ -6,7 +6,7 @@ covers-paths:
   - bin/**
   - config/**
   - pilot/monitoring-hub/**
-last-verified-commit: f2dcaff
+last-verified-commit: c40aa35
 ---
 
 # Design e sicurezza applicativa
